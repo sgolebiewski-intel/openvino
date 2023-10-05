@@ -55,6 +55,178 @@ body {
     border-color: rgb(var(--ost-color-primary));
 }
 
+/* Showcase Extension */
+
+:root {
+    /* Colors */
+    --ov-color: hsl(261, 87.2%, 54.1%);
+    --black: hsl(0, 0%, 0%);
+    --white: hsl(0, 0%, 100%);
+  }
+  .showcase-wrap {
+    width: fit-content;
+    display: inline-block;
+    margin: 10px;
+  
+  }
+  
+  .showcase-content-container h2, .showcase-content-container p {
+    margin: 0;
+  }
+  
+  .showcase-content-container h2 {
+    font-size: 1.25rem;
+    line-height: 1;
+    color: var(--white);
+  }
+  
+  .showcase-content-container p {
+    font-size: 0.8rem;
+    line-height: 1.2;
+    color: var(--white);
+    margin-top: 10px!important;
+  }
+  
+  
+  .showcase {
+    display: grid;
+    place-items: center;
+    width: 200px;
+    max-width: 200px;
+    height: 320px;
+    overflow: hidden;
+    border-radius: 0.625rem;
+    box-shadow: 0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
+  }
+  
+  .showcase > * {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+  }
+  
+  .showcase-img {
+    object-fit: cover;
+    max-width: 100%;
+    height: 100%;
+  }
+  
+  .showcase-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-self: flex-end;
+    height: 100%;
+    width: 200px;
+    padding: 0.3rem 0.30rem 1rem;
+    background: linear-gradient(
+      180deg,
+      hsla(0, 0%, 0%, 0) 0%,
+      hsla(0, 0%, 0%, 0.3) 10%,
+      hsl(0, 0%, 0%) 100%
+    );
+  }
+  
+  .showcase-title {
+    position: relative;
+    width: fit-content;
+    width: -moz-fit-content;
+    margin-bottom: 15px!important;
+  }
+  
+  .showcase-title::after {
+    content: "";
+    position: absolute;
+    height: 0.25rem;
+    width: 200px;
+    bottom: calc((1.25rem - 0.5rem) * -1);
+    left: -1rem;
+    background-color: var(--ov-color);
+  }
+  .showcase-badge {
+    margin-right: 3px;
+  }
+  .showcase-button {
+    padding: 0.15em 1em;
+    width: 90%;
+    font-weight: normal;
+    border-radius: 25px;
+    border: none;
+    background-color: var(--ov-color);
+    font-size: 1.25rem;
+    color: var(--white);
+  }
+  
+  .showcase-button:focus {
+    outline: 2px solid black;
+    outline-offset: -5px;
+  }
+  
+  @media (any-hover: hover) and (any-pointer: fine) {
+    .showcase-content {
+      transform: translateY(62%);
+      transition: transform 500ms ease-out;
+      transition-delay: 500ms;
+    }
+  
+    .showcase-title::after {
+      opacity: 0;
+      transform: scaleX(0);
+      transition: opacity 1000ms ease-in, transform 500ms ease-out;
+      transition-delay: 500ms;
+      transform-origin: right;
+    }
+  
+    .showcase-img {
+      transition: transform 500ms ease-in;
+    }
+  
+    .showcase-content-container > :not(.showcase-title),
+    .showcase-button {
+      opacity: 0;
+      transition: transform 500ms ease-out, opacity 500ms ease-out;
+    }
+  
+    .showcase:hover,
+    .showcase:focus-within {
+      transform: scale(1.05);
+      transition: transform 500ms ease-in;
+    }
+  
+    .showcase:hover .showcase-content,
+    .showcase:focus-within .showcase-content {
+      transform: translateY(0);
+      transition: transform 500ms ease-in;
+    }
+  
+    .showcase:focus-within .showcase-content {
+      transition-duration: 0ms;
+    }
+  
+    .showcase:hover .showcase-img,
+    .showcase:focus-within .showcase-img {
+      transform: scale(1.3);
+    }
+  
+    .showcase:hover .showcase-content-container > :not(.showcase-title),
+    .showcase:hover .showcase-button,
+    .showcase:focus-within .showcase-content-container > :not(.showcase-title),
+    .showcase:focus-within .showcase-button {
+      opacity: 1;
+      transition: opacity 500ms ease-in;
+      transition-delay: 1000ms;
+    }
+  
+    .showcase:hover .showcase-title::after,
+    .showcase:focus-within .showcase-title::after {
+      opacity: 1;
+      transform: scaleX(1);
+      transform-origin: left;
+      transition: opacity 500ms ease-in, transform 500ms ease-in;
+      transition-delay: 500ms;
+    }
+  }
+  
+
 /* Scrollbox Extension */
 
 .scrollbox {
