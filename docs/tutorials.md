@@ -247,13 +247,13 @@ The Jupyter notebooks are categorized into following classes:
 
          .. showcase::
             :title: 214-grammar-correction
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Grammatical error correction with OpenVINO.
 
          .. showcase::
             :title: 216-attention-center
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             The attention center model with OpenVINO™
 
@@ -265,7 +265,7 @@ The Jupyter notebooks are categorized into following classes:
 
          .. showcase::
             :title: 219-knowledge-graphs-conve
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Optimize the knowledge graph embeddings model (ConvE) with OpenVINO.
 
@@ -277,7 +277,7 @@ The Jupyter notebooks are categorized into following classes:
 
          .. showcase::
             :title: 221-machine-translation
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Real-time translation from English to German.
 
@@ -403,7 +403,7 @@ The Jupyter notebooks are categorized into following classes:
 
          .. showcase::
             :title: 244-named-entity-recognition
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Named entity recognition with OpenVINO™.
 
@@ -421,7 +421,7 @@ The Jupyter notebooks are categorized into following classes:
 
          .. showcase::
             :title: 247-code-language-id
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Identify the programming language used in an arbitrary code snippet.
 
@@ -433,7 +433,7 @@ The Jupyter notebooks are categorized into following classes:
 
          .. showcase::
             :title: 252-fastcomposer-image-generation
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Image generation with FastComposer and OpenVINO™.
 
@@ -456,7 +456,7 @@ The Jupyter notebooks are categorized into following classes:
 
       .. showcase::
          :title: 002-openvino-api
-         :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+         :img: _static/images/openvino_notebooks_thumbnail.png
 
          Learn the OpenVINO Python API.
 
@@ -487,19 +487,19 @@ The Jupyter notebooks are categorized into following classes:
 
       .. showcase::
          :title: 102-pytorch-to-openvino
-         :img: https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png
+         :img: _static/images/openvino_notebooks_thumbnail.png
 
          Convert PyTorch models to OpenVINO IR.
 
       .. showcase::
          :title: 103-paddle-onnx-to-openvino
-         :img: https://user-images.githubusercontent.com/15709723/127779326-dc14653f-a960-4877-b529-86908a6f2a61.png
+         :img: _static/images/openvino_notebooks_thumbnail.png
 
          Convert PaddlePaddle models to OpenVINO IR.
 
       .. showcase::
          :title: 121-convert-to-openvino
-         :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+         :img: _static/images/openvino_notebooks_thumbnail.png
 
          Learn OpenVINO model conversion API.
 
@@ -508,133 +508,133 @@ The Jupyter notebooks are categorized into following classes:
 
          .. showcase::
             :title: 102-pytorch-onnx-to-openvino
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Convert PyTorch models to OpenVINO IR.
 
          .. showcase::
             :title: 104-model-tools
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Download, convert and benchmark models from Open Model Zoo.
 
          .. showcase::
             :title: 105-language-quantize-bert
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Optimize and quantize a pre-trained BERT model.
 
          .. showcase::
             :title: 106-auto-device
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Demonstrates how to use AUTO Device.
 
          .. showcase::
             :title: 107-speech-recognition-quantization-data2vec
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Optimize and quantize a pre-trained Data2Vec speech model.
 
          .. showcase::
             :title: 107-speech-recognition-quantization-wav2vec2
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Optimize and quantize a pre-trained Wav2Vec2 speech model.
 
          .. showcase::
             :title: 108-gpu-device
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Working with GPUs in OpenVINO™
 
          .. showcase::
             :title: 109-latency-tricks
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Performance tricks for latency mode in OpenVINO™.
 
          .. showcase::
             :title: 109-throughput-tricks
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Performance tricks for throughput mode in OpenVINO™.
 
          .. showcase::
             :title: 110-ct-scan-live-inference
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Live inference of a kidney segmentation model and benchmark CT-scan data with OpenVINO.
 
          .. showcase::
             :title: 110-ct-segmentation-quantize-nncf
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Quantize a kidney segmentation model and show live inference.
 
          .. showcase::
             :title: 111-yolov5-quantization-migration
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Migrate YOLOv5 POT API based quantization pipeline on Neural Network Compression Framework (NNCF).
 
          .. showcase::
             :title: 112-pytorch-post-training-quantization-nncf
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Use Neural Network Compression Framework (NNCF) to quantize PyTorch model in post-training mode (without model fine-tuning).
 
          .. showcase::
             :title: 113-image-classification-quantization
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Quantize MobileNet image classification.
 
          .. showcase::
             :title: 115-async-api
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Use asynchronous execution to improve data pipelining.
 
          .. showcase::
             :title: 116-sparsity-optimization
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Improve performance of sparse Transformer models.
 
          .. showcase::
             :title: 117-model-server
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Improve performance of sparse Transformer models.
 
          .. showcase::
             :title: 118-optimize-preprocessing
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Improve performance of image preprocessing step.
 
          .. showcase::
             :title: 119-tflite-to-openvino
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Convert TensorFlow Lite models to OpenVINO IR.
 
          .. showcase::
             :title: 120-tensorflow-object-detection-to-openvino
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Convert TensorFlow Object Detection models to OpenVINO IR.
 
          .. showcase::
             :title: 122-speech-recognition-quantization-wav2vec2
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Quantize Speech Recognition Models with accuracy control using NNCF PTQ API.
 
          .. showcase::
             :title: 122-yolov8-quantization-with-accuracy-control
-            :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+            :img: _static/images/openvino_notebooks_thumbnail.png
 
             Convert and Optimize YOLOv8 with OpenVINO™.
 
@@ -651,19 +651,19 @@ The Jupyter notebooks are categorized into following classes:
 
       .. showcase::
          :title: 301-tensorflow-training-openvino-nncf
-         :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+         :img: _static/images/openvino_notebooks_thumbnail.png
 
          Use Neural Network Compression Framework (NNCF) to quantize model from TensorFlow
 
       .. showcase::
          :title: 302-pytorch-quantization-aware-training
-         :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+         :img: _static/images/openvino_notebooks_thumbnail.png
 
          Use Neural Network Compression Framework (NNCF) to quantize PyTorch model.
 
       .. showcase::
          :title: 305-tensorflow-quantization-aware-training
-         :img: https://user-images.githubusercontent.com/15709723/127787560-d8ec4d92-b4a0-411f-84aa-007e90faba98.png
+         :img: _static/images/openvino_notebooks_thumbnail.png
 
          Use Neural Network Compression Framework (NNCF) to quantize TensorFlow model.
 
