@@ -7,6 +7,10 @@ from typing import List, Tuple
 from docutils.nodes import Node
 from docutils import nodes
 from sphinx.util import parselinenos
+import requests
+from bs4 import BeautifulSoup as bS
+import json
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -133,14 +137,50 @@ class Scrollbox(Directive):
             self.state.nested_parse(self.content, self.content_offset, node)
         return [node]
 
+
+def fetch_binder_list(file) -> list:
+    with open(file, 'r+', encoding='cp437') as file:
+        list_of_buttons = file.read().splitlines()
+    return list_of_buttons
+
+
+def fetch_colab_list(file) -> list:
+        with open(file, 'r+', encoding='cp437') as file:
+            list_of_cbuttons = file.read().splitlines()
+        return list_of_cbuttons
+
 def visit_showcase(self, node):
     attrs = {}
-    notebooks_repo = "https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/"
+    notebooks_repo = "https://github.com/openvinotoolkit/openvino_notebooks/blob/main/"
     notebooks_binder = "https://mybinder.org/v2/gh/openvinotoolkit/openvino_notebooks/HEAD?filepath=notebooks%2F"
-    notebooks_colab = "https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/notebooks/"
+    notebooks_colab = "https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/main/"
     git_badge = "<img class='showcase-badge' src='https://badgen.net/badge/icon/github?icon=github&amp;label' alt='Github'>"
     binder_badge = "<img class='showcase-badge' src='https://mybinder.org/badge_logo.svg' alt='Binder'>"
     colab_badge = "<img class='showcase-badge' src='https://camo.githubusercontent.com/84f0493939e0c4de4e6dbe113251b4bfb5353e57134ffd9fcab6b8714514d4d1/68747470733a2f2f636f6c61622e72657365617263682e676f6f676c652e636f6d2f6173736574732f636f6c61622d62616467652e737667' alt='Colab'>"
+    parent_repo_name = "openvinotoolkit"
+    notebooks_repo_link = "openvino_notebooks"
+    github_api_link = "https://api.github.com/repos/{}/{}/git/trees/main?recursive=1".format(parent_repo_name,
+                                                                                             notebooks_repo_link)
+    doc_dir = os.path.abspath(
+        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
+    notebooks_dir = "\\notebooks\\"
+    binder_list_file = "notebooks_with_binder_buttons.txt"
+    colab_list_file = "notebooks_with_colab_buttons.txt"
+    # jsonfile = doc_dir + notebooks_dir + "main.json"
+    binder_path = doc_dir + notebooks_dir + binder_list_file
+    colab_path = doc_dir + notebooks_dir + colab_list_file
+    binder_buttons_list = fetch_binder_list(binder_path)
+    colab_buttons_list = fetch_colab_list(colab_path)
+    result = requests.get(github_api_link)
+    # result = open(jsonfile, 'r').read()
+    parse_tree = bS(result.text, 'html.parser')
+    # parse_tree = bS(result, 'html.parser')
+    paths_list = json.loads(parse_tree.text)
+    list_all_paths = [p.get('path') for p in paths_list['tree'] if p.get('path')]
+    ipynb_ext = re.compile(".*\\.ipynb")
+    ipynb_list = list(filter(ipynb_ext.match, list_all_paths))
+    notebook_with_ext = node["title"] + ".ipynb"
+    matched_notebook = [match for match in ipynb_list if notebook_with_ext in match]
 
     if "height" or "width" in node:
         attrs["style"] = (
@@ -150,11 +190,18 @@ def visit_showcase(self, node):
         )
     self.body.append("<div class='showcase-wrap'>")
     self.body.append(self.starttag(node, "div", **attrs))
-    self.body.append(("<img " + (" class='" + (node["img-class"] + " showcase-img' ") if 'img-class' in node is not None else " class='showcase-img'") + "src='" + node["img"] + "' alt='"+os.path.basename(node["img"])+"' />") if "img" in node is not None else "")
+    self.body.append(("<div class='showcase-img-placeholder'><img " + (" class='" + (node["img-class"] + " showcase-img' ") if 'img-class' in node is not None else " class='showcase-img'") + "src='" + node["img"] + "' alt='"+os.path.basename(node["img"])+"' /></div>") if "img" in node is not None else "")
     self.body.append(("<div class='showcase-content'><div class='showcase-content-container'><h2 class='showcase-title'>" + node["title"] + "</h2>") if 'title' in node is not None else "")
-    self.body.append(("<a href='" + notebooks_repo + node["title"] + "/" + node["title"] + ".ipynb' target='_blank'>" + git_badge + "</a>") if 'title' in node is not None else "")
-    self.body.append(("<a href='" + notebooks_binder + node["title"] + "%2F" + node["title"] + ".ipynb' target='_blank'>" + binder_badge + "</a>") if 'title' in node is not None else "")
-    self.body.append(("<a href='" + notebooks_colab + node["title"] + "/" + node["title"] + ".ipynb' target='_blank'>" + colab_badge + "</a>") if 'title' in node is not None else "")
+
+    if matched_notebook is not None:
+        for n in matched_notebook:
+            self.body.append(("<a href='" + notebooks_repo + n + "' target='_blank'>" + git_badge + "</a>") if 'title' in node is not None else "")
+            if node["title"] in binder_buttons_list:
+                self.body.append(("<a href='" + notebooks_binder + n + "' target='_blank'>" + binder_badge + "</a>"
+                                  ) if 'title' in node is not None else "")
+            if node["title"] in colab_buttons_list:
+                self.body.append(("<a href='" + notebooks_colab + n + "' target='_blank'>" + colab_badge + "</a>"
+                                  ) if 'title' in node is not None else "")
 
 
 def depart_showcase(self, node):
