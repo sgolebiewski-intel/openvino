@@ -163,8 +163,8 @@ def visit_showcase(self, node):
     github_api_link = "https://api.github.com/repos/{}/{}/git/trees/main?recursive=1".format(parent_repo_name,
                                                                                              notebooks_repo_link)
     #doc_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
-    binder_path = Path('../../../docs/notebooks/notebooks_with_binder_buttons.txt').resolve(strict=True)
-    colab_path = Path('../../../docs/notebooks/notebooks_with_colab_buttons.txt').resolve(strict=True)
+    binder_path = Path('../../../notebooks/notebooks_with_binder_buttons.txt').resolve(strict=True)
+    colab_path = Path('../../../notebooks/notebooks_with_colab_buttons.txt').resolve(strict=True)
     #notebooks_dir = "/notebooks/"
     #binder_list_file = "notebooks_with_binder_buttons.txt"
     #colab_list_file = "notebooks_with_colab_buttons.txt"
