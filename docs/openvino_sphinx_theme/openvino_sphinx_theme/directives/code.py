@@ -1,4 +1,7 @@
 import os.path
+import requests
+import json
+import re
 
 from sphinx.directives.code import LiteralInclude, LiteralIncludeReader, container_wrapper
 from sphinx.util import logging
@@ -7,10 +10,8 @@ from typing import List, Tuple
 from docutils.nodes import Node
 from docutils import nodes
 from sphinx.util import parselinenos
-import requests
+from pathlib import Path
 from bs4 import BeautifulSoup as bS
-import json
-import re
 
 logger = logging.getLogger(__name__)
 
@@ -161,14 +162,15 @@ def visit_showcase(self, node):
     notebooks_repo_link = "openvino_notebooks"
     github_api_link = "https://api.github.com/repos/{}/{}/git/trees/main?recursive=1".format(parent_repo_name,
                                                                                              notebooks_repo_link)
-    doc_dir = os.path.abspath(
-        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
-    notebooks_dir = "\\notebooks\\"
-    binder_list_file = "notebooks_with_binder_buttons.txt"
-    colab_list_file = "notebooks_with_colab_buttons.txt"
+    #doc_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
+    binder_path = Path('../../../../docs/notebooks/notebooks_with_binder_buttons.txt').resolve(strict=True)
+    colab_path = Path('../../../../docs/notebooks/notebooks_with_colab_buttons.txt').resolve(strict=True)
+    #notebooks_dir = "/notebooks/"
+    #binder_list_file = "notebooks_with_binder_buttons.txt"
+    #colab_list_file = "notebooks_with_colab_buttons.txt"
     # jsonfile = doc_dir + notebooks_dir + "main.json"
-    binder_path = doc_dir + notebooks_dir + binder_list_file
-    colab_path = doc_dir + notebooks_dir + colab_list_file
+    #binder_path = doc_dir + notebooks_dir + binder_list_file
+    #colab_path = doc_dir + notebooks_dir + colab_list_file
     binder_buttons_list = fetch_binder_list(binder_path)
     colab_buttons_list = fetch_colab_list(colab_path)
     result = requests.get(github_api_link)
