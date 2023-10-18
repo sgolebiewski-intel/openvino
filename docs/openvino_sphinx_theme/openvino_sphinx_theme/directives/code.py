@@ -160,8 +160,7 @@ def visit_showcase(self, node):
     colab_badge = "<img class='showcase-badge' src='https://camo.githubusercontent.com/84f0493939e0c4de4e6dbe113251b4bfb5353e57134ffd9fcab6b8714514d4d1/68747470733a2f2f636f6c61622e72657365617263682e676f6f676c652e636f6d2f6173736574732f636f6c61622d62616467652e737667' alt='Colab'>"
     parent_repo_name = "openvinotoolkit"
     notebooks_repo_link = "openvino_notebooks"
-    github_api_link = "https://api.github.com/repos/{}/{}/git/trees/main?recursive=1".format(parent_repo_name,
-                                                                                             notebooks_repo_link)
+    github_api_link = "https://api.github.com/repos/{}/{}/git/trees/main?recursive=1".format(parent_repo_name, notebooks_repo_link)
     #doc_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
     binder_path = Path('../../../notebooks/notebooks_with_binder_buttons.txt').resolve(strict=True)
     colab_path = Path('../../../notebooks/notebooks_with_colab_buttons.txt').resolve(strict=True)
