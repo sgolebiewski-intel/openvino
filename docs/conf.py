@@ -14,6 +14,7 @@ import os
 import sys
 import json
 import shutil
+import time
 from sphinx.util import logging
 from json import JSONDecodeError
 from sphinx.ext.autodoc import ClassDocumenter
@@ -193,7 +194,8 @@ def replace_index_with_redirect(app,exception):
     shutil.copy("../../../docs/index.html","../_build/index.html")
 
 def replace_design_tabs_script(app, exception):
-    shutil.copy("../../../docs/_static/design-tabs.js","../_build/_static/design-tabs.js")
+    os.makedirs(os.environ['SPHINX_OUTPUT'] +"/_static")
+    shutil.copy(os.environ['OPENVINO_ROOT_DIR'] + "/docs/_static/design-tabs.js", os.environ['SPHINX_OUTPUT'] +"/_static/design-tabs.js")
 
 
 def setup(app):
@@ -203,7 +205,7 @@ def setup(app):
     app.add_config_value('repositories', repositories, rebuild=True)
     app.connect('autodoc-skip-member', autodoc_skip_member)
     app.connect('build-finished',replace_index_with_redirect)
-    app.connect('build-finished', replace_design_tabs_script)
+    #app.connect('build-finished', replace_design_tabs_script)
     app.add_js_file('js/custom.js')
     app.add_js_file('js/graphs.js')
     app.add_js_file('js/newsletter.js')
