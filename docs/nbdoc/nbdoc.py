@@ -70,7 +70,7 @@ def add_glob_directive():
     """This function modifies toctrees of the five node articles in tutorials 
        section. It adds the notebooks found in docs/notebooks directory to the menu.
     """
-    tutorials_path = Path('../../docs/articles_en/learn_openvino/tutorials').resolve(strict=True)
+    tutorials_path = Path('../../../docs/articles_en/learn_openvino/tutorials').resolve(strict=True)
     tutorials_files = [x for x in os.listdir(tutorials_path) if re.match("notebooks_section_[0-9]{1}\.", x)]
     for tutorials_file in tutorials_files:
         file_name = os.path.join(tutorials_path, tutorials_file)
