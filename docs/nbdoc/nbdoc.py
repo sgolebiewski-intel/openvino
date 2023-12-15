@@ -79,7 +79,7 @@ def add_glob_directive():
             read_file = section_file.read()
             if ':glob:' not in read_file:
                 add_glob = read_file\
-                    .replace(":hidden:\n", ":hidden:\n   :glob:\n   :reversed:\n\n   ../../../notebooks/" + section_number +"*\n")
+                    .replace(":hidden:\n", ":hidden:\n   :glob:\n   :reversed:\n\n   ../../../../docs/notebooks/" + section_number +"*\n")
                 section_file.seek(0)
                 section_file.write(add_glob)
                 section_file.truncate()
