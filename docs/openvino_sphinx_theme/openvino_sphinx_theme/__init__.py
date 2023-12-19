@@ -5,11 +5,14 @@ from json import JSONDecodeError
 from sphinx.errors import ExtensionError
 import jinja2
 from docutils.parsers import rst
+from docutils.parsers.rst import roles
+from docutils import nodes
 from pathlib import Path
 from bs4 import BeautifulSoup
 from sphinx.util import logging
 from pydata_sphinx_theme import index_toctree
 from .directives.code import DoxygenSnippet, Scrollbox, Nodescrollbox, visit_scrollbox, depart_scrollbox, Showcase, Nodeshowcase, visit_showcase, depart_showcase
+import re
 
 SPHINX_LOGGER = logging.getLogger(__name__)
 
@@ -206,6 +209,22 @@ def read_doxygen_configs(app, env, docnames):
                 app.config.html_context['doxygen_mapping_file'] = json.load(f)
         except (JSONDecodeError, FileNotFoundError):
             app.config.html_context['doxygen_mapping_file'] = dict()
+
+
+def gitref_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
+    repo_link = 'https://github.com/openvinotoolkit/openvino'
+    branch_name = 'master'
+    if not branch_name:
+        raise Exception("This is neither a valid branch name nor any repository.", branch_name)
+    repo_path = '{}/blob/{}/%s'.format(repo_link, branch_name)
+    title_only = re.compile("<.*?>")
+    title = title_only.sub('', text)
+    path = text[text.find("<")+1:text.find(">")]
+    url = repo_path % (path,)
+    node = nodes.reference(rawtext, title, refuri=url, **options)
+    return [node], []
+
+roles.register_canonical_role('gitref', gitref_role)
 
 
 def setup(app):
