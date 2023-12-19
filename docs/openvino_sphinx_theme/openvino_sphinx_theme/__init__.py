@@ -5,11 +5,13 @@ from json import JSONDecodeError
 from sphinx.errors import ExtensionError
 import jinja2
 from docutils.parsers import rst
+from docutils import nodes
 from pathlib import Path
 from bs4 import BeautifulSoup
 from sphinx.util import logging
 from pydata_sphinx_theme import index_toctree
 from .directives.code import DoxygenSnippet, Scrollbox, Nodescrollbox, visit_scrollbox, depart_scrollbox, Showcase, Nodeshowcase, visit_showcase, depart_showcase
+import subprocess
 
 SPHINX_LOGGER = logging.getLogger(__name__)
 
@@ -208,6 +210,25 @@ def read_doxygen_configs(app, env, docnames):
             app.config.html_context['doxygen_mapping_file'] = dict()
 
 
+def gitref_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
+    repo_link = 'https://github.com/openvinotoolkit/openvino'
+    try:
+        branch_name = str(os.system("git symbolic-ref --short HEAD"))
+        if not branch_name:
+            raise AttributeError
+    except AttributeError as err:
+        raise ValueError('Github branch name is missing. It is not a repository' % str(err))
+    #branch_name = os.system("git symbolic-ref --short HEAD")
+    repo_path = '{}/blob/{}/%s'.format(repo_link, branch_name)
+    title_only = re.compile("<.*?>")
+    title = title_only.sub('', text)
+    path = text[text.find("<")+1:text.find(">")]
+    url = repo_path % (path,)
+    link_node = nodes.reference(rawtext, title, refuri=url, **options)
+    return [link_node], []
+    return role
+
+
 def setup(app):
     theme_path = get_theme_path()
     templates_path = os.path.join(theme_path, 'templates')
@@ -231,4 +252,5 @@ def setup(app):
     html=(visit_showcase, depart_showcase),
     latex=(visit_showcase, depart_showcase)
     )
+    app.add_role('gitref', gitref_role)
     return {'parallel_read_safe': True, 'parallel_write_safe': True}
