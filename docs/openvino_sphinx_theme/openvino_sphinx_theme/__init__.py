@@ -5,6 +5,7 @@ from json import JSONDecodeError
 from sphinx.errors import ExtensionError
 import jinja2
 from docutils.parsers import rst
+from docutils.parsers.rst.roles import code_role
 from docutils import nodes
 from pathlib import Path
 from bs4 import BeautifulSoup
@@ -222,7 +223,7 @@ def gitref_role(app, name, rawtext, text, lineno, inliner, options={}, content=[
     url = repo_path % (path,)
     link_node = nodes.reference(rawtext, title, refuri=url, **options)
     return [link_node], []
-    return role
+    return gitref_role
 
 
 def setup(app):
