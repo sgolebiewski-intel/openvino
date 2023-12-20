@@ -5,7 +5,7 @@ from json import JSONDecodeError
 from sphinx.errors import ExtensionError
 import jinja2
 from docutils.parsers import rst
-from docutils.parsers.rst.roles import code_role
+
 from docutils import nodes
 from pathlib import Path
 from bs4 import BeautifulSoup
@@ -13,6 +13,7 @@ from sphinx.util import logging
 from pydata_sphinx_theme import index_toctree
 from .directives.code import DoxygenSnippet, Scrollbox, Nodescrollbox, visit_scrollbox, depart_scrollbox, Showcase, Nodeshowcase, visit_showcase, depart_showcase
 import re
+
 
 SPHINX_LOGGER = logging.getLogger(__name__)
 
@@ -211,7 +212,7 @@ def read_doxygen_configs(app, env, docnames):
             app.config.html_context['doxygen_mapping_file'] = dict()
 
 
-def gitref_role(app, name, rawtext, text, lineno, inliner, options={}, content=[]):
+def gitrefs_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     repo_link = 'https://github.com/openvinotoolkit/openvino'
     branch_name = app.config.default_branch.get('name')
     if not branch_name:
@@ -223,7 +224,7 @@ def gitref_role(app, name, rawtext, text, lineno, inliner, options={}, content=[
     url = repo_path % (path,)
     link_node = nodes.reference(rawtext, title, refuri=url, **options)
     return [link_node], []
-    return gitref_role
+    return gitrefs_role
 
 
 def setup(app):
@@ -249,5 +250,5 @@ def setup(app):
     html=(visit_showcase, depart_showcase),
     latex=(visit_showcase, depart_showcase)
     )
-    app.add_role('gitref', gitref_role)
+    rst.roles.register_canonical_role('gitrefs', gitrefs_role)
     return {'parallel_read_safe': True, 'parallel_write_safe': True}
