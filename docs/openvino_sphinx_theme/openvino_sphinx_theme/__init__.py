@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from sphinx.util import logging
 from pydata_sphinx_theme import index_toctree
 from .directives.code import DoxygenSnippet, Scrollbox, Nodescrollbox, visit_scrollbox, depart_scrollbox, Showcase, Nodeshowcase, visit_showcase, depart_showcase
-import git
+import re
 
 SPHINX_LOGGER = logging.getLogger(__name__)
 
@@ -210,12 +210,9 @@ def read_doxygen_configs(app, env, docnames):
             app.config.html_context['doxygen_mapping_file'] = dict()
 
 
-
-def gitref_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
+def gitref_role(app, name, rawtext, text, lineno, inliner, options={}, content=[]):
     repo_link = 'https://github.com/openvinotoolkit/openvino'
-    repo = git.Repo(search_parent_directories=True)
-    branch_name = str(repo.active_branch)
-    #branch_name = str(os.system("git symbolic-ref --short HEAD"))
+    branch_name = app.config.default_branch.get('name')
     if not branch_name:
         raise Exception("This is neither a valid branch name nor any repository.", branch_name)
     repo_path = '{}/blob/{}/%s'.format(repo_link, branch_name)
