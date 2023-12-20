@@ -212,9 +212,9 @@ def read_doxygen_configs(app, env, docnames):
             app.config.html_context['doxygen_mapping_file'] = dict()
 
 
-def gitref_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
+def gitref_role(app, rawtext, text, lineno, inliner, options={}, content=[]):
     repo_link = 'https://github.com/openvinotoolkit/openvino'
-    branch_name = 'master'
+    branch_name = app.config.default_branch.get('name')
     if not branch_name:
         raise Exception("This is neither a valid branch name nor any repository.", branch_name)
     repo_path = '{}/blob/{}/%s'.format(repo_link, branch_name)
