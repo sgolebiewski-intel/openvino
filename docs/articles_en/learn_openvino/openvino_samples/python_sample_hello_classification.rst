@@ -148,7 +148,3 @@ See Also
 - :doc:`Model Downloader <omz_tools_downloader>`
 - :doc:`Convert a Model <openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide>`
 - :gitref:`Hello Classification Sample on Github <samples/python/hello_classification/README.md>`
-
-gitrefs
-
-- :gitrefs:`Hello Classification Sample on Github <samples/python/hello_classification/README.md>`
