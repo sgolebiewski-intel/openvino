@@ -213,17 +213,23 @@ def read_doxygen_configs(app, env, docnames):
 
 def gitref_role(app, rawtext, text, lineno, inliner, options={}, content=[]):
     repo_link = 'https://github.com/openvinotoolkit/openvino'
-    branch_name = app.config.default_branch.get('name')
-    #branch_name = 'master'
-    if not branch_name:
-        raise Exception("This is neither a valid branch name nor any repository.", branch_name)
-    repo_path = '{}/blob/{}/%s'.format(repo_link, branch_name)
-    title_only = re.compile("<.*?>")
-    title = title_only.sub('', text)
-    path = text[text.find("<")+1:text.find(">")]
-    url = repo_path % (path,)
-    node = nodes.reference(rawtext, title, refuri=url, **options)
-    return [node], []
+    try:
+        #branch_name = app.config.default_branch
+        branch_name = app.config.default_branch.get('name')
+        # branch_name = 'master'
+        if not branch_name:
+            raise Exception("This is neither a valid branch name nor any repository.", branch_name)
+        repo_path = '{}/blob/{}/%s'.format(repo_link, branch_name)
+        title_only = re.compile("<.*?>")
+        title = title_only.sub('', text)
+        path = text[text.find("<")+1:text.find(">")]
+        url = repo_path % (path,)
+        node = nodes.reference(rawtext, title, refuri=url, **options)
+        return [node], []
+    except AttributeError:
+        raise ExtensionError("Missing required value for `default_branch`. " 
+            "Ensure `default_branch` is set in conf.py.")
+
 
 roles.register_canonical_role('gitref', gitref_role)
 
