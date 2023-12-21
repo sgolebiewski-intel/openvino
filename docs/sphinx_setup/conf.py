@@ -216,6 +216,7 @@ def setup(app):
     app.add_config_value('doxygen_mapping_file',
                          doxygen_mapping_file, rebuild=True)
     app.add_config_value('repositories', repositories, rebuild=True)
+    app.add_config_value('default_branch', default_branch, rebuild=True)
     app.connect('autodoc-skip-member', autodoc_skip_member)
     app.connect('build-finished',replace_index_with_redirect)
     app.connect('build-finished', replace_design_tabs_script)
