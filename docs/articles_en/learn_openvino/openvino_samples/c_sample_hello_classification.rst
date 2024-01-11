@@ -5,8 +5,8 @@ Hello Classification C Sample
 
 
 .. meta::
-   :description: Learn how to do inference of image 
-                 classification models, such as alexnet and googlenet-v1, using 
+   :description: Learn how to do inference of image
+                 classification models, such as alexnet and googlenet-v1, using
                  Synchronous Inference Request (C) API.
 
 
@@ -14,7 +14,7 @@ This sample demonstrates how to execute an inference of image classification net
 
 .. tab-set::
 
-   .. tab-item:: Requirements 
+   .. tab-item:: Requirements
 
       +----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
       | Options                    | Values                                                                                                                                                                     |
@@ -30,7 +30,7 @@ This sample demonstrates how to execute an inference of image classification net
       | Other language realization | :doc:`C++ <openvino_inference_engine_samples_hello_classification_README>`, :doc:`Python <openvino_inference_engine_ie_bridges_python_sample_hello_classification_README>` |
       +----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-   .. tab-item:: C API 
+   .. tab-item:: C API
 
       Hello Classification C sample application demonstrates how to use the C API from OpenVINO in applications.
 
@@ -61,13 +61,13 @@ This sample demonstrates how to execute an inference of image classification net
       |                                     | ``ov_preprocess_input_info_get_preprocess_steps``,          |                                                                                                                                                                                         |
       |                                     | ``ov_preprocess_preprocess_steps_resize``,                  |                                                                                                                                                                                         |
       |                                     | ``ov_preprocess_input_model_info_set_layout``,              |                                                                                                                                                                                         |
-      |                                     | ``ov_preprocess_output_set_element_type``,                  |                                                                                                                                                                                         | 
+      |                                     | ``ov_preprocess_output_set_element_type``,                  |                                                                                                                                                                                         |
       |                                     | ``ov_preprocess_prepostprocessor_build``                    |                                                                                                                                                                                         |
       +-------------------------------------+-------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
    .. tab-item:: Sample Code
 
-      .. doxygensnippet:: samples/c/hello_classification/main.c 
+      .. doxygensnippet:: samples/c/hello_classification/main.c
          :language: c
 
 How It Works
@@ -92,8 +92,8 @@ To run the sample, you need specify a model and image:
 - You can use :doc:`public <omz_models_group_public>` or :doc:`Intel's <omz_models_group_intel>` pre-trained models from the Open Model Zoo. The models can be downloaded using the :doc:`Model Downloader <omz_tools_downloader>`.
 - You can use images from the media files collection available at `the storage <https://storage.openvinotoolkit.org/data/test_data>`__.
 
-.. note:: 
-  
+.. note::
+
    - By default, OpenVINO™ Toolkit Samples and Demos expect input with BGR channels order. If you trained your model to work with RGB order, you need to manually rearrange the default channels order in the sample or demo application or reconvert your model using ``mo`` with `reverse_input_channels` argument specified. For more information about the argument, refer to **When to Reverse Input Channels** section of :doc:`Embedding Preprocessing Computation <openvino_docs_MO_DG_prepare_model_convert_model_Converting_Model>`.
    - Before running the sample with a trained model, make sure the model is converted to the Inference Engine format (\*.xml + \*.bin) using the :doc:`model conversion API <openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide>`.
    - The sample accepts models in ONNX format (\*.onnx) that do not require preprocessing.
@@ -102,21 +102,21 @@ Example
 +++++++
 
 1. Download a pre-trained model using [Model Downloader](@ref omz_tools_downloader):
-   
+
    .. code-block:: console
-      
+
       python <path_to_omz_tools>/downloader.py --name alexnet
 
 2. If a model is not in the Inference Engine IR or ONNX format, it must be converted. You can do this using the model converter script:
-   
+
    .. code-block:: console
-      
+
       python <path_to_omz_tools>/converter.py --name alexnet
 
 3. Perform inference of ``car.bmp`` using ``alexnet`` model on a ``GPU``, for example:
-   
+
    .. code-block:: console
-      
+
       <path_to_sample>/hello_classification_c <path_to_model>/alexnet.xml <path_to_image>/car.bmp GPU
 
 Sample Output
@@ -125,11 +125,11 @@ Sample Output
 The application outputs top-10 inference results.
 
 .. code-block:: console
-   
+
    Top 10 results:
-   
+
    Image /opt/intel/openvino/samples/scripts/car.png
-   
+
    classid probability
    ------- -----------
    656       0.666479
@@ -142,7 +142,7 @@ The application outputs top-10 inference results.
    511       0.010592
    569       0.008178
    717       0.006336
-   
+
    This sample is an API example, for any performance measurements please use the dedicated benchmark_app tool
 
 See Also
@@ -152,6 +152,5 @@ See Also
 - :doc:`Using OpenVINO™ Samples <openvino_docs_OV_UG_Samples_Overview>`
 - :doc:`Model Downloader <omz_tools_downloader>`
 - :doc:`Convert a Model <openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide>`
-- :doc:`C API Reference <pot_compression_api_README>`
 
 
