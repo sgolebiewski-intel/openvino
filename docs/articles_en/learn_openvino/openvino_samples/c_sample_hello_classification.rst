@@ -152,5 +152,4 @@ See Also
 - :doc:`Using OpenVINO™ Samples <openvino_docs_OV_UG_Samples_Overview>`
 - :doc:`Model Downloader <omz_tools_downloader>`
 - :doc:`Convert a Model <openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide>`
-
-
+- `C API Reference <https://docs.openvino.ai/2023.3/pot_compression_api_README.html>`__
