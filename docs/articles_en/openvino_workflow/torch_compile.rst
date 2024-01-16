@@ -86,7 +86,11 @@ enable model caching, set the cache directory etc. You can use a dictionary of t
 * ``cache_dir`` - enables defining a custom directory for the model files (if
   ``model_caching`` is set to ``True``). By default, the OpenVINO IR is saved
   in the cache sub-directory, created in the application's root directory.
-* ``config`` - enables passing any OpenVINO configuration option as a dictionary to this variable. For details on the various options, refer to the :ref:`OpenVINO Advanced Features <openvino-advanced-features>`.
+* ``config`` - enables passing any OpenVINO configuration option as a dictionary
+  to this variable. For details on the various options, refer to the
+  :ref:`OpenVINO Advanced Features <openvino-advanced-features>`.
+
+See the example below for details:
 
 .. code-block:: python
 
