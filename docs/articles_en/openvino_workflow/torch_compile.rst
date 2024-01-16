@@ -73,20 +73,7 @@ Options
 ++++++++++++++++++++
 
 It is possible to use additional arguments for ``torch.compile`` to set the backend device,
-enable model caching, set the cache directory etc. You can use a dictionary of options such as below:
-
-.. code-block:: python
-
-   model = torch.compile(model, backend="openvino", options = {"device" : "CPU", "model_caching" : True, "cache_dir": "./model_cache"})
-
-You can also set OpenVINO specific configuration options by adding them as a dictionary under ``config`` key in ``options``:
-
-.. code-block:: python
-
-   opts = {"device" : "CPU", "config" : {"PERFORMANCE_HINT" : "LATENCY"}}
-   model = torch.compile(model, backend="openvino", options=opts)
-
-Below is a list of available options:
+enable model caching, set the cache directory etc. You can use a dictionary of the available options:
 
 * ``device`` - enables selecting a specific hardware device to run the application.
   By default, the OpenVINO backend for ``torch.compile`` runs PyTorch applications
@@ -100,6 +87,18 @@ Below is a list of available options:
   ``model_caching`` is set to ``True``). By default, the OpenVINO IR is saved
   in the cache sub-directory, created in the application's root directory.
 * ``config`` - enables passing any OpenVINO configuration option as a dictionary to this variable. For details on the various options, refer to the :ref:`OpenVINO Advanced Features <openvino-advanced-features>`.
+
+.. code-block:: python
+
+   model = torch.compile(model, backend="openvino", options = {"device" : "CPU", "model_caching" : True, "cache_dir": "./model_cache"})
+
+You can also set OpenVINO specific configuration options by adding them as a dictionary under ``config`` key in ``options``:
+
+.. code-block:: python
+
+   opts = {"device" : "CPU", "config" : {"PERFORMANCE_HINT" : "LATENCY"}}
+   model = torch.compile(model, backend="openvino", options=opts)
+
 
 .. important::
 
