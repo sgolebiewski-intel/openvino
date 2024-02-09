@@ -34,7 +34,7 @@ and hardware solutions it supports.
    </div>
 
 
-.. csv-table:: Table Title
+.. csv-table::
     :class: modeldata
     :name: id-of-table
     :header-rows: 1
