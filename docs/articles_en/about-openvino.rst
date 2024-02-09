@@ -17,6 +17,30 @@ OpenVINO is a toolkit for simple and efficient deployment of various deep learni
 In this section you will find information on the product itself, as well as the software
 and hardware solutions it supports.
 
+
+.. raw:: html
+ 
+   <div>
+   <input type="checkbox" id="topology" name="interest" value="topology" data-column="0" class="toggle-vis"/>
+   <label for="topology" >Hide topology</label>
+   </div>
+   <div>
+   <input type="checkbox" id="precision" name="interest" value="precision" data-column="2" class="toggle-vis"/>
+   <label for="precision" >Hide precision</label>
+   </div>
+   <div>
+   <input type="checkbox" disabled id="source" name="source" value="source" data-column="1" class="toggle-vis"/>
+   <label for="source" >Hide source framework</label>
+   </div>
+
+
+.. csv-table:: Table Title
+    :class: modeldata
+    :name: id-of-table
+    :header-rows: 1
+    :file: _static/models.csv
+
+
 OpenVINO (Open Visual Inference and Neural network Optimization) is an open-source software toolkit designed to optimize, accelerate, and deploy deep learning models for user applications. OpenVINO was developed by Intel to work efficiently on a wide range of Intel hardware platforms, including CPUs (x86 and Arm), GPUs, and NPUs.
 
 
