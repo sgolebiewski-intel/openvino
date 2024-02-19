@@ -20,8 +20,10 @@
 
    .. autosummary::
       :toctree:
-   {% func for func in functions if not(func.startswith('_')) %}
-      {{ func }}
+   {% for func in functions %}
+      {% if not func.startswith('_') %}
+         {{ func }}
+      {% endif %}
    {%- endfor %}
 {% endif %}
 {% endblock %}
