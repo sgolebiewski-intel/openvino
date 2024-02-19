@@ -1,7 +1,7 @@
 {{ fullname | escape | underline}}
 
 .. automodule:: {{ fullname }}
-  
+
 {% block attributes %}
 {% if attributes %}
    .. rubric:: Module Attributes
@@ -20,7 +20,7 @@
 
    .. autosummary::
       :toctree:
-   {% for func in functions %}
+   {% func for func in functions if not(func.startswith('_')) %}
       {{ func }}
    {%- endfor %}
 {% endif %}
