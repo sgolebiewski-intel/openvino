@@ -121,15 +121,15 @@ PYBIND11_MODULE(_pyopenvino, m) {
             into provided paths.
             This method serializes model "as-is" that means no weights compression is applied.
             It is recommended to use ov::save_model function instead of ov::serialize in all cases
-            when it is not related to debugging.\n
-            :param model: model which will be converted to IR representation\n
-            :type model: openvino.runtime.Model\n
-            :param xml_path: path where .xml file will be saved\n
-            :type xml_path: Union[str, bytes, pathlib.Path]\n
+            when it is not related to debugging.\r\n
+            :param model: model which will be converted to IR representation\r\n
+            :type model: openvino.runtime.Model\r\n
+            :param xml_path: path where .xml file will be saved\r\n
+            :type xml_path: Union[str, bytes, pathlib.Path]\r\n
             :param bin_path: path where .bin file will be saved (optional),
-                             the same name as for xml_path will be used by default.\n
-            :type bin_path: Union[str, bytes, pathlib.Path]\n
-            :param version: version of the generated IR (optional).\n
+                             the same name as for xml_path will be used by default.\r\n
+            :type bin_path: Union[str, bytes, pathlib.Path]\r\n
+            :param version: version of the generated IR (optional).\r\n
             Supported versions are:
             - "UNSPECIFIED" (default) : Use the latest or model version
             - "IR_V10" : v10 IR
