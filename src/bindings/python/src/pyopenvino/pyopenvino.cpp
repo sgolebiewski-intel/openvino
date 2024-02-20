@@ -129,37 +129,37 @@ PYBIND11_MODULE(_pyopenvino, m) {
         "the same name as for xml_path will be used by default.\n"
         ":type bin_path: Union[str, bytes, pathlib.Path]\r\n"
         ":param version: version of the generated IR (optional).\n"
-        "Supported versions are:"
-        "- "UNSPECIFIED" (default) : Use the latest or model version"
-        "- "IR_V10" : v10 IR"
-        "- "IR_V11" : v11 IR"
+        "Supported versions are:\n\n"
+        "- "UNSPECIFIED" (default) : Use the latest or model version\n"
+        "- "IR_V10" : v10 IR\n"
+        "- "IR_V11" : v11 IR\n"
 
-        ":Examples:"
+        ":Examples:\n\n"
 
-        "1. Default IR version:"
+        "1. Default IR version:\n\n"
 
-        "   .. code-block:: python"
+        "   .. code-block:: python\n\n"
 
-        "      shape = [2, 2]"
-        "      parameter_a = ov.parameter(shape, dtype=np.float32, name="A")"
-        "      parameter_b = ov.parameter(shape, dtype=np.float32, name="B")"
-        "      parameter_c = ov.parameter(shape, dtype=np.float32, name="C")"
-        "      op = (parameter_a + parameter_b) * parameter_c"
-        "      model = Model(op, [parameter_a, parameter_b, parameter_c], "Model")"
-        "      # IR generated with default version"
-        "      serialize(model, xml_path="./serialized.xml", bin_path="./serialized.bin")"
+        "      shape = [2, 2]\n"
+        "      parameter_a = ov.parameter(shape, dtype=np.float32, name="A")\n"
+        "      parameter_b = ov.parameter(shape, dtype=np.float32, name="B")\n"
+        "      parameter_c = ov.parameter(shape, dtype=np.float32, name="C")\n"
+        "      op = (parameter_a + parameter_b) * parameter_c\n"
+        "      model = Model(op, [parameter_a, parameter_b, parameter_c], "Model")\n"
+        "      # IR generated with default version\n"
+        "      serialize(model, xml_path="./serialized.xml", bin_path="./serialized.bin")\n\n"
 
-        "2. IR version 11:"
+        "2. IR version 11:\n\n"
 
-        "   .. code-block:: python"
+        "   .. code-block:: python\n\n"
 
-        "       parameter_a = ov.parameter(shape, dtype=np.float32, name="A")"
-        "       parameter_b = ov.parameter(shape, dtype=np.float32, name="B")"
-        "       parameter_c = ov.parameter(shape, dtype=np.float32, name="C")"
-        "       op = (parameter_a + parameter_b) * parameter_c"
-        "       model = Model(ops, [parameter_a, parameter_b, parameter_c], "Model")"
-        "       # IR generated with default version"
-        "       serialize(model, xml_path="./serialized.xml", bin_path="./serialized.bin", version="IR_V11")");
+        "       parameter_a = ov.parameter(shape, dtype=np.float32, name="A")\n"
+        "       parameter_b = ov.parameter(shape, dtype=np.float32, name="B")\n"
+        "       parameter_c = ov.parameter(shape, dtype=np.float32, name="C")\n"
+        "       op = (parameter_a + parameter_b) * parameter_c\n"
+        "       model = Model(ops, [parameter_a, parameter_b, parameter_c], "Model")\n"
+        "       # IR generated with default version\n"
+        "       serialize(model, xml_path="./serialized.xml", bin_path="./serialized.bin", version="IR_V11")\n");
 
     m.def(
         "save_model",
