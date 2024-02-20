@@ -116,7 +116,7 @@ PYBIND11_MODULE(_pyopenvino, m) {
         py::arg("xml_path"),
         py::arg("bin_path") = py::str(""),
         py::arg("version") = "UNSPECIFIED",
-        "Serialize given model into IR. The generated .xml and .bin files will be saved"
+        "Serialize given model into OpenVINO IR. The generated .xml and .bin files will be saved"
         "into provided paths."
         "This method serializes model "as-is" that means no weights compression is applied."
         "It is recommended to use ov::save_model function instead of ov::serialize in all cases"
