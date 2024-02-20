@@ -31,6 +31,15 @@ use the Python API and tools for optimized deep learning inference. You can run 
 code one section at a time to see how to integrate your application with OpenVINO
 libraries.
 
+
+.. raw:: html
+
+   <script type="module" crossorigin src="https://openvinotoolkit.github.io/openvino_notebooks/assets/embedded-Re_0vLit.js"></script>
+   <iframe id="notebooks-selector" src="https://openvinotoolkit.github.io/openvino_notebooks/" style="width: 100%; border: none;" title="OpenVINO™ Notebooks - Jupyter notebook tutorials for OpenVINO™"></iframe>
+
+
+
+
 Notebooks with |binder logo| and |colab logo| buttons can be run without installing anything.
 Once you have found the tutorial of your interest, just click the button next to
 its name and the Jupyter notebook will start it in a new tab of a browser.
