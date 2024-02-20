@@ -116,51 +116,50 @@ PYBIND11_MODULE(_pyopenvino, m) {
         py::arg("xml_path"),
         py::arg("bin_path") = py::str(""),
         py::arg("version") = "UNSPECIFIED",
-        R"(
-            Serialize given model into IR. The generated .xml and .bin files will be saved
-            into provided paths.
-            This method serializes model "as-is" that means no weights compression is applied.
-            It is recommended to use ov::save_model function instead of ov::serialize in all cases
-            when it is not related to debugging.\r\n
-            :param model: model which will be converted to IR representation\r\n
-            :type model: openvino.runtime.Model\r\n
-            :param xml_path: path where .xml file will be saved\r\n
-            :type xml_path: Union[str, bytes, pathlib.Path]\r\n
-            :param bin_path: path where .bin file will be saved (optional),
-                             the same name as for xml_path will be used by default.\r\n
-            :type bin_path: Union[str, bytes, pathlib.Path]\r\n
-            :param version: version of the generated IR (optional).\r\n
-            Supported versions are:
-            - "UNSPECIFIED" (default) : Use the latest or model version
-            - "IR_V10" : v10 IR
-            - "IR_V11" : v11 IR
+        "Serialize given model into IR. The generated .xml and .bin files will be saved"
+        "into provided paths."
+        "This method serializes model "as-is" that means no weights compression is applied."
+        "It is recommended to use ov::save_model function instead of ov::serialize in all cases"
+        "when it is not related to debugging.\n"
+        ":param model: model which will be converted to IR representation\n"
+        ":type model: openvino.runtime.Model\n"
+        ":param xml_path: path where .xml file will be saved\n"
+        ":type xml_path: Union[str, bytes, pathlib.Path]\n"
+        ":param bin_path: path where .bin file will be saved (optional),"
+        "the same name as for xml_path will be used by default.\n"
+        ":type bin_path: Union[str, bytes, pathlib.Path]\r\n"
+        ":param version: version of the generated IR (optional).\n"
+        "Supported versions are:"
+        "- "UNSPECIFIED" (default) : Use the latest or model version"
+        "- "IR_V10" : v10 IR"
+        "- "IR_V11" : v11 IR"
 
-            :Examples:
+        ":Examples:"
 
-            1. Default IR version:
+        "1. Default IR version:"
 
-            .. code-block:: python
+        "   .. code-block:: python"
 
-                shape = [2, 2]
-                parameter_a = ov.parameter(shape, dtype=np.float32, name="A")
-                parameter_b = ov.parameter(shape, dtype=np.float32, name="B")
-                parameter_c = ov.parameter(shape, dtype=np.float32, name="C")
-                op = (parameter_a + parameter_b) * parameter_c
-                model = Model(op, [parameter_a, parameter_b, parameter_c], "Model")
-                # IR generated with default version
-                serialize(model, xml_path="./serialized.xml", bin_path="./serialized.bin")
-            2. IR version 11:
+        "      shape = [2, 2]"
+        "      parameter_a = ov.parameter(shape, dtype=np.float32, name="A")"
+        "      parameter_b = ov.parameter(shape, dtype=np.float32, name="B")"
+        "      parameter_c = ov.parameter(shape, dtype=np.float32, name="C")"
+        "      op = (parameter_a + parameter_b) * parameter_c"
+        "      model = Model(op, [parameter_a, parameter_b, parameter_c], "Model")"
+        "      # IR generated with default version"
+        "      serialize(model, xml_path="./serialized.xml", bin_path="./serialized.bin")"
 
-            .. code-block:: python
+        "2. IR version 11:"
 
-                parameter_a = ov.parameter(shape, dtype=np.float32, name="A")
-                parameter_b = ov.parameter(shape, dtype=np.float32, name="B")
-                parameter_c = ov.parameter(shape, dtype=np.float32, name="C")
-                op = (parameter_a + parameter_b) * parameter_c
-                model = Model(ops, [parameter_a, parameter_b, parameter_c], "Model")
-                # IR generated with default version
-                serialize(model, xml_path="./serialized.xml", bin_path="./serialized.bin", version="IR_V11")
-        )");
+        "   .. code-block:: python"
+
+        "       parameter_a = ov.parameter(shape, dtype=np.float32, name="A")"
+        "       parameter_b = ov.parameter(shape, dtype=np.float32, name="B")"
+        "       parameter_c = ov.parameter(shape, dtype=np.float32, name="C")"
+        "       op = (parameter_a + parameter_b) * parameter_c"
+        "       model = Model(ops, [parameter_a, parameter_b, parameter_c], "Model")"
+        "       # IR generated with default version"
+        "       serialize(model, xml_path="./serialized.xml", bin_path="./serialized.bin", version="IR_V11")");
 
     m.def(
         "save_model",
