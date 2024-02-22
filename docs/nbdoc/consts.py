@@ -14,8 +14,8 @@ file_with_binder_notebooks = Path('../../docs/notebooks/notebooks_with_binder_bu
 file_with_colab_notebooks = Path('../../docs/notebooks/notebooks_with_colab_buttons.txt').resolve(strict=True)
 openvino_notebooks_ipynb_list = Path('../../docs/notebooks/all_notebooks_paths.txt').resolve(strict=True)
 binder_image_source = "https://mybinder.org/badge_logo.svg"
-colab_image_source = "_images/open_in_colab.svg"
-github_image_source = "_images/launch_in_binder.svg"
+colab_image_source = Path('../../docs/sphinx_setup/_static/images/open_in_colab.svg').as_posix()
+github_image_source = Path('../../docs/sphinx_setup/_static/images/launch_in_binder.svg').as_posix()
 
 # Templates
 
