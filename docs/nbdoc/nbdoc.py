@@ -66,24 +66,19 @@ def fetch_colab_list(colab_list_file) -> list:
             list_of_cbuttons = file.read().splitlines()
     return list_of_cbuttons
 
-
-def add_glob_directive():
+def add_glob_directive(tutorials_file):
     """This function modifies toctrees of the five node articles in tutorials
        section. It adds the notebooks found in docs/notebooks directory to the menu.
     """
-    tutorials_path = Path('../../docs/articles_en/learn-openvino/interactive-tutorials-python').resolve(strict=True)
-    tutorials_files = [x for x in os.listdir(tutorials_path) if re.match("notebooks-section-[0-9]{1}.*?\.rst", x)]
-    for tutorials_file in tutorials_files:
-        file_name = os.path.join(tutorials_path, tutorials_file)
-        with open(file_name, 'r+', encoding='cp437') as section_file:
-            section_number = ''.join(c for c in str(tutorials_file) if c.isdigit())
-            read_file = section_file.read()
-            if ':glob:' not in read_file:
-                add_glob = read_file\
-                    .replace(":hidden:\n", ":hidden:\n   :glob:\n   :reversed:\n\n   notebooks/" + section_number +"*\n")
-                section_file.seek(0)
-                section_file.write(add_glob)
-                section_file.truncate()
+    with open(tutorials_file, 'r+', encoding='cp437') as mainfile:
+        readfile = mainfile.read()
+        if ':glob:' not in readfile:
+            add_glob = readfile\
+                .replace(":hidden:\n", ":hidden:\n   :glob:\n")\
+                .replace("notebooks_installation\n", "notebooks_installation\n   notebooks/*\n")
+            mainfile.seek(0)
+            mainfile.write(add_glob)
+            mainfile.truncate()
 
 class NbTravisDownloader:
     @staticmethod
@@ -215,7 +210,8 @@ def main():
     sourcedir = args.sourcedir
     outdir = args.outdir
 
-    add_glob_directive()
+    main_tutorials_file = Path('../../docs/articles_en/learn-openvino/interactive-tutorials-python.rst').resolve(strict=True)
+    add_glob_directive(main_tutorials_file)
 
     if args.download:
         outdir.mkdir(parents=True, exist_ok=True)
