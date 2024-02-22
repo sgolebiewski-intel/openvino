@@ -13,9 +13,9 @@ notebooks_colab = "https://colab.research.google.com/github/openvinotoolkit/open
 file_with_binder_notebooks = Path('../../docs/notebooks/notebooks_with_binder_buttons.txt').resolve(strict=True)
 file_with_colab_notebooks = Path('../../docs/notebooks/notebooks_with_colab_buttons.txt').resolve(strict=True)
 openvino_notebooks_ipynb_list = Path('../../docs/notebooks/all_notebooks_paths.txt').resolve(strict=True)
-binder_image_source = "https://mybinder.org/badge_logo.svg"
+binder_image_source = repr(Path('../../docs/sphinx_setup/_static/images/launch_in_binder.svg'))
 colab_image_source = repr(Path('../../docs/sphinx_setup/_static/images/open_in_colab.svg'))
-github_image_source = repr(Path('../../docs/sphinx_setup/_static/images/launch_in_binder.svg'))
+github_image_source = "https://badgen.net/badge/icon/github?icon=github&label"
 
 # Templates
 
