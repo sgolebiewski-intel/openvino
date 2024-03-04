@@ -1,10 +1,13 @@
 import os
 import sys
 import json
+import re
 from json import JSONDecodeError
 from sphinx.errors import ExtensionError
 import jinja2
 from docutils.parsers import rst
+from docutils.parsers.rst import roles
+from docutils import nodes
 from pathlib import Path
 from bs4 import BeautifulSoup
 from sphinx.util import logging
@@ -206,6 +209,27 @@ def read_doxygen_configs(app, env, docnames):
                 app.config.html_context['doxygen_mapping_file'] = json.load(f)
         except (JSONDecodeError, FileNotFoundError):
             app.config.html_context['doxygen_mapping_file'] = dict()
+
+
+def ovref_role(app, rawtext, text, lineno, inliner, options={}, content=[]):
+    repo_link = 'https://github.com/openvinotoolkit/openvino'
+    branch_name = app.config.version_name
+    print(branch_name)
+    if not branch_name:
+        raise Exception("This is neither a valid branch name nor any repository.", branch_name)
+    if branch_name is "nightly":
+
+
+
+    repo_path = '{}/blob/{}/%s'.format(repo_link, branch_name)
+    title_only = re.compile("<.*?>")
+    title = title_only.sub('', text)
+    path = text[text.find("<")+1:text.find(">")]
+    url = repo_path % (path,)
+    node = nodes.reference(rawtext, title, refuri=url, **options)
+    return [node], []
+
+roles.register_canonical_role('ov-ref', ovref_role)
 
 
 def setup(app):
