@@ -15,7 +15,8 @@ from consts import (
     repo_directory,
     repo_name,
     openvino_notebooks_ipynb_list,
-    notebooks_collected_metadata,
+    file_with_binder_notebooks,
+    file_with_colab_notebooks,
     repo_owner,
     notebooks_repo,
     notebooks_binder,
@@ -35,8 +36,6 @@ import requests
 import os
 import re
 import sys
-import json
-from bs4 import BeautifulSoup as bS
 
 matching_notebooks_paths = []
 
@@ -161,17 +160,6 @@ class NbProcessor:
         :raises FileNotFoundError: In case of a failure in adding the content, an error will appear.
 
         """
-        result = requests.get(notebooks_collected_metadata)
-        # result = open(jsonfile, 'r').read()
-        parse_tree = bS(result.text, 'html.parser')
-        # parse_tree = bS(result, 'html.parser')
-        paths_list = json.loads(parse_tree.text)
-        list_all_paths = [p.get('path') for p in paths_list['tree'] if p.get('path')]
-        ipynb_ext = re.compile(".*\\.ipynb")
-        ipynb_list = list(filter(ipynb_ext.match, list_all_paths))
-        notebook_with_ext = node["title"] + ".ipynb"
-        matched_notebook = [match for match in ipynb_list if notebook_with_ext in match]
-
 
         for notebook_file, nb_path in zip([
             nb for nb in os.listdir(self.nb_path) if verify_notebook_name(nb)
