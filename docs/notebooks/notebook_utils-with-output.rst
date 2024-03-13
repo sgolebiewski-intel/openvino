@@ -71,7 +71,7 @@ functions in the section. #### Table of contents:
 Files
 -----
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Load an image, download a file, download an OpenVINO IR model, and
 create a progress bar to show download progress.
@@ -98,7 +98,7 @@ create a progress bar to show download progress.
 Test File Functions
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -192,12 +192,12 @@ Test File Functions
 Images
 ------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Convert Pixel Data
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Normalize image pixel values between 0 and 1, and convert images to
 ``RGB`` and ``BGR``.
@@ -222,7 +222,7 @@ Normalize image pixel values between 0 and 1, and convert images to
 Test Data Conversion Functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -248,12 +248,12 @@ Test Data Conversion Functions
 Videos
 ------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Video Player
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 A custom video player to fulfill FPS requirements. You can set target
 FPS and output size, flip the video horizontally or skip first N frames.
@@ -269,7 +269,7 @@ FPS and output size, flip the video horizontally or skip first N frames.
 Test Video Player
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -300,12 +300,12 @@ Test Video Player
 Visualization
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Segmentation
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Define a ``SegmentationMap NamedTuple`` that keeps the labels and
 colormap for a segmentation project/dataset. Create
@@ -405,7 +405,7 @@ the original image.
 Network Results
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Show network result image, optionally together with the source image and
 a legend with labels.
@@ -419,7 +419,7 @@ a legend with labels.
 Test Visualization Functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -487,7 +487,7 @@ Test Visualization Functions
 Checks and Alerts
 -----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Create an alert class to show stylized info/error/warning messages and a
 ``check_device`` function that checks whether a given device is
@@ -516,7 +516,7 @@ available.
 Test Alerts
 ~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

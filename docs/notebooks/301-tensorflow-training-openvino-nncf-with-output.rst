@@ -31,7 +31,7 @@ Table of contents:
 Preparation
 -----------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The notebook requires that the training notebook has been run and that
 the Intermediate Representation (IR) models are created. If the IR
@@ -7491,7 +7491,7 @@ notebook. This will take a while.
 Imports
 ~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The Post Training Quantization API is implemented in the ``nncf``
 library.
@@ -7520,7 +7520,7 @@ library.
 Post-training Quantization with NNCF
 ------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -7959,7 +7959,7 @@ Save quantized model to benchmark.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -7988,7 +7988,7 @@ select device from dropdown list for running inference using OpenVINO
 Compare Metrics
 ---------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Define a metric to determine the performance of the model.
 
@@ -8065,7 +8065,7 @@ accuracy with a much smaller size of the quantized model.
 Run Inference on Quantized Model
 --------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Copy the preprocess function from the training notebook and run
 inference on the quantized model with Inference Engine. See the
@@ -8146,7 +8146,7 @@ Python API.
 Compare Inference Speed
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Measure inference speed with the `OpenVINO Benchmark
 App <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__.

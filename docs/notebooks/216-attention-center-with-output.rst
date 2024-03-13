@@ -109,7 +109,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -138,7 +138,7 @@ Imports
 Download the attention-center model
 -----------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Download the model as part of `attention-center
 repo <https://github.com/google/attention-center/tree/main>`__. The repo
@@ -537,7 +537,7 @@ Resolving deltas: 100% (73/73), done.
 Convert Tensorflow Lite model to OpenVINO IR format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The attention-center model is pre-trained model in TensorFlow Lite
 format. In this Notebook the model will be converted to OpenVINO IR
@@ -576,7 +576,7 @@ find example in
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -611,7 +611,7 @@ select device from dropdown list for running inference using OpenVINO
 Prepare image to use with attention-center model
 ------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The attention-center model takes an RGB image with shape (480, 640) as
 input.
@@ -664,7 +664,7 @@ input.
 Load input image
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Upload input image using file loading button
 
@@ -726,7 +726,7 @@ Upload input image using file loading button
 Get result with OpenVINO IR model
 ---------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

@@ -67,7 +67,7 @@ notebook consists of the following steps:
 Get and prepare PyTorch model
 -----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The first thing we’ll need to do is clone
 `repository <https://github.com/rstrudel/segmenter>`__ containing model
@@ -84,7 +84,7 @@ weights (checkpoint) file and add some additional helper functions.
 Prerequisites
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -462,7 +462,7 @@ config for our model.
 Loading PyTorch model
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 PyTorch models are usually an instance of
 `torch.nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
@@ -511,7 +511,7 @@ Load normalization settings from config file.
 Preparing preprocessing and visualization functions
 ---------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now we will define utility functions for preprocessing and visualizing
 the results.
@@ -519,7 +519,7 @@ the results.
 Preprocessing
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Inference input is tensor with shape ``[1, 3, H, W]`` in ``B, C, H, W``
 format, where:
@@ -566,7 +566,7 @@ normalized with given mean and standard deviation provided in
 Visualization
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Inference output contains labels assigned to each pixel, so the output
 in our case is ``[150, H, W]`` in ``CL, H, W`` format where:
@@ -612,7 +612,7 @@ corresponding to the inferred labels.
 Validation of inference of original model
 -----------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now that we have everything ready, we can perform segmentation on
 example image ``coco_hollywood.jpg``.
@@ -666,7 +666,7 @@ larger models, but it already shows nice segmentation performance.
 Convert PyTorch model to OpenVINO Intermediate Representation (IR)
 ------------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now that we’ve verified that the inference of PyTorch model works, we
 will convert it to OpenVINO IR format.
@@ -732,7 +732,7 @@ they are not a problem.
 Verify converted model inference
 --------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To test that model was successfully converted, we can use same inference
 function from original repository, but we need to make custom class.
@@ -802,7 +802,7 @@ inference function.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -865,7 +865,7 @@ As we can see, we get the same results as with original model.
 Benchmarking performance of converted model
 -------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Finally, use the OpenVINO `Benchmark
 Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__

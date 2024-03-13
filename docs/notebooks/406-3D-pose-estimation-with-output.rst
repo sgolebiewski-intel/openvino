@@ -50,7 +50,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 **The ``pythreejs`` extension may not display properly when using the
 latest Jupyter Notebook release (2.4.1). Therefore, it is recommended to
@@ -157,7 +157,7 @@ use Jupyter Lab instead.**
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -182,12 +182,12 @@ Imports
 The model
 ---------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Download the model
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We use ``omz_downloader``, which is a command line tool from the
 ``openvino-dev`` package. ``omz_downloader`` automatically creates a
@@ -827,7 +827,7 @@ directory structure and downloads the selected model.
 Convert Model to OpenVINO IR format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The selected model comes from the public directory, which means it must
 be converted into OpenVINO Intermediate Representation (OpenVINO IR). We
@@ -884,7 +884,7 @@ IR format.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -913,7 +913,7 @@ select device from dropdown list for running inference using OpenVINO
 Load the model
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Converted models are located in a fixed structure, which indicates
 vendor, model name and precision.
@@ -957,12 +957,12 @@ heat maps, PAF (part affinity fields) and features.
 Processing
 ----------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Model Inference
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Frames captured from video files or the live webcam are used as the
 input for the 3D model. This is how you obtain the output heat maps, PAF
@@ -1002,7 +1002,7 @@ input for the 3D model. This is how you obtain the output heat maps, PAF
 Draw 2D Pose Overlays
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We need to define some connections between the joints in advance, so
 that we can draw the structure of the human body in the resulting image
@@ -1086,7 +1086,7 @@ from Open Model Zoo.
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Run 3D pose estimation on the specified source. It could be either a
 webcam feed or a video file.
@@ -1252,7 +1252,7 @@ webcam feed or a video file.
 Run
 ---
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Run, using a webcam as the video input. By default, the primary webcam
 is set with ``source=0``. If you have multiple webcams, each one will be

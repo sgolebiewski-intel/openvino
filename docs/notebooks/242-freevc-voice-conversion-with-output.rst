@@ -43,7 +43,7 @@ Table of contents:
 Pre-requisites
 --------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 This steps can be done manually or will be performed automatically
 during the execution of the notebook, but in minimum necessary scope. 1.
@@ -418,7 +418,7 @@ Resolving deltas: 100% (43/43), done.
 Imports and settings
 --------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -549,7 +549,7 @@ Result audio files should be available in ‘outputs/freevc’
 Convert Modes to OpenVINO Intermediate Representation
 =====================================================
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Convert each model to OpenVINO IR, with FP16 precision. The
 ``ov.convert_model`` function accepts the original PyTorch model object
@@ -564,7 +564,7 @@ conversion, see this
 Convert Prior Encoder.
 ~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 First we convert WavLM model, as a part of Convert Prior Encoder to
 OpenVINO’s IR format. We keep the original name of the model in code:
@@ -653,7 +653,7 @@ Select device from dropdown list for running inference using OpenVINO
 Convert ``SpeakerEncoder``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -808,7 +808,7 @@ Then compile model.
 Convert Decoder
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 In the same way export ``SynthesizerTrn`` model, that implements decoder
 function to OpenVINO IR format.

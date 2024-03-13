@@ -47,7 +47,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -133,7 +133,7 @@ Imports
 Settings
 --------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -150,12 +150,12 @@ Settings
 Inference on PaddlePaddle Model
 -------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Investigate PaddleGAN Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The `PaddleGAN
 documentation <https://github.com/PaddlePaddle/PaddleGAN>`__ explains
@@ -214,7 +214,7 @@ To get more information about how the model looks like, use the
 Do Inference
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To show inference on the PaddlePaddle model, set ``PADDLEGAN_INFERENCE``
 to ``True`` in the cell below. Keep in mind that performing inference
@@ -275,7 +275,7 @@ may take some time.
 Convert PaddleGAN Model to ONNX and OpenVINO IR
 -----------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To convert the PaddlePaddle model to OpenVINO IR, first convert the
 model to ONNX, and then convert the ONNX model to the OpenVINO IR
@@ -284,7 +284,7 @@ format.
 Convert PaddlePaddle Model to ONNX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -327,7 +327,7 @@ Convert PaddlePaddle Model to ONNX
 Convert ONNX Model to OpenVINO IR with `Model Conversion Python API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -350,7 +350,7 @@ Convert ONNX Model to OpenVINO IR with `Model Conversion Python API <https://doc
 Do Inference on OpenVINO IR Model
 ---------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -363,7 +363,7 @@ Do Inference on OpenVINO IR Model
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -469,7 +469,7 @@ select device from dropdown list for running inference using OpenVINO
 Show an Animated GIF
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To visualize the difference between the bicubic image and the
 superresolution image, create an animated GIF image that switches
@@ -505,7 +505,7 @@ between both versions.
 Create a Comparison Video
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Create a video with a “slider”, showing the bicubic image to the right
 and the superresolution image on the left.
@@ -565,7 +565,7 @@ open it directly from the images directory, and play it locally.
 Download the video
 ^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Please, click the link below to download the video or just run cell if
 you use the Google Colab

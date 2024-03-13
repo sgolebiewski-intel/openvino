@@ -55,7 +55,7 @@ Table of contents:
 Background
 ----------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Visual language processing is a branch of artificial intelligence that
 focuses on creating algorithms designed to enable computers to more
@@ -87,7 +87,7 @@ considers Image Captioning and Visual Question Answering.
 Image Captioning
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Image Captioning is the task of describing the content of an image in
 words. This task lies at the intersection of computer vision and natural
@@ -101,7 +101,7 @@ decoded into a descriptive text sequence.
 Visual Question Answering
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Visual Question Answering (VQA) is the task of answering text-based
 questions about image content.
@@ -201,7 +201,7 @@ There are a lot of applications for visual question answering:
 Instantiate Model
 -----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The BLIP model was proposed in the `BLIP: Bootstrapping Language-Image
 Pre-training for Unified Vision-Language Understanding and
@@ -339,7 +339,7 @@ text and vision modalities and postprocessing of generation results.
 Convert Models to OpenVINO IR
 -----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Starting from OpenVINO 2023.0 release, OpenVINO supports direct PyTorch
 models conversion to OpenVINO Intermediate Representation (IR) format to
@@ -363,7 +363,7 @@ you should convert each part independently.
 Vision Model
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The vision model accepts float input tensors with the [1,3,384,384]
 shape, containing RGB image pixel values normalized in the [0,1] range.
@@ -403,7 +403,7 @@ shape, containing RGB image pixel values normalized in the [0,1] range.
 Text Encoder
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The text encoder is used by visual question answering tasks to build a
 question embedding representation. It takes ``input_ids`` with a
@@ -442,7 +442,7 @@ model and attention masks for them.
 Text Decoder
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The text decoder is responsible for generating the sequence of tokens to
 represent model output (answer to question or caption), using an image
@@ -525,12 +525,12 @@ shapes.
 Run OpenVINO Model
 ------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Prepare Inference Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 As discussed before, the model consists of several blocks which can be
 reused for building pipelines for different tasks. In the diagram below,
@@ -565,7 +565,7 @@ The next step is implementing both pipelines using OpenVINO models.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -624,7 +624,7 @@ Now, the model is ready for generation.
 Image Captioning
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -640,7 +640,7 @@ Image Captioning
 Question Answering
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -671,7 +671,7 @@ Optimize model using NNCF
 Quantize
 ~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding the quantization layers into the
@@ -723,7 +723,7 @@ The optimization process contains the following steps:
 Prepare dataset
 ^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The `VQAv2 <https://visualqa.org/>`__ is a dataset containing
 open-ended questions about images. These questions require an
@@ -833,7 +833,7 @@ time and depends on your internet connection.
 Vision model
 ^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -944,7 +944,7 @@ Vision model
 Text encoder
 ^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1052,7 +1052,7 @@ Text encoder
 Compress weights
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The quantization of the text decoder leads to significant accuracy loss.
 Instead of post-training quantization, we can use data free weights
@@ -1107,7 +1107,7 @@ The optimization process contains the following steps:
 Run optimized OpenVINO model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The steps for making predictions with the optimized OpenVINO BLIP model
 are similar to the PyTorch model. Let us check the model result using
@@ -1194,7 +1194,7 @@ Compare file sizes
 Compare inference time of the FP16 and optimized models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 models, we use median inference time on 100 samples of the calibration
@@ -1276,7 +1276,7 @@ quantized models.
 Interactive demo
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1324,7 +1324,7 @@ Interactive demo
 Next steps
 ----------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Open the `233-blip-optimize <233-blip-optimize-with-output.html>`__ notebook to
 quantize vision and text encoder models with the Post-training

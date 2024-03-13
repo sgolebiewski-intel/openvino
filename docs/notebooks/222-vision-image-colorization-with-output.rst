@@ -97,7 +97,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -116,7 +116,7 @@ Imports
 Configurations
 --------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 -  ``PRECISION`` - {FP16, FP32}, default: FP16.
 -  ``MODEL_DIR`` - directory where the model is to be stored, default:
@@ -137,7 +137,7 @@ Configurations
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -168,7 +168,7 @@ select device from dropdown list for running inference using OpenVINO
 Download the model
 ------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 ``omz_downloader`` downloads model files from online sources and, if
 necessary, patches them to make them more usable with Model Converter.
@@ -4314,7 +4314,7 @@ above.
 Convert the model to OpenVINO IR
 --------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 ``omz_converter`` converts the models that are not in the OpenVINO™ IR
 format into that format using model conversion API.
@@ -4379,7 +4379,7 @@ respectively
 Loading the Model
 -----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Load the model in OpenVINO Runtime with ``ie.read_model`` and compile it
 for the specified device with ``ie.compile_model``.
@@ -4396,7 +4396,7 @@ for the specified device with ``ie.compile_model``.
 Utility Functions
 -----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -4475,7 +4475,7 @@ Utility Functions
 Load the Image
 --------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -4543,7 +4543,7 @@ Load the Image
 Display Colorized Image
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

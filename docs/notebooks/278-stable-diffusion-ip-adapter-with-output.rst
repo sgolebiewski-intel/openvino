@@ -46,7 +46,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -83,7 +83,7 @@ Prerequisites
 Prepare Diffusers pipeline
 --------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 First of all, we should collect all components of our pipeline together.
 To work with Stable Diffusion, we will use HuggingFace
@@ -184,7 +184,7 @@ Additionally, LCM requires using LCMScheduler for efficient generation.
 Convert PyTorch models
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Starting from 2023.0 release, OpenVINO supports PyTorch models directly
 via Model Conversion API. ``ov.convert_model`` function accepts instance
@@ -205,7 +205,7 @@ Let us convert each part:
 Image Encoder
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 IP-Adapter relies on an image encoder to generate the image features.
 Usually
@@ -272,7 +272,7 @@ extractor as input and returns image embeddings.
 U-net
 ~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 U-Net model gradually denoises latent image representation guided by
 text encoder hidden state.
@@ -352,7 +352,7 @@ Model predicts the ``sample`` state for the next step.
 VAE Encoder and Decoder
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The VAE model has two parts, an encoder and a decoder. The encoder is
 used to convert the image into a low dimensional latent representation,
@@ -436,7 +436,7 @@ image in pipeline, we can discuss it in inference examples.
 Text Encoder
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The text-encoder is responsible for transforming the input prompt, for
 example, “a photo of an astronaut riding a horse” into an embedding
@@ -480,7 +480,7 @@ hidden states.
 Prepare OpenVINO inference pipeline
 -----------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 As shown on diagram below, the only difference between original Stable
 Diffusion pipeline and IP-Adapter Stable Diffusion pipeline only in
@@ -906,14 +906,14 @@ encoder (VAE).
 Run model inference
 -------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now let’s configure our pipeline and take a look on generation results.
 
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Select inference device from dropdown list.
 
@@ -967,7 +967,7 @@ Select inference device from dropdown list.
 Generation image variation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 If we stay input text prompt empty and provide only ip-adapter image, we
 can get variation of the same image.
@@ -1032,7 +1032,7 @@ can get variation of the same image.
 Generation conditioned by image and text
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 IP-Adapter allows you to use both image and text to condition the image
 generation process. Both IP-Adapter image and text prompt serve as
@@ -1064,7 +1064,7 @@ extension for each other, for example we can use a text prompt to add
 Generation image blending
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 IP-Adapter also works great with Image-to-Image translation. It helps to
 achieve image blending effect.
@@ -1095,7 +1095,7 @@ achieve image blending effect.
 Interactive demo
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now, you can try model using own images and text prompts.
 

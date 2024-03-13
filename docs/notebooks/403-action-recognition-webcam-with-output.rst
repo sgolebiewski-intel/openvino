@@ -73,7 +73,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -101,12 +101,12 @@ Imports
 The models
 ----------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Download the models
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Use the ``download_ir_model``, a function from the ``notebook_utils``
 file. It automatically creates a directory structure and downloads the
@@ -162,7 +162,7 @@ and the system automatically downloads the two models
 Load your labels
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 This tutorial uses `Kinetics-400
 dataset <https://deepmind.com/research/open-source/kinetics>`__, and
@@ -200,7 +200,7 @@ also provides the text file embedded into this notebook.
 Load the models
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Load the two models for this particular architecture, Encoder and
 Decoder. Downloaded models are located in a fixed structure, indicating
@@ -242,7 +242,7 @@ Select device from dropdown list for running inference using OpenVINO
 Model Initialization function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -276,7 +276,7 @@ Model Initialization function
 Initialization for Encoder and Decoder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -293,7 +293,7 @@ Initialization for Encoder and Decoder
 Helper functions
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Use the following helper functions for preprocessing and postprocessing
 frames:
@@ -416,7 +416,7 @@ frames:
 AI Functions
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Following the pipeline above, you will use the next functions to:
 
@@ -508,7 +508,7 @@ Following the pipeline above, you will use the next functions to:
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Running action recognition function will run in different operations,
 either a webcam or a video file. See the list of procedures below:
@@ -661,7 +661,7 @@ either a webcam or a video file. See the list of procedures below:
 Run Action Recognition
 ~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Find out how the model works in a video file. `Any format
 supported <https://docs.opencv.org/4.5.1/dd/d43/tutorial_py_video_display.html>`__

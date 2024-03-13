@@ -55,7 +55,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -88,7 +88,7 @@ Prerequisites
 Prepare pipeline
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Traditional Speaker Diarization systems can be generalized into a
 five-step process:
@@ -166,7 +166,7 @@ hub <https://huggingface.co/pyannote/speaker-diarization>`__.
 Load test audio file
 --------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -224,7 +224,7 @@ Load test audio file
 Run inference pipeline
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 For running inference, we should provide a path to input audio to the
 pipeline
@@ -287,7 +287,7 @@ We can also print each time frame and corresponding speaker:
 Convert model to OpenVINO Intermediate Representation format
 ------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 For best results with OpenVINO, it is recommended to convert the model
 to OpenVINO IR format. OpenVINO supports PyTorch via ONNX conversion. We
@@ -328,7 +328,7 @@ with ``ov.save_model``.
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -357,7 +357,7 @@ select device from dropdown list for running inference using OpenVINO
 Replace segmentation model with OpenVINO
 ----------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -389,7 +389,7 @@ Replace segmentation model with OpenVINO
 Run speaker diarization with OpenVINO
 -------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

@@ -40,7 +40,7 @@ Table of contents:
 Imports and Settings
 --------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Import NNCF and all auxiliary packages from your Python code. Set a name
 for the model, input image size, used batch size, and the learning rate.
@@ -428,7 +428,7 @@ models will be stored.
 Dataset Preprocessing
 ---------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Download and prepare Imagenette 160px dataset. - Number of classes: 10 -
 Download size: 94.18 MiB
@@ -488,7 +488,7 @@ Download size: 94.18 MiB
 Define a Floating-Point Model
 -----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -565,7 +565,7 @@ Define a Floating-Point Model
 Pre-train a Floating-Point Model
 --------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Using NNCF for model compression assumes that the user has a pre-trained
 model and a training pipeline.
@@ -636,7 +636,7 @@ model and a training pipeline.
 Create and Initialize Quantization
 ----------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 NNCF enables compression-aware training by integrating into regular
 training pipelines. The framework is designed so that modifications to
@@ -747,7 +747,7 @@ demonstrated here.
 Fine-tune the Compressed Model
 ------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 At this step, a regular fine-tuning process is applied to further
 improve quantized model accuracy. Normally, several epochs of tuning are
@@ -1845,7 +1845,7 @@ training pipeline are required. Here is a simple example.
 Export Models to OpenVINO Intermediate Representation (IR)
 ----------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Use model conversion Python API to convert the models to OpenVINO IR.
 
@@ -1882,7 +1882,7 @@ Executing this command may take a while.
 Benchmark Model Performance by Computing Inference Time
 -------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Finally, measure the inference performance of the ``FP32`` and ``INT8``
 models, using `Benchmark

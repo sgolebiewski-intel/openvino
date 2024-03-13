@@ -38,7 +38,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -75,7 +75,7 @@ Prerequisites
 Create and initialize quantization
 ----------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding the quantization layers into the
@@ -113,7 +113,7 @@ quantized model. 3. Serialize the ``INT8`` model using
 Prepare datasets
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The `Conceptual
 Captions <https://ai.google.com/research/ConceptualCaptions/>`__ dataset
@@ -443,7 +443,7 @@ in the NNCF repository for more information.
 Compare results for the OpenVINO FP16 model and the quantized model
 -------------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Compare the probability matrices for ``FP16`` and ``INT8`` models. More
 details about probability matrix can be found in
@@ -467,7 +467,7 @@ details about probability matrix can be found in
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -570,7 +570,7 @@ Get embeddings of quantized models
 Compare File Size
 ^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -607,7 +607,7 @@ Compare File Size
 Compare inference time of the FP16 IR and quantized models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 models, we use median inference time on calibration dataset. So we can

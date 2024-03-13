@@ -110,7 +110,7 @@ Table of contents:
 Imports
 ~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -176,7 +176,7 @@ Imports
 Loading models and checkpoints
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The complete pipeline here requires only two models: one for depth
 estimation and a ScaleMapLearner model which is responsible for
@@ -411,7 +411,7 @@ MiDaS-small      `model <https://github.com/isl-org/VI-Depth/releases/download/v
 Cleaning up the model directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 From the verbose of the previous step it is obvious that
 `torch.hub.load <https://pytorch.org/docs/stable/hub.html#torch.hub.load>`__
@@ -434,7 +434,7 @@ process.
 Transformation of models
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Each of the models need an appropriate transformation which can be
 invoked by the ``get_model_transforms`` function. It needs only the
@@ -471,7 +471,7 @@ model are always in direct correspondence with each other.
 Dummy input creation
 ^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Dummy inputs help during conversion. Although ``ov.convert_model``
 accepts any dummy input for a single pass through the model and thereby
@@ -554,7 +554,7 @@ dataset
 Conversion of depth model to OpenVINO IR format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Starting from 2023.0.0 release, OpenVINO supports PyTorch model via
 conversion to OpenVINO Intermediate Representation format (IR). To have
@@ -589,7 +589,7 @@ we shall follow the following steps:
 Select inference device
 '''''''''''''''''''''''
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -620,7 +620,7 @@ select device from dropdown list for running inference using OpenVINO
 Compilation of depth model
 ''''''''''''''''''''''''''
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now we can go ahead and compile our depth model.
 
@@ -677,7 +677,7 @@ Now we can go ahead and compile our depth model.
 Computation of scale and shift parameters
 '''''''''''''''''''''''''''''''''''''''''
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Computation of these parameters required the depth estimation model
 output from the previous step. These are the regression based parameters
@@ -787,7 +787,7 @@ purpose has already been created.
 Conversion of Scale Map Learner model to OpenVINO IR format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The OpenVINO™ toolkit provides direct method of converting PyTorch
 models to the intermediate representation format. To have the associated
@@ -885,7 +885,7 @@ common format of all checkpoint files from the model releases.
 Select inference device
 '''''''''''''''''''''''
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -905,7 +905,7 @@ select device from dropdown list for running inference using OpenVINO
 Compilation of the ScaleMapLearner(SML) model
 '''''''''''''''''''''''''''''''''''''''''''''
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now we can go ahead and compile our SML model.
 
@@ -964,7 +964,7 @@ Now we can go ahead and compile our SML model.
 Storing and visualizing dummy results obtained
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1021,7 +1021,7 @@ Storing and visualizing dummy results obtained
 Running inference on a test image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now role of both the dummy inputs i.e. the dummy image as well as its
 associated depth map is now over. Since we have access to the compiled
@@ -1114,7 +1114,7 @@ present*\ `here <https://drive.google.com/uc?id=1bbN46kR_hcH3GG8-jGRqAI433uddYrn
 Store and visualize Inference results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1163,7 +1163,7 @@ Store and visualize Inference results
 Cleaning up the data directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We will *follow suit* for the directory in which we downloaded images
 and depth maps from another repo. We shall move remove the unnecessary
@@ -1177,7 +1177,7 @@ directories and files which were created during the download process.
 Concluding notes
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
    1. The code for this tutorial is adapted from the `VI-Depth
       repository <https://github.com/isl-org/VI-Depth>`__.

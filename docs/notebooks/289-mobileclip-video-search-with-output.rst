@@ -47,7 +47,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__ ## Prerequisites
+## Prerequisites
 
 .. code:: ipython3
 
@@ -242,7 +242,7 @@ Unpacking objects: 100% (45/45), 428.50 KiB | 2.86 MiB/s, done.
 Select model
 ------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 For starting work, we should select model that will be used in our
 demonstration. By default, we will use the MobileCLIP model, but for
@@ -352,7 +352,7 @@ comparison purposes, you can select different models among:
 Run model inference
 -------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now, let’s see model in action. We will try to find image, where some
 specific object is represented using embeddings. Embeddings are a
@@ -373,7 +373,7 @@ represent are.
 Prepare image gallery
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -466,7 +466,7 @@ Prepare image gallery
 Prepare model
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The code bellow download model weights, create model class instance and
 preprocessing utilities
@@ -502,7 +502,7 @@ preprocessing utilities
 Perform search
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -547,7 +547,7 @@ Perform search
 Convert Model to OpenVINO Intermediate Representation format
 ------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 For best results with OpenVINO, it is recommended to convert the model
 to OpenVINO IR format. OpenVINO supports PyTorch via Model conversion
@@ -618,12 +618,12 @@ be used separately. Let’s convert each part to OpenVINO.
 Run OpenVINO model inference
 ----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Select device for image encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -657,7 +657,7 @@ Select device for image encoder
 Select device for text encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -680,7 +680,7 @@ Select device for text encoder
 Perform search
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -714,7 +714,7 @@ Perform search
 Interactive Demo
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 In this part, you can try different supported by tutorial models in
 searching frames in the video by text query or image. Upload v

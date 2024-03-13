@@ -74,7 +74,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -98,7 +98,7 @@ Imports
 Settings
 --------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -114,7 +114,7 @@ Settings
 Download Models
 ---------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The next cells will run Model Downloader to download the detection and
 recognition models. If the models have been downloaded before, they will
@@ -23277,7 +23277,7 @@ text-recognition-resnet-fc.
 Convert Models
 --------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The downloaded detection model is an Intel model, which is already in
 OpenVINO Intermediate Representation (OpenVINO IR) format. The text
@@ -23349,7 +23349,7 @@ Converting text-recognition-resnet-fc…
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -23378,7 +23378,7 @@ select device from dropdown list for running inference using OpenVINO
 Object Detection
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Load a detection model, load an image, do inference and get the
 detection inference result.
@@ -23386,7 +23386,7 @@ detection inference result.
 Load a Detection Model
 ~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -23400,7 +23400,7 @@ Load a Detection Model
 Load an Image
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -23428,7 +23428,7 @@ Load an Image
 Do Inference
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Text boxes are detected in the images and returned as blobs of data in
 the shape of ``[100, 5]``. Each description of detection has the
@@ -23445,7 +23445,7 @@ the shape of ``[100, 5]``. Each description of detection has the
 Get Detection Results
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -23516,7 +23516,7 @@ Get Detection Results
 Text Recognition
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Load the text recognition model and do inference on the detected boxes
 from the detection model.
@@ -23524,7 +23524,7 @@ from the detection model.
 Load Text Recognition Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -23543,7 +23543,7 @@ Load Text Recognition Model
 Do Inference
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -23591,12 +23591,12 @@ Do Inference
 Show Results
 ------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Show Detected Text Boxes and OCR Results for the Image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Visualize the result by drawing boxes around recognized text and showing
 the OCR result from the text recognition model.
@@ -23614,7 +23614,7 @@ the OCR result from the text recognition model.
 Show the OCR Result per Bounding Box
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Depending on the image, the OCR result may not be readable in the image
 with boxes, as displayed in the cell above. Use the code below to
@@ -23677,7 +23677,7 @@ robert
 Print Annotations in Plain Text Format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Print annotations for detected text based on their position in the input
 image, starting from the upper left corner.

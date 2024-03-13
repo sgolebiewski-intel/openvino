@@ -90,7 +90,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -134,7 +134,7 @@ Prerequisites
 Instantiate PyTorch model
 -------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To start work with the model, we should instantiate the PyTorch model
 class. ``imagebind_model.imagebind_huge(pretrained=True)`` downloads
@@ -172,7 +172,7 @@ card <https://github.com/facebookresearch/ImageBind/blob/main/model_card.md>`__.
 Prepare input data
 ------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 ImageBind works with data across 6 different modalities. Each of them
 requires its steps for preprocessing. ``data`` module is responsible for
@@ -206,7 +206,7 @@ data reading and preprocessing for each modality.
 Convert Model to OpenVINO Intermediate Representation (IR) format
 -----------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 OpenVINO supports PyTorch through Model Conversion API. You will use
 `model conversion Python
@@ -242,7 +242,7 @@ embeddings.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -307,7 +307,7 @@ select device from dropdown list for running inference using OpenVINO
 Zero-shot classification using ImageBind and OpenVINO
 -----------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 In zero-shot classification, a piece of data is embedded and fed to the
 model to retrieve a label that corresponds with the contents of the
@@ -370,7 +370,7 @@ they represent the same object.
 Text-Image classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -386,7 +386,7 @@ Text-Image classification
 Text-Audio classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -402,7 +402,7 @@ Text-Audio classification
 Image-Audio classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -517,7 +517,7 @@ Putting all together, we can match text, image, and sound for our data.
 Next Steps
 ----------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Open the `239-image-bind-quantize <239-image-bind-quantize-with-output.html>`__
 notebook to quantize the IR model with the Post-training Quantization

@@ -43,7 +43,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -84,7 +84,7 @@ Prerequisites
 Get a test image
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 First of all lets get a test image from an open dataset.
 
@@ -112,7 +112,7 @@ First of all lets get a test image from an open dataset.
 Download and prepare a model
 ----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Define width and height of the image that will be used by the network
 during inference. According to the input transforms function, the model
@@ -165,7 +165,7 @@ but there is only one for this model.
 Define a preprocessing and prepare an input data
 ------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 You can use ``torchvision.transforms`` to make a preprocessing or
 use\ `preprocessing transforms from the model
@@ -185,7 +185,7 @@ wight <https://pytorch.org/vision/stable/models.html#using-the-pre-trained-model
 Run an inference on the PyTorch model
 -------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -196,7 +196,7 @@ Run an inference on the PyTorch model
 Convert the original model to OpenVINO IR Format
 ------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To convert the original model to OpenVINO IR with ``FP16`` precision,
 use model conversion API. The models are saved inside the current
@@ -219,7 +219,7 @@ directory. For more information on how to convert models, see this
 Run an inference on the OpenVINO model
 --------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Select device from dropdown list for running inference using OpenVINO
 
@@ -259,7 +259,7 @@ Run an inference
 Show results
 ------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Confirm that the segmentation results look as expected by comparing
 model predictions on the OpenVINO IR and PyTorch models.
@@ -340,7 +340,7 @@ And now we can plot a boolean mask on top of the original image.
 Show results for the OpenVINO IR model
 --------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

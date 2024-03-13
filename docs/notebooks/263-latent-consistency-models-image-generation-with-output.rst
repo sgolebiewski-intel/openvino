@@ -76,7 +76,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -86,7 +86,7 @@ Prerequisites
 Prepare models for OpenVINO format conversion
 ---------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 In this tutorial we will use
 `LCM_Dreamshaper_v7 <https://huggingface.co/SimianLuo/LCM_Dreamshaper_v7>`__
@@ -206,7 +206,7 @@ provide which module should be loaded for initialization using
 Convert models to OpenVINO format
 ---------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Starting from 2023.0 release, OpenVINO supports PyTorch models directly
 via Model Conversion API. ``ov.convert_model`` function accepts instance
@@ -227,7 +227,7 @@ Let us convert each part:
 Text Encoder
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The text-encoder is responsible for transforming the input prompt, for
 example, “a photo of an astronaut riding a horse” into an embedding
@@ -313,7 +313,7 @@ hidden states.
 U-Net
 ~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 U-Net model, similar to Stable Diffusion UNet model, has four inputs:
 
@@ -386,7 +386,7 @@ Model predicts the ``sample`` state for the next step.
 VAE
 ~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The VAE model has two parts, an encoder and a decoder. The encoder is
 used to convert the image into a low dimensional latent representation,
@@ -465,7 +465,7 @@ VAE encoder, can be found in Stable Diffusion notebook.
 Prepare inference pipeline
 --------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Putting it all together, let us now take a closer look at how the model
 works in inference by illustrating the logical flow.
@@ -740,7 +740,7 @@ decoded by the decoder part of the variational auto encoder.
 Configure Inference Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 First, you should create instances of OpenVINO Model and compile it
 using selected device. Select device from dropdown list for running
@@ -802,7 +802,7 @@ scheduler and safety checker from original LCM pipeline.
 Text-to-image generation
 ------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now, let’s see model in action
 
@@ -845,7 +845,7 @@ Nice. As you can see, the picture has quite a high definition 🔥.
 Quantization
 ------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -908,7 +908,7 @@ Let’s load ``skip magic`` extension to skip quantization if
 Prepare calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We use a portion of
 `conceptual_captions <https://huggingface.co/datasets/conceptual_captions>`__
@@ -998,7 +998,7 @@ model inputs for calibration we should customize ``CompiledModel``.
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Create a quantized model from the pre-trained converted OpenVINO model.
 
@@ -1157,7 +1157,7 @@ data.
 Compare inference time of the FP16 and INT8 models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 pipelines, we use median inference time on calibration subset.
@@ -1219,7 +1219,7 @@ pipelines, we use median inference time on calibration subset.
 Compare UNet file size
 ^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1243,7 +1243,7 @@ Compare UNet file size
 Interactive demo
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

@@ -38,7 +38,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Install dependencies.
 
@@ -184,7 +184,7 @@ Load FP32 model IR.
 Prepare calibration datasets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Whisper consists of an encoder and a decoder models. We need to collect
 calibration data for both of them.
@@ -257,7 +257,7 @@ dataset from Hugging Face as calibration data.
 Quantize Whisper encoder and decoder models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Quantize both encoder and decoder models using ``nncf.quantize()`` API
 and save the quantized IRs after that.
@@ -352,7 +352,7 @@ and save the quantized IRs after that.
 Transcribe video with quantized OpenVINO model
 ----------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Load ``INT8`` models saved above into a new instance of Whisper model.
 
@@ -492,7 +492,7 @@ As you can see the result is almost the same.
 Compare performance and accuracy of the FP32 and INT8 IRs
 ---------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Compare model file size.
 
