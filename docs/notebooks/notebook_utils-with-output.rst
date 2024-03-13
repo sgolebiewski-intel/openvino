@@ -7,39 +7,39 @@ OpenVINO™ Notebooks. The code is synchronized with the
 
 There are four categories:
 
--  `Files <#Files>`__
--  `Images <#Images>`__
--  `Videos <#Videos>`__
--  `Visualization <#Visualization>`__
--  `Checks and Alerts <#Checks-and-Alerts>`__
+-  `Files <#files>`__
+-  `Images <#images>`__
+-  `Videos <#videos>`__
+-  `Visualization <#visualization>`__
+-  `Checks and Alerts <#checks-and-alerts>`__
 
 Each category contains a test cell that also shows how to use the
 functions in the section. #### Table of contents:
 
--  `Files <#Files>`__
+-  `Files <#files>`__
 
-   -  `Test File Functions <#Test-File-Functions>`__
+   -  `Test File Functions <#test-file-functions>`__
 
--  `Images <#Images>`__
+-  `Images <#images>`__
 
-   -  `Convert Pixel Data <#Convert-Pixel-Data>`__
+   -  `Convert Pixel Data <#convert-pixel-data>`__
    -  `Test Data Conversion
-      Functions <#Test-Data-Conversion-Functions>`__
+      Functions <#test-data-conversion-functions>`__
 
--  `Videos <#Videos>`__
+-  `Videos <#videos>`__
 
-   -  `Video Player <#Video-Player>`__
-   -  `Test Video Player <#Test-Video-Player>`__
+   -  `Video Player <#video-player>`__
+   -  `Test Video Player <#test-video-player>`__
 
--  `Visualization <#Visualization>`__
+-  `Visualization <#visualization>`__
 
-   -  `Segmentation <#Segmentation>`__
-   -  `Network Results <#Network-Results>`__
-   -  `Test Visualization Functions <#Test-Visualization-Functions>`__
+   -  `Segmentation <#segmentation>`__
+   -  `Network Results <#network-results>`__
+   -  `Test Visualization Functions <#test-visualization-functions>`__
 
--  `Checks and Alerts <#Checks-and-Alerts>`__
+-  `Checks and Alerts <#checks-and-alerts>`__
 
-   -  `Test Alerts <#Test-Alerts>`__
+   -  `Test Alerts <#test-alerts>`__
 
 .. code:: ipython3
 
@@ -71,7 +71,7 @@ functions in the section. #### Table of contents:
 Files
 -----
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Load an image, download a file, download an OpenVINO IR model, and
 create a progress bar to show download progress.
@@ -98,7 +98,7 @@ create a progress bar to show download progress.
 Test File Functions
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -192,12 +192,12 @@ Test File Functions
 Images
 ------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Convert Pixel Data
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Normalize image pixel values between 0 and 1, and convert images to
 ``RGB`` and ``BGR``.
@@ -222,7 +222,7 @@ Normalize image pixel values between 0 and 1, and convert images to
 Test Data Conversion Functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -248,12 +248,12 @@ Test Data Conversion Functions
 Videos
 ------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Video Player
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 A custom video player to fulfill FPS requirements. You can set target
 FPS and output size, flip the video horizontally or skip first N frames.
@@ -269,7 +269,7 @@ FPS and output size, flip the video horizontally or skip first N frames.
 Test Video Player
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -300,12 +300,12 @@ Test Video Player
 Visualization
 -------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Segmentation
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Define a ``SegmentationMap NamedTuple`` that keeps the labels and
 colormap for a segmentation project/dataset. Create
@@ -405,7 +405,7 @@ the original image.
 Network Results
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Show network result image, optionally together with the source image and
 a legend with labels.
@@ -419,7 +419,7 @@ a legend with labels.
 Test Visualization Functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -487,7 +487,7 @@ Test Visualization Functions
 Checks and Alerts
 -----------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Create an alert class to show stylized info/error/warning messages and a
 ``check_device`` function that checks whether a given device is
@@ -516,7 +516,7 @@ available.
 Test Alerts
 ~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 

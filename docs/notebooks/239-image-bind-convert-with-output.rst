@@ -70,27 +70,27 @@ zero-shot classification.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#Prerequisites>`__
--  `Instantiate PyTorch model <#Instantiate-PyTorch-model>`__
--  `Prepare input data <#Prepare-input-data>`__
+-  `Prerequisites <#prerequisites>`__
+-  `Instantiate PyTorch model <#instantiate-pytorch-model>`__
+-  `Prepare input data <#prepare-input-data>`__
 -  `Convert Model to OpenVINO Intermediate Representation (IR)
-   format <#Convert-Model-to-OpenVINO-Intermediate-Representation-(IR)-format>`__
+   format <#convert-model-to-openvino-intermediate-representation-ir-format>`__
 
-   -  `Select inference device <#Select-inference-device>`__
+   -  `Select inference device <#select-inference-device>`__
 
 -  `Zero-shot classification using ImageBind and
-   OpenVINO <#Zero-shot-classification-using-ImageBind-and-OpenVINO>`__
+   OpenVINO <#zero-shot-classification-using-imagebind-and-openvino>`__
 
-   -  `Text-Image classification <#Text-Image-classification>`__
-   -  `Text-Audio classification <#Text-Audio-classification>`__
-   -  `Image-Audio classification <#Image-Audio-classification>`__
+   -  `Text-Image classification <#text-image-classification>`__
+   -  `Text-Audio classification <#text-audio-classification>`__
+   -  `Image-Audio classification <#image-audio-classification>`__
 
--  `Next Steps <#Next-Steps>`__
+-  `Next Steps <#next-steps>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -134,7 +134,7 @@ Prerequisites
 Instantiate PyTorch model
 -------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 To start work with the model, we should instantiate the PyTorch model
 class. ``imagebind_model.imagebind_huge(pretrained=True)`` downloads
@@ -172,7 +172,7 @@ card <https://github.com/facebookresearch/ImageBind/blob/main/model_card.md>`__.
 Prepare input data
 ------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 ImageBind works with data across 6 different modalities. Each of them
 requires its steps for preprocessing. ``data`` module is responsible for
@@ -206,7 +206,7 @@ data reading and preprocessing for each modality.
 Convert Model to OpenVINO Intermediate Representation (IR) format
 -----------------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 OpenVINO supports PyTorch through Model Conversion API. You will use
 `model conversion Python
@@ -242,7 +242,7 @@ embeddings.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -307,7 +307,7 @@ select device from dropdown list for running inference using OpenVINO
 Zero-shot classification using ImageBind and OpenVINO
 -----------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 In zero-shot classification, a piece of data is embedded and fed to the
 model to retrieve a label that corresponds with the contents of the
@@ -370,7 +370,7 @@ they represent the same object.
 Text-Image classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -386,7 +386,7 @@ Text-Image classification
 Text-Audio classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -402,7 +402,7 @@ Text-Audio classification
 Image-Audio classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -517,8 +517,8 @@ Putting all together, we can match text, image, and sound for our data.
 Next Steps
 ----------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
-Open the `239-image-bind-quantize <239-image-bind-quantize.ipynb>`__
+Open the `239-image-bind-quantize <239-image-bind-quantize-with-output.html>`__
 notebook to quantize the IR model with the Post-training Quantization
 API of NNCF and compare ``FP16`` and ``INT8`` models.

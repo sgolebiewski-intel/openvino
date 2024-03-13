@@ -31,19 +31,19 @@ devices. It consists of the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Pre-requisites <#Pre-requisites>`__
--  `Imports and settings <#Imports-and-settings>`__
+-  `Pre-requisites <#pre-requisites>`__
+-  `Imports and settings <#imports-and-settings>`__
 -  `Convert Modes to OpenVINO Intermediate
-   Representation <#Convert-Modes-to-OpenVINO-Intermediate-Representation>`__
+   Representation <#convert-modes-to-openvino-intermediate-representation>`__
 
-   -  `Convert Prior Encoder. <#Convert-Prior-Encoder.>`__
-   -  `Convert ``SpeakerEncoder`` <#Convert-SpeakerEncoder>`__
-   -  `Convert Decoder <#Convert-Decoder>`__
+   -  `Convert Prior Encoder. <#convert-prior-encoder->`__
+   -  `Convert SpeakerEncoder <#convert-speakerencoder>`__
+   -  `Convert Decoder <#convert-decoder>`__
 
 Pre-requisites
 --------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 This steps can be done manually or will be performed automatically
 during the execution of the notebook, but in minimum necessary scope. 1.
@@ -99,17 +99,156 @@ Check if FreeVC is installed and append its path to ``sys.path``
 .. parsed-literal::
 
     remote: Enumerating objects: 131, done.[K
-    remote: Counting objects:   1% (1/65)[Kremote: Counting objects:   3% (2/65)[Kremote: Counting objects:   4% (3/65)[Kremote: Counting objects:   6% (4/65)[Kremote: Counting objects:   7% (5/65)[Kremote: Counting objects:   9% (6/65)[Kremote: Counting objects:  10% (7/65)[Kremote: Counting objects:  12% (8/65)[Kremote: Counting objects:  13% (9/65)[Kremote: Counting objects:  15% (10/65)[Kremote: Counting objects:  16% (11/65)[Kremote: Counting objects:  18% (12/65)[Kremote: Counting objects:  20% (13/65)[Kremote: Counting objects:  21% (14/65)[Kremote: Counting objects:  23% (15/65)[Kremote: Counting objects:  24% (16/65)[Kremote: Counting objects:  26% (17/65)[Kremote: Counting objects:  27% (18/65)[Kremote: Counting objects:  29% (19/65)[Kremote: Counting objects:  30% (20/65)[Kremote: Counting objects:  32% (21/65)[Kremote: Counting objects:  33% (22/65)[Kremote: Counting objects:  35% (23/65)[Kremote: Counting objects:  36% (24/65)[Kremote: Counting objects:  38% (25/65)[Kremote: Counting objects:  40% (26/65)[Kremote: Counting objects:  41% (27/65)[Kremote: Counting objects:  43% (28/65)[Kremote: Counting objects:  44% (29/65)[Kremote: Counting objects:  46% (30/65)[Kremote: Counting objects:  47% (31/65)[Kremote: Counting objects:  49% (32/65)[Kremote: Counting objects:  50% (33/65)[Kremote: Counting objects:  52% (34/65)[Kremote: Counting objects:  53% (35/65)[Kremote: Counting objects:  55% (36/65)[Kremote: Counting objects:  56% (37/65)[Kremote: Counting objects:  58% (38/65)[Kremote: Counting objects:  60% (39/65)[Kremote: Counting objects:  61% (40/65)[Kremote: Counting objects:  63% (41/65)[Kremote: Counting objects:  64% (42/65)[Kremote: Counting objects:  66% (43/65)[Kremote: Counting objects:  67% (44/65)[Kremote: Counting objects:  69% (45/65)[Kremote: Counting objects:  70% (46/65)[Kremote: Counting objects:  72% (47/65)[Kremote: Counting objects:  73% (48/65)[Kremote: Counting objects:  75% (49/65)[Kremote: Counting objects:  76% (50/65)[Kremote: Counting objects:  78% (51/65)[Kremote: Counting objects:  80% (52/65)[Kremote: Counting objects:  81% (53/65)[Kremote: Counting objects:  83% (54/65)[Kremote: Counting objects:  84% (55/65)[Kremote: Counting objects:  86% (56/65)[Kremote: Counting objects:  87% (57/65)[Kremote: Counting objects:  89% (58/65)[Kremote: Counting objects:  90% (59/65)[Kremote: Counting objects:  92% (60/65)[Kremote: Counting objects:  93% (61/65)[Kremote: Counting objects:  95% (62/65)[Kremote: Counting objects:  96% (63/65)[Kremote: Counting objects:  98% (64/65)[Kremote: Counting objects: 100% (65/65)[Kremote: Counting objects: 100% (65/65), done.[K
-    remote: Compressing objects:   2% (1/41)[Kremote: Compressing objects:   4% (2/41)[Kremote: Compressing objects:   7% (3/41)[Kremote: Compressing objects:   9% (4/41)[Kremote: Compressing objects:  12% (5/41)[Kremote: Compressing objects:  14% (6/41)[Kremote: Compressing objects:  17% (7/41)[Kremote: Compressing objects:  19% (8/41)[Kremote: Compressing objects:  21% (9/41)[Kremote: Compressing objects:  24% (10/41)[Kremote: Compressing objects:  26% (11/41)[Kremote: Compressing objects:  29% (12/41)[Kremote: Compressing objects:  31% (13/41)[Kremote: Compressing objects:  34% (14/41)[Kremote: Compressing objects:  36% (15/41)[Kremote: Compressing objects:  39% (16/41)[Kremote: Compressing objects:  41% (17/41)[Kremote: Compressing objects:  43% (18/41)[Kremote: Compressing objects:  46% (19/41)[Kremote: Compressing objects:  48% (20/41)[Kremote: Compressing objects:  51% (21/41)[Kremote: Compressing objects:  53% (22/41)[Kremote: Compressing objects:  56% (23/41)[Kremote: Compressing objects:  58% (24/41)[Kremote: Compressing objects:  60% (25/41)[Kremote: Compressing objects:  63% (26/41)[Kremote: Compressing objects:  65% (27/41)[Kremote: Compressing objects:  68% (28/41)[Kremote: Compressing objects:  70% (29/41)[Kremote: Compressing objects:  73% (30/41)[Kremote: Compressing objects:  75% (31/41)[Kremote: Compressing objects:  78% (32/41)[Kremote: Compressing objects:  80% (33/41)[Kremote: Compressing objects:  82% (34/41)[Kremote: Compressing objects:  85% (35/41)[Kremote: Compressing objects:  87% (36/41)[Kremote: Compressing objects:  90% (37/41)[Kremote: Compressing objects:  92% (38/41)[Kremote: Compressing objects:  95% (39/41)[Kremote: Compressing objects:  97% (40/41)[Kremote: Compressing objects: 100% (41/41)[Kremote: Compressing objects: 100% (41/41), done.[K
+    remote: Counting objects:   1% (1/65)[K
+remote: Counting objects:   3% (2/65)[K
+remote: Counting objects:   4% (3/65)[K
+remote: Counting objects:   6% (4/65)[K
+remote: Counting objects:   7% (5/65)[K
+remote: Counting objects:   9% (6/65)[K
+remote: Counting objects:  10% (7/65)[K
+remote: Counting objects:  12% (8/65)[K
+remote: Counting objects:  13% (9/65)[K
+remote: Counting objects:  15% (10/65)[K
+remote: Counting objects:  16% (11/65)[K
+remote: Counting objects:  18% (12/65)[K
+remote: Counting objects:  20% (13/65)[K
+remote: Counting objects:  21% (14/65)[K
+remote: Counting objects:  23% (15/65)[K
+remote: Counting objects:  24% (16/65)[K
+remote: Counting objects:  26% (17/65)[K
+remote: Counting objects:  27% (18/65)[K
+remote: Counting objects:  29% (19/65)[K
+remote: Counting objects:  30% (20/65)[K
+remote: Counting objects:  32% (21/65)[K
+remote: Counting objects:  33% (22/65)[K
+remote: Counting objects:  35% (23/65)[K
+remote: Counting objects:  36% (24/65)[K
+remote: Counting objects:  38% (25/65)[K
+remote: Counting objects:  40% (26/65)[K
+remote: Counting objects:  41% (27/65)[K
+remote: Counting objects:  43% (28/65)[K
+remote: Counting objects:  44% (29/65)[K
+remote: Counting objects:  46% (30/65)[K
+remote: Counting objects:  47% (31/65)[K
+remote: Counting objects:  49% (32/65)[K
+remote: Counting objects:  50% (33/65)[K
+remote: Counting objects:  52% (34/65)[K
+remote: Counting objects:  53% (35/65)[K
+remote: Counting objects:  55% (36/65)[K
+remote: Counting objects:  56% (37/65)[K
+remote: Counting objects:  58% (38/65)[K
+remote: Counting objects:  60% (39/65)[K
+remote: Counting objects:  61% (40/65)[K
+remote: Counting objects:  63% (41/65)[K
+remote: Counting objects:  64% (42/65)[K
+remote: Counting objects:  66% (43/65)[K
+remote: Counting objects:  67% (44/65)[K
+remote: Counting objects:  69% (45/65)[K
+remote: Counting objects:  70% (46/65)[K
+remote: Counting objects:  72% (47/65)[K
+remote: Counting objects:  73% (48/65)[K
+remote: Counting objects:  75% (49/65)[K
+remote: Counting objects:  76% (50/65)[K
+remote: Counting objects:  78% (51/65)[K
+remote: Counting objects:  80% (52/65)[K
+remote: Counting objects:  81% (53/65)[K
+remote: Counting objects:  83% (54/65)[K
+remote: Counting objects:  84% (55/65)[K
+remote: Counting objects:  86% (56/65)[K
+remote: Counting objects:  87% (57/65)[K
+remote: Counting objects:  89% (58/65)[K
+remote: Counting objects:  90% (59/65)[K
+remote: Counting objects:  92% (60/65)[K
+remote: Counting objects:  93% (61/65)[K
+remote: Counting objects:  95% (62/65)[K
+remote: Counting objects:  96% (63/65)[K
+remote: Counting objects:  98% (64/65)[K
+remote: Counting objects: 100% (65/65)[K
+remote: Counting objects: 100% (65/65), done.[K
+    remote: Compressing objects:   2% (1/41)[K
+remote: Compressing objects:   4% (2/41)[K
+remote: Compressing objects:   7% (3/41)[K
+remote: Compressing objects:   9% (4/41)[K
+remote: Compressing objects:  12% (5/41)[K
+remote: Compressing objects:  14% (6/41)[K
+remote: Compressing objects:  17% (7/41)[K
+remote: Compressing objects:  19% (8/41)[K
+remote: Compressing objects:  21% (9/41)[K
+remote: Compressing objects:  24% (10/41)[K
+remote: Compressing objects:  26% (11/41)[K
+remote: Compressing objects:  29% (12/41)[K
+remote: Compressing objects:  31% (13/41)[K
+remote: Compressing objects:  34% (14/41)[K
+remote: Compressing objects:  36% (15/41)[K
+remote: Compressing objects:  39% (16/41)[K
+remote: Compressing objects:  41% (17/41)[K
+remote: Compressing objects:  43% (18/41)[K
+remote: Compressing objects:  46% (19/41)[K
+remote: Compressing objects:  48% (20/41)[K
+remote: Compressing objects:  51% (21/41)[K
+remote: Compressing objects:  53% (22/41)[K
+remote: Compressing objects:  56% (23/41)[K
+remote: Compressing objects:  58% (24/41)[K
+remote: Compressing objects:  60% (25/41)[K
+remote: Compressing objects:  63% (26/41)[K
+remote: Compressing objects:  65% (27/41)[K
+remote: Compressing objects:  68% (28/41)[K
+remote: Compressing objects:  70% (29/41)[K
+remote: Compressing objects:  73% (30/41)[K
+remote: Compressing objects:  75% (31/41)[K
+remote: Compressing objects:  78% (32/41)[K
+remote: Compressing objects:  80% (33/41)[K
+remote: Compressing objects:  82% (34/41)[K
+remote: Compressing objects:  85% (35/41)[K
+remote: Compressing objects:  87% (36/41)[K
+remote: Compressing objects:  90% (37/41)[K
+remote: Compressing objects:  92% (38/41)[K
+remote: Compressing objects:  95% (39/41)[K
+remote: Compressing objects:  97% (40/41)[K
+remote: Compressing objects: 100% (41/41)[K
+remote: Compressing objects: 100% (41/41), done.[K
 
 
 .. parsed-literal::
 
-    Receiving objects:   0% (1/131)Receiving objects:   1% (2/131)Receiving objects:   2% (3/131)Receiving objects:   3% (4/131)Receiving objects:   4% (6/131)Receiving objects:   5% (7/131)Receiving objects:   6% (8/131)Receiving objects:   7% (10/131)Receiving objects:   8% (11/131)Receiving objects:   9% (12/131)Receiving objects:  10% (14/131)Receiving objects:  11% (15/131)Receiving objects:  12% (16/131)Receiving objects:  13% (18/131)Receiving objects:  14% (19/131)Receiving objects:  15% (20/131)Receiving objects:  16% (21/131)Receiving objects:  17% (23/131)Receiving objects:  18% (24/131)Receiving objects:  19% (25/131)Receiving objects:  20% (27/131)Receiving objects:  21% (28/131)Receiving objects:  22% (29/131)Receiving objects:  23% (31/131)Receiving objects:  24% (32/131)Receiving objects:  25% (33/131)Receiving objects:  26% (35/131)Receiving objects:  27% (36/131)Receiving objects:  28% (37/131)Receiving objects:  29% (38/131)Receiving objects:  30% (40/131)Receiving objects:  31% (41/131)Receiving objects:  32% (42/131)
+    Receiving objects:   0% (1/131)
+Receiving objects:   1% (2/131)
+Receiving objects:   2% (3/131)
+Receiving objects:   3% (4/131)
+Receiving objects:   4% (6/131)
+Receiving objects:   5% (7/131)
+Receiving objects:   6% (8/131)
+Receiving objects:   7% (10/131)
+Receiving objects:   8% (11/131)
+Receiving objects:   9% (12/131)
+Receiving objects:  10% (14/131)
+Receiving objects:  11% (15/131)
+Receiving objects:  12% (16/131)
+Receiving objects:  13% (18/131)
+Receiving objects:  14% (19/131)
+Receiving objects:  15% (20/131)
+Receiving objects:  16% (21/131)
+Receiving objects:  17% (23/131)
+Receiving objects:  18% (24/131)
+Receiving objects:  19% (25/131)
+Receiving objects:  20% (27/131)
+Receiving objects:  21% (28/131)
+Receiving objects:  22% (29/131)
+Receiving objects:  23% (31/131)
+Receiving objects:  24% (32/131)
+Receiving objects:  25% (33/131)
+Receiving objects:  26% (35/131)
+Receiving objects:  27% (36/131)
+Receiving objects:  28% (37/131)
+Receiving objects:  29% (38/131)
+Receiving objects:  30% (40/131)
+Receiving objects:  31% (41/131)
+Receiving objects:  32% (42/131)
 
 .. parsed-literal::
 
-    Receiving objects:  33% (44/131)Receiving objects:  34% (45/131)
+    Receiving objects:  33% (44/131)
+Receiving objects:  34% (45/131)
 
 .. parsed-literal::
 
@@ -121,17 +260,93 @@ Check if FreeVC is installed and append its path to ``sys.path``
 
 .. parsed-literal::
 
-    Receiving objects:  35% (46/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  36% (48/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  37% (49/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  38% (50/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  39% (52/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  40% (53/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  41% (54/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  42% (56/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  43% (57/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  44% (58/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  45% (59/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  46% (61/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  47% (62/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  48% (63/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  49% (65/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  50% (66/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  51% (67/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  52% (69/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  53% (70/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  54% (71/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  55% (73/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  56% (74/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  57% (75/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  58% (76/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  59% (78/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  60% (79/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  61% (80/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  62% (82/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  63% (83/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  64% (84/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  65% (86/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  66% (87/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  67% (88/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  68% (90/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  69% (91/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  70% (92/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  71% (94/131), 12.64 MiB | 4.81 MiB/s
+    Receiving objects:  35% (46/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  36% (48/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  37% (49/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  38% (50/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  39% (52/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  40% (53/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  41% (54/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  42% (56/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  43% (57/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  44% (58/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  45% (59/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  46% (61/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  47% (62/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  48% (63/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  49% (65/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  50% (66/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  51% (67/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  52% (69/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  53% (70/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  54% (71/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  55% (73/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  56% (74/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  57% (75/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  58% (76/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  59% (78/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  60% (79/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  61% (80/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  62% (82/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  63% (83/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  64% (84/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  65% (86/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  66% (87/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  67% (88/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  68% (90/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  69% (91/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  70% (92/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  71% (94/131), 12.64 MiB | 4.81 MiB/s
 
 .. parsed-literal::
 
     remote: Total 131 (delta 39), reused 24 (delta 24), pack-reused 66[K
-    Receiving objects:  72% (95/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  73% (96/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  74% (97/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  75% (99/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  76% (100/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  77% (101/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  78% (103/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  79% (104/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  80% (105/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  81% (107/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  82% (108/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  83% (109/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  84% (111/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  85% (112/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  86% (113/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  87% (114/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  88% (116/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  89% (117/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  90% (118/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  91% (120/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  92% (121/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  93% (122/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  94% (124/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  95% (125/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  96% (126/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  97% (128/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  98% (129/131), 12.64 MiB | 4.81 MiB/sReceiving objects:  99% (130/131), 12.64 MiB | 4.81 MiB/sReceiving objects: 100% (131/131), 12.64 MiB | 4.81 MiB/sReceiving objects: 100% (131/131), 15.28 MiB | 5.25 MiB/s, done.
-    Resolving deltas:   0% (0/43)Resolving deltas:  16% (7/43)Resolving deltas:  25% (11/43)
+    Receiving objects:  72% (95/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  73% (96/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  74% (97/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  75% (99/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  76% (100/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  77% (101/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  78% (103/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  79% (104/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  80% (105/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  81% (107/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  82% (108/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  83% (109/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  84% (111/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  85% (112/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  86% (113/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  87% (114/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  88% (116/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  89% (117/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  90% (118/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  91% (120/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  92% (121/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  93% (122/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  94% (124/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  95% (125/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  96% (126/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  97% (128/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  98% (129/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects:  99% (130/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects: 100% (131/131), 12.64 MiB | 4.81 MiB/s
+Receiving objects: 100% (131/131), 15.28 MiB | 5.25 MiB/s, done.
+    Resolving deltas:   0% (0/43)
+Resolving deltas:  16% (7/43)
+Resolving deltas:  25% (11/43)
 
 .. parsed-literal::
 
-    Resolving deltas:  51% (22/43)Resolving deltas:  65% (28/43)Resolving deltas:  67% (29/43)Resolving deltas:  74% (32/43)Resolving deltas:  81% (35/43)Resolving deltas:  83% (36/43)Resolving deltas:  90% (39/43)Resolving deltas:  95% (41/43)Resolving deltas: 100% (43/43)Resolving deltas: 100% (43/43), done.
+    Resolving deltas:  51% (22/43)
+Resolving deltas:  65% (28/43)
+Resolving deltas:  67% (29/43)
+Resolving deltas:  74% (32/43)
+Resolving deltas:  81% (35/43)
+Resolving deltas:  83% (36/43)
+Resolving deltas:  90% (39/43)
+Resolving deltas:  95% (41/43)
+Resolving deltas: 100% (43/43)
+Resolving deltas: 100% (43/43), done.
 
 
 .. code:: ipython3
@@ -203,7 +418,7 @@ Check if FreeVC is installed and append its path to ``sys.path``
 Imports and settings
 --------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -306,19 +521,23 @@ Inference
 
 .. parsed-literal::
 
-    0it [00:00, ?it/s]
+    
+0it [00:00, ?it/s]
 
 .. parsed-literal::
 
-    1it [00:00,  1.08it/s]
+    
+1it [00:00,  1.08it/s]
 
 .. parsed-literal::
 
-    2it [00:01,  1.26it/s]
+    
+2it [00:01,  1.26it/s]
 
 .. parsed-literal::
 
-    2it [00:01,  1.23it/s]
+    
+2it [00:01,  1.23it/s]
 
 .. parsed-literal::
 
@@ -330,7 +549,7 @@ Result audio files should be available in ‘outputs/freevc’
 Convert Modes to OpenVINO Intermediate Representation
 =====================================================
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Convert each model to OpenVINO IR, with FP16 precision. The
 ``ov.convert_model`` function accepts the original PyTorch model object
@@ -345,7 +564,7 @@ conversion, see this
 Convert Prior Encoder.
 ~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 First we convert WavLM model, as a part of Convert Prior Encoder to
 OpenVINO’s IR format. We keep the original name of the model in code:
@@ -434,7 +653,7 @@ Select device from dropdown list for running inference using OpenVINO
 Convert ``SpeakerEncoder``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -589,7 +808,7 @@ Then compile model.
 Convert Decoder
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 In the same way export ``SynthesizerTrn`` model, that implements decoder
 function to OpenVINO IR format.
@@ -681,19 +900,23 @@ And now we can check inference using only IR models.
 
 .. parsed-literal::
 
-    0it [00:00, ?it/s]
+    
+0it [00:00, ?it/s]
 
 .. parsed-literal::
 
-    1it [00:00,  1.68it/s]
+    
+1it [00:00,  1.68it/s]
 
 .. parsed-literal::
 
-    2it [00:01,  1.19it/s]
+    
+2it [00:01,  1.19it/s]
 
 .. parsed-literal::
 
-    2it [00:01,  1.25it/s]
+    
+2it [00:01,  1.25it/s]
 
 .. parsed-literal::
 
@@ -810,14 +1033,14 @@ inference. Use rate corresponding to the value of
 
 
 
-.. raw:: html
-
-    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 
 
 
 
-.. parsed-literal::
+
+
+
+
 
     
 
