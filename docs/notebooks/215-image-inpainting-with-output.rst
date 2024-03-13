@@ -12,29 +12,36 @@ original image. The Following pipeline will be used in this notebook.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Download the Model <#download-the-model>`__
+-  `Download the Model <#Download-the-Model>`__
 -  `Convert Tensorflow model to OpenVINO IR
-   format <#convert-tensorflow-model-to-openvino-ir-format>`__
--  `Load the model <#load-the-model>`__
+   format <#Convert-Tensorflow-model-to-OpenVINO-IR-format>`__
+-  `Load the model <#Load-the-model>`__
 -  `Determine the input shapes of the
-   model <#determine-the-input-shapes-of-the-model>`__
--  `Create a square mask <#create-a-square-mask>`__
--  `Load and Resize the Image <#load-and-resize-the-image>`__
--  `Generating the Masked Image <#generating-the-masked-image>`__
--  `Preprocessing <#preprocessing>`__
--  `Inference <#inference>`__
--  `Save the Restored Image <#save-the-restored-image>`__
+   model <#Determine-the-input-shapes-of-the-model>`__
+-  `Create a square mask <#Create-a-square-mask>`__
+-  `Load and Resize the Image <#Load-and-Resize-the-Image>`__
+-  `Generating the Masked Image <#Generating-the-Masked-Image>`__
+-  `Preprocessing <#Preprocessing>`__
+-  `Inference <#Inference>`__
+-  `Save the Restored Image <#Save-the-Restored-Image>`__
 
 .. |pipeline| image:: https://user-images.githubusercontent.com/4547501/165792473-ba784c0d-0a37-409f-a5f6-bb1849c1d140.png
 
 .. code:: ipython3
 
-    %pip install -q "openvino>=2023.1.0" "opencv-python" "matplotlib"
+    import platform
+    
+    %pip install -q "openvino>=2023.1.0" "opencv-python"
+    
+    if platform.system() != "Windows":
+        %pip install -q "matplotlib>=3.4"
+    else:
+        %pip install -q "matplotlib>=3.4,<3.7"
 
 
 .. parsed-literal::
 
-
+    
     [notice] A new release of pip is available: 23.2.1 -> 23.3.1
     [notice] To update, run: pip install --upgrade pip
     Note: you may need to restart the kernel to use updated packages.
@@ -44,20 +51,20 @@ Table of contents:
 
     import sys
     from pathlib import Path
-
+    
     import cv2
     import matplotlib.pyplot as plt
     import numpy as np
     from zipfile import ZipFile
     import openvino as ov
-
+    
     sys.path.append("../utils")
     import notebook_utils as utils
 
 Download the Model
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download ``gmcnn-places2-tf``\ model (this step will be skipped if the
 model is already downloaded) and then unzip it. Downloaded model stored
@@ -71,14 +78,14 @@ be obtained from original model checkpoint can be found in this
     base_model_dir = "model"
     # The name of the model from Open Model Zoo.
     model_name = "gmcnn-places2-tf"
-
+    
     model_path = Path(f"{base_model_dir}/public/{model_name}/frozen_model.pb")
     if not model_path.exists():
         model_url = f"https://storage.openvinotoolkit.org/repositories/open_model_zoo/public/2022.1/gmcnn-places2-tf/{model_name}.zip"
         utils.download_file(model_url, model_name, base_model_dir)
     else:
         print("Already downloaded")
-
+    
     with ZipFile(f'{base_model_dir}/{model_name}' + '', "r") as zip_ref:
         zip_ref.extractall(path=Path(base_model_dir, 'public', ))
 
@@ -91,7 +98,7 @@ be obtained from original model checkpoint can be found in this
 Convert Tensorflow model to OpenVINO IR format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The pre-trained model is in TensorFlow format. To use it with OpenVINO,
 convert it to OpenVINO IR format with model conversion API. For more
@@ -103,7 +110,7 @@ This step is also skipped if the model is already converted.
 
     model_dir = Path(base_model_dir, 'public', 'ir')
     ir_path = Path(f"{model_dir}/frozen_model.xml")
-
+    
     # Run model conversion API to convert model to OpenVINO IR FP32 format, if the IR file does not exist.
     if not ir_path.exists():
         ov_model = ov.convert_model(model_path, input=[[1,512,680,3],[1,512,680,1]])
@@ -120,7 +127,7 @@ This step is also skipped if the model is already converted.
 Load the model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, load the OpenVINO IR model and perform as follows:
 
@@ -135,21 +142,21 @@ Only a few lines of code are required to run the model:
 .. code:: ipython3
 
     core = ov.Core()
-
+    
     # Read the model.xml and weights file
     model = core.read_model(model=ir_path)
 
 .. code:: ipython3
 
     import ipywidgets as widgets
-
+    
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
         value='AUTO',
         description='Device:',
         disabled=False,
     )
-
+    
     device
 
 
@@ -172,7 +179,7 @@ Only a few lines of code are required to run the model:
 Determine the input shapes of the model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Note that both input shapes are the same. However, the second input has
 1 channel (monotone).
@@ -184,7 +191,7 @@ Note that both input shapes are the same. However, the second input has
 Create a square mask
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Next, create a single channeled mask that will be laid on top of the
 original image.
@@ -194,14 +201,14 @@ original image.
     def create_mask(image_width, image_height, size_x=30, size_y=30, number=1):
         """
         Create a square mask of defined size on a random location.
-
+    
         :param: image_width: width of the image
         :param: image_height: height of the image
         :param: size: size in pixels of one side
         :returns:
                 mask: grayscale float32 mask of size shaped [image_height, image_width, 1]
         """
-
+    
         mask = np.zeros((image_height, image_width, 1), dtype=np.float32)
         for _ in range(number):
             start_x = np.random.randint(image_width - size_x)
@@ -229,7 +236,7 @@ original image.
 Load and Resize the Image
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This image will be altered by using the mask. You can process any image
 you like. Just change the URL below.
@@ -237,14 +244,14 @@ you like. Just change the URL below.
 .. code:: ipython3
 
     img_path = Path("data/laptop.png")
-
+    
     if not img_path.exists():
         # Download an image.
         url = "https://user-images.githubusercontent.com/29454499/281372079-fa8d84c4-8bf9-4a82-a1b9-5a74ad42ce47.png"
         image_file = utils.download_file(
             url, filename="laptop.png", directory="data", show_progress=False, silent=True, timeout=30
         )
-
+    
     # Read the image.
     image = cv2.imread(str(img_path))
     # Resize the image to meet network expected input sizes.
@@ -260,7 +267,7 @@ you like. Just change the URL below.
 Generating the Masked Image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This multiplication of the image and the mask gives the result of the
 masked image layered on top of the original image. The ``masked_image``
@@ -281,7 +288,7 @@ will be the first input to the GMCNN model.
 Preprocessing
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The model expects the input dimensions to be ``NHWC``.
 
@@ -296,7 +303,7 @@ The model expects the input dimensions to be ``NHWC``.
 Inference
 ~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Do inference with the given masked image and the mask. Then, show the
 restored image.
@@ -316,7 +323,7 @@ restored image.
 Save the Restored Image
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Save the restored image to the data directory to download it.
 
