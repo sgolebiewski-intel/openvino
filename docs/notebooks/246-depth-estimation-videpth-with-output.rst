@@ -398,7 +398,7 @@ depth prediction model as you will see.
 .. parsed-literal::
 
 
-100%|██████████| 81.8M/81.8M [00:01<00:00, 43.0MB/s]
+   100%|██████████| 81.8M/81.8M [00:01<00:00, 43.0MB/s]
 
 
 Cleaning up the model directory

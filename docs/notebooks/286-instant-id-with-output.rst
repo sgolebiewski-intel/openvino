@@ -63,9 +63,9 @@ Table of contents:
 - `Convert InstantID pipeline components to OpenVINO Intermediate Representation format <#convert-instantid-pipeline-components-to-openvino-intermediate-representation-format>`__
 
   - `ControlNet <#controlnet>`__
-  - `unet<#unet>`__
+  - `unet <#unet>`__
   - `VAE Decoder <#vae-decoder>`__
-  - `textencoders<#text-encoders>`__
+  - `text encoders <#text-encoders>`__
   - `Image Projection Model <#image-projection-model>`__
 
 - `Prepare OpenVINO InstantID Pipeline <#prepare-openvino-instantid-pipeline>`__
@@ -73,7 +73,7 @@ Table of contents:
 
   - `Select inference device for InstantID <#select-inference-device-for-instantid>`__
   - `Create pipeline <#create-pipeline>`__
-  - `runinference<#run-inference>`__
+  - `run inference <#run-inference>`__
 
 - `Quantization <#quantization>`__
 
