@@ -17,7 +17,7 @@ post <https://stability.ai/news/stability-ai-sdxl-turbo>`__.
 
 Previously, we already discussed how to launch Stable Diffusion XL model
 using OpenVINO in the following
-`notebook <../248-stable-diffusion-xl>`__, in this tutorial we will
+`notebook <248-stable-diffusion-xl-with-output.html>`__, in this tutorial we will
 focus on the
 `SDXL-turbo <https://huggingface.co/stabilityai/sdxl-turbo>`__ version.
 Additionally, to improve image decoding speed, we will use `Tiny
@@ -33,31 +33,31 @@ used to convert the models to OpenVINO™ IR format.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#Prerequisites>`__
+-  `Prerequisites <#prerequisites>`__
 -  `Convert model to OpenVINO
-   format <#Convert-model-to-OpenVINO-format>`__
--  `Text-to-image generation <#Text-to-image-generation>`__
+   format <#convert-model-to-openvino-format>`__
+-  `Text-to-image generation <#text-to-image-generation>`__
 
    -  `Select inference device for text-to-image
-      generation <#Select-inference-device-for-text-to-image-generation>`__
+      generation <#select-inference-device-for-text-to-image-generation>`__
 
--  `Image-to-Image generation <#Image-to-Image-generation>`__
--  `Quantization <#Quantization>`__
+-  `Image-to-Image generation <#image-to-image-generation>`__
+-  `Quantization <#quantization>`__
 
-   -  `Prepare calibration dataset <#Prepare-calibration-dataset>`__
-   -  `Run quantization <#Run-quantization>`__
+   -  `Prepare calibration dataset <#prepare-calibration-dataset>`__
+   -  `Run quantization <#run-quantization>`__
 
-      -  `Compare UNet file size <#Compare-UNet-file-size>`__
+      -  `Compare UNet file size <#compare-unet-file-size>`__
 
    -  `Compare inference time of the FP16 and INT8
-      models <#Compare-inference-time-of-the-FP16-and-INT8-models>`__
+      models <#compare-inference-time-of-the-fp16-and-int8-models>`__
 
--  `Interactive Demo <#Interactive-Demo>`__
+-  `Interactive Demo <#interactive-demo>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -67,7 +67,7 @@ Prerequisites
 Convert model to OpenVINO format
 --------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 `sdxl-turbo <https://huggingface.co/stabilityai/sdxl-turbo>`__ is
 available for downloading via the `HuggingFace
@@ -157,7 +157,7 @@ back to image format.
 Text-to-image generation
 ------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Text-to-image generation lets you create images using text description.
 To start generating images, we need to load models first. To load an
@@ -170,7 +170,7 @@ should be passed. Additionally, you can specify an inference device.
 Select inference device for text-to-image generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -256,7 +256,7 @@ disabled using ``guidance_scale = 0``
 Image-to-Image generation
 -------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Image-to-image generation lets you transform images to match the
 characteristics provided in the text description. We can reuse the
@@ -327,7 +327,7 @@ finally, we get 0.5 \* 2.0 = 1 step in our pipeline.
 Quantization
 ------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -387,7 +387,7 @@ improve model inference speed.
 Prepare calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 We use a portion of
 `conceptual_captions <https://huggingface.co/datasets/conceptual_captions>`__
@@ -470,7 +470,7 @@ model inputs for calibration we should customize ``CompiledModel``.
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Create a quantized model from the pre-trained converted OpenVINO model.
 Quantization of the first and last ``Convolution`` layers impacts the
@@ -583,7 +583,7 @@ data.
 Compare UNet file size
 ^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -607,7 +607,7 @@ Compare UNet file size
 Compare inference time of the FP16 and INT8 models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 pipelines, we use median inference time on calibration subset.
@@ -680,7 +680,7 @@ pipelines, we use median inference time on calibration subset.
 Interactive Demo
 ----------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Now, you can check model work using own text descriptions. Provide text
 prompt in the text box and launch generation using Run button.

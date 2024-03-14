@@ -51,16 +51,16 @@ below.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#Imports>`__
--  `Prepare the Model <#Prepare-the-Model>`__
--  `Prepare LibriSpeech Dataset <#Prepare-LibriSpeech-Dataset>`__
--  `Prepare calibration dataset <#Prepare-calibration-dataset>`__
--  `Prepare validation function <#Prepare-validation-function>`__
+-  `Imports <#imports>`__
+-  `Prepare the Model <#prepare-the-model>`__
+-  `Prepare LibriSpeech Dataset <#prepare-librispeech-dataset>`__
+-  `Prepare calibration dataset <#prepare-calibration-dataset>`__
+-  `Prepare validation function <#prepare-validation-function>`__
 -  `Run quantization with accuracy
-   control <#Run-quantization-with-accuracy-control>`__
--  `Model Usage Example <#Model-Usage-Example>`__
+   control <#run-quantization-with-accuracy-control>`__
+-  `Model Usage Example <#model-usage-example>`__
 -  `Compare Accuracy of the Original and Quantized
-   Models <#Compare-Accuracy-of-the-Original-and-Quantized-Models>`__
+   Models <#compare-accuracy-of-the-original-and-quantized-models>`__
 
 .. code:: ipython3
 
@@ -71,7 +71,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -92,7 +92,7 @@ Imports
 Prepare the Model
 -----------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 For instantiating PyTorch model class, we should use
 ``Wav2Vec2ForCTC.from_pretrained`` method with providing model ID for
@@ -148,7 +148,7 @@ Convert it to the OpenVINO Intermediate Representation (OpenVINO IR)
 Prepare LibriSpeech Dataset
 ---------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 For demonstration purposes, we will use short dummy version of
 LibriSpeech dataset - ``patrickvonplaten/librispeech_asr_dummy`` to
@@ -186,7 +186,7 @@ dataset.
 Prepare calibration dataset
 ---------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -213,7 +213,7 @@ Prepare calibration dataset
 Prepare validation function
 ---------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Define the validation function.
 
@@ -245,7 +245,7 @@ Define the validation function.
 Run quantization with accuracy control
 --------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 You should provide the calibration dataset and the validation dataset.
 It can be the same dataset. - parameter ``max_drop`` defines the
@@ -303,7 +303,7 @@ value 25 to speed up the execution.
     INFO:nncf:Validation of initial model was started
 
 
-.. parsed-literal::
+
 
     
 
@@ -347,7 +347,7 @@ value 25 to speed up the execution.
 Model Usage Example
 -------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -414,7 +414,7 @@ Next, make a prediction.
 Compare Accuracy of the Original and Quantized Models
 -----------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 -  Define dataloader for test dataset.
 -  Define functions to get inference for PyTorch and OpenVINO models.

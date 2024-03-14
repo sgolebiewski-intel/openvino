@@ -96,24 +96,24 @@ realtime tracking,” in ICIP, 2016, pp. 3464–3468.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#Imports>`__
--  `Download the Model <#Download-the-Model>`__
--  `Load model <#Load-model>`__
+-  `Imports <#imports>`__
+-  `Download the Model <#download-the-model>`__
+-  `Load model <#load-model>`__
 
-   -  `Select inference device <#Select-inference-device>`__
+   -  `Select inference device <#select-inference-device>`__
 
--  `Data Processing <#Data-Processing>`__
+-  `Data Processing <#data-processing>`__
 -  `Test person reidentification
-   model <#Test-person-reidentification-model>`__
+   model <#test-person-reidentification-model>`__
 
-   -  `Visualize data <#Visualize-data>`__
-   -  `Compare two persons <#Compare-two-persons>`__
+   -  `Visualize data <#visualize-data>`__
+   -  `Compare two persons <#compare-two-persons>`__
 
--  `Main Processing Function <#Main-Processing-Function>`__
--  `Run <#Run>`__
+-  `Main Processing Function <#main-processing-function>`__
+-  `Run <#run>`__
 
-   -  `Initialize tracker <#Initialize-tracker>`__
-   -  `Run Live Person Tracking <#Run-Live-Person-Tracking>`__
+   -  `Initialize tracker <#initialize-tracker>`__
+   -  `Run Live Person Tracking <#run-live-person-tracking>`__
 
 .. code:: ipython3
 
@@ -161,7 +161,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -199,7 +199,7 @@ Imports
 Download the Model
 ------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 We will use pre-trained models from OpenVINO’s `Open Model
 Zoo <https://docs.openvino.ai/2024/documentation/legacy-features/model-zoo.html>`__
@@ -273,7 +273,14 @@ replace the name of the model in the code below.
 
 .. parsed-literal::
 
-    ... 25%, 64 KB, 949 KB/s, 0 seconds passed... 38%, 96 KB, 1383 KB/s, 0 seconds passed... 51%, 128 KB, 1281 KB/s, 0 seconds passed... 64%, 160 KB, 1583 KB/s, 0 seconds passed... 77%, 192 KB, 1870 KB/s, 0 seconds passed... 89%, 224 KB, 2139 KB/s, 0 seconds passed... 100%, 248 KB, 2354 KB/s, 0 seconds passed
+    ... 25%, 64 KB, 949 KB/s, 0 seconds passed
+... 38%, 96 KB, 1383 KB/s, 0 seconds passed
+... 51%, 128 KB, 1281 KB/s, 0 seconds passed
+... 64%, 160 KB, 1583 KB/s, 0 seconds passed
+... 77%, 192 KB, 1870 KB/s, 0 seconds passed
+... 89%, 224 KB, 2139 KB/s, 0 seconds passed
+... 100%, 248 KB, 2354 KB/s, 0 seconds passed
+
     
     ========== Downloading model/intel/person-detection-0202/FP16/person-detection-0202.bin
 
@@ -284,23 +291,129 @@ replace the name of the model in the code below.
 
 .. parsed-literal::
 
-    ... 1%, 64 KB, 927 KB/s, 0 seconds passed... 2%, 96 KB, 1379 KB/s, 0 seconds passed... 3%, 128 KB, 1816 KB/s, 0 seconds passed
+    ... 1%, 64 KB, 927 KB/s, 0 seconds passed
+... 2%, 96 KB, 1379 KB/s, 0 seconds passed
+... 3%, 128 KB, 1816 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 4%, 160 KB, 1550 KB/s, 0 seconds passed... 5%, 192 KB, 1839 KB/s, 0 seconds passed... 6%, 224 KB, 2116 KB/s, 0 seconds passed... 7%, 256 KB, 2400 KB/s, 0 seconds passed... 8%, 288 KB, 2674 KB/s, 0 seconds passed... 9%, 320 KB, 2301 KB/s, 0 seconds passed... 9%, 352 KB, 2523 KB/s, 0 seconds passed... 10%, 384 KB, 2745 KB/s, 0 seconds passed... 11%, 416 KB, 2967 KB/s, 0 seconds passed... 12%, 448 KB, 3183 KB/s, 0 seconds passed
+    ... 4%, 160 KB, 1550 KB/s, 0 seconds passed
+... 5%, 192 KB, 1839 KB/s, 0 seconds passed
+... 6%, 224 KB, 2116 KB/s, 0 seconds passed
+... 7%, 256 KB, 2400 KB/s, 0 seconds passed
+... 8%, 288 KB, 2674 KB/s, 0 seconds passed
+... 9%, 320 KB, 2301 KB/s, 0 seconds passed
+... 9%, 352 KB, 2523 KB/s, 0 seconds passed
+... 10%, 384 KB, 2745 KB/s, 0 seconds passed
+... 11%, 416 KB, 2967 KB/s, 0 seconds passed
+... 12%, 448 KB, 3183 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 13%, 480 KB, 3378 KB/s, 0 seconds passed... 14%, 512 KB, 3587 KB/s, 0 seconds passed... 15%, 544 KB, 3793 KB/s, 0 seconds passed... 16%, 576 KB, 3996 KB/s, 0 seconds passed... 17%, 608 KB, 4194 KB/s, 0 seconds passed... 18%, 640 KB, 3715 KB/s, 0 seconds passed... 18%, 672 KB, 3887 KB/s, 0 seconds passed... 19%, 704 KB, 4062 KB/s, 0 seconds passed... 20%, 736 KB, 4237 KB/s, 0 seconds passed... 21%, 768 KB, 4399 KB/s, 0 seconds passed... 22%, 800 KB, 4567 KB/s, 0 seconds passed... 23%, 832 KB, 4740 KB/s, 0 seconds passed... 24%, 864 KB, 4910 KB/s, 0 seconds passed... 25%, 896 KB, 5079 KB/s, 0 seconds passed... 26%, 928 KB, 5247 KB/s, 0 seconds passed... 27%, 960 KB, 5404 KB/s, 0 seconds passed... 27%, 992 KB, 5572 KB/s, 0 seconds passed... 28%, 1024 KB, 5730 KB/s, 0 seconds passed... 29%, 1056 KB, 5885 KB/s, 0 seconds passed... 30%, 1088 KB, 6048 KB/s, 0 seconds passed... 31%, 1120 KB, 6215 KB/s, 0 seconds passed... 32%, 1152 KB, 6370 KB/s, 0 seconds passed... 33%, 1184 KB, 6532 KB/s, 0 seconds passed... 34%, 1216 KB, 6694 KB/s, 0 seconds passed... 35%, 1248 KB, 6856 KB/s, 0 seconds passed... 36%, 1280 KB, 7010 KB/s, 0 seconds passed
+    ... 13%, 480 KB, 3378 KB/s, 0 seconds passed
+... 14%, 512 KB, 3587 KB/s, 0 seconds passed
+... 15%, 544 KB, 3793 KB/s, 0 seconds passed
+... 16%, 576 KB, 3996 KB/s, 0 seconds passed
+... 17%, 608 KB, 4194 KB/s, 0 seconds passed
+... 18%, 640 KB, 3715 KB/s, 0 seconds passed
+... 18%, 672 KB, 3887 KB/s, 0 seconds passed
+... 19%, 704 KB, 4062 KB/s, 0 seconds passed
+... 20%, 736 KB, 4237 KB/s, 0 seconds passed
+... 21%, 768 KB, 4399 KB/s, 0 seconds passed
+... 22%, 800 KB, 4567 KB/s, 0 seconds passed
+... 23%, 832 KB, 4740 KB/s, 0 seconds passed
+... 24%, 864 KB, 4910 KB/s, 0 seconds passed
+... 25%, 896 KB, 5079 KB/s, 0 seconds passed
+... 26%, 928 KB, 5247 KB/s, 0 seconds passed
+... 27%, 960 KB, 5404 KB/s, 0 seconds passed
+... 27%, 992 KB, 5572 KB/s, 0 seconds passed
+... 28%, 1024 KB, 5730 KB/s, 0 seconds passed
+... 29%, 1056 KB, 5885 KB/s, 0 seconds passed
+... 30%, 1088 KB, 6048 KB/s, 0 seconds passed
+... 31%, 1120 KB, 6215 KB/s, 0 seconds passed
+... 32%, 1152 KB, 6370 KB/s, 0 seconds passed
+... 33%, 1184 KB, 6532 KB/s, 0 seconds passed
+... 34%, 1216 KB, 6694 KB/s, 0 seconds passed
+... 35%, 1248 KB, 6856 KB/s, 0 seconds passed
+... 36%, 1280 KB, 7010 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 36%, 1312 KB, 6346 KB/s, 0 seconds passed... 37%, 1344 KB, 6485 KB/s, 0 seconds passed... 38%, 1376 KB, 6627 KB/s, 0 seconds passed... 39%, 1408 KB, 6768 KB/s, 0 seconds passed... 40%, 1440 KB, 6910 KB/s, 0 seconds passed... 41%, 1472 KB, 6946 KB/s, 0 seconds passed... 42%, 1504 KB, 7079 KB/s, 0 seconds passed... 43%, 1536 KB, 7216 KB/s, 0 seconds passed... 44%, 1568 KB, 7353 KB/s, 0 seconds passed... 45%, 1600 KB, 7489 KB/s, 0 seconds passed... 45%, 1632 KB, 7625 KB/s, 0 seconds passed... 46%, 1664 KB, 7760 KB/s, 0 seconds passed... 47%, 1696 KB, 7895 KB/s, 0 seconds passed... 48%, 1728 KB, 8029 KB/s, 0 seconds passed... 49%, 1760 KB, 8162 KB/s, 0 seconds passed... 50%, 1792 KB, 8296 KB/s, 0 seconds passed... 51%, 1824 KB, 8428 KB/s, 0 seconds passed... 52%, 1856 KB, 8561 KB/s, 0 seconds passed... 53%, 1888 KB, 8694 KB/s, 0 seconds passed... 54%, 1920 KB, 8825 KB/s, 0 seconds passed... 54%, 1952 KB, 8956 KB/s, 0 seconds passed... 55%, 1984 KB, 9086 KB/s, 0 seconds passed... 56%, 2016 KB, 9216 KB/s, 0 seconds passed... 57%, 2048 KB, 9346 KB/s, 0 seconds passed... 58%, 2080 KB, 9474 KB/s, 0 seconds passed... 59%, 2112 KB, 9604 KB/s, 0 seconds passed... 60%, 2144 KB, 9732 KB/s, 0 seconds passed... 61%, 2176 KB, 9861 KB/s, 0 seconds passed... 62%, 2208 KB, 9989 KB/s, 0 seconds passed... 63%, 2240 KB, 10116 KB/s, 0 seconds passed... 64%, 2272 KB, 10243 KB/s, 0 seconds passed... 64%, 2304 KB, 10370 KB/s, 0 seconds passed... 65%, 2336 KB, 10500 KB/s, 0 seconds passed... 66%, 2368 KB, 10629 KB/s, 0 seconds passed... 67%, 2400 KB, 10759 KB/s, 0 seconds passed... 68%, 2432 KB, 10888 KB/s, 0 seconds passed... 69%, 2464 KB, 11018 KB/s, 0 seconds passed... 70%, 2496 KB, 11147 KB/s, 0 seconds passed... 71%, 2528 KB, 11277 KB/s, 0 seconds passed... 72%, 2560 KB, 11410 KB/s, 0 seconds passed... 73%, 2592 KB, 11542 KB/s, 0 seconds passed... 73%, 2624 KB, 11675 KB/s, 0 seconds passed... 74%, 2656 KB, 10924 KB/s, 0 seconds passed
+    ... 36%, 1312 KB, 6346 KB/s, 0 seconds passed
+... 37%, 1344 KB, 6485 KB/s, 0 seconds passed
+... 38%, 1376 KB, 6627 KB/s, 0 seconds passed
+... 39%, 1408 KB, 6768 KB/s, 0 seconds passed
+... 40%, 1440 KB, 6910 KB/s, 0 seconds passed
+... 41%, 1472 KB, 6946 KB/s, 0 seconds passed
+... 42%, 1504 KB, 7079 KB/s, 0 seconds passed
+... 43%, 1536 KB, 7216 KB/s, 0 seconds passed
+... 44%, 1568 KB, 7353 KB/s, 0 seconds passed
+... 45%, 1600 KB, 7489 KB/s, 0 seconds passed
+... 45%, 1632 KB, 7625 KB/s, 0 seconds passed
+... 46%, 1664 KB, 7760 KB/s, 0 seconds passed
+... 47%, 1696 KB, 7895 KB/s, 0 seconds passed
+... 48%, 1728 KB, 8029 KB/s, 0 seconds passed
+... 49%, 1760 KB, 8162 KB/s, 0 seconds passed
+... 50%, 1792 KB, 8296 KB/s, 0 seconds passed
+... 51%, 1824 KB, 8428 KB/s, 0 seconds passed
+... 52%, 1856 KB, 8561 KB/s, 0 seconds passed
+... 53%, 1888 KB, 8694 KB/s, 0 seconds passed
+... 54%, 1920 KB, 8825 KB/s, 0 seconds passed
+... 54%, 1952 KB, 8956 KB/s, 0 seconds passed
+... 55%, 1984 KB, 9086 KB/s, 0 seconds passed
+... 56%, 2016 KB, 9216 KB/s, 0 seconds passed
+... 57%, 2048 KB, 9346 KB/s, 0 seconds passed
+... 58%, 2080 KB, 9474 KB/s, 0 seconds passed
+... 59%, 2112 KB, 9604 KB/s, 0 seconds passed
+... 60%, 2144 KB, 9732 KB/s, 0 seconds passed
+... 61%, 2176 KB, 9861 KB/s, 0 seconds passed
+... 62%, 2208 KB, 9989 KB/s, 0 seconds passed
+... 63%, 2240 KB, 10116 KB/s, 0 seconds passed
+... 64%, 2272 KB, 10243 KB/s, 0 seconds passed
+... 64%, 2304 KB, 10370 KB/s, 0 seconds passed
+... 65%, 2336 KB, 10500 KB/s, 0 seconds passed
+... 66%, 2368 KB, 10629 KB/s, 0 seconds passed
+... 67%, 2400 KB, 10759 KB/s, 0 seconds passed
+... 68%, 2432 KB, 10888 KB/s, 0 seconds passed
+... 69%, 2464 KB, 11018 KB/s, 0 seconds passed
+... 70%, 2496 KB, 11147 KB/s, 0 seconds passed
+... 71%, 2528 KB, 11277 KB/s, 0 seconds passed
+... 72%, 2560 KB, 11410 KB/s, 0 seconds passed
+... 73%, 2592 KB, 11542 KB/s, 0 seconds passed
+... 73%, 2624 KB, 11675 KB/s, 0 seconds passed
+... 74%, 2656 KB, 10924 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 75%, 2688 KB, 11031 KB/s, 0 seconds passed... 76%, 2720 KB, 11145 KB/s, 0 seconds passed... 77%, 2752 KB, 11258 KB/s, 0 seconds passed... 78%, 2784 KB, 11370 KB/s, 0 seconds passed... 79%, 2816 KB, 11483 KB/s, 0 seconds passed... 80%, 2848 KB, 11595 KB/s, 0 seconds passed... 81%, 2880 KB, 11707 KB/s, 0 seconds passed... 82%, 2912 KB, 11819 KB/s, 0 seconds passed... 82%, 2944 KB, 11929 KB/s, 0 seconds passed... 83%, 2976 KB, 12040 KB/s, 0 seconds passed... 84%, 3008 KB, 12151 KB/s, 0 seconds passed... 85%, 3040 KB, 12262 KB/s, 0 seconds passed... 86%, 3072 KB, 12373 KB/s, 0 seconds passed... 87%, 3104 KB, 12483 KB/s, 0 seconds passed... 88%, 3136 KB, 12593 KB/s, 0 seconds passed... 89%, 3168 KB, 12702 KB/s, 0 seconds passed... 90%, 3200 KB, 12811 KB/s, 0 seconds passed... 91%, 3232 KB, 12920 KB/s, 0 seconds passed... 91%, 3264 KB, 13028 KB/s, 0 seconds passed... 92%, 3296 KB, 13138 KB/s, 0 seconds passed... 93%, 3328 KB, 13245 KB/s, 0 seconds passed... 94%, 3360 KB, 13352 KB/s, 0 seconds passed... 95%, 3392 KB, 13460 KB/s, 0 seconds passed... 96%, 3424 KB, 13571 KB/s, 0 seconds passed... 97%, 3456 KB, 13682 KB/s, 0 seconds passed... 98%, 3488 KB, 13793 KB/s, 0 seconds passed... 99%, 3520 KB, 13904 KB/s, 0 seconds passed... 100%, 3549 KB, 14001 KB/s, 0 seconds passed
+    ... 75%, 2688 KB, 11031 KB/s, 0 seconds passed
+... 76%, 2720 KB, 11145 KB/s, 0 seconds passed
+... 77%, 2752 KB, 11258 KB/s, 0 seconds passed
+... 78%, 2784 KB, 11370 KB/s, 0 seconds passed
+... 79%, 2816 KB, 11483 KB/s, 0 seconds passed
+... 80%, 2848 KB, 11595 KB/s, 0 seconds passed
+... 81%, 2880 KB, 11707 KB/s, 0 seconds passed
+... 82%, 2912 KB, 11819 KB/s, 0 seconds passed
+... 82%, 2944 KB, 11929 KB/s, 0 seconds passed
+... 83%, 2976 KB, 12040 KB/s, 0 seconds passed
+... 84%, 3008 KB, 12151 KB/s, 0 seconds passed
+... 85%, 3040 KB, 12262 KB/s, 0 seconds passed
+... 86%, 3072 KB, 12373 KB/s, 0 seconds passed
+... 87%, 3104 KB, 12483 KB/s, 0 seconds passed
+... 88%, 3136 KB, 12593 KB/s, 0 seconds passed
+... 89%, 3168 KB, 12702 KB/s, 0 seconds passed
+... 90%, 3200 KB, 12811 KB/s, 0 seconds passed
+... 91%, 3232 KB, 12920 KB/s, 0 seconds passed
+... 91%, 3264 KB, 13028 KB/s, 0 seconds passed
+... 92%, 3296 KB, 13138 KB/s, 0 seconds passed
+... 93%, 3328 KB, 13245 KB/s, 0 seconds passed
+... 94%, 3360 KB, 13352 KB/s, 0 seconds passed
+... 95%, 3392 KB, 13460 KB/s, 0 seconds passed
+... 96%, 3424 KB, 13571 KB/s, 0 seconds passed
+... 97%, 3456 KB, 13682 KB/s, 0 seconds passed
+... 98%, 3488 KB, 13793 KB/s, 0 seconds passed
+... 99%, 3520 KB, 13904 KB/s, 0 seconds passed
+... 100%, 3549 KB, 14001 KB/s, 0 seconds passed
+
     
 
 
@@ -317,19 +430,124 @@ replace the name of the model in the code below.
 
 .. parsed-literal::
 
-    ... 1%, 64 KB, 992 KB/s, 0 seconds passed... 2%, 96 KB, 1467 KB/s, 0 seconds passed... 3%, 128 KB, 1928 KB/s, 0 seconds passed... 4%, 160 KB, 1669 KB/s, 0 seconds passed... 5%, 192 KB, 1973 KB/s, 0 seconds passed... 6%, 224 KB, 2260 KB/s, 0 seconds passed... 7%, 256 KB, 2553 KB/s, 0 seconds passed... 8%, 288 KB, 2850 KB/s, 0 seconds passed
+    ... 1%, 64 KB, 992 KB/s, 0 seconds passed
+... 2%, 96 KB, 1467 KB/s, 0 seconds passed
+... 3%, 128 KB, 1928 KB/s, 0 seconds passed
+... 4%, 160 KB, 1669 KB/s, 0 seconds passed
+... 5%, 192 KB, 1973 KB/s, 0 seconds passed
+... 6%, 224 KB, 2260 KB/s, 0 seconds passed
+... 7%, 256 KB, 2553 KB/s, 0 seconds passed
+... 8%, 288 KB, 2850 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 9%, 320 KB, 2490 KB/s, 0 seconds passed... 10%, 352 KB, 2729 KB/s, 0 seconds passed... 11%, 384 KB, 2939 KB/s, 0 seconds passed... 11%, 416 KB, 3162 KB/s, 0 seconds passed... 12%, 448 KB, 3383 KB/s, 0 seconds passed... 13%, 480 KB, 3597 KB/s, 0 seconds passed... 14%, 512 KB, 3810 KB/s, 0 seconds passed... 15%, 544 KB, 4021 KB/s, 0 seconds passed... 16%, 576 KB, 4231 KB/s, 0 seconds passed... 17%, 608 KB, 4431 KB/s, 0 seconds passed
+    ... 9%, 320 KB, 2490 KB/s, 0 seconds passed
+... 10%, 352 KB, 2729 KB/s, 0 seconds passed
+... 11%, 384 KB, 2939 KB/s, 0 seconds passed
+... 11%, 416 KB, 3162 KB/s, 0 seconds passed
+... 12%, 448 KB, 3383 KB/s, 0 seconds passed
+... 13%, 480 KB, 3597 KB/s, 0 seconds passed
+... 14%, 512 KB, 3810 KB/s, 0 seconds passed
+... 15%, 544 KB, 4021 KB/s, 0 seconds passed
+... 16%, 576 KB, 4231 KB/s, 0 seconds passed
+... 17%, 608 KB, 4431 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 18%, 640 KB, 3977 KB/s, 0 seconds passed... 19%, 672 KB, 4160 KB/s, 0 seconds passed... 20%, 704 KB, 4347 KB/s, 0 seconds passed... 21%, 736 KB, 4532 KB/s, 0 seconds passed... 22%, 768 KB, 4718 KB/s, 0 seconds passed... 22%, 800 KB, 4903 KB/s, 0 seconds passed... 23%, 832 KB, 5085 KB/s, 0 seconds passed... 24%, 864 KB, 5268 KB/s, 0 seconds passed... 25%, 896 KB, 5448 KB/s, 0 seconds passed... 26%, 928 KB, 5628 KB/s, 0 seconds passed... 27%, 960 KB, 5807 KB/s, 0 seconds passed... 28%, 992 KB, 5986 KB/s, 0 seconds passed... 29%, 1024 KB, 6162 KB/s, 0 seconds passed... 30%, 1056 KB, 6339 KB/s, 0 seconds passed... 31%, 1088 KB, 6520 KB/s, 0 seconds passed... 32%, 1120 KB, 6701 KB/s, 0 seconds passed... 33%, 1152 KB, 6880 KB/s, 0 seconds passed... 33%, 1184 KB, 6997 KB/s, 0 seconds passed... 34%, 1216 KB, 7165 KB/s, 0 seconds passed... 35%, 1248 KB, 7339 KB/s, 0 seconds passed... 36%, 1280 KB, 6601 KB/s, 0 seconds passed... 37%, 1312 KB, 6746 KB/s, 0 seconds passed... 38%, 1344 KB, 6894 KB/s, 0 seconds passed... 39%, 1376 KB, 7042 KB/s, 0 seconds passed... 40%, 1408 KB, 7189 KB/s, 0 seconds passed... 41%, 1440 KB, 7338 KB/s, 0 seconds passed... 42%, 1472 KB, 7486 KB/s, 0 seconds passed... 43%, 1504 KB, 7633 KB/s, 0 seconds passed... 44%, 1536 KB, 7780 KB/s, 0 seconds passed... 44%, 1568 KB, 7927 KB/s, 0 seconds passed... 45%, 1600 KB, 8074 KB/s, 0 seconds passed... 46%, 1632 KB, 8219 KB/s, 0 seconds passed... 47%, 1664 KB, 8365 KB/s, 0 seconds passed... 48%, 1696 KB, 8507 KB/s, 0 seconds passed... 49%, 1728 KB, 8650 KB/s, 0 seconds passed... 50%, 1760 KB, 8794 KB/s, 0 seconds passed... 51%, 1792 KB, 8937 KB/s, 0 seconds passed... 52%, 1824 KB, 9079 KB/s, 0 seconds passed... 53%, 1856 KB, 9221 KB/s, 0 seconds passed... 54%, 1888 KB, 9363 KB/s, 0 seconds passed... 55%, 1920 KB, 9503 KB/s, 0 seconds passed... 55%, 1952 KB, 9643 KB/s, 0 seconds passed... 56%, 1984 KB, 9782 KB/s, 0 seconds passed... 57%, 2016 KB, 9922 KB/s, 0 seconds passed... 58%, 2048 KB, 10059 KB/s, 0 seconds passed... 59%, 2080 KB, 10198 KB/s, 0 seconds passed... 60%, 2112 KB, 10334 KB/s, 0 seconds passed... 61%, 2144 KB, 10472 KB/s, 0 seconds passed... 62%, 2176 KB, 10608 KB/s, 0 seconds passed... 63%, 2208 KB, 10745 KB/s, 0 seconds passed... 64%, 2240 KB, 10884 KB/s, 0 seconds passed... 65%, 2272 KB, 11024 KB/s, 0 seconds passed... 66%, 2304 KB, 11164 KB/s, 0 seconds passed... 66%, 2336 KB, 11303 KB/s, 0 seconds passed... 67%, 2368 KB, 11442 KB/s, 0 seconds passed... 68%, 2400 KB, 11581 KB/s, 0 seconds passed... 69%, 2432 KB, 11717 KB/s, 0 seconds passed... 70%, 2464 KB, 11854 KB/s, 0 seconds passed... 71%, 2496 KB, 11992 KB/s, 0 seconds passed
+    ... 18%, 640 KB, 3977 KB/s, 0 seconds passed
+... 19%, 672 KB, 4160 KB/s, 0 seconds passed
+... 20%, 704 KB, 4347 KB/s, 0 seconds passed
+... 21%, 736 KB, 4532 KB/s, 0 seconds passed
+... 22%, 768 KB, 4718 KB/s, 0 seconds passed
+... 22%, 800 KB, 4903 KB/s, 0 seconds passed
+... 23%, 832 KB, 5085 KB/s, 0 seconds passed
+... 24%, 864 KB, 5268 KB/s, 0 seconds passed
+... 25%, 896 KB, 5448 KB/s, 0 seconds passed
+... 26%, 928 KB, 5628 KB/s, 0 seconds passed
+... 27%, 960 KB, 5807 KB/s, 0 seconds passed
+... 28%, 992 KB, 5986 KB/s, 0 seconds passed
+... 29%, 1024 KB, 6162 KB/s, 0 seconds passed
+... 30%, 1056 KB, 6339 KB/s, 0 seconds passed
+... 31%, 1088 KB, 6520 KB/s, 0 seconds passed
+... 32%, 1120 KB, 6701 KB/s, 0 seconds passed
+... 33%, 1152 KB, 6880 KB/s, 0 seconds passed
+... 33%, 1184 KB, 6997 KB/s, 0 seconds passed
+... 34%, 1216 KB, 7165 KB/s, 0 seconds passed
+... 35%, 1248 KB, 7339 KB/s, 0 seconds passed
+... 36%, 1280 KB, 6601 KB/s, 0 seconds passed
+... 37%, 1312 KB, 6746 KB/s, 0 seconds passed
+... 38%, 1344 KB, 6894 KB/s, 0 seconds passed
+... 39%, 1376 KB, 7042 KB/s, 0 seconds passed
+... 40%, 1408 KB, 7189 KB/s, 0 seconds passed
+... 41%, 1440 KB, 7338 KB/s, 0 seconds passed
+... 42%, 1472 KB, 7486 KB/s, 0 seconds passed
+... 43%, 1504 KB, 7633 KB/s, 0 seconds passed
+... 44%, 1536 KB, 7780 KB/s, 0 seconds passed
+... 44%, 1568 KB, 7927 KB/s, 0 seconds passed
+... 45%, 1600 KB, 8074 KB/s, 0 seconds passed
+... 46%, 1632 KB, 8219 KB/s, 0 seconds passed
+... 47%, 1664 KB, 8365 KB/s, 0 seconds passed
+... 48%, 1696 KB, 8507 KB/s, 0 seconds passed
+... 49%, 1728 KB, 8650 KB/s, 0 seconds passed
+... 50%, 1760 KB, 8794 KB/s, 0 seconds passed
+... 51%, 1792 KB, 8937 KB/s, 0 seconds passed
+... 52%, 1824 KB, 9079 KB/s, 0 seconds passed
+... 53%, 1856 KB, 9221 KB/s, 0 seconds passed
+... 54%, 1888 KB, 9363 KB/s, 0 seconds passed
+... 55%, 1920 KB, 9503 KB/s, 0 seconds passed
+... 55%, 1952 KB, 9643 KB/s, 0 seconds passed
+... 56%, 1984 KB, 9782 KB/s, 0 seconds passed
+... 57%, 2016 KB, 9922 KB/s, 0 seconds passed
+... 58%, 2048 KB, 10059 KB/s, 0 seconds passed
+... 59%, 2080 KB, 10198 KB/s, 0 seconds passed
+... 60%, 2112 KB, 10334 KB/s, 0 seconds passed
+... 61%, 2144 KB, 10472 KB/s, 0 seconds passed
+... 62%, 2176 KB, 10608 KB/s, 0 seconds passed
+... 63%, 2208 KB, 10745 KB/s, 0 seconds passed
+... 64%, 2240 KB, 10884 KB/s, 0 seconds passed
+... 65%, 2272 KB, 11024 KB/s, 0 seconds passed
+... 66%, 2304 KB, 11164 KB/s, 0 seconds passed
+... 66%, 2336 KB, 11303 KB/s, 0 seconds passed
+... 67%, 2368 KB, 11442 KB/s, 0 seconds passed
+... 68%, 2400 KB, 11581 KB/s, 0 seconds passed
+... 69%, 2432 KB, 11717 KB/s, 0 seconds passed
+... 70%, 2464 KB, 11854 KB/s, 0 seconds passed
+... 71%, 2496 KB, 11992 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 72%, 2528 KB, 12129 KB/s, 0 seconds passed... 73%, 2560 KB, 12266 KB/s, 0 seconds passed... 74%, 2592 KB, 11415 KB/s, 0 seconds passed... 75%, 2624 KB, 11531 KB/s, 0 seconds passed... 76%, 2656 KB, 11654 KB/s, 0 seconds passed... 77%, 2688 KB, 11776 KB/s, 0 seconds passed... 77%, 2720 KB, 11899 KB/s, 0 seconds passed... 78%, 2752 KB, 12022 KB/s, 0 seconds passed... 79%, 2784 KB, 12145 KB/s, 0 seconds passed... 80%, 2816 KB, 12267 KB/s, 0 seconds passed... 81%, 2848 KB, 12388 KB/s, 0 seconds passed... 82%, 2880 KB, 12507 KB/s, 0 seconds passed... 83%, 2912 KB, 12625 KB/s, 0 seconds passed... 84%, 2944 KB, 12742 KB/s, 0 seconds passed... 85%, 2976 KB, 12859 KB/s, 0 seconds passed... 86%, 3008 KB, 12975 KB/s, 0 seconds passed... 87%, 3040 KB, 13092 KB/s, 0 seconds passed... 88%, 3072 KB, 13209 KB/s, 0 seconds passed... 88%, 3104 KB, 13325 KB/s, 0 seconds passed... 89%, 3136 KB, 13440 KB/s, 0 seconds passed... 90%, 3168 KB, 13556 KB/s, 0 seconds passed... 91%, 3200 KB, 13672 KB/s, 0 seconds passed... 92%, 3232 KB, 13785 KB/s, 0 seconds passed... 93%, 3264 KB, 13899 KB/s, 0 seconds passed... 94%, 3296 KB, 14013 KB/s, 0 seconds passed... 95%, 3328 KB, 14129 KB/s, 0 seconds passed... 96%, 3360 KB, 14248 KB/s, 0 seconds passed... 97%, 3392 KB, 14366 KB/s, 0 seconds passed... 98%, 3424 KB, 14484 KB/s, 0 seconds passed... 99%, 3456 KB, 14602 KB/s, 0 seconds passed... 100%, 3487 KB, 14713 KB/s, 0 seconds passed
+    ... 72%, 2528 KB, 12129 KB/s, 0 seconds passed
+... 73%, 2560 KB, 12266 KB/s, 0 seconds passed
+... 74%, 2592 KB, 11415 KB/s, 0 seconds passed
+... 75%, 2624 KB, 11531 KB/s, 0 seconds passed
+... 76%, 2656 KB, 11654 KB/s, 0 seconds passed
+... 77%, 2688 KB, 11776 KB/s, 0 seconds passed
+... 77%, 2720 KB, 11899 KB/s, 0 seconds passed
+... 78%, 2752 KB, 12022 KB/s, 0 seconds passed
+... 79%, 2784 KB, 12145 KB/s, 0 seconds passed
+... 80%, 2816 KB, 12267 KB/s, 0 seconds passed
+... 81%, 2848 KB, 12388 KB/s, 0 seconds passed
+... 82%, 2880 KB, 12507 KB/s, 0 seconds passed
+... 83%, 2912 KB, 12625 KB/s, 0 seconds passed
+... 84%, 2944 KB, 12742 KB/s, 0 seconds passed
+... 85%, 2976 KB, 12859 KB/s, 0 seconds passed
+... 86%, 3008 KB, 12975 KB/s, 0 seconds passed
+... 87%, 3040 KB, 13092 KB/s, 0 seconds passed
+... 88%, 3072 KB, 13209 KB/s, 0 seconds passed
+... 88%, 3104 KB, 13325 KB/s, 0 seconds passed
+... 89%, 3136 KB, 13440 KB/s, 0 seconds passed
+... 90%, 3168 KB, 13556 KB/s, 0 seconds passed
+... 91%, 3200 KB, 13672 KB/s, 0 seconds passed
+... 92%, 3232 KB, 13785 KB/s, 0 seconds passed
+... 93%, 3264 KB, 13899 KB/s, 0 seconds passed
+... 94%, 3296 KB, 14013 KB/s, 0 seconds passed
+... 95%, 3328 KB, 14129 KB/s, 0 seconds passed
+... 96%, 3360 KB, 14248 KB/s, 0 seconds passed
+... 97%, 3392 KB, 14366 KB/s, 0 seconds passed
+... 98%, 3424 KB, 14484 KB/s, 0 seconds passed
+... 99%, 3456 KB, 14602 KB/s, 0 seconds passed
+... 100%, 3487 KB, 14713 KB/s, 0 seconds passed
+
     
     ========== Downloading model/intel/person-reidentification-retail-0287/FP16/person-reidentification-retail-0287.xml
 
@@ -340,37 +558,88 @@ replace the name of the model in the code below.
 
 .. parsed-literal::
 
-    ... 10%, 64 KB, 915 KB/s, 0 seconds passed... 15%, 96 KB, 1363 KB/s, 0 seconds passed
+    ... 10%, 64 KB, 915 KB/s, 0 seconds passed
+... 15%, 96 KB, 1363 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 21%, 128 KB, 1220 KB/s, 0 seconds passed... 26%, 160 KB, 1517 KB/s, 0 seconds passed... 31%, 192 KB, 1813 KB/s, 0 seconds passed... 37%, 224 KB, 2108 KB/s, 0 seconds passed... 42%, 256 KB, 2401 KB/s, 0 seconds passed
+    ... 21%, 128 KB, 1220 KB/s, 0 seconds passed
+... 26%, 160 KB, 1517 KB/s, 0 seconds passed
+... 31%, 192 KB, 1813 KB/s, 0 seconds passed
+... 37%, 224 KB, 2108 KB/s, 0 seconds passed
+... 42%, 256 KB, 2401 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 47%, 288 KB, 2028 KB/s, 0 seconds passed... 53%, 320 KB, 2247 KB/s, 0 seconds passed... 58%, 352 KB, 2465 KB/s, 0 seconds passed... 63%, 384 KB, 2683 KB/s, 0 seconds passed... 69%, 416 KB, 2840 KB/s, 0 seconds passed... 74%, 448 KB, 2973 KB/s, 0 seconds passed... 79%, 480 KB, 3164 KB/s, 0 seconds passed... 85%, 512 KB, 3332 KB/s, 0 seconds passed... 90%, 544 KB, 3500 KB/s, 0 seconds passed... 95%, 576 KB, 3311 KB/s, 0 seconds passed... 100%, 600 KB, 3441 KB/s, 0 seconds passed
+    ... 47%, 288 KB, 2028 KB/s, 0 seconds passed
+... 53%, 320 KB, 2247 KB/s, 0 seconds passed
+... 58%, 352 KB, 2465 KB/s, 0 seconds passed
+... 63%, 384 KB, 2683 KB/s, 0 seconds passed
+... 69%, 416 KB, 2840 KB/s, 0 seconds passed
+... 74%, 448 KB, 2973 KB/s, 0 seconds passed
+... 79%, 480 KB, 3164 KB/s, 0 seconds passed
+... 85%, 512 KB, 3332 KB/s, 0 seconds passed
+... 90%, 544 KB, 3500 KB/s, 0 seconds passed
+... 95%, 576 KB, 3311 KB/s, 0 seconds passed
+... 100%, 600 KB, 3441 KB/s, 0 seconds passed
+
     
     ========== Downloading model/intel/person-reidentification-retail-0287/FP16/person-reidentification-retail-0287.bin
 
 
 .. parsed-literal::
 
-    ... 2%, 32 KB, 938 KB/s, 0 seconds passed... 5%, 64 KB, 936 KB/s, 0 seconds passed... 8%, 96 KB, 1395 KB/s, 0 seconds passed
+    ... 2%, 32 KB, 938 KB/s, 0 seconds passed
+... 5%, 64 KB, 936 KB/s, 0 seconds passed
+... 8%, 96 KB, 1395 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 11%, 128 KB, 1246 KB/s, 0 seconds passed... 13%, 160 KB, 1549 KB/s, 0 seconds passed... 16%, 192 KB, 1852 KB/s, 0 seconds passed... 19%, 224 KB, 2153 KB/s, 0 seconds passed... 22%, 256 KB, 2451 KB/s, 0 seconds passed... 24%, 288 KB, 2750 KB/s, 0 seconds passed
+    ... 11%, 128 KB, 1246 KB/s, 0 seconds passed
+... 13%, 160 KB, 1549 KB/s, 0 seconds passed
+... 16%, 192 KB, 1852 KB/s, 0 seconds passed
+... 19%, 224 KB, 2153 KB/s, 0 seconds passed
+... 22%, 256 KB, 2451 KB/s, 0 seconds passed
+... 24%, 288 KB, 2750 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 27%, 320 KB, 2333 KB/s, 0 seconds passed... 30%, 352 KB, 2557 KB/s, 0 seconds passed... 33%, 384 KB, 2782 KB/s, 0 seconds passed... 36%, 416 KB, 3005 KB/s, 0 seconds passed... 38%, 448 KB, 3227 KB/s, 0 seconds passed... 41%, 480 KB, 3448 KB/s, 0 seconds passed... 44%, 512 KB, 3667 KB/s, 0 seconds passed... 47%, 544 KB, 3887 KB/s, 0 seconds passed... 49%, 576 KB, 4107 KB/s, 0 seconds passed... 52%, 608 KB, 3559 KB/s, 0 seconds passed... 55%, 640 KB, 3733 KB/s, 0 seconds passed... 58%, 672 KB, 3910 KB/s, 0 seconds passed... 61%, 704 KB, 4086 KB/s, 0 seconds passed... 63%, 736 KB, 4261 KB/s, 0 seconds passed... 66%, 768 KB, 4436 KB/s, 0 seconds passed... 69%, 800 KB, 4612 KB/s, 0 seconds passed... 72%, 832 KB, 4786 KB/s, 0 seconds passed... 74%, 864 KB, 4960 KB/s, 0 seconds passed... 77%, 896 KB, 5131 KB/s, 0 seconds passed... 80%, 928 KB, 5303 KB/s, 0 seconds passed... 83%, 960 KB, 5474 KB/s, 0 seconds passed... 86%, 992 KB, 5644 KB/s, 0 seconds passed... 88%, 1024 KB, 5813 KB/s, 0 seconds passed... 91%, 1056 KB, 5983 KB/s, 0 seconds passed... 94%, 1088 KB, 6154 KB/s, 0 seconds passed... 97%, 1120 KB, 6324 KB/s, 0 seconds passed... 99%, 1152 KB, 6495 KB/s, 0 seconds passed... 100%, 1153 KB, 6492 KB/s, 0 seconds passed
+    ... 27%, 320 KB, 2333 KB/s, 0 seconds passed
+... 30%, 352 KB, 2557 KB/s, 0 seconds passed
+... 33%, 384 KB, 2782 KB/s, 0 seconds passed
+... 36%, 416 KB, 3005 KB/s, 0 seconds passed
+... 38%, 448 KB, 3227 KB/s, 0 seconds passed
+... 41%, 480 KB, 3448 KB/s, 0 seconds passed
+... 44%, 512 KB, 3667 KB/s, 0 seconds passed
+... 47%, 544 KB, 3887 KB/s, 0 seconds passed
+... 49%, 576 KB, 4107 KB/s, 0 seconds passed
+... 52%, 608 KB, 3559 KB/s, 0 seconds passed
+... 55%, 640 KB, 3733 KB/s, 0 seconds passed
+... 58%, 672 KB, 3910 KB/s, 0 seconds passed
+... 61%, 704 KB, 4086 KB/s, 0 seconds passed
+... 63%, 736 KB, 4261 KB/s, 0 seconds passed
+... 66%, 768 KB, 4436 KB/s, 0 seconds passed
+... 69%, 800 KB, 4612 KB/s, 0 seconds passed
+... 72%, 832 KB, 4786 KB/s, 0 seconds passed
+... 74%, 864 KB, 4960 KB/s, 0 seconds passed
+... 77%, 896 KB, 5131 KB/s, 0 seconds passed
+... 80%, 928 KB, 5303 KB/s, 0 seconds passed
+... 83%, 960 KB, 5474 KB/s, 0 seconds passed
+... 86%, 992 KB, 5644 KB/s, 0 seconds passed
+... 88%, 1024 KB, 5813 KB/s, 0 seconds passed
+... 91%, 1056 KB, 5983 KB/s, 0 seconds passed
+... 94%, 1088 KB, 6154 KB/s, 0 seconds passed
+... 97%, 1120 KB, 6324 KB/s, 0 seconds passed
+... 99%, 1152 KB, 6495 KB/s, 0 seconds passed
+... 100%, 1153 KB, 6492 KB/s, 0 seconds passed
+
     
 
 
 Load model
 ----------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Define a common class for model loading and predicting.
 
@@ -433,7 +702,7 @@ performance, but slightly longer startup time).
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -468,7 +737,7 @@ select device from dropdown list for running inference using OpenVINO
 Data Processing
 ---------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Data Processing includes data preprocess and postprocess functions. -
 Data preprocess function is used to change the layout and shape of input
@@ -589,7 +858,7 @@ network’s original output and visualize it.
 Test person reidentification model
 ----------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 The reidentification network outputs a blob with the ``(1, 256)`` shape
 named ``reid_embedding``, which can be compared with other descriptors
@@ -598,7 +867,7 @@ using the cosine distance.
 Visualize data
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -648,7 +917,7 @@ Visualize data
 Compare two persons
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -672,7 +941,7 @@ Compare two persons
 Main Processing Function
 ------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Run person tracking on the specified source. Either a webcam feed or a
 video file.
@@ -829,12 +1098,12 @@ video file.
 Run
 ---
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Initialize tracker
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Before running a new tracking task, we have to reinitialize a Tracker
 object
@@ -856,7 +1125,7 @@ object
 Run Live Person Tracking
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Use a webcam as the video input. By default, the primary webcam is set
 with ``source=0``. If you have multiple webcams, each one will be

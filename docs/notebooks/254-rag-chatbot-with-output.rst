@@ -31,41 +31,41 @@ The tutorial consists of the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#Prerequisites>`__
--  `Select model for inference <#Select-model-for-inference>`__
+-  `Prerequisites <#prerequisites>`__
+-  `Select model for inference <#select-model-for-inference>`__
 -  `login to huggingfacehub to get access to pretrained
    model <#login-to-huggingfacehub-to-get-access-to-pretrained-model>`__
--  `Convert model <#Convert-model>`__
+-  `Convert model <#convert-model>`__
 
-   -  `Convert LLM model <#Convert-LLM-model>`__
+   -  `Convert LLM model <#convert-llm-model>`__
 
--  `Compress model weights <#Compress-model-weights>`__
+-  `Compress model weights <#compress-model-weights>`__
 
    -  `Weights Compression using Optimum
-      Intel <#Weights-Compression-using-Optimum-Intel>`__
+      Intel <#weights-compression-using-optimum-intel>`__
    -  `Weights Compression using
-      NNCF <#Weights-Compression-using-NNCF>`__
-   -  `Convert embedding model <#Convert-embedding-model>`__
+      NNCF <#weights-compression-using-nncf>`__
+   -  `Convert embedding model <#convert-embedding-model>`__
 
 -  `Select device for inference and model
-   variant <#Select-device-for-inference-and-model-variant>`__
+   variant <#select-device-for-inference-and-model-variant>`__
 
    -  `Select device for embedding model
-      inference <#Select-device-for-embedding-model-inference>`__
+      inference <#select-device-for-embedding-model-inference>`__
    -  `Select device for LLM model
-      inference <#Select-device-for-LLM-model-inference>`__
+      inference <#select-device-for-llm-model-inference>`__
 
--  `Load model <#Load-model>`__
+-  `Load model <#load-model>`__
 
-   -  `Load embedding model <#Load-embedding-model>`__
-   -  `Load LLM model <#Load-LLM-model>`__
+   -  `Load embedding model <#load-embedding-model>`__
+   -  `Load LLM model <#load-llm-model>`__
 
--  `Run QA over Document <#Run-QA-over-Document>`__
+-  `Run QA over Document <#run-qa-over-document>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Install required dependencies
 
@@ -96,7 +96,7 @@ Install required dependencies
 Select model for inference
 --------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 The tutorial supports different models, you can select one from the
 provided options to compare the quality of open source LLM solutions.
@@ -141,7 +141,7 @@ The available LLM model options are:
    model can be found in `model
    card <https://huggingface.co/google/gemma-2b-it>`__. >\ **Note**: run
    model with demo, you will need to accept license agreement. >You must
-   be a registered user in 🤗 Hugging Face Hub. Please visit `HuggingFace
+   be a registered user in Hugging Face Hub. Please visit `HuggingFace
    model card <https://huggingface.co/google/gemma-2b-it>`__, carefully
    read terms of usage and click accept button. You will need to use an
    access token for the code below to run. For more information on
@@ -185,7 +185,7 @@ The available LLM model options are:
    model can be found in `model
    card <https://huggingface.co/google/gemma-7b-it>`__. >\ **Note**: run
    model with demo, you will need to accept license agreement. >You must
-   be a registered user in 🤗 Hugging Face Hub. Please visit `HuggingFace
+   be a registered user in Hugging Face Hub. Please visit `HuggingFace
    model card <https://huggingface.co/google/gemma-7b-it>`__, carefully
    read terms of usage and click accept button. You will need to use an
    access token for the code below to run. For more information on
@@ -217,7 +217,7 @@ The available LLM model options are:
    `HuggingFace model
    card <https://huggingface.co/meta-llama/Llama-2-7b-chat-hf>`__.
    >\ **Note**: run model with demo, you will need to accept license
-   agreement. >You must be a registered user in 🤗 Hugging Face Hub.
+   agreement. >You must be a registered user in Hugging Face Hub.
    Please visit `HuggingFace model
    card <https://huggingface.co/meta-llama/Llama-2-7b-chat-hf>`__,
    carefully read terms of usage and click accept button. You will need
@@ -384,12 +384,12 @@ The available LLM model options are:
 Convert model
 -------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Convert LLM model
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -499,7 +499,7 @@ with Optimum Intel.
 Compress model weights
 ----------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 The Weights Compression algorithm is aimed at compressing the weights of
 the models and can be used to optimize the model footprint and
@@ -512,7 +512,7 @@ quality.
 Weights Compression using Optimum Intel
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Optimum Intel supports weight compression via NNCF out of the box. For
 8-bit compression we pass ``load_in_8bit=True`` to ``from_pretrained()``
@@ -527,7 +527,7 @@ consider how to do it on RedPajama, LLAMA and Zephyr examples.
 Weights Compression using NNCF
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 You also can perform weights compression for OpenVINO models using NNCF
 directly. ``nncf.compress_weights`` function accepts OpenVINO model
@@ -795,7 +795,7 @@ Let’s compare model size for different compression types
 Convert embedding model
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Since some embedding models can only support limited languages, we can
 filter them out according the LLM you selected.
@@ -850,7 +850,7 @@ filter them out according the LLM you selected.
 Select device for inference and model variant
 ---------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
    **Note**: There may be no speedup for INT4/INT8 compressed models on
    dGPU.
@@ -858,7 +858,7 @@ Select device for inference and model variant
 Select device for embedding model inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -894,7 +894,7 @@ Select device for embedding model inference
 Select device for LLM model inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -929,12 +929,12 @@ Select device for LLM model inference
 Load model
 ----------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Load embedding model
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Wrapper around a text embedding model for LangChain, used for converting
 text to embeddings.
@@ -958,7 +958,7 @@ text to embeddings.
 Load LLM model
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 The cell below create ``OVMPTModel`` and ``OVCHATGLM2Model`` wrapper
 based on ``OVModelForCausalLM`` model.
@@ -1099,7 +1099,7 @@ based on ``OVModelForCausalLM`` model.
 Run QA over Document
 --------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Now, when model created, we can setup Chatbot interface using
 `Gradio <https://www.gradio.app/>`__.

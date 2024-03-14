@@ -8,7 +8,7 @@ Compression Framework) and infer quantized model via OpenVINO™ Toolkit.
 The optimization process contains the following steps:
 
 1. Quantize the converted OpenVINO model from `227-whisper-convert
-   notebook <227-whisper-convert.ipynb>`__ with NNCF.
+   notebook <227-whisper-convert-with-output.html>`__ with NNCF.
 2. Check model result for the demo video.
 3. Compare model size, performance and accuracy of FP32 and quantized
    INT8 models.
@@ -16,29 +16,29 @@ The optimization process contains the following steps:
 ..
 
    **NOTE**: you should run
-   `227-whisper-convert <227-whisper-convert.ipynb>`__ notebook first to
+   `227-whisper-convert <227-whisper-convert-with-output.html>`__ notebook first to
    generate OpenVINO IR model that is used for quantization.
 
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#Prerequisites>`__
+-  `Prerequisites <#prerequisites>`__
 -  `Create and initialize quantization
-   ⇑(#0) <#Create-and-initialize-quantization-⇑(#0)>`__
+    <#create-and-initialize-quantization-#0>`__
 
-   -  `Prepare calibration datasets <#Prepare-calibration-datasets>`__
+   -  `Prepare calibration datasets <#prepare-calibration-datasets>`__
    -  `Quantize Whisper encoder and decoder
-      models <#Quantize-Whisper-encoder-and-decoder-models>`__
+      models <#quantize-whisper-encoder-and-decoder-models>`__
 
 -  `Transcribe video with quantized OpenVINO
-   model <#Transcribe-video-with-quantized-OpenVINO-model>`__
+   model <#transcribe-video-with-quantized-openvino-model>`__
 -  `Compare performance and accuracy of the FP32 and INT8
-   IRs <#Compare-performance-and-accuracy-of-the-FP32-and-INT8-IRs>`__
+   IRs <#compare-performance-and-accuracy-of-the-fp32-and-int8-irs>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Install dependencies.
 
@@ -137,7 +137,7 @@ Select the task for the model:
 
 
 ## Create and initialize quantization `⇑ <#0>`__ `back to top
-⬆️ <#Table-of-contents:>`__
+⬆️ <#table-of-contents>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding the quantization layers into the
@@ -155,7 +155,7 @@ The optimization process contains the following steps:
    function.
 
 Set paths to the model converted in
-`227-whisper-convert <227-whisper-convert.ipynb>`__ notebook and the
+`227-whisper-convert <227-whisper-convert-with-output.html>`__ notebook and the
 paths where quantized models will be saved.
 
 .. code:: ipython3
@@ -184,7 +184,7 @@ Load FP32 model IR.
 Prepare calibration datasets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Whisper consists of an encoder and a decoder models. We need to collect
 calibration data for both of them.
@@ -257,7 +257,7 @@ dataset from Hugging Face as calibration data.
 Quantize Whisper encoder and decoder models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Quantize both encoder and decoder models using ``nncf.quantize()`` API
 and save the quantized IRs after that.
@@ -352,7 +352,7 @@ and save the quantized IRs after that.
 Transcribe video with quantized OpenVINO model
 ----------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Load ``INT8`` models saved above into a new instance of Whisper model.
 
@@ -365,7 +365,7 @@ Load ``INT8`` models saved above into a new instance of Whisper model.
     model_int8.decoder = OpenVINOTextDecoder(core, WHISPER_DECODER_OV_INT8, device=device.value)
 
 Select a video for transcription as in
-`227-whisper-convert <227-whisper-convert.ipynb>`__ notebook.
+`227-whisper-convert <227-whisper-convert-with-output.html>`__ notebook.
 
 .. code:: ipython3
 
@@ -492,7 +492,7 @@ As you can see the result is almost the same.
 Compare performance and accuracy of the FP32 and INT8 IRs
 ---------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`back to top ⬆️ <#table-of-contents>`__
 
 Compare model file size.
 
