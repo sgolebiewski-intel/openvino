@@ -93,10 +93,10 @@ Imports
 
     import json
     from pathlib import Path
-    
+
     import openvino as ov
     from IPython.display import Markdown, display
-    
+
     # Fetch `notebook_utils` module
     import urllib.request
     urllib.request.urlretrieve(
@@ -131,11 +131,11 @@ The following settings can be changed:
     base_model_dir = Path("model")
     omz_cache_dir = Path("cache")
     precision = "FP16"
-    
+
     # Check if an GPU is available on this system to use with Benchmark App.
     core = ov.Core()
     gpu_available = "GPU" in core.available_devices
-    
+
     print(
         f"base_model_dir: {base_model_dir}, omz_cache_dir: {omz_cache_dir}, gpu_availble: {gpu_available}"
     )
@@ -157,7 +157,7 @@ model.
 .. code:: ipython3
 
     ## Uncomment the next line to show help in omz_downloader which explains the command-line options.
-    
+
     # !omz_downloader --help
 
 .. code:: ipython3
@@ -182,7 +182,7 @@ Downloading mobilenet-v2-pytorch…
 .. parsed-literal::
 
     ################|| Downloading mobilenet-v2-pytorch ||################
-    
+
 
 
 .. parsed-literal::
@@ -648,7 +648,7 @@ Downloading mobilenet-v2-pytorch…
 ... 99%, 13856 KB, 35044 KB/s, 0 seconds passed
 ... 100%, 13879 KB, 35077 KB/s, 0 seconds passed
 
-    
+
 
 
 Convert a Model to OpenVINO IR format
@@ -666,7 +666,7 @@ that are already in OpenVINO IR format, conversion will be skipped.
 .. code:: ipython3
 
     ## Uncomment the next line to show Help in omz_converter which explains the command-line options.
-    
+
     # !omz_converter --help
 
 .. code:: ipython3
@@ -674,7 +674,7 @@ that are already in OpenVINO IR format, conversion will be skipped.
     convert_command = f"omz_converter --name {model_name} --precisions {precision} --download_dir {base_model_dir} --output_dir {base_model_dir}"
     display(Markdown(f"Convert command: `{convert_command}`"))
     display(Markdown(f"Converting {model_name}..."))
-    
+
     ! $convert_command
 
 
@@ -691,7 +691,7 @@ Converting mobilenet-v2-pytorch…
 
     ========== Converting mobilenet-v2-pytorch to ONNX
     Conversion to ONNX command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/omz_tools/internal_scripts/pytorch_to_onnx.py --model-name=mobilenet_v2 --weights=model/public/mobilenet-v2-pytorch/mobilenet_v2-b0353104.pth --import-module=torchvision.models --input-shape=1,3,224,224 --output-file=model/public/mobilenet-v2-pytorch/mobilenet-v2.onnx --input-names=data --output-names=prob
-    
+
 
 
 .. parsed-literal::
@@ -701,26 +701,22 @@ Converting mobilenet-v2-pytorch…
 
 .. parsed-literal::
 
-    
+
     ========== Converting mobilenet-v2-pytorch to IR (FP16)
     Conversion command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/bin/mo --framework=onnx --output_dir=model/public/mobilenet-v2-pytorch/FP16 --model_name=mobilenet-v2-pytorch --input=data '--mean_values=data[123.675,116.28,103.53]' '--scale_values=data[58.624,57.12,57.375]' --reverse_input_channels --output=prob --input_model=model/public/mobilenet-v2-pytorch/mobilenet-v2.onnx '--layout=data(NCHW)' '--input_shape=[1, 3, 224, 224]' --compress_to_fp16=True
-    
+
 
 
 .. parsed-literal::
 
     [ INFO ] Generated IR will be compressed to FP16. If you get lower accuracy, please consider disabling compression explicitly by adding argument --compress_to_fp16=False.
     Find more information about compression to FP16 at https://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
-    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release. Please use OpenVINO Model Converter (OVC). OVC represents a lightweight alternative of MO and provides simplified model conversion API. 
+    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release. Please use OpenVINO Model Converter (OVC). OVC represents a lightweight alternative of MO and provides simplified model conversion API.
     Find more information about transition from MO to OVC at https://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
     [ SUCCESS ] Generated IR version 11 model.
     [ SUCCESS ] XML file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/104-model-tools/model/public/mobilenet-v2-pytorch/FP16/mobilenet-v2-pytorch.xml
     [ SUCCESS ] BIN file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/104-model-tools/model/public/mobilenet-v2-pytorch/FP16/mobilenet-v2-pytorch.bin
 
-
-.. parsed-literal::
-
-    
 
 
 Get Model Information
@@ -750,7 +746,7 @@ information in a dictionary.
 
     model_info_output = %sx omz_info_dumper --name $model_name
     model_info = json.loads(model_info_output.get_nlstr())
-    
+
     if len(model_info) > 1:
         NotebookAlert(
             f"There are multiple IR files for the {model_name} model. The first model in the "
@@ -758,7 +754,7 @@ information in a dictionary.
             "`selected_model_info` in the cell below to select a different model from the list.",
             "warning",
         )
-    
+
     model_info
 
 
@@ -822,7 +818,7 @@ image) and throughput values (frames per second).
     benchmark_command = f"benchmark_app -m {model_path} -t 15"
     display(Markdown(f"Benchmark command: `{benchmark_command}`"))
     display(Markdown(f"Benchmarking {model_name} on CPU with async inference for 15 seconds..."))
-    
+
     ! $benchmark_command
 
 
@@ -843,7 +839,7 @@ seconds…
     [Step 2/11] Loading OpenVINO Runtime
     [ INFO ] OpenVINO:
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
+    [ INFO ]
     [ INFO ] Device info:
 
 
@@ -851,8 +847,8 @@ seconds…
 
     [ INFO ] CPU
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
-    [ INFO ] 
+    [ INFO ]
+    [ INFO ]
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(CPU) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
@@ -903,7 +899,7 @@ seconds…
     [ INFO ]   KV_CACHE_PRECISION: <Type: 'float16'>
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'data'!. This input will be filled with random values!
-    [ INFO ] Fill input 'data' with random values 
+    [ INFO ] Fill input 'data' with random values
     [Step 10/11] Measuring performance (Start inference asynchronously, 6 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
     [ INFO ] First inference took 6.30 ms
@@ -970,7 +966,7 @@ the cell below that, you display available devices on the system.
             benchmark_command = f"benchmark_app -m {model_path} -d {device} -t {seconds} -api {api} -b {batch}"
             display(Markdown(f"**Benchmark {model_path.name} with {device} for {seconds} seconds with {api} inference**"))
             display(Markdown(f"Benchmark command: `{benchmark_command}`"))
-    
+
             benchmark_output = %sx $benchmark_command
             print("command ended")
             benchmark_result = [line for line in benchmark_output
@@ -980,7 +976,7 @@ the cell below that, you display available devices on the system.
 .. code:: ipython3
 
     core = ov.Core()
-    
+
     # Show devices available for OpenVINO Runtime
     for device in core.available_devices:
         device_name = core.get_property(device, "FULL_DEVICE_NAME")
@@ -997,14 +993,14 @@ You can select inference device using device widget
 .. code:: ipython3
 
     import ipywidgets as widgets
-    
+
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
         value='CPU',
         description='Device:',
         disabled=False,
     )
-    
+
     device
 
 
@@ -1034,5 +1030,5 @@ Benchmark command:
 .. parsed-literal::
 
     command ended
-    
+
 

@@ -55,12 +55,12 @@ Table of contents:
 .. code:: ipython3
 
     from pathlib import Path
-    
+
     # Set the data and model directories
     DATA_DIR = Path("data")
     MODEL_DIR = Path('model')
     model_repo = 'pytorch-cifar-models'
-    
+
     DATA_DIR.mkdir(exist_ok=True)
     MODEL_DIR.mkdir(exist_ok=True)
 
@@ -79,10 +79,10 @@ Model preparation stage has the following steps:
 .. code:: ipython3
 
     import sys
-    
+
     if not Path(model_repo).exists():
         !git clone https://github.com/chenyaofo/pytorch-cifar-models.git
-    
+
     sys.path.append(model_repo)
 
 
@@ -468,7 +468,7 @@ Resolving deltas: 100% (135/135), done.
 .. code:: ipython3
 
     from pytorch_cifar_models import cifar10_mobilenetv2_x1_0
-    
+
     model = cifar10_mobilenetv2_x1_0(pretrained=True)
 
 OpenVINO supports PyTorch models via conversion to OpenVINO Intermediate
@@ -486,12 +486,12 @@ can be found on this
 .. code:: ipython3
 
     import openvino as ov
-    
+
     model.eval()
-    
+
     ov_model = ov.convert_model(model, input=[1,3,32,32])
-    
-    ov.save_model(ov_model, MODEL_DIR / "mobilenet_v2.xml") 
+
+    ov.save_model(ov_model, MODEL_DIR / "mobilenet_v2.xml")
 
 Prepare Dataset
 ---------------
@@ -509,7 +509,7 @@ Preprocessing for model obtained from training
     import torch
     from torchvision import transforms
     from torchvision.datasets import CIFAR10
-    
+
     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261))])
     dataset = CIFAR10(root=DATA_DIR, train=False, transform=transform, download=True)
     val_loader = torch.utils.data.DataLoader(
@@ -528,322 +528,322 @@ Preprocessing for model obtained from training
 
 .. parsed-literal::
 
-    
+
   0%|          | 0/170498071 [00:00<?, ?it/s]
 
 .. parsed-literal::
 
-    
+
   0%|          | 32768/170498071 [00:00<10:17, 275946.37it/s]
 
 .. parsed-literal::
 
-    
+
   0%|          | 65536/170498071 [00:00<10:28, 271284.88it/s]
 
 .. parsed-literal::
 
-    
+
   0%|          | 98304/170498071 [00:00<10:31, 269970.74it/s]
 
 .. parsed-literal::
 
-    
+
   0%|          | 229376/170498071 [00:00<04:50, 586473.34it/s]
 
 .. parsed-literal::
 
-    
+
   0%|          | 393216/170498071 [00:00<03:17, 859242.88it/s]
 
 .. parsed-literal::
 
-    
+
   0%|          | 786432/170498071 [00:00<01:42, 1661012.29it/s]
 
 .. parsed-literal::
 
-    
+
   1%|          | 1507328/170498071 [00:00<00:55, 3048520.02it/s]
 
 .. parsed-literal::
 
-    
+
   2%|▏         | 3014656/170498071 [00:00<00:28, 5961632.12it/s]
 
 .. parsed-literal::
 
-    
+
   3%|▎         | 5963776/170498071 [00:01<00:14, 11664878.14it/s]
 
 .. parsed-literal::
 
-    
+
   6%|▌         | 9502720/170498071 [00:01<00:09, 16415065.07it/s]
 
 .. parsed-literal::
 
-    
+
   7%|▋         | 12484608/170498071 [00:01<00:08, 18713452.56it/s]
 
 .. parsed-literal::
 
-    
+
   9%|▉         | 15532032/170498071 [00:01<00:07, 20509245.76it/s]
 
 .. parsed-literal::
 
-    
+
  11%|█         | 18513920/170498071 [00:01<00:07, 21529733.73it/s]
 
 .. parsed-literal::
 
-    
+
  13%|█▎        | 21692416/170498071 [00:01<00:06, 22662379.12it/s]
 
 .. parsed-literal::
 
-    
+
  15%|█▍        | 24805376/170498071 [00:01<00:06, 23237932.55it/s]
 
 .. parsed-literal::
 
-    
+
  16%|█▋        | 28016640/170498071 [00:01<00:05, 23916419.04it/s]
 
 .. parsed-literal::
 
-    
+
  18%|█▊        | 31195136/170498071 [00:02<00:05, 24165013.75it/s]
 
 .. parsed-literal::
 
-    
+
  20%|██        | 34373632/170498071 [00:02<00:05, 24570741.60it/s]
 
 .. parsed-literal::
 
-    
+
  22%|██▏       | 37617664/170498071 [00:02<00:05, 24839298.54it/s]
 
 .. parsed-literal::
 
-    
+
  24%|██▍       | 40763392/170498071 [00:02<00:05, 24899513.26it/s]
 
 .. parsed-literal::
 
-    
+
  26%|██▌       | 43909120/170498071 [00:02<00:05, 24859956.00it/s]
 
 .. parsed-literal::
 
-    
+
  28%|██▊       | 47054848/170498071 [00:02<00:04, 24910085.77it/s]
 
 .. parsed-literal::
 
-    
+
  30%|██▉       | 50462720/170498071 [00:02<00:04, 25342462.67it/s]
 
 .. parsed-literal::
 
-    
+
  32%|███▏      | 53772288/170498071 [00:03<00:04, 25549574.14it/s]
 
 .. parsed-literal::
 
-    
+
  33%|███▎      | 56983552/170498071 [00:03<00:04, 25497496.83it/s]
 
 .. parsed-literal::
 
-    
+
  35%|███▌      | 60129280/170498071 [00:03<00:04, 25318471.74it/s]
 
 .. parsed-literal::
 
-    
+
  37%|███▋      | 63864832/170498071 [00:03<00:04, 26188505.17it/s]
 
 .. parsed-literal::
 
-    
+
  39%|███▉      | 67076096/170498071 [00:03<00:04, 25607940.52it/s]
 
 .. parsed-literal::
 
-    
+
  41%|████      | 70221824/170498071 [00:03<00:03, 25164439.49it/s]
 
 .. parsed-literal::
 
-    
+
  43%|████▎     | 73269248/170498071 [00:03<00:03, 24814859.91it/s]
 
 .. parsed-literal::
 
-    
+
  45%|████▍     | 76316672/170498071 [00:03<00:03, 24363754.63it/s]
 
 .. parsed-literal::
 
-    
+
  46%|████▋     | 79233024/170498071 [00:04<00:03, 23924798.97it/s]
 
 .. parsed-literal::
 
-    
+
  48%|████▊     | 82247680/170498071 [00:04<00:03, 23837747.76it/s]
 
 .. parsed-literal::
 
-    
+
  50%|█████     | 85426176/170498071 [00:04<00:03, 24006567.90it/s]
 
 .. parsed-literal::
 
-    
+
  52%|█████▏    | 88539136/170498071 [00:04<00:03, 24061028.14it/s]
 
 .. parsed-literal::
 
-    
+
  54%|█████▍    | 91783168/170498071 [00:04<00:03, 24193022.36it/s]
 
 .. parsed-literal::
 
-    
+
  56%|█████▌    | 94863360/170498071 [00:04<00:03, 24172569.31it/s]
 
 .. parsed-literal::
 
-    
+
  57%|█████▋    | 97943552/170498071 [00:04<00:02, 24211561.34it/s]
 
 .. parsed-literal::
 
-    
+
  59%|█████▉    | 101023744/170498071 [00:04<00:02, 24311644.55it/s]
 
 .. parsed-literal::
 
-    
+
  61%|██████    | 104071168/170498071 [00:05<00:02, 24218216.60it/s]
 
 .. parsed-literal::
 
-    
+
  63%|██████▎   | 107151360/170498071 [00:05<00:02, 24154999.17it/s]
 
 .. parsed-literal::
 
-    
+
  65%|██████▍   | 110133248/170498071 [00:05<00:02, 24021903.66it/s]
 
 .. parsed-literal::
 
-    
+
  66%|██████▋   | 113016832/170498071 [00:05<00:02, 23700128.22it/s]
 
 .. parsed-literal::
 
-    
+
  68%|██████▊   | 116162560/170498071 [00:05<00:02, 23748863.27it/s]
 
 .. parsed-literal::
 
-    
+
  70%|██████▉   | 119242752/170498071 [00:05<00:02, 23908673.56it/s]
 
 .. parsed-literal::
 
-    
+
  72%|███████▏  | 122355712/170498071 [00:05<00:02, 23981194.75it/s]
 
 .. parsed-literal::
 
-    
+
  74%|███████▎  | 125403136/170498071 [00:05<00:01, 23999264.79it/s]
 
 .. parsed-literal::
 
-    
+
  75%|███████▌  | 128581632/170498071 [00:06<00:01, 24304776.88it/s]
 
 .. parsed-literal::
 
-    
+
  77%|███████▋  | 131596288/170498071 [00:06<00:01, 24188415.22it/s]
 
 .. parsed-literal::
 
-    
+
  79%|███████▉  | 134709248/170498071 [00:06<00:01, 24194648.52it/s]
 
 .. parsed-literal::
 
-    
+
  81%|████████  | 137756672/170498071 [00:06<00:01, 24193549.64it/s]
 
 .. parsed-literal::
 
-    
+
  83%|████████▎ | 141066240/170498071 [00:06<00:01, 24630062.43it/s]
 
 .. parsed-literal::
 
-    
+
  85%|████████▍ | 144113664/170498071 [00:06<00:01, 24505080.69it/s]
 
 .. parsed-literal::
 
-    
+
  86%|████████▋ | 147062784/170498071 [00:06<00:00, 24261709.76it/s]
 
 .. parsed-literal::
 
-    
+
  88%|████████▊ | 150044672/170498071 [00:06<00:00, 24102172.86it/s]
 
 .. parsed-literal::
 
-    
+
  90%|████████▉ | 153059328/170498071 [00:07<00:00, 23913295.27it/s]
 
 .. parsed-literal::
 
-    
+
  92%|█████████▏| 156041216/170498071 [00:07<00:00, 23659468.91it/s]
 
 .. parsed-literal::
 
-    
+
  93%|█████████▎| 158892032/170498071 [00:07<00:00, 23391139.06it/s]
 
 .. parsed-literal::
 
-    
+
  95%|█████████▍| 161972224/170498071 [00:07<00:00, 23475130.31it/s]
 
 .. parsed-literal::
 
-    
+
  97%|█████████▋| 164954112/170498071 [00:07<00:00, 23499014.41it/s]
 
 .. parsed-literal::
 
-    
+
  99%|█████████▊| 168001536/170498071 [00:07<00:00, 23679867.24it/s]
 
 .. parsed-literal::
 
-    
-100%|██████████| 170498071/170498071 [00:07<00:00, 21918964.93it/s]
+
+   100%|██████████| 170498071/170498071 [00:07<00:00, 21918964.93it/s]
 
 
 
-    
+
 
 
 .. parsed-literal::
@@ -881,11 +881,11 @@ model during quantization, in our case, to pick input tensor from pair
 .. code:: ipython3
 
     import nncf
-    
+
     def transform_fn(data_item):
         image_tensor = data_item[0]
         return image_tensor.numpy()
-    
+
     quantization_dataset = nncf.Dataset(val_loader, transform_fn)
 
 
@@ -987,7 +987,7 @@ Compare Accuracy of the Original and Quantized Models
 
     from tqdm.notebook import tqdm
     import numpy as np
-    
+
     def test_accuracy(ov_model, data_loader):
         correct = 0
         total = 0
@@ -1008,7 +1008,7 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     import ipywidgets as widgets
-    
+
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
@@ -1016,7 +1016,7 @@ select device from dropdown list for running inference using OpenVINO
         description='Device:',
         disabled=False,
     )
-    
+
     device
 
 
@@ -1033,7 +1033,7 @@ select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     compiled_model = core.compile_model(ov_model, device.value)
     optimized_compiled_model = core.compile_model(quant_ov_model, device.value)
-    
+
     orig_accuracy = test_accuracy(compiled_model, val_loader)
     optimized_accuracy = test_accuracy(optimized_compiled_model, val_loader)
 
@@ -1092,12 +1092,12 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
     [Step 2/11] Loading OpenVINO Runtime
     [ INFO ] OpenVINO:
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
+    [ INFO ]
     [ INFO ] Device info:
     [ INFO ] AUTO
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
-    [ INFO ] 
+    [ INFO ]
+    [ INFO ]
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
@@ -1160,7 +1160,7 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'x'!. This input will be filled with random values!
-    [ INFO ] Fill input 'x' with random values 
+    [ INFO ] Fill input 'x' with random values
     [Step 10/11] Measuring performance (Start inference asynchronously, 12 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
     [ INFO ] First inference took 3.17 ms
@@ -1193,12 +1193,12 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
     [Step 2/11] Loading OpenVINO Runtime
     [ INFO ] OpenVINO:
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
+    [ INFO ]
     [ INFO ] Device info:
     [ INFO ] AUTO
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
-    [ INFO ] 
+    [ INFO ]
+    [ INFO ]
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
@@ -1253,7 +1253,7 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'x'!. This input will be filled with random values!
-    [ INFO ] Fill input 'x' with random values 
+    [ INFO ] Fill input 'x' with random values
     [Step 10/11] Measuring performance (Start inference asynchronously, 12 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
     [ INFO ] First inference took 2.10 ms
@@ -1284,7 +1284,7 @@ Compare results on four pictures
     labels_names = ["airplane", "automobile", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"]
     all_pictures = []
     all_labels = []
-    
+
     # Get all pictures and their labels.
     for i, batch in enumerate(val_loader):
         all_pictures.append(batch[0].numpy())
@@ -1293,7 +1293,7 @@ Compare results on four pictures
 .. code:: ipython3
 
     import matplotlib.pyplot as plt
-    
+
     def plot_pictures(indexes: list, all_pictures=all_pictures, all_labels=all_labels):
         """Plot 4 pictures.
         :param indexes: a list of indexes of pictures to be displayed.
@@ -1306,19 +1306,19 @@ Compare results on four pictures
             assert idx < 10000, 'Cannot get such index, there are only 10000'
             pic = np.rollaxis(all_pictures[idx].squeeze(), 0, 3)
             images.append(pic)
-    
+
             labels.append(labels_names[all_labels[idx]])
-    
+
         f, axarr = plt.subplots(1, 4)
         axarr[0].imshow(images[0])
         axarr[0].set_title(labels[0])
-    
+
         axarr[1].imshow(images[1])
         axarr[1].set_title(labels[1])
-    
+
         axarr[2].imshow(images[2])
         axarr[2].set_title(labels[2])
-    
+
         axarr[3].imshow(images[3])
         axarr[3].set_title(labels[3])
 
@@ -1327,7 +1327,7 @@ Compare results on four pictures
     def infer_on_pictures(model, indexes: list, all_pictures=all_pictures):
         """ Inference model on a few pictures.
         :param net: model on which do inference
-        :param indexes: list of indexes 
+        :param indexes: list of indexes
         """
         output_key = model.output(0)
         predicted_labels = []
@@ -1341,12 +1341,12 @@ Compare results on four pictures
 .. code:: ipython3
 
     indexes_to_infer = [7, 12, 15, 20]  # To plot, specify 4 indexes.
-    
+
     plot_pictures(indexes_to_infer)
-    
+
     results_float = infer_on_pictures(compiled_model, indexes_to_infer)
     results_quanized = infer_on_pictures(optimized_compiled_model, indexes_to_infer)
-    
+
     print(f"Labels for picture from float model : {results_float}.")
     print(f"Labels for picture from quantized model : {results_quanized}.")
 

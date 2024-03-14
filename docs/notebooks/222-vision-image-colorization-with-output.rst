@@ -87,7 +87,7 @@ Table of contents:
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -104,12 +104,12 @@ Imports
     import os
     import sys
     from pathlib import Path
-    
+
     import cv2
     import matplotlib.pyplot as plt
     import numpy as np
     import openvino as ov
-    
+
     sys.path.append("../utils")
     import notebook_utils as utils
 
@@ -144,16 +144,16 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     import ipywidgets as widgets
-    
+
     core = ov.Core()
-    
+
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
         value='AUTO',
         description='Device:',
         disabled=False,
     )
-    
+
     device
 
 
@@ -197,7 +197,7 @@ above.
 .. parsed-literal::
 
     ################|| Downloading colorization-v2 ||################
-    
+
     ========== Downloading models/public/colorization-v2/ckpt/colorization-v2-eccv16.pth
 
 
@@ -4280,7 +4280,7 @@ above.
 
 .. parsed-literal::
 
-    
+
     ========== Downloading models/public/colorization-v2/model/__init__.py
 
 
@@ -4288,7 +4288,7 @@ above.
 
     ... 100%, 0 KB, 305 KB/s, 0 seconds passed
 
-    
+
     ========== Downloading models/public/colorization-v2/model/base_color.py
 
 
@@ -4296,7 +4296,7 @@ above.
 
     ... 100%, 0 KB, 1751 KB/s, 0 seconds passed
 
-    
+
     ========== Downloading models/public/colorization-v2/model/eccv16.py
 
 
@@ -4304,11 +4304,11 @@ above.
 
     ... 100%, 4 KB, 17511 KB/s, 0 seconds passed
 
-    
+
     ========== Replacing text in models/public/colorization-v2/model/__init__.py
     ========== Replacing text in models/public/colorization-v2/model/__init__.py
     ========== Replacing text in models/public/colorization-v2/model/eccv16.py
-    
+
 
 
 Convert the model to OpenVINO IR
@@ -4340,7 +4340,7 @@ respectively
 
     ========== Converting colorization-v2 to ONNX
     Conversion to ONNX command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/omz_tools/internal_scripts/pytorch_to_onnx.py --model-path=models/public/colorization-v2 --model-name=ECCVGenerator --weights=models/public/colorization-v2/ckpt/colorization-v2-eccv16.pth --import-module=model --input-shape=1,1,256,256 --output-file=models/public/colorization-v2/colorization-v2-eccv16.onnx --input-names=data_l --output-names=color_ab
-    
+
 
 
 .. parsed-literal::
@@ -4350,17 +4350,17 @@ respectively
 
 .. parsed-literal::
 
-    
+
     ========== Converting colorization-v2 to IR (FP16)
     Conversion command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/bin/mo --framework=onnx --output_dir=models/public/colorization-v2/FP16 --model_name=colorization-v2 --input=data_l --output=color_ab --input_model=models/public/colorization-v2/colorization-v2-eccv16.onnx '--layout=data_l(NCHW)' '--input_shape=[1, 1, 256, 256]' --compress_to_fp16=True
-    
+
 
 
 .. parsed-literal::
 
     [ INFO ] Generated IR will be compressed to FP16. If you get lower accuracy, please consider disabling compression explicitly by adding argument --compress_to_fp16=False.
     Find more information about compression to FP16 at https://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
-    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release. Please use OpenVINO Model Converter (OVC). OVC represents a lightweight alternative of MO and provides simplified model conversion API. 
+    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release. Please use OpenVINO Model Converter (OVC). OVC represents a lightweight alternative of MO and provides simplified model conversion API.
     Find more information about transition from MO to OVC at https://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
 
 
@@ -4370,10 +4370,6 @@ respectively
     [ SUCCESS ] XML file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/222-vision-image-colorization/models/public/colorization-v2/FP16/colorization-v2.xml
     [ SUCCESS ] BIN file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/222-vision-image-colorization/models/public/colorization-v2/FP16/colorization-v2.bin
 
-
-.. parsed-literal::
-
-    
 
 
 Loading the Model
@@ -4404,14 +4400,14 @@ Utility Functions
         """
         Returns an image as ndarra, given path to an image reads the
         (BGR) image using opencv's imread() API.
-    
+
             Parameter:
                 impath (string): Path of the image to be read and returned.
-    
+
             Returns:
                 image (ndarray): Numpy array representing the read image.
         """
-    
+
         raw_image = cv2.imread(impath)
         if raw_image.shape[2] > 1:
             image = cv2.cvtColor(
@@ -4419,57 +4415,57 @@ Utility Functions
             )
         else:
             image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-    
+
         return image
-    
-    
+
+
     def plot_image(image: np.ndarray, title: str = "") -> None:
         """
         Given a image as ndarray and title as string, display it using
         matplotlib.
-    
+
             Parameters:
                 image (ndarray): Numpy array representing the image to be
                                  displayed.
                 title (string): String representing the title of the plot.
-    
+
             Returns:
                 None
-    
+
         """
-    
+
         plt.imshow(image)
         plt.title(title)
         plt.axis("off")
         plt.show()
-    
-    
+
+
     def plot_output(gray_img: np.ndarray, color_img: np.ndarray) -> None:
         """
         Plots the original (bw or grayscale) image and colorized image
         on different column axes for comparing side by side.
-    
+
             Parameters:
                 gray_image (ndarray): Numpy array representing the original image.
                 color_image (ndarray): Numpy array representing the model output.
-    
+
             Returns:
                 None
         """
-    
+
         fig = plt.figure(figsize=(12, 12))
-    
+
         ax1 = fig.add_subplot(1, 2, 1)
         plt.title("Input", fontsize=20)
         ax1.axis("off")
-    
+
         ax2 = fig.add_subplot(1, 2, 2)
         plt.title("Colorized", fontsize=20)
         ax2.axis("off")
-    
+
         ax1.imshow(gray_img)
         ax2.imshow(color_img)
-    
+
         plt.show()
 
 Load the Image
@@ -4481,50 +4477,50 @@ Load the Image
 
     img_url_0 = "https://user-images.githubusercontent.com/18904157/180923287-20339d01-b1bf-493f-9a0d-55eff997aff1.jpg"
     img_url_1 = "https://user-images.githubusercontent.com/18904157/180923289-0bb71e09-25e1-46a6-aaf1-e8f666b62d26.jpg"
-    
+
     image_file_0 = utils.download_file(
         img_url_0, filename="test_0.jpg", directory="data", show_progress=False, silent=True, timeout=30
     )
     assert Path(image_file_0).exists()
-    
+
     image_file_1 = utils.download_file(
         img_url_1, filename="test_1.jpg", directory="data", show_progress=False, silent=True, timeout=30
     )
     assert Path(image_file_1).exists()
-    
+
     test_img_0 = read_image("data/test_0.jpg")
     test_img_1 = read_image("data/test_1.jpg")
 
 .. code:: ipython3
 
     def colorize(gray_img: np.ndarray) -> np.ndarray:
-    
+
         """
-        Given an image as ndarray for inference convert the image into LAB image, 
-        the model consumes as input L-Channel of LAB image and provides output 
+        Given an image as ndarray for inference convert the image into LAB image,
+        the model consumes as input L-Channel of LAB image and provides output
         A & B - Channels of LAB image. i.e returns a colorized image
-    
+
             Parameters:
                 gray_img (ndarray): Numpy array representing the original
                                     image.
-    
+
             Returns:
                 colorize_image (ndarray): Numpy arrray depicting the
                                           colorized version of the original
                                           image.
         """
-        
+
         # Preprocess
         h_in, w_in, _ = gray_img.shape
         img_rgb = gray_img.astype(np.float32) / 255
         img_lab = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2Lab)
         img_l_rs = cv2.resize(img_lab.copy(), (W, H))[:, :, 0]
-    
+
         # Inference
         inputs = np.expand_dims(img_l_rs, axis=[0, 1])
         res = compiled_model([inputs])[output_layer]
         update_res = np.squeeze(res)
-    
+
         # Post-process
         out = update_res.transpose((1, 2, 0))
         out = cv2.resize(out, (w_in, h_in))
