@@ -4,10 +4,12 @@ Programming Language Classification with OpenVINO
 Overview
 --------
 
-This tutorial will be divided in 2 parts:
-1. Create a simple inference pipeline with a pre-trained model using the OpenVINO™ IR format.
-2. Conduct `post-training quantization <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training.html>`__
-   on a pre-trained model using Hugging Face Optimum and benchmark performance.
+This tutorial will be divided in 2 parts: 1. Create a simple inference
+pipeline with a pre-trained model using the OpenVINO™ IR format. 2.
+Conduct `post-training
+quantization <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training.html>`__
+on a pre-trained model using Hugging Face Optimum and benchmark
+performance.
 
 Feel free to use the notebook outline in Jupyter or your IDE for easy
 navigation.
@@ -15,48 +17,48 @@ navigation.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Introduction <#introduction>`__
+-  `Introduction <#Introduction>`__
 
-   -  `Task <#task>`__
-   -  `Model <#model>`__
+   -  `Task <#Task>`__
+   -  `Model <#Model>`__
 
 -  `Part 1: Inference pipeline with
-   OpenVINO <#part-1-inference-pipeline-with-openvino>`__
+   OpenVINO <#Part-1:-Inference-pipeline-with-OpenVINO>`__
 
-   -  `Install prerequisites <#install-prerequisites>`__
-   -  `Imports <#imports>`__
-   -  `Setting up HuggingFace cache <#setting-up-huggingface-cache>`__
-   -  `Select inference device <#select-inference-device>`__
-   -  `Download resources <#download-resources>`__
-   -  `Create inference pipeline <#create-inference-pipeline>`__
-   -  `Inference on new input <#inference-on-new-input>`__
+   -  `Install prerequisites <#Install-prerequisites>`__
+   -  `Imports <#Imports>`__
+   -  `Setting up HuggingFace cache <#Setting-up-HuggingFace-cache>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Download resources <#Download-resources>`__
+   -  `Create inference pipeline <#Create-inference-pipeline>`__
+   -  `Inference on new input <#Inference-on-new-input>`__
 
 -  `Part 2: OpenVINO post-training quantization with HuggingFace
-   Optimum <#part-2-openvino-post-training-quantization-with-huggingface-optimum>`__
+   Optimum <#Part-2:-OpenVINO-post-training-quantization-with-HuggingFace-Optimum>`__
 
    -  `Define constants and
-      functions <#define-constants-and-functions>`__
-   -  `Load resources <#load-resources>`__
-   -  `Load calibration dataset <#load-calibration-dataset>`__
-   -  `Quantize model <#quantize-model>`__
-   -  `Load quantized model <#load-quantized-model>`__
+      functions <#Define-constants-and-functions>`__
+   -  `Load resources <#Load-resources>`__
+   -  `Load calibration dataset <#Load-calibration-dataset>`__
+   -  `Quantize model <#Quantize-model>`__
+   -  `Load quantized model <#Load-quantized-model>`__
    -  `Inference on new input using quantized
-      model <#inference-on-new-input-using-quantized-model>`__
-   -  `Load evaluation set <#load-evaluation-set>`__
-   -  `Evaluate model <#evaluate-model>`__
+      model <#Inference-on-new-input-using-quantized-model>`__
+   -  `Load evaluation set <#Load-evaluation-set>`__
+   -  `Evaluate model <#Evaluate-model>`__
 
--  `Additional resources <#additional-resources>`__
--  `Clean up <#clean-up>`__
+-  `Additional resources <#Additional-resources>`__
+-  `Clean up <#Clean-up>`__
 
 Introduction
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Task
 ~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 **Programming language classification** is the task of identifying which
 programming language is used in an arbitrary code snippet. This can be
@@ -84,15 +86,15 @@ used in Golang, but was later introduced in Python 3.8.
 Model
 ~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The classification model that will be used in this notebook is
-`CodeBERTa-language-id <https://huggingface.co/huggingface/CodeBERTa-language-id>`__
+```CodeBERTa-language-id`` <https://huggingface.co/huggingface/CodeBERTa-language-id>`__
 by HuggingFace. This model was fine-tuned from the masked language
 modeling model
-`CodeBERTa-small-v1 <https://huggingface.co/huggingface/CodeBERTa-small-v1>`__
+```CodeBERTa-small-v1`` <https://huggingface.co/huggingface/CodeBERTa-small-v1>`__
 trained on the
-`CodeSearchNet <https://huggingface.co/huggingface/CodeBERTa-small-v1>`__
+```CodeSearchNet`` <https://huggingface.co/huggingface/CodeBERTa-small-v1>`__
 dataset (Husain, 2019).
 
 It supports 6 programming languages: - Go - Java - JavaScript - PHP -
@@ -101,7 +103,7 @@ Python - Ruby
 Part 1: Inference pipeline with OpenVINO
 ----------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For this section, we will use the `HuggingFace
 Optimum <https://huggingface.co/docs/optimum/index>`__ library, which
@@ -113,7 +115,7 @@ will allow to automatically convert models to the OpenVINO™ IR format.
 Install prerequisites
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, complete the `repository installation steps <../../README.md>`__.
 
@@ -129,15 +131,17 @@ OpenVINO support - HuggingFace Evaluate to benchmark results
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-
+    
 
 .. parsed-literal::
 
     ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    pytorch-lightning 1.6.5 requires protobuf<=3.20.1, but you have protobuf 4.25.2 which is incompatible.
-    tensorflow-metadata 1.14.0 requires protobuf<4.21,>=3.20.3, but you have protobuf 4.25.2 which is incompatible.
-    tf2onnx 1.16.1 requires protobuf~=3.20, but you have protobuf 4.25.2 which is incompatible.
-
+    googleapis-common-protos 1.63.0 requires protobuf!=3.20.0,!=3.20.1,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0.dev0,>=3.19.5, but you have protobuf 5.26.0 which is incompatible.
+    pytorch-lightning 1.6.5 requires protobuf<=3.20.1, but you have protobuf 5.26.0 which is incompatible.
+    tensorflow 2.12.0 requires protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0dev,>=3.20.3, but you have protobuf 5.26.0 which is incompatible.
+    tensorflow-metadata 1.14.0 requires protobuf<4.21,>=3.20.3, but you have protobuf 5.26.0 which is incompatible.
+    tf2onnx 1.16.1 requires protobuf~=3.20, but you have protobuf 5.26.0 which is incompatible.
+    
 
 .. parsed-literal::
 
@@ -147,7 +151,7 @@ OpenVINO support - HuggingFace Evaluate to benchmark results
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-
+    
 
 .. parsed-literal::
 
@@ -157,7 +161,7 @@ OpenVINO support - HuggingFace Evaluate to benchmark results
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The import ``OVModelForSequenceClassification`` from Optimum is
 equivalent to ``AutoModelForSequenceClassification`` from Transformers
@@ -166,26 +170,31 @@ equivalent to ``AutoModelForSequenceClassification`` from Transformers
 
     from functools import partial
     from pathlib import Path
-
+    
     import pandas as pd
     from datasets import load_dataset, Dataset
     import evaluate
     from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
-    from optimum.intel import OVModelForSequenceClassification
+    from optimum.intel import OVModelForSequenceClassification  
     from optimum.intel.openvino import OVConfig, OVQuantizer
     from huggingface_hub.utils import RepositoryNotFoundError
 
 
 .. parsed-literal::
 
-    2024-02-10 00:24:44.251373: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-02-10 00:24:44.284790: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-03-14 00:01:47.035464: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-03-14 00:01:47.070078: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-02-10 00:24:44.788542: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-03-14 00:01:47.575168: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+
+
+.. parsed-literal::
+
+    OpenVINO Tokenizer version is not compatible with OpenVINO version. Installed OpenVINO version: 2024.0.0,OpenVINO Tokenizers requires . OpenVINO Tokenizers models will not be added during export.
 
 
 .. parsed-literal::
@@ -195,14 +204,14 @@ equivalent to ``AutoModelForSequenceClassification`` from Transformers
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/diffusers/utils/outputs.py:63: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/diffusers/utils/outputs.py:63: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
       torch.utils._pytree._register_pytree_node(
 
 
 Setting up HuggingFace cache
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Resources from HuggingFace will be downloaded in the local folder
 ``./model`` (next to this notebook) instead of the device global cache
@@ -218,7 +227,7 @@ for easy cleanup. Learn more
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -226,16 +235,16 @@ select device from dropdown list for running inference using OpenVINO
 
     import ipywidgets as widgets
     import openvino as ov
-
+    
     core = ov.Core()
-
+    
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
         value='AUTO',
         description='Device:',
         disabled=False,
     )
-
+    
     device
 
 
@@ -250,7 +259,7 @@ select device from dropdown list for running inference using OpenVINO
 Download resources
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -259,13 +268,13 @@ Download resources
         model = OVModelForSequenceClassification.from_pretrained(MODEL_LOCAL_PATH, device=device.value)
         tokenizer = AutoTokenizer.from_pretrained(MODEL_LOCAL_PATH)
         print(f"Loaded resources from local path: {MODEL_LOCAL_PATH.absolute()}")
-
+    
     # if not found, download from HuggingFace Hub then save locally
     except (RepositoryNotFoundError, OSError):
         print("Downloading resources from HuggingFace Hub")
         tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
         tokenizer.save_pretrained(MODEL_LOCAL_PATH)
-
+    
         # export=True is needed to convert the PyTorch model to OpenVINO
         model = OVModelForSequenceClassification.from_pretrained(MODEL_ID, export=True, device=device.value)
         model.save_pretrained(MODEL_LOCAL_PATH)
@@ -279,7 +288,7 @@ Download resources
 
 .. parsed-literal::
 
-    Framework not specified. Using pt to export to ONNX.
+    Framework not specified. Using pt to export the model.
 
 
 .. parsed-literal::
@@ -297,7 +306,7 @@ Download resources
 
 .. parsed-literal::
 
-    Using framework PyTorch: 2.2.0+cpu
+    Using framework PyTorch: 2.2.1+cpu
 
 
 .. parsed-literal::
@@ -322,18 +331,24 @@ Download resources
 
 .. parsed-literal::
 
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4193: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+      warnings.warn(
+
+
+.. parsed-literal::
+
     Compiling the model to AUTO ...
 
 
 .. parsed-literal::
 
-    Ressources cached locally at: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/notebooks/247-code-language-id/model/CodeBERTa-language-id
+    Ressources cached locally at: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/notebooks/247-code-language-id/model/CodeBERTa-language-id
 
 
 Create inference pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -348,14 +363,14 @@ Create inference pipeline
 Inference on new input
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # change input snippet to test model
     input_snippet = "df['speed'] = df.distance / df.time"
     output = code_classification_pipe(input_snippet)
-
+    
     print(f"Input snippet:\n  {input_snippet}\n")
     print(f"Predicted label: {output[0]['label']}")
     print(f"Predicted score: {output[0]['score']:.2}")
@@ -365,7 +380,7 @@ Inference on new input
 
     Input snippet:
       df['speed'] = df.distance / df.time
-
+    
     Predicted label: python
     Predicted score: 0.81
 
@@ -373,7 +388,7 @@ Inference on new input
 Part 2: OpenVINO post-training quantization with HuggingFace Optimum
 --------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In this section, we will quantize a trained model. At a high-level, this
 process consists of using lower precision numbers in the model, which
@@ -388,15 +403,15 @@ more <https://huggingface.co/docs/optimum/main/en/intel/index>`__.
 Define constants and functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     QUANTIZED_MODEL_LOCAL_PATH = MODEL_LOCAL_PATH.with_name(f"{MODEL_NAME}-quantized")
     DATASET_NAME = "code_search_net"
     LABEL_MAPPING = {"go": 0, "java": 1, "javascript": 2, "php": 3, "python": 4, "ruby": 5}
-
-
+    
+    
     def preprocess_function(examples: dict, tokenizer):
         """Preprocess inputs by tokenizing the `func_code_string` column"""
         return tokenizer(
@@ -405,32 +420,32 @@ Define constants and functions
             max_length=tokenizer.model_max_length,
             truncation=True,
         )
-
-
+    
+    
     def map_labels(example: dict) -> dict:
         """Convert string labels to integers"""
         label_mapping = {"go": 0, "java": 1, "javascript": 2, "php": 3, "python": 4, "ruby": 5}
         example["language"] = label_mapping[example["language"]]
-        return example
-
-
+        return example 
+    
+    
     def get_dataset_sample(dataset_split: str, num_samples: int) -> Dataset:
         """Create a sample with equal representation of each class without downloading the entire data"""
         labels = ["go", "java", "javascript", "php", "python", "ruby"]
         example_per_label = num_samples // len(labels)
-
+    
         examples = []
         for label in labels:
             subset = load_dataset("code_search_net", split=dataset_split, name=label, streaming=True)
             subset = subset.map(map_labels)
             examples.extend([example for example in subset.shuffle().take(example_per_label)])
-
+        
         return Dataset.from_list(examples)
 
 Load resources
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NOTE: the base model is loaded using
 ``AutoModelForSequenceClassification`` from ``Transformers``
@@ -439,7 +454,7 @@ NOTE: the base model is loaded using
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_LOCAL_PATH)
     base_model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID)
-
+    
     quantizer = OVQuantizer.from_pretrained(base_model)
     quantization_config = OVConfig()
 
@@ -454,7 +469,7 @@ NOTE: the base model is loaded using
 Load calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``get_dataset_sample()`` function will sample up to ``num_samples``,
 with an equal number of examples across the 6 programming languages.
@@ -466,7 +481,7 @@ NOTE: Uncomment the method below to download and use the full dataset
 
     calibration_sample = get_dataset_sample(dataset_split="train", num_samples=120)
     calibration_sample = calibration_sample.map(partial(preprocess_function, tokenizer=tokenizer))
-
+    
     # calibration_sample = quantizer.get_calibration_dataset(
     #     DATASET_NAME,
     #     preprocess_function=partial(preprocess_function, tokenizer=tokenizer),
@@ -478,7 +493,7 @@ NOTE: Uncomment the method below to download and use the full dataset
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/datasets/load.py:1454: FutureWarning: The repository for code_search_net contains custom code which must be executed to correctly load the dataset. You can inspect the repository content at https://hf.co/datasets/code_search_net
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/datasets/load.py:1461: FutureWarning: The repository for code_search_net contains custom code which must be executed to correctly load the dataset. You can inspect the repository content at https://hf.co/datasets/code_search_net
     You can avoid this message in future by passing the argument `trust_remote_code=True`.
     Passing `trust_remote_code=True` will be mandatory to load this dataset from the next major release of `datasets`.
       warnings.warn(
@@ -493,7 +508,7 @@ NOTE: Uncomment the method below to download and use the full dataset
 Quantize model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Calling ``quantizer.quantize(...)`` will iterate through the calibration
 dataset to quantize and save the model
@@ -510,6 +525,16 @@ dataset to quantize and save the model
 .. parsed-literal::
 
     The argument `quantization_config` is deprecated, and will be removed in optimum-intel v1.6.0, please use `ov_config` instead
+
+
+.. parsed-literal::
+
+    The support of `torch.nn.Module` will be deprecated in a future release of optimum-intel, please use the corresponding `OVModelForXxx` class to load you model.To convert a PyTorch model to OpenVINO, you can set `export=True` when loading your model as `OVModelForXxx.from_pretrained(..., export=True)`
+
+
+.. parsed-literal::
+
+    Passing the argument `library_name` to `get_supported_tasks_for_model_type` is required, but got library_name=None. Defaulting to `transformers`. An error will be raised in a future version of Optimum if `library_name` is not provided.
 
 
 .. parsed-literal::
@@ -818,7 +843,7 @@ dataset to quantize and save the model
 
 .. parsed-literal::
 
-    Using framework PyTorch: 2.2.0+cpu
+    Using framework PyTorch: 2.2.1+cpu
 
 
 .. parsed-literal::
@@ -833,13 +858,43 @@ dataset to quantize and save the model
 
 .. parsed-literal::
 
+    WARNING:nncf:You are setting `forward` on an NNCF-processed model object.
+    NNCF relies on custom-wrapping the `forward` call in order to function properly.
+    Arbitrary adjustments to the forward function on an NNCFNetwork object have undefined behavior.
+    If you need to replace the underlying forward function of the original model so that NNCF should be using that instead of the original forward function that NNCF saved during the compressed model creation, you can do this by calling:
+    model.nncf.set_original_unbound_forward(fn)
+    if `fn` has an unbound 0-th `self` argument, or
+    with model.nncf.temporary_bound_original_forward(fn): ...
+    if `fn` already had 0-th `self` argument bound or never had it in the first place.
+
+
+.. parsed-literal::
+
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4193: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+      warnings.warn(
+
+
+.. parsed-literal::
+
+    WARNING:nncf:You are setting `forward` on an NNCF-processed model object.
+    NNCF relies on custom-wrapping the `forward` call in order to function properly.
+    Arbitrary adjustments to the forward function on an NNCFNetwork object have undefined behavior.
+    If you need to replace the underlying forward function of the original model so that NNCF should be using that instead of the original forward function that NNCF saved during the compressed model creation, you can do this by calling:
+    model.nncf.set_original_unbound_forward(fn)
+    if `fn` has an unbound 0-th `self` argument, or
+    with model.nncf.temporary_bound_original_forward(fn): ...
+    if `fn` already had 0-th `self` argument bound or never had it in the first place.
+
+
+.. parsed-literal::
+
     Configuration saved in model/CodeBERTa-language-id-quantized/openvino_config.json
 
 
 Load quantized model
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NOTE: the argument ``export=True`` is not required since the quantized
 model is already in the OpenVINO format.
@@ -863,13 +918,13 @@ model is already in the OpenVINO format.
 Inference on new input using quantized model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     input_snippet = "df['speed'] = df.distance / df.time"
     output = quantized_code_classification_pipe(input_snippet)
-
+    
     print(f"Input snippet:\n  {input_snippet}\n")
     print(f"Predicted label: {output[0]['label']}")
     print(f"Predicted score: {output[0]['score']:.2}")
@@ -879,15 +934,15 @@ Inference on new input using quantized model
 
     Input snippet:
       df['speed'] = df.distance / df.time
-
+    
     Predicted label: python
-    Predicted score: 0.82
+    Predicted score: 0.8
 
 
 Load evaluation set
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NOTE: Uncomment the method below to download and use the full dataset
 (5+ Gb).
@@ -895,13 +950,13 @@ NOTE: Uncomment the method below to download and use the full dataset
 .. code:: ipython3
 
     validation_sample = get_dataset_sample(dataset_split="validation", num_samples=120)
-
+    
     # validation_sample = load_dataset(DATASET_NAME, split="validation")
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/datasets/load.py:1454: FutureWarning: The repository for code_search_net contains custom code which must be executed to correctly load the dataset. You can inspect the repository content at https://hf.co/datasets/code_search_net
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/datasets/load.py:1461: FutureWarning: The repository for code_search_net contains custom code which must be executed to correctly load the dataset. You can inspect the repository content at https://hf.co/datasets/code_search_net
     You can avoid this message in future by passing the argument `trust_remote_code=True`.
     Passing `trust_remote_code=True` will be mandatory to load this dataset from the next major release of `datasets`.
       warnings.warn(
@@ -910,7 +965,7 @@ NOTE: Uncomment the method below to download and use the full dataset
 Evaluate model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -921,20 +976,20 @@ Evaluate model
             self.metric = metric
             self.metric_args = metric_args
             self.metric_kwargs = metric_kwargs
-
+        
         def add(self, *args, **kwargs):
             return self.metric.add(*args, **kwargs)
-
+        
         def add_batch(self, *args, **kwargs):
             return self.metric.add_batch(*args, **kwargs)
-
+    
         def compute(self, *args, **kwargs):
             return self.metric.compute(*args, *self.metric_args, **kwargs, **self.metric_kwargs)
-
+    
         @property
         def name(self):
             return self.metric.name
-
+    
         def _feature_names(self):
             return self.metric._feature_names()
 
@@ -952,7 +1007,7 @@ displayed.
     metrics = evaluate.combine([
         ConfiguredMetric(evaluate.load('f1'), average='macro'),
     ])
-
+    
     base_results = code_classification_evaluator.compute(
         model_or_pipeline=code_classification_pipe,
         data=validation_sample,
@@ -961,7 +1016,7 @@ displayed.
         label_mapping=LABEL_MAPPING,
         metric=metrics,
     )
-
+    
     quantized_results = code_classification_evaluator.compute(
         model_or_pipeline=quantized_code_classification_pipe,
         data=validation_sample,
@@ -970,7 +1025,7 @@ displayed.
         label_mapping=LABEL_MAPPING,
         metric=metrics,
     )
-
+    
     results_df = pd.DataFrame.from_records([base_results, quantized_results], index=["base", "quantized"])
     results_df
 
@@ -984,11 +1039,11 @@ displayed.
         .dataframe tbody tr th:only-of-type {
             vertical-align: middle;
         }
-
+    
         .dataframe tbody tr th {
             vertical-align: top;
         }
-
+    
         .dataframe thead th {
             text-align: right;
         }
@@ -1007,16 +1062,16 @@ displayed.
         <tr>
           <th>base</th>
           <td>1.0</td>
-          <td>2.038191</td>
-          <td>58.875750</td>
-          <td>0.016985</td>
+          <td>2.123811</td>
+          <td>56.502207</td>
+          <td>0.017698</td>
         </tr>
         <tr>
           <th>quantized</th>
           <td>1.0</td>
-          <td>2.669737</td>
-          <td>44.948249</td>
-          <td>0.022248</td>
+          <td>3.098888</td>
+          <td>38.723563</td>
+          <td>0.025824</td>
         </tr>
       </tbody>
     </table>
@@ -1027,13 +1082,16 @@ displayed.
 Additional resources
 --------------------
 
-- `Grammatical Error Correction with OpenVINO <https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/214-grammar-correction/214-grammar-correction.ipynb>`__
-- `Quantize a Hugging Face Question-Answering Model with OpenVINO <https://github.com/huggingface/optimum-intel/blob/main/notebooks/openvino/question_answering_quantization.ipynb>`__
+`back to top ⬆️ <#Table-of-contents:>`__ - `Grammatical Error Correction
+with
+OpenVINO <https://github.com/openvinotoolkit/openvino_notebooks/blob/main/notebooks/214-grammar-correction/214-grammar-correction.ipynb>`__
+- `Quantize a Hugging Face Question-Answering Model with
+OpenVINO <https://github.com/huggingface/optimum-intel/blob/main/notebooks/openvino/question_answering_quantization.ipynb>`__\ \*\*
 
 Clean up
 --------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Uncomment and run cell below to delete all resources cached locally in
 ./model
@@ -1042,7 +1100,7 @@ Uncomment and run cell below to delete all resources cached locally in
 
     # import os
     # import shutil
-
+    
     # try:
     #     shutil.rmtree(path=QUANTIZED_MODEL_LOCAL_PATH)
     #     shutil.rmtree(path=MODEL_LOCAL_PATH)

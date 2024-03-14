@@ -45,55 +45,49 @@ repository for more details.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Configurations <#configurations>`__
+-  `Imports <#Imports>`__
+-  `Configurations <#Configurations>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
--  `Download the model <#download-the-model>`__
+-  `Download the model <#Download-the-model>`__
 -  `Convert the model to OpenVINO
-   IR <#convert-the-model-to-openvino-ir>`__
--  `Loading the Model <#loading-the-model>`__
--  `Utility Functions <#utility-functions>`__
--  `Load the Image <#load-the-image>`__
--  `Display Colorized Image <#display-colorized-image>`__
+   IR <#Convert-the-model-to-OpenVINO-IR>`__
+-  `Loading the Model <#Loading-the-Model>`__
+-  `Utility Functions <#Utility-Functions>`__
+-  `Load the Image <#Load-the-Image>`__
+-  `Display Colorized Image <#Display-Colorized-Image>`__
 
 .. code:: ipython3
 
-    %pip install "openvino-dev>=2023.1.0"
+    %pip install "openvino-dev>=2024.0.0"
 
 
 .. parsed-literal::
 
-    Requirement already satisfied: openvino-dev>=2023.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (2023.3.0)
-    Requirement already satisfied: addict>=2.4.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (2.4.0)
-    Requirement already satisfied: defusedxml>=0.7.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (0.7.1)
-    Requirement already satisfied: jstyleson>=0.0.2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (0.0.2)
-    Requirement already satisfied: networkx<=3.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (2.8.8)
-    Requirement already satisfied: numpy>=1.16.6 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (1.23.5)
-    Requirement already satisfied: opencv-python in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (4.9.0.80)
-    Requirement already satisfied: openvino-telemetry>=2022.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (2023.2.1)
-    Requirement already satisfied: pillow>=8.1.2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (10.2.0)
-    Requirement already satisfied: pyyaml>=5.4.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (6.0.1)
-    Requirement already satisfied: requests>=2.25.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (2.31.0)
-    Requirement already satisfied: scipy>=1.8 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (1.10.1)
-    Requirement already satisfied: texttable>=1.6.3 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (1.7.0)
+    Requirement already satisfied: openvino-dev>=2024.0.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (2024.0.0)
+    Requirement already satisfied: defusedxml>=0.7.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (0.7.1)
+    Requirement already satisfied: networkx<=3.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (2.8.8)
+    Requirement already satisfied: numpy>=1.16.6 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (1.23.5)
+    Requirement already satisfied: openvino-telemetry>=2023.2.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (2023.2.1)
+    Requirement already satisfied: packaging in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (24.0)
+    Requirement already satisfied: pyyaml>=5.4.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (6.0.1)
+    Requirement already satisfied: requests>=2.25.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (2.31.0)
+    Requirement already satisfied: openvino==2024.0.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (2024.0.0)
 
 
 .. parsed-literal::
 
-    Requirement already satisfied: tqdm>=4.54.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (4.66.1)
-    Requirement already satisfied: openvino==2023.3.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2023.1.0) (2023.3.0)
-    Requirement already satisfied: charset-normalizer<4,>=2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2023.1.0) (3.3.2)
-    Requirement already satisfied: idna<4,>=2.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2023.1.0) (3.6)
-    Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2023.1.0) (2.2.0)
-    Requirement already satisfied: certifi>=2017.4.17 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2023.1.0) (2024.2.2)
+    Requirement already satisfied: charset-normalizer<4,>=2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (3.3.2)
+    Requirement already satisfied: idna<4,>=2.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (3.6)
+    Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (2.2.1)
+    Requirement already satisfied: certifi>=2017.4.17 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (2024.2.2)
 
 
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-
+    
 
 .. parsed-literal::
 
@@ -103,26 +97,26 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import os
     import sys
     from pathlib import Path
-
+    
     import cv2
     import matplotlib.pyplot as plt
     import numpy as np
     import openvino as ov
-
+    
     sys.path.append("../utils")
     import notebook_utils as utils
 
 Configurations
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 -  ``PRECISION`` - {FP16, FP32}, default: FP16.
 -  ``MODEL_DIR`` - directory where the model is to be stored, default:
@@ -143,23 +137,23 @@ Configurations
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
 .. code:: ipython3
 
     import ipywidgets as widgets
-
+    
     core = ov.Core()
-
+    
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
         value='AUTO',
         description='Device:',
         disabled=False,
     )
-
+    
     device
 
 
@@ -174,7 +168,7 @@ select device from dropdown list for running inference using OpenVINO
 Download the model
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ``omz_downloader`` downloads model files from online sources and, if
 necessary, patches them to make them more usable with Model Converter.
@@ -203,5993 +197,253 @@ above.
 .. parsed-literal::
 
     ################|| Downloading colorization-v2 ||################
-
+    
     ========== Downloading models/public/colorization-v2/ckpt/colorization-v2-eccv16.pth
 
 
 .. parsed-literal::
 
-    ... 0%, 32 KB, 1298 KB/s, 0 seconds passed
+    ... 0%, 32 KB, 962 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 0%, 64 KB, 1111 KB/s, 0 seconds passed
-... 0%, 96 KB, 1601 KB/s, 0 seconds passed
+    ... 0%, 64 KB, 958 KB/s, 0 seconds passed... 0%, 96 KB, 1393 KB/s, 0 seconds passed... 0%, 128 KB, 1789 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 0%, 128 KB, 1382 KB/s, 0 seconds passed
-... 0%, 160 KB, 1607 KB/s, 0 seconds passed
-... 0%, 192 KB, 1513 KB/s, 0 seconds passed
-... 0%, 224 KB, 1759 KB/s, 0 seconds passed
-... 0%, 256 KB, 2004 KB/s, 0 seconds passed
-... 0%, 288 KB, 2238 KB/s, 0 seconds passed
+    ... 0%, 160 KB, 1589 KB/s, 0 seconds passed... 0%, 192 KB, 1878 KB/s, 0 seconds passed... 0%, 224 KB, 2144 KB/s, 0 seconds passed... 0%, 256 KB, 2413 KB/s, 0 seconds passed... 0%, 288 KB, 2676 KB/s, 0 seconds passed... 0%, 320 KB, 2384 KB/s, 0 seconds passed... 0%, 352 KB, 2612 KB/s, 0 seconds passed... 0%, 384 KB, 2838 KB/s, 0 seconds passed... 0%, 416 KB, 3065 KB/s, 0 seconds passed... 0%, 448 KB, 3287 KB/s, 0 seconds passed... 0%, 480 KB, 3499 KB/s, 0 seconds passed... 0%, 512 KB, 3714 KB/s, 0 seconds passed... 0%, 544 KB, 3934 KB/s, 0 seconds passed... 0%, 576 KB, 4152 KB/s, 0 seconds passed... 0%, 608 KB, 4317 KB/s, 0 seconds passed... 0%, 640 KB, 4525 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 0%, 320 KB, 1988 KB/s, 0 seconds passed
-... 0%, 352 KB, 2178 KB/s, 0 seconds passed
-... 0%, 384 KB, 2371 KB/s, 0 seconds passed
-... 0%, 416 KB, 2552 KB/s, 0 seconds passed
+    ... 0%, 672 KB, 3982 KB/s, 0 seconds passed... 0%, 704 KB, 4160 KB/s, 0 seconds passed... 0%, 736 KB, 4300 KB/s, 0 seconds passed... 0%, 768 KB, 4475 KB/s, 0 seconds passed... 0%, 800 KB, 4649 KB/s, 0 seconds passed... 0%, 832 KB, 4824 KB/s, 0 seconds passed... 0%, 864 KB, 4995 KB/s, 0 seconds passed... 0%, 896 KB, 5165 KB/s, 0 seconds passed... 0%, 928 KB, 5336 KB/s, 0 seconds passed... 0%, 960 KB, 5495 KB/s, 0 seconds passed... 0%, 992 KB, 5666 KB/s, 0 seconds passed... 0%, 1024 KB, 5835 KB/s, 0 seconds passed... 0%, 1056 KB, 6004 KB/s, 0 seconds passed... 0%, 1088 KB, 6172 KB/s, 0 seconds passed... 0%, 1120 KB, 6340 KB/s, 0 seconds passed... 0%, 1152 KB, 6507 KB/s, 0 seconds passed... 0%, 1184 KB, 6672 KB/s, 0 seconds passed... 0%, 1216 KB, 6838 KB/s, 0 seconds passed... 0%, 1248 KB, 7006 KB/s, 0 seconds passed... 1%, 1280 KB, 7174 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 0%, 448 KB, 2292 KB/s, 0 seconds passed
-... 0%, 480 KB, 2445 KB/s, 0 seconds passed
-... 0%, 512 KB, 2603 KB/s, 0 seconds passed
-... 0%, 544 KB, 2493 KB/s, 0 seconds passed
-... 0%, 576 KB, 2502 KB/s, 0 seconds passed
-... 0%, 608 KB, 2637 KB/s, 0 seconds passed
-... 0%, 640 KB, 2771 KB/s, 0 seconds passed
-... 0%, 672 KB, 2835 KB/s, 0 seconds passed
+    ... 1%, 1312 KB, 6434 KB/s, 0 seconds passed... 1%, 1344 KB, 6575 KB/s, 0 seconds passed... 1%, 1376 KB, 6717 KB/s, 0 seconds passed... 1%, 1408 KB, 6861 KB/s, 0 seconds passed... 1%, 1440 KB, 7003 KB/s, 0 seconds passed... 1%, 1472 KB, 7146 KB/s, 0 seconds passed... 1%, 1504 KB, 7287 KB/s, 0 seconds passed... 1%, 1536 KB, 7429 KB/s, 0 seconds passed... 1%, 1568 KB, 7559 KB/s, 0 seconds passed... 1%, 1600 KB, 7699 KB/s, 0 seconds passed... 1%, 1632 KB, 7840 KB/s, 0 seconds passed... 1%, 1664 KB, 7963 KB/s, 0 seconds passed... 1%, 1696 KB, 8100 KB/s, 0 seconds passed... 1%, 1728 KB, 8232 KB/s, 0 seconds passed... 1%, 1760 KB, 8369 KB/s, 0 seconds passed... 1%, 1792 KB, 8496 KB/s, 0 seconds passed... 1%, 1824 KB, 8630 KB/s, 0 seconds passed... 1%, 1856 KB, 8762 KB/s, 0 seconds passed... 1%, 1888 KB, 8898 KB/s, 0 seconds passed... 1%, 1920 KB, 9033 KB/s, 0 seconds passed... 1%, 1952 KB, 9165 KB/s, 0 seconds passed... 1%, 1984 KB, 9297 KB/s, 0 seconds passed... 1%, 2016 KB, 9430 KB/s, 0 seconds passed... 1%, 2048 KB, 9563 KB/s, 0 seconds passed... 1%, 2080 KB, 9698 KB/s, 0 seconds passed... 1%, 2112 KB, 9829 KB/s, 0 seconds passed... 1%, 2144 KB, 9965 KB/s, 0 seconds passed... 1%, 2176 KB, 10091 KB/s, 0 seconds passed... 1%, 2208 KB, 10225 KB/s, 0 seconds passed... 1%, 2240 KB, 10354 KB/s, 0 seconds passed... 1%, 2272 KB, 10488 KB/s, 0 seconds passed... 1%, 2304 KB, 10621 KB/s, 0 seconds passed... 1%, 2336 KB, 10743 KB/s, 0 seconds passed... 1%, 2368 KB, 10876 KB/s, 0 seconds passed... 1%, 2400 KB, 10995 KB/s, 0 seconds passed... 1%, 2432 KB, 11117 KB/s, 0 seconds passed... 1%, 2464 KB, 11246 KB/s, 0 seconds passed... 1%, 2496 KB, 11350 KB/s, 0 seconds passed... 2%, 2528 KB, 11458 KB/s, 0 seconds passed... 2%, 2560 KB, 11578 KB/s, 0 seconds passed... 2%, 2592 KB, 11705 KB/s, 0 seconds passed... 2%, 2624 KB, 11826 KB/s, 0 seconds passed... 2%, 2656 KB, 11277 KB/s, 0 seconds passed... 2%, 2688 KB, 11151 KB/s, 0 seconds passed... 2%, 2720 KB, 11259 KB/s, 0 seconds passed... 2%, 2752 KB, 11371 KB/s, 0 seconds passed... 2%, 2784 KB, 11485 KB/s, 0 seconds passed... 2%, 2816 KB, 11600 KB/s, 0 seconds passed... 2%, 2848 KB, 11715 KB/s, 0 seconds passed... 2%, 2880 KB, 11827 KB/s, 0 seconds passed... 2%, 2912 KB, 11942 KB/s, 0 seconds passed... 2%, 2944 KB, 12053 KB/s, 0 seconds passed... 2%, 2976 KB, 12166 KB/s, 0 seconds passed... 2%, 3008 KB, 12279 KB/s, 0 seconds passed... 2%, 3040 KB, 12390 KB/s, 0 seconds passed... 2%, 3072 KB, 12501 KB/s, 0 seconds passed... 2%, 3104 KB, 12612 KB/s, 0 seconds passed... 2%, 3136 KB, 12725 KB/s, 0 seconds passed... 2%, 3168 KB, 12837 KB/s, 0 seconds passed... 2%, 3200 KB, 12946 KB/s, 0 seconds passed... 2%, 3232 KB, 13058 KB/s, 0 seconds passed... 2%, 3264 KB, 13168 KB/s, 0 seconds passed... 2%, 3296 KB, 13277 KB/s, 0 seconds passed... 2%, 3328 KB, 13385 KB/s, 0 seconds passed... 2%, 3360 KB, 13494 KB/s, 0 seconds passed... 2%, 3392 KB, 13601 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 0%, 704 KB, 2664 KB/s, 0 seconds passed
-... 0%, 736 KB, 2776 KB/s, 0 seconds passed
-... 0%, 768 KB, 2893 KB/s, 0 seconds passed
-... 0%, 800 KB, 2947 KB/s, 0 seconds passed
+    ... 2%, 3424 KB, 13709 KB/s, 0 seconds passed... 2%, 3456 KB, 13816 KB/s, 0 seconds passed... 2%, 3488 KB, 13923 KB/s, 0 seconds passed... 2%, 3520 KB, 14030 KB/s, 0 seconds passed... 2%, 3552 KB, 14137 KB/s, 0 seconds passed... 2%, 3584 KB, 14244 KB/s, 0 seconds passed... 2%, 3616 KB, 14351 KB/s, 0 seconds passed... 2%, 3648 KB, 14456 KB/s, 0 seconds passed... 2%, 3680 KB, 14563 KB/s, 0 seconds passed... 2%, 3712 KB, 14669 KB/s, 0 seconds passed... 2%, 3744 KB, 14777 KB/s, 0 seconds passed... 2%, 3776 KB, 14886 KB/s, 0 seconds passed... 3%, 3808 KB, 14996 KB/s, 0 seconds passed... 3%, 3840 KB, 15070 KB/s, 0 seconds passed... 3%, 3872 KB, 15177 KB/s, 0 seconds passed... 3%, 3904 KB, 15287 KB/s, 0 seconds passed... 3%, 3936 KB, 15396 KB/s, 0 seconds passed... 3%, 3968 KB, 15504 KB/s, 0 seconds passed... 3%, 4000 KB, 15615 KB/s, 0 seconds passed... 3%, 4032 KB, 15723 KB/s, 0 seconds passed... 3%, 4064 KB, 15831 KB/s, 0 seconds passed... 3%, 4096 KB, 15938 KB/s, 0 seconds passed... 3%, 4128 KB, 16047 KB/s, 0 seconds passed... 3%, 4160 KB, 16152 KB/s, 0 seconds passed... 3%, 4192 KB, 16258 KB/s, 0 seconds passed... 3%, 4224 KB, 16366 KB/s, 0 seconds passed... 3%, 4256 KB, 16470 KB/s, 0 seconds passed... 3%, 4288 KB, 16576 KB/s, 0 seconds passed... 3%, 4320 KB, 16684 KB/s, 0 seconds passed... 3%, 4352 KB, 16771 KB/s, 0 seconds passed... 3%, 4384 KB, 16877 KB/s, 0 seconds passed... 3%, 4416 KB, 16983 KB/s, 0 seconds passed... 3%, 4448 KB, 17088 KB/s, 0 seconds passed... 3%, 4480 KB, 17194 KB/s, 0 seconds passed... 3%, 4512 KB, 17299 KB/s, 0 seconds passed... 3%, 4544 KB, 17400 KB/s, 0 seconds passed... 3%, 4576 KB, 17505 KB/s, 0 seconds passed... 3%, 4608 KB, 17602 KB/s, 0 seconds passed... 3%, 4640 KB, 17707 KB/s, 0 seconds passed... 3%, 4672 KB, 17808 KB/s, 0 seconds passed... 3%, 4704 KB, 17911 KB/s, 0 seconds passed... 3%, 4736 KB, 18015 KB/s, 0 seconds passed... 3%, 4768 KB, 18119 KB/s, 0 seconds passed... 3%, 4800 KB, 18218 KB/s, 0 seconds passed... 3%, 4832 KB, 18321 KB/s, 0 seconds passed... 3%, 4864 KB, 18423 KB/s, 0 seconds passed... 3%, 4896 KB, 18526 KB/s, 0 seconds passed... 3%, 4928 KB, 18625 KB/s, 0 seconds passed... 3%, 4960 KB, 18727 KB/s, 0 seconds passed... 3%, 4992 KB, 18829 KB/s, 0 seconds passed... 3%, 5024 KB, 18913 KB/s, 0 seconds passed... 4%, 5056 KB, 18992 KB/s, 0 seconds passed... 4%, 5088 KB, 19089 KB/s, 0 seconds passed... 4%, 5120 KB, 19191 KB/s, 0 seconds passed... 4%, 5152 KB, 19288 KB/s, 0 seconds passed... 4%, 5184 KB, 19388 KB/s, 0 seconds passed... 4%, 5216 KB, 19479 KB/s, 0 seconds passed... 4%, 5248 KB, 19569 KB/s, 0 seconds passed... 4%, 5280 KB, 19671 KB/s, 0 seconds passed... 4%, 5312 KB, 19736 KB/s, 0 seconds passed... 4%, 5344 KB, 19802 KB/s, 0 seconds passed... 4%, 5376 KB, 19817 KB/s, 0 seconds passed... 4%, 5408 KB, 19905 KB/s, 0 seconds passed... 4%, 5440 KB, 20006 KB/s, 0 seconds passed... 4%, 5472 KB, 20111 KB/s, 0 seconds passed... 4%, 5504 KB, 20194 KB/s, 0 seconds passed... 4%, 5536 KB, 20265 KB/s, 0 seconds passed... 4%, 5568 KB, 20318 KB/s, 0 seconds passed... 4%, 5600 KB, 20323 KB/s, 0 seconds passed... 4%, 5632 KB, 20410 KB/s, 0 seconds passed... 4%, 5664 KB, 20499 KB/s, 0 seconds passed... 4%, 5696 KB, 20587 KB/s, 0 seconds passed... 4%, 5728 KB, 20676 KB/s, 0 seconds passed... 4%, 5760 KB, 20763 KB/s, 0 seconds passed... 4%, 5792 KB, 20852 KB/s, 0 seconds passed... 4%, 5824 KB, 20943 KB/s, 0 seconds passed... 4%, 5856 KB, 21036 KB/s, 0 seconds passed... 4%, 5888 KB, 20299 KB/s, 0 seconds passed... 4%, 5920 KB, 20373 KB/s, 0 seconds passed... 4%, 5952 KB, 20453 KB/s, 0 seconds passed... 4%, 5984 KB, 20536 KB/s, 0 seconds passed... 4%, 6016 KB, 20619 KB/s, 0 seconds passed... 4%, 6048 KB, 20702 KB/s, 0 seconds passed... 4%, 6080 KB, 20786 KB/s, 0 seconds passed... 4%, 6112 KB, 20869 KB/s, 0 seconds passed... 4%, 6144 KB, 20952 KB/s, 0 seconds passed... 4%, 6176 KB, 21032 KB/s, 0 seconds passed... 4%, 6208 KB, 21114 KB/s, 0 seconds passed... 4%, 6240 KB, 21194 KB/s, 0 seconds passed... 4%, 6272 KB, 21275 KB/s, 0 seconds passed... 5%, 6304 KB, 21356 KB/s, 0 seconds passed... 5%, 6336 KB, 21437 KB/s, 0 seconds passed... 5%, 6368 KB, 21517 KB/s, 0 seconds passed... 5%, 6400 KB, 21598 KB/s, 0 seconds passed... 5%, 6432 KB, 21676 KB/s, 0 seconds passed... 5%, 6464 KB, 21756 KB/s, 0 seconds passed... 5%, 6496 KB, 21835 KB/s, 0 seconds passed... 5%, 6528 KB, 21915 KB/s, 0 seconds passed... 5%, 6560 KB, 21995 KB/s, 0 seconds passed... 5%, 6592 KB, 22075 KB/s, 0 seconds passed... 5%, 6624 KB, 22154 KB/s, 0 seconds passed... 5%, 6656 KB, 22233 KB/s, 0 seconds passed... 5%, 6688 KB, 22311 KB/s, 0 seconds passed... 5%, 6720 KB, 22391 KB/s, 0 seconds passed... 5%, 6752 KB, 22469 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 0%, 832 KB, 2786 KB/s, 0 seconds passed
-... 0%, 864 KB, 2884 KB/s, 0 seconds passed
-... 0%, 896 KB, 2984 KB/s, 0 seconds passed
-... 0%, 928 KB, 3035 KB/s, 0 seconds passed
-... 0%, 960 KB, 2881 KB/s, 0 seconds passed
-... 0%, 992 KB, 2969 KB/s, 0 seconds passed
-... 0%, 1024 KB, 3060 KB/s, 0 seconds passed
+    ... 5%, 6784 KB, 22548 KB/s, 0 seconds passed... 5%, 6816 KB, 22626 KB/s, 0 seconds passed... 5%, 6848 KB, 22702 KB/s, 0 seconds passed... 5%, 6880 KB, 22779 KB/s, 0 seconds passed... 5%, 6912 KB, 22857 KB/s, 0 seconds passed... 5%, 6944 KB, 22934 KB/s, 0 seconds passed... 5%, 6976 KB, 23010 KB/s, 0 seconds passed... 5%, 7008 KB, 23087 KB/s, 0 seconds passed... 5%, 7040 KB, 23165 KB/s, 0 seconds passed... 5%, 7072 KB, 23241 KB/s, 0 seconds passed... 5%, 7104 KB, 23317 KB/s, 0 seconds passed... 5%, 7136 KB, 23391 KB/s, 0 seconds passed... 5%, 7168 KB, 23472 KB/s, 0 seconds passed... 5%, 7200 KB, 23558 KB/s, 0 seconds passed... 5%, 7232 KB, 23645 KB/s, 0 seconds passed... 5%, 7264 KB, 23731 KB/s, 0 seconds passed... 5%, 7296 KB, 23816 KB/s, 0 seconds passed... 5%, 7328 KB, 23902 KB/s, 0 seconds passed... 5%, 7360 KB, 23987 KB/s, 0 seconds passed... 5%, 7392 KB, 24073 KB/s, 0 seconds passed... 5%, 7424 KB, 24158 KB/s, 0 seconds passed... 5%, 7456 KB, 24244 KB/s, 0 seconds passed... 5%, 7488 KB, 24329 KB/s, 0 seconds passed... 5%, 7520 KB, 24413 KB/s, 0 seconds passed... 5%, 7552 KB, 24498 KB/s, 0 seconds passed... 6%, 7584 KB, 24583 KB/s, 0 seconds passed... 6%, 7616 KB, 24667 KB/s, 0 seconds passed... 6%, 7648 KB, 24752 KB/s, 0 seconds passed... 6%, 7680 KB, 24836 KB/s, 0 seconds passed... 6%, 7712 KB, 24919 KB/s, 0 seconds passed... 6%, 7744 KB, 25003 KB/s, 0 seconds passed... 6%, 7776 KB, 25087 KB/s, 0 seconds passed... 6%, 7808 KB, 25170 KB/s, 0 seconds passed... 6%, 7840 KB, 25253 KB/s, 0 seconds passed... 6%, 7872 KB, 25336 KB/s, 0 seconds passed... 6%, 7904 KB, 25420 KB/s, 0 seconds passed... 6%, 7936 KB, 25503 KB/s, 0 seconds passed... 6%, 7968 KB, 25586 KB/s, 0 seconds passed... 6%, 8000 KB, 25669 KB/s, 0 seconds passed... 6%, 8032 KB, 25752 KB/s, 0 seconds passed... 6%, 8064 KB, 25835 KB/s, 0 seconds passed... 6%, 8096 KB, 25917 KB/s, 0 seconds passed... 6%, 8128 KB, 26000 KB/s, 0 seconds passed... 6%, 8160 KB, 26082 KB/s, 0 seconds passed... 6%, 8192 KB, 26165 KB/s, 0 seconds passed... 6%, 8224 KB, 26246 KB/s, 0 seconds passed... 6%, 8256 KB, 26328 KB/s, 0 seconds passed... 6%, 8288 KB, 26410 KB/s, 0 seconds passed... 6%, 8320 KB, 26491 KB/s, 0 seconds passed... 6%, 8352 KB, 26574 KB/s, 0 seconds passed... 6%, 8384 KB, 26653 KB/s, 0 seconds passed... 6%, 8416 KB, 26735 KB/s, 0 seconds passed... 6%, 8448 KB, 26815 KB/s, 0 seconds passed... 6%, 8480 KB, 26896 KB/s, 0 seconds passed... 6%, 8512 KB, 26977 KB/s, 0 seconds passed... 6%, 8544 KB, 27057 KB/s, 0 seconds passed... 6%, 8576 KB, 27138 KB/s, 0 seconds passed... 6%, 8608 KB, 27219 KB/s, 0 seconds passed... 6%, 8640 KB, 27299 KB/s, 0 seconds passed... 6%, 8672 KB, 27387 KB/s, 0 seconds passed... 6%, 8704 KB, 27474 KB/s, 0 seconds passed... 6%, 8736 KB, 27561 KB/s, 0 seconds passed... 6%, 8768 KB, 27648 KB/s, 0 seconds passed... 6%, 8800 KB, 27735 KB/s, 0 seconds passed... 7%, 8832 KB, 27821 KB/s, 0 seconds passed... 7%, 8864 KB, 27908 KB/s, 0 seconds passed... 7%, 8896 KB, 27995 KB/s, 0 seconds passed... 7%, 8928 KB, 28082 KB/s, 0 seconds passed... 7%, 8960 KB, 28169 KB/s, 0 seconds passed... 7%, 8992 KB, 28256 KB/s, 0 seconds passed... 7%, 9024 KB, 28341 KB/s, 0 seconds passed... 7%, 9056 KB, 28428 KB/s, 0 seconds passed... 7%, 9088 KB, 28515 KB/s, 0 seconds passed... 7%, 9120 KB, 28601 KB/s, 0 seconds passed... 7%, 9152 KB, 28687 KB/s, 0 seconds passed... 7%, 9184 KB, 28773 KB/s, 0 seconds passed... 7%, 9216 KB, 28860 KB/s, 0 seconds passed... 7%, 9248 KB, 28942 KB/s, 0 seconds passed... 7%, 9280 KB, 29014 KB/s, 0 seconds passed... 7%, 9312 KB, 29090 KB/s, 0 seconds passed... 7%, 9344 KB, 29166 KB/s, 0 seconds passed... 7%, 9376 KB, 29242 KB/s, 0 seconds passed... 7%, 9408 KB, 29313 KB/s, 0 seconds passed... 7%, 9440 KB, 29389 KB/s, 0 seconds passed... 7%, 9472 KB, 29464 KB/s, 0 seconds passed... 7%, 9504 KB, 29535 KB/s, 0 seconds passed... 7%, 9536 KB, 29610 KB/s, 0 seconds passed... 7%, 9568 KB, 29681 KB/s, 0 seconds passed... 7%, 9600 KB, 29761 KB/s, 0 seconds passed... 7%, 9632 KB, 29830 KB/s, 0 seconds passed... 7%, 9664 KB, 29905 KB/s, 0 seconds passed... 7%, 9696 KB, 29975 KB/s, 0 seconds passed... 7%, 9728 KB, 30046 KB/s, 0 seconds passed... 7%, 9760 KB, 30106 KB/s, 0 seconds passed... 7%, 9792 KB, 30168 KB/s, 0 seconds passed... 7%, 9824 KB, 30246 KB/s, 0 seconds passed... 7%, 9856 KB, 30330 KB/s, 0 seconds passed... 7%, 9888 KB, 30413 KB/s, 0 seconds passed... 7%, 9920 KB, 30487 KB/s, 0 seconds passed... 7%, 9952 KB, 30560 KB/s, 0 seconds passed... 7%, 9984 KB, 30629 KB/s, 0 seconds passed... 7%, 10016 KB, 30703 KB/s, 0 seconds passed... 7%, 10048 KB, 30772 KB/s, 0 seconds passed... 8%, 10080 KB, 30831 KB/s, 0 seconds passed... 8%, 10112 KB, 30890 KB/s, 0 seconds passed... 8%, 10144 KB, 30958 KB/s, 0 seconds passed... 8%, 10176 KB, 31044 KB/s, 0 seconds passed... 8%, 10208 KB, 31130 KB/s, 0 seconds passed... 8%, 10240 KB, 31202 KB/s, 0 seconds passed... 8%, 10272 KB, 31273 KB/s, 0 seconds passed... 8%, 10304 KB, 31346 KB/s, 0 seconds passed... 8%, 10336 KB, 31413 KB/s, 0 seconds passed... 8%, 10368 KB, 31485 KB/s, 0 seconds passed... 8%, 10400 KB, 31557 KB/s, 0 seconds passed... 8%, 10432 KB, 31624 KB/s, 0 seconds passed... 8%, 10464 KB, 31696 KB/s, 0 seconds passed... 8%, 10496 KB, 31763 KB/s, 0 seconds passed... 8%, 10528 KB, 31834 KB/s, 0 seconds passed... 8%, 10560 KB, 31906 KB/s, 0 seconds passed... 8%, 10592 KB, 31977 KB/s, 0 seconds passed... 8%, 10624 KB, 32049 KB/s, 0 seconds passed... 8%, 10656 KB, 32115 KB/s, 0 seconds passed... 8%, 10688 KB, 32186 KB/s, 0 seconds passed... 8%, 10720 KB, 32257 KB/s, 0 seconds passed... 8%, 10752 KB, 32323 KB/s, 0 seconds passed... 8%, 10784 KB, 32393 KB/s, 0 seconds passed... 8%, 10816 KB, 32459 KB/s, 0 seconds passed... 8%, 10848 KB, 32524 KB/s, 0 seconds passed... 8%, 10880 KB, 32580 KB/s, 0 seconds passed... 8%, 10912 KB, 32636 KB/s, 0 seconds passed... 8%, 10944 KB, 32699 KB/s, 0 seconds passed... 8%, 10976 KB, 32782 KB/s, 0 seconds passed... 8%, 11008 KB, 32866 KB/s, 0 seconds passed... 8%, 11040 KB, 32942 KB/s, 0 seconds passed... 8%, 11072 KB, 33006 KB/s, 0 seconds passed... 8%, 11104 KB, 33076 KB/s, 0 seconds passed... 8%, 11136 KB, 33146 KB/s, 0 seconds passed... 8%, 11168 KB, 33215 KB/s, 0 seconds passed... 8%, 11200 KB, 33279 KB/s, 0 seconds passed... 8%, 11232 KB, 33349 KB/s, 0 seconds passed... 8%, 11264 KB, 33409 KB/s, 0 seconds passed... 8%, 11296 KB, 33462 KB/s, 0 seconds passed... 8%, 11328 KB, 33537 KB/s, 0 seconds passed... 9%, 11360 KB, 33617 KB/s, 0 seconds passed... 9%, 11392 KB, 33680 KB/s, 0 seconds passed... 9%, 11424 KB, 33748 KB/s, 0 seconds passed... 9%, 11456 KB, 33817 KB/s, 0 seconds passed... 9%, 11488 KB, 33880 KB/s, 0 seconds passed... 9%, 11520 KB, 33948 KB/s, 0 seconds passed... 9%, 11552 KB, 34016 KB/s, 0 seconds passed... 9%, 11584 KB, 34084 KB/s, 0 seconds passed... 9%, 11616 KB, 34152 KB/s, 0 seconds passed... 9%, 11648 KB, 34215 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 0%, 1056 KB, 2969 KB/s, 0 seconds passed
-... 0%, 1088 KB, 2957 KB/s, 0 seconds passed
-... 0%, 1120 KB, 3038 KB/s, 0 seconds passed
-... 0%, 1152 KB, 3120 KB/s, 0 seconds passed
-... 0%, 1184 KB, 3036 KB/s, 0 seconds passed
+    ... 9%, 11680 KB, 32983 KB/s, 0 seconds passed... 9%, 11712 KB, 33033 KB/s, 0 seconds passed... 9%, 11744 KB, 33086 KB/s, 0 seconds passed... 9%, 11776 KB, 33141 KB/s, 0 seconds passed... 9%, 11808 KB, 33199 KB/s, 0 seconds passed... 9%, 11840 KB, 31510 KB/s, 0 seconds passed... 9%, 11872 KB, 31554 KB/s, 0 seconds passed... 9%, 11904 KB, 31601 KB/s, 0 seconds passed... 9%, 11936 KB, 31654 KB/s, 0 seconds passed... 9%, 11968 KB, 31705 KB/s, 0 seconds passed... 9%, 12000 KB, 31758 KB/s, 0 seconds passed... 9%, 12032 KB, 31811 KB/s, 0 seconds passed... 9%, 12064 KB, 31865 KB/s, 0 seconds passed... 9%, 12096 KB, 31919 KB/s, 0 seconds passed... 9%, 12128 KB, 31970 KB/s, 0 seconds passed... 9%, 12160 KB, 32023 KB/s, 0 seconds passed... 9%, 12192 KB, 32075 KB/s, 0 seconds passed... 9%, 12224 KB, 32128 KB/s, 0 seconds passed... 9%, 12256 KB, 32181 KB/s, 0 seconds passed... 9%, 12288 KB, 32232 KB/s, 0 seconds passed... 9%, 12320 KB, 32284 KB/s, 0 seconds passed... 9%, 12352 KB, 32337 KB/s, 0 seconds passed... 9%, 12384 KB, 32389 KB/s, 0 seconds passed... 9%, 12416 KB, 32439 KB/s, 0 seconds passed... 9%, 12448 KB, 32491 KB/s, 0 seconds passed... 9%, 12480 KB, 32543 KB/s, 0 seconds passed... 9%, 12512 KB, 32596 KB/s, 0 seconds passed... 9%, 12544 KB, 32647 KB/s, 0 seconds passed... 9%, 12576 KB, 32700 KB/s, 0 seconds passed... 10%, 12608 KB, 32752 KB/s, 0 seconds passed... 10%, 12640 KB, 32802 KB/s, 0 seconds passed... 10%, 12672 KB, 32852 KB/s, 0 seconds passed... 10%, 12704 KB, 32903 KB/s, 0 seconds passed... 10%, 12736 KB, 32962 KB/s, 0 seconds passed... 10%, 12768 KB, 33023 KB/s, 0 seconds passed... 10%, 12800 KB, 33085 KB/s, 0 seconds passed... 10%, 12832 KB, 33147 KB/s, 0 seconds passed... 10%, 12864 KB, 33210 KB/s, 0 seconds passed... 10%, 12896 KB, 33273 KB/s, 0 seconds passed... 10%, 12928 KB, 33334 KB/s, 0 seconds passed... 10%, 12960 KB, 33396 KB/s, 0 seconds passed... 10%, 12992 KB, 33458 KB/s, 0 seconds passed... 10%, 13024 KB, 33520 KB/s, 0 seconds passed... 10%, 13056 KB, 33581 KB/s, 0 seconds passed... 10%, 13088 KB, 33643 KB/s, 0 seconds passed... 10%, 13120 KB, 33704 KB/s, 0 seconds passed... 10%, 13152 KB, 33764 KB/s, 0 seconds passed... 10%, 13184 KB, 33825 KB/s, 0 seconds passed... 10%, 13216 KB, 33885 KB/s, 0 seconds passed... 10%, 13248 KB, 33946 KB/s, 0 seconds passed... 10%, 13280 KB, 34008 KB/s, 0 seconds passed... 10%, 13312 KB, 34068 KB/s, 0 seconds passed... 10%, 13344 KB, 34130 KB/s, 0 seconds passed... 10%, 13376 KB, 34190 KB/s, 0 seconds passed... 10%, 13408 KB, 34251 KB/s, 0 seconds passed... 10%, 13440 KB, 34312 KB/s, 0 seconds passed... 10%, 13472 KB, 34372 KB/s, 0 seconds passed... 10%, 13504 KB, 34432 KB/s, 0 seconds passed... 10%, 13536 KB, 34493 KB/s, 0 seconds passed... 10%, 13568 KB, 34553 KB/s, 0 seconds passed... 10%, 13600 KB, 34614 KB/s, 0 seconds passed... 10%, 13632 KB, 34674 KB/s, 0 seconds passed... 10%, 13664 KB, 34732 KB/s, 0 seconds passed... 10%, 13696 KB, 34791 KB/s, 0 seconds passed... 10%, 13728 KB, 34851 KB/s, 0 seconds passed... 10%, 13760 KB, 34911 KB/s, 0 seconds passed... 10%, 13792 KB, 34971 KB/s, 0 seconds passed... 10%, 13824 KB, 35032 KB/s, 0 seconds passed... 11%, 13856 KB, 35091 KB/s, 0 seconds passed... 11%, 13888 KB, 35151 KB/s, 0 seconds passed... 11%, 13920 KB, 35210 KB/s, 0 seconds passed... 11%, 13952 KB, 35270 KB/s, 0 seconds passed... 11%, 13984 KB, 35330 KB/s, 0 seconds passed... 11%, 14016 KB, 35388 KB/s, 0 seconds passed... 11%, 14048 KB, 35454 KB/s, 0 seconds passed... 11%, 14080 KB, 35519 KB/s, 0 seconds passed... 11%, 14112 KB, 35585 KB/s, 0 seconds passed... 11%, 14144 KB, 35651 KB/s, 0 seconds passed... 11%, 14176 KB, 35716 KB/s, 0 seconds passed... 11%, 14208 KB, 35782 KB/s, 0 seconds passed... 11%, 14240 KB, 35849 KB/s, 0 seconds passed... 11%, 14272 KB, 35913 KB/s, 0 seconds passed... 11%, 14304 KB, 35978 KB/s, 0 seconds passed... 11%, 14336 KB, 36043 KB/s, 0 seconds passed... 11%, 14368 KB, 36105 KB/s, 0 seconds passed... 11%, 14400 KB, 36166 KB/s, 0 seconds passed... 11%, 14432 KB, 36223 KB/s, 0 seconds passed... 11%, 14464 KB, 36275 KB/s, 0 seconds passed... 11%, 14496 KB, 36331 KB/s, 0 seconds passed... 11%, 14528 KB, 36387 KB/s, 0 seconds passed... 11%, 14560 KB, 36443 KB/s, 0 seconds passed... 11%, 14592 KB, 36500 KB/s, 0 seconds passed... 11%, 14624 KB, 36555 KB/s, 0 seconds passed... 11%, 14656 KB, 36607 KB/s, 0 seconds passed... 11%, 14688 KB, 36658 KB/s, 0 seconds passed... 11%, 14720 KB, 36714 KB/s, 0 seconds passed... 11%, 14752 KB, 36769 KB/s, 0 seconds passed... 11%, 14784 KB, 36825 KB/s, 0 seconds passed... 11%, 14816 KB, 36876 KB/s, 0 seconds passed... 11%, 14848 KB, 36936 KB/s, 0 seconds passed... 11%, 14880 KB, 36987 KB/s, 0 seconds passed... 11%, 14912 KB, 37042 KB/s, 0 seconds passed... 11%, 14944 KB, 37093 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 0%, 1216 KB, 3023 KB/s, 0 seconds passed
-... 0%, 1248 KB, 3095 KB/s, 0 seconds passed
-... 1%, 1280 KB, 3170 KB/s, 0 seconds passed
-... 1%, 1312 KB, 3092 KB/s, 0 seconds passed
-... 1%, 1344 KB, 3078 KB/s, 0 seconds passed
-... 1%, 1376 KB, 3145 KB/s, 0 seconds passed
-... 1%, 1408 KB, 3215 KB/s, 0 seconds passed
+    ... 11%, 14976 KB, 35870 KB/s, 0 seconds passed... 11%, 15008 KB, 35902 KB/s, 0 seconds passed... 11%, 15040 KB, 35941 KB/s, 0 seconds passed... 11%, 15072 KB, 35983 KB/s, 0 seconds passed... 11%, 15104 KB, 36026 KB/s, 0 seconds passed... 12%, 15136 KB, 36071 KB/s, 0 seconds passed... 12%, 15168 KB, 36113 KB/s, 0 seconds passed... 12%, 15200 KB, 36156 KB/s, 0 seconds passed... 12%, 15232 KB, 36199 KB/s, 0 seconds passed... 12%, 15264 KB, 36243 KB/s, 0 seconds passed... 12%, 15296 KB, 36285 KB/s, 0 seconds passed... 12%, 15328 KB, 36329 KB/s, 0 seconds passed... 12%, 15360 KB, 36373 KB/s, 0 seconds passed... 12%, 15392 KB, 36417 KB/s, 0 seconds passed... 12%, 15424 KB, 36459 KB/s, 0 seconds passed... 12%, 15456 KB, 36502 KB/s, 0 seconds passed... 12%, 15488 KB, 36546 KB/s, 0 seconds passed... 12%, 15520 KB, 36589 KB/s, 0 seconds passed... 12%, 15552 KB, 36633 KB/s, 0 seconds passed... 12%, 15584 KB, 36676 KB/s, 0 seconds passed... 12%, 15616 KB, 36720 KB/s, 0 seconds passed... 12%, 15648 KB, 36762 KB/s, 0 seconds passed... 12%, 15680 KB, 36803 KB/s, 0 seconds passed... 12%, 15712 KB, 36846 KB/s, 0 seconds passed... 12%, 15744 KB, 36890 KB/s, 0 seconds passed... 12%, 15776 KB, 36932 KB/s, 0 seconds passed... 12%, 15808 KB, 36981 KB/s, 0 seconds passed... 12%, 15840 KB, 37030 KB/s, 0 seconds passed... 12%, 15872 KB, 37078 KB/s, 0 seconds passed... 12%, 15904 KB, 37127 KB/s, 0 seconds passed... 12%, 15936 KB, 37174 KB/s, 0 seconds passed... 12%, 15968 KB, 37222 KB/s, 0 seconds passed... 12%, 16000 KB, 37271 KB/s, 0 seconds passed... 12%, 16032 KB, 37317 KB/s, 0 seconds passed... 12%, 16064 KB, 37365 KB/s, 0 seconds passed... 12%, 16096 KB, 37413 KB/s, 0 seconds passed... 12%, 16128 KB, 37461 KB/s, 0 seconds passed... 12%, 16160 KB, 37509 KB/s, 0 seconds passed... 12%, 16192 KB, 37556 KB/s, 0 seconds passed... 12%, 16224 KB, 37603 KB/s, 0 seconds passed... 12%, 16256 KB, 37651 KB/s, 0 seconds passed... 12%, 16288 KB, 37699 KB/s, 0 seconds passed... 12%, 16320 KB, 37746 KB/s, 0 seconds passed... 12%, 16352 KB, 37794 KB/s, 0 seconds passed... 13%, 16384 KB, 37841 KB/s, 0 seconds passed... 13%, 16416 KB, 37888 KB/s, 0 seconds passed... 13%, 16448 KB, 37933 KB/s, 0 seconds passed... 13%, 16480 KB, 37979 KB/s, 0 seconds passed... 13%, 16512 KB, 38025 KB/s, 0 seconds passed... 13%, 16544 KB, 38073 KB/s, 0 seconds passed... 13%, 16576 KB, 38120 KB/s, 0 seconds passed... 13%, 16608 KB, 38167 KB/s, 0 seconds passed... 13%, 16640 KB, 38215 KB/s, 0 seconds passed... 13%, 16672 KB, 38261 KB/s, 0 seconds passed... 13%, 16704 KB, 38308 KB/s, 0 seconds passed... 13%, 16736 KB, 38354 KB/s, 0 seconds passed... 13%, 16768 KB, 38401 KB/s, 0 seconds passed... 13%, 16800 KB, 38447 KB/s, 0 seconds passed... 13%, 16832 KB, 38494 KB/s, 0 seconds passed... 13%, 16864 KB, 38538 KB/s, 0 seconds passed... 13%, 16896 KB, 38594 KB/s, 0 seconds passed... 13%, 16928 KB, 38649 KB/s, 0 seconds passed... 13%, 16960 KB, 38703 KB/s, 0 seconds passed... 13%, 16992 KB, 38757 KB/s, 0 seconds passed... 13%, 17024 KB, 38812 KB/s, 0 seconds passed... 13%, 17056 KB, 38866 KB/s, 0 seconds passed... 13%, 17088 KB, 38921 KB/s, 0 seconds passed... 13%, 17120 KB, 38975 KB/s, 0 seconds passed... 13%, 17152 KB, 39029 KB/s, 0 seconds passed... 13%, 17184 KB, 39085 KB/s, 0 seconds passed... 13%, 17216 KB, 39140 KB/s, 0 seconds passed... 13%, 17248 KB, 39194 KB/s, 0 seconds passed... 13%, 17280 KB, 39248 KB/s, 0 seconds passed... 13%, 17312 KB, 39302 KB/s, 0 seconds passed... 13%, 17344 KB, 39357 KB/s, 0 seconds passed... 13%, 17376 KB, 39411 KB/s, 0 seconds passed... 13%, 17408 KB, 39465 KB/s, 0 seconds passed... 13%, 17440 KB, 39517 KB/s, 0 seconds passed... 13%, 17472 KB, 39570 KB/s, 0 seconds passed... 13%, 17504 KB, 39624 KB/s, 0 seconds passed... 13%, 17536 KB, 39678 KB/s, 0 seconds passed... 13%, 17568 KB, 39731 KB/s, 0 seconds passed... 13%, 17600 KB, 39785 KB/s, 0 seconds passed... 13%, 17632 KB, 39838 KB/s, 0 seconds passed... 14%, 17664 KB, 39892 KB/s, 0 seconds passed... 14%, 17696 KB, 39946 KB/s, 0 seconds passed... 14%, 17728 KB, 40000 KB/s, 0 seconds passed... 14%, 17760 KB, 40054 KB/s, 0 seconds passed... 14%, 17792 KB, 40108 KB/s, 0 seconds passed... 14%, 17824 KB, 40162 KB/s, 0 seconds passed... 14%, 17856 KB, 40215 KB/s, 0 seconds passed... 14%, 17888 KB, 40269 KB/s, 0 seconds passed... 14%, 17920 KB, 40322 KB/s, 0 seconds passed... 14%, 17952 KB, 40375 KB/s, 0 seconds passed... 14%, 17984 KB, 40429 KB/s, 0 seconds passed... 14%, 18016 KB, 40483 KB/s, 0 seconds passed... 14%, 18048 KB, 40536 KB/s, 0 seconds passed... 14%, 18080 KB, 40588 KB/s, 0 seconds passed... 14%, 18112 KB, 40641 KB/s, 0 seconds passed... 14%, 18144 KB, 40693 KB/s, 0 seconds passed... 14%, 18176 KB, 40747 KB/s, 0 seconds passed... 14%, 18208 KB, 40800 KB/s, 0 seconds passed... 14%, 18240 KB, 40853 KB/s, 0 seconds passed... 14%, 18272 KB, 40907 KB/s, 0 seconds passed... 14%, 18304 KB, 40960 KB/s, 0 seconds passed... 14%, 18336 KB, 41013 KB/s, 0 seconds passed... 14%, 18368 KB, 41066 KB/s, 0 seconds passed... 14%, 18400 KB, 41108 KB/s, 0 seconds passed... 14%, 18432 KB, 41156 KB/s, 0 seconds passed... 14%, 18464 KB, 41203 KB/s, 0 seconds passed... 14%, 18496 KB, 41250 KB/s, 0 seconds passed... 14%, 18528 KB, 41293 KB/s, 0 seconds passed... 14%, 18560 KB, 41340 KB/s, 0 seconds passed... 14%, 18592 KB, 41382 KB/s, 0 seconds passed... 14%, 18624 KB, 41424 KB/s, 0 seconds passed... 14%, 18656 KB, 41467 KB/s, 0 seconds passed... 14%, 18688 KB, 41509 KB/s, 0 seconds passed... 14%, 18720 KB, 41556 KB/s, 0 seconds passed... 14%, 18752 KB, 41601 KB/s, 0 seconds passed... 14%, 18784 KB, 41648 KB/s, 0 seconds passed... 14%, 18816 KB, 41694 KB/s, 0 seconds passed... 14%, 18848 KB, 41741 KB/s, 0 seconds passed... 14%, 18880 KB, 41787 KB/s, 0 seconds passed... 15%, 18912 KB, 41829 KB/s, 0 seconds passed... 15%, 18944 KB, 41876 KB/s, 0 seconds passed... 15%, 18976 KB, 41922 KB/s, 0 seconds passed... 15%, 19008 KB, 41964 KB/s, 0 seconds passed... 15%, 19040 KB, 42015 KB/s, 0 seconds passed... 15%, 19072 KB, 42061 KB/s, 0 seconds passed... 15%, 19104 KB, 42102 KB/s, 0 seconds passed... 15%, 19136 KB, 42149 KB/s, 0 seconds passed... 15%, 19168 KB, 42195 KB/s, 0 seconds passed... 15%, 19200 KB, 42236 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 1%, 1440 KB, 3137 KB/s, 0 seconds passed
-... 1%, 1472 KB, 3124 KB/s, 0 seconds passed
-... 1%, 1504 KB, 3185 KB/s, 0 seconds passed
-... 1%, 1536 KB, 3250 KB/s, 0 seconds passed
-... 1%, 1568 KB, 3178 KB/s, 0 seconds passed
+    ... 15%, 19232 KB, 42286 KB/s, 0 seconds passed... 15%, 19264 KB, 42333 KB/s, 0 seconds passed... 15%, 19296 KB, 42374 KB/s, 0 seconds passed... 15%, 19328 KB, 42420 KB/s, 0 seconds passed... 15%, 19360 KB, 42461 KB/s, 0 seconds passed... 15%, 19392 KB, 42506 KB/s, 0 seconds passed... 15%, 19424 KB, 42542 KB/s, 0 seconds passed... 15%, 19456 KB, 42588 KB/s, 0 seconds passed... 15%, 19488 KB, 42628 KB/s, 0 seconds passed... 15%, 19520 KB, 42598 KB/s, 0 seconds passed... 15%, 19552 KB, 42650 KB/s, 0 seconds passed... 15%, 19584 KB, 42706 KB/s, 0 seconds passed... 15%, 19616 KB, 42764 KB/s, 0 seconds passed... 15%, 19648 KB, 42821 KB/s, 0 seconds passed... 15%, 19680 KB, 42878 KB/s, 0 seconds passed... 15%, 19712 KB, 42921 KB/s, 0 seconds passed... 15%, 19744 KB, 42966 KB/s, 0 seconds passed... 15%, 19776 KB, 43011 KB/s, 0 seconds passed... 15%, 19808 KB, 43056 KB/s, 0 seconds passed... 15%, 19840 KB, 43096 KB/s, 0 seconds passed... 15%, 19872 KB, 43142 KB/s, 0 seconds passed... 15%, 19904 KB, 43187 KB/s, 0 seconds passed... 15%, 19936 KB, 43232 KB/s, 0 seconds passed... 15%, 19968 KB, 43271 KB/s, 0 seconds passed... 15%, 20000 KB, 43321 KB/s, 0 seconds passed... 15%, 20032 KB, 43366 KB/s, 0 seconds passed... 15%, 20064 KB, 43400 KB/s, 0 seconds passed... 15%, 20096 KB, 43450 KB/s, 0 seconds passed... 15%, 20128 KB, 43495 KB/s, 0 seconds passed... 16%, 20160 KB, 43534 KB/s, 0 seconds passed... 16%, 20192 KB, 43579 KB/s, 0 seconds passed... 16%, 20224 KB, 43623 KB/s, 0 seconds passed... 16%, 20256 KB, 43658 KB/s, 0 seconds passed... 16%, 20288 KB, 43692 KB/s, 0 seconds passed... 16%, 20320 KB, 43723 KB/s, 0 seconds passed... 16%, 20352 KB, 43780 KB/s, 0 seconds passed... 16%, 20384 KB, 43829 KB/s, 0 seconds passed... 16%, 20416 KB, 43863 KB/s, 0 seconds passed... 16%, 20448 KB, 43894 KB/s, 0 seconds passed... 16%, 20480 KB, 43925 KB/s, 0 seconds passed... 16%, 20512 KB, 43956 KB/s, 0 seconds passed... 16%, 20544 KB, 44012 KB/s, 0 seconds passed... 16%, 20576 KB, 44068 KB/s, 0 seconds passed... 16%, 20608 KB, 44124 KB/s, 0 seconds passed... 16%, 20640 KB, 44168 KB/s, 0 seconds passed... 16%, 20672 KB, 44197 KB/s, 0 seconds passed... 16%, 20704 KB, 44232 KB/s, 0 seconds passed... 16%, 20736 KB, 44269 KB/s, 0 seconds passed... 16%, 20768 KB, 44305 KB/s, 0 seconds passed... 16%, 20800 KB, 44343 KB/s, 0 seconds passed... 16%, 20832 KB, 44379 KB/s, 0 seconds passed... 16%, 20864 KB, 44415 KB/s, 0 seconds passed... 16%, 20896 KB, 44452 KB/s, 0 seconds passed... 16%, 20928 KB, 44488 KB/s, 0 seconds passed... 16%, 20960 KB, 44525 KB/s, 0 seconds passed... 16%, 20992 KB, 44561 KB/s, 0 seconds passed... 16%, 21024 KB, 44598 KB/s, 0 seconds passed... 16%, 21056 KB, 44634 KB/s, 0 seconds passed... 16%, 21088 KB, 44670 KB/s, 0 seconds passed... 16%, 21120 KB, 44707 KB/s, 0 seconds passed... 16%, 21152 KB, 44743 KB/s, 0 seconds passed... 16%, 21184 KB, 44779 KB/s, 0 seconds passed... 16%, 21216 KB, 44813 KB/s, 0 seconds passed... 16%, 21248 KB, 44850 KB/s, 0 seconds passed... 16%, 21280 KB, 44885 KB/s, 0 seconds passed... 16%, 21312 KB, 44922 KB/s, 0 seconds passed... 16%, 21344 KB, 44958 KB/s, 0 seconds passed... 16%, 21376 KB, 44994 KB/s, 0 seconds passed... 16%, 21408 KB, 45029 KB/s, 0 seconds passed... 17%, 21440 KB, 45065 KB/s, 0 seconds passed... 17%, 21472 KB, 45100 KB/s, 0 seconds passed... 17%, 21504 KB, 45136 KB/s, 0 seconds passed... 17%, 21536 KB, 45172 KB/s, 0 seconds passed... 17%, 21568 KB, 45208 KB/s, 0 seconds passed... 17%, 21600 KB, 45250 KB/s, 0 seconds passed... 17%, 21632 KB, 45297 KB/s, 0 seconds passed... 17%, 21664 KB, 45341 KB/s, 0 seconds passed... 17%, 21696 KB, 45387 KB/s, 0 seconds passed... 17%, 21728 KB, 45432 KB/s, 0 seconds passed... 17%, 21760 KB, 45478 KB/s, 0 seconds passed... 17%, 21792 KB, 45524 KB/s, 0 seconds passed... 17%, 21824 KB, 45571 KB/s, 0 seconds passed... 17%, 21856 KB, 45617 KB/s, 0 seconds passed... 17%, 21888 KB, 45663 KB/s, 0 seconds passed... 17%, 21920 KB, 45709 KB/s, 0 seconds passed... 17%, 21952 KB, 45754 KB/s, 0 seconds passed... 17%, 21984 KB, 45800 KB/s, 0 seconds passed... 17%, 22016 KB, 45847 KB/s, 0 seconds passed... 17%, 22048 KB, 45893 KB/s, 0 seconds passed... 17%, 22080 KB, 45939 KB/s, 0 seconds passed... 17%, 22112 KB, 45986 KB/s, 0 seconds passed... 17%, 22144 KB, 46031 KB/s, 0 seconds passed... 17%, 22176 KB, 46076 KB/s, 0 seconds passed... 17%, 22208 KB, 46121 KB/s, 0 seconds passed... 17%, 22240 KB, 46166 KB/s, 0 seconds passed... 17%, 22272 KB, 46212 KB/s, 0 seconds passed... 17%, 22304 KB, 46257 KB/s, 0 seconds passed... 17%, 22336 KB, 46302 KB/s, 0 seconds passed... 17%, 22368 KB, 46347 KB/s, 0 seconds passed... 17%, 22400 KB, 46393 KB/s, 0 seconds passed... 17%, 22432 KB, 46438 KB/s, 0 seconds passed... 17%, 22464 KB, 46484 KB/s, 0 seconds passed... 17%, 22496 KB, 46522 KB/s, 0 seconds passed... 17%, 22528 KB, 46562 KB/s, 0 seconds passed... 17%, 22560 KB, 46603 KB/s, 0 seconds passed... 17%, 22592 KB, 46639 KB/s, 0 seconds passed... 17%, 22624 KB, 46680 KB/s, 0 seconds passed... 17%, 22656 KB, 46724 KB/s, 0 seconds passed... 18%, 22688 KB, 46765 KB/s, 0 seconds passed... 18%, 22720 KB, 46801 KB/s, 0 seconds passed... 18%, 22752 KB, 46841 KB/s, 0 seconds passed... 18%, 22784 KB, 46882 KB/s, 0 seconds passed... 18%, 22816 KB, 46917 KB/s, 0 seconds passed... 18%, 22848 KB, 46958 KB/s, 0 seconds passed... 18%, 22880 KB, 46998 KB/s, 0 seconds passed... 18%, 22912 KB, 47028 KB/s, 0 seconds passed... 18%, 22944 KB, 47069 KB/s, 0 seconds passed... 18%, 22976 KB, 47109 KB/s, 0 seconds passed... 18%, 23008 KB, 47145 KB/s, 0 seconds passed... 18%, 23040 KB, 47184 KB/s, 0 seconds passed... 18%, 23072 KB, 47225 KB/s, 0 seconds passed... 18%, 23104 KB, 47265 KB/s, 0 seconds passed... 18%, 23136 KB, 47305 KB/s, 0 seconds passed... 18%, 23168 KB, 47337 KB/s, 0 seconds passed... 18%, 23200 KB, 47380 KB/s, 0 seconds passed... 18%, 23232 KB, 47414 KB/s, 0 seconds passed... 18%, 23264 KB, 47459 KB/s, 0 seconds passed... 18%, 23296 KB, 47501 KB/s, 0 seconds passed... 18%, 23328 KB, 47535 KB/s, 0 seconds passed... 18%, 23360 KB, 47575 KB/s, 0 seconds passed... 18%, 23392 KB, 47615 KB/s, 0 seconds passed... 18%, 23424 KB, 47649 KB/s, 0 seconds passed... 18%, 23456 KB, 47690 KB/s, 0 seconds passed... 18%, 23488 KB, 47724 KB/s, 0 seconds passed... 18%, 23520 KB, 47765 KB/s, 0 seconds passed... 18%, 23552 KB, 47805 KB/s, 0 seconds passed... 18%, 23584 KB, 47845 KB/s, 0 seconds passed... 18%, 23616 KB, 47878 KB/s, 0 seconds passed... 18%, 23648 KB, 47908 KB/s, 0 seconds passed... 18%, 23680 KB, 47949 KB/s, 0 seconds passed... 18%, 23712 KB, 47988 KB/s, 0 seconds passed... 18%, 23744 KB, 48022 KB/s, 0 seconds passed... 18%, 23776 KB, 48061 KB/s, 0 seconds passed... 18%, 23808 KB, 48096 KB/s, 0 seconds passed... 18%, 23840 KB, 48135 KB/s, 0 seconds passed... 18%, 23872 KB, 48179 KB/s, 0 seconds passed... 18%, 23904 KB, 48218 KB/s, 0 seconds passed... 19%, 23936 KB, 48252 KB/s, 0 seconds passed... 19%, 23968 KB, 48291 KB/s, 0 seconds passed... 19%, 24000 KB, 48330 KB/s, 0 seconds passed... 19%, 24032 KB, 48364 KB/s, 0 seconds passed... 19%, 24064 KB, 48403 KB/s, 0 seconds passed... 19%, 24096 KB, 48441 KB/s, 0 seconds passed... 19%, 24128 KB, 48480 KB/s, 0 seconds passed... 19%, 24160 KB, 48519 KB/s, 0 seconds passed... 19%, 24192 KB, 48553 KB/s, 0 seconds passed... 19%, 24224 KB, 48591 KB/s, 0 seconds passed... 19%, 24256 KB, 48630 KB/s, 0 seconds passed... 19%, 24288 KB, 48664 KB/s, 0 seconds passed... 19%, 24320 KB, 48702 KB/s, 0 seconds passed... 19%, 24352 KB, 48730 KB/s, 0 seconds passed... 19%, 24384 KB, 48769 KB/s, 0 seconds passed... 19%, 24416 KB, 48808 KB/s, 0 seconds passed... 19%, 24448 KB, 48846 KB/s, 0 seconds passed... 19%, 24480 KB, 48879 KB/s, 0 seconds passed... 19%, 24512 KB, 48917 KB/s, 0 seconds passed... 19%, 24544 KB, 48955 KB/s, 0 seconds passed... 19%, 24576 KB, 48989 KB/s, 0 seconds passed... 19%, 24608 KB, 49027 KB/s, 0 seconds passed... 19%, 24640 KB, 49065 KB/s, 0 seconds passed... 19%, 24672 KB, 49103 KB/s, 0 seconds passed... 19%, 24704 KB, 49141 KB/s, 0 seconds passed... 19%, 24736 KB, 49174 KB/s, 0 seconds passed... 19%, 24768 KB, 49212 KB/s, 0 seconds passed... 19%, 24800 KB, 49250 KB/s, 0 seconds passed... 19%, 24832 KB, 49287 KB/s, 0 seconds passed... 19%, 24864 KB, 49326 KB/s, 0 seconds passed... 19%, 24896 KB, 49359 KB/s, 0 seconds passed... 19%, 24928 KB, 49391 KB/s, 0 seconds passed... 19%, 24960 KB, 49429 KB/s, 0 seconds passed... 19%, 24992 KB, 49461 KB/s, 0 seconds passed... 19%, 25024 KB, 49499 KB/s, 0 seconds passed... 19%, 25056 KB, 49537 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 1%, 1600 KB, 3165 KB/s, 0 seconds passed
-... 1%, 1632 KB, 3222 KB/s, 0 seconds passed
-... 1%, 1664 KB, 3283 KB/s, 0 seconds passed
-... 1%, 1696 KB, 3311 KB/s, 0 seconds passed
-... 1%, 1728 KB, 3202 KB/s, 0 seconds passed
-... 1%, 1760 KB, 3255 KB/s, 0 seconds passed
-... 1%, 1792 KB, 3310 KB/s, 0 seconds passed
-... 1%, 1824 KB, 3336 KB/s, 0 seconds passed
+    ... 19%, 25088 KB, 49564 KB/s, 0 seconds passed... 19%, 25120 KB, 49602 KB/s, 0 seconds passed... 19%, 25152 KB, 49634 KB/s, 0 seconds passed... 19%, 25184 KB, 49672 KB/s, 0 seconds passed... 20%, 25216 KB, 49709 KB/s, 0 seconds passed... 20%, 25248 KB, 49738 KB/s, 0 seconds passed... 20%, 25280 KB, 49769 KB/s, 0 seconds passed... 20%, 25312 KB, 49798 KB/s, 0 seconds passed... 20%, 25344 KB, 49828 KB/s, 0 seconds passed... 20%, 25376 KB, 49857 KB/s, 0 seconds passed... 20%, 25408 KB, 49891 KB/s, 0 seconds passed... 20%, 25440 KB, 49932 KB/s, 0 seconds passed... 20%, 25472 KB, 49979 KB/s, 0 seconds passed... 20%, 25504 KB, 50025 KB/s, 0 seconds passed... 20%, 25536 KB, 50063 KB/s, 0 seconds passed... 20%, 25568 KB, 50095 KB/s, 0 seconds passed... 20%, 25600 KB, 50132 KB/s, 0 seconds passed... 20%, 25632 KB, 50169 KB/s, 0 seconds passed... 20%, 25664 KB, 50201 KB/s, 0 seconds passed... 20%, 25696 KB, 50238 KB/s, 0 seconds passed... 20%, 25728 KB, 50275 KB/s, 0 seconds passed... 20%, 25760 KB, 50312 KB/s, 0 seconds passed... 20%, 25792 KB, 50349 KB/s, 0 seconds passed... 20%, 25824 KB, 50385 KB/s, 0 seconds passed... 20%, 25856 KB, 50417 KB/s, 0 seconds passed... 20%, 25888 KB, 50454 KB/s, 0 seconds passed... 20%, 25920 KB, 50482 KB/s, 0 seconds passed... 20%, 25952 KB, 50500 KB/s, 0 seconds passed... 20%, 25984 KB, 50531 KB/s, 0 seconds passed... 20%, 26016 KB, 50564 KB/s, 0 seconds passed... 20%, 26048 KB, 50598 KB/s, 0 seconds passed... 20%, 26080 KB, 50629 KB/s, 0 seconds passed... 20%, 26112 KB, 50663 KB/s, 0 seconds passed... 20%, 26144 KB, 50695 KB/s, 0 seconds passed... 20%, 26176 KB, 50728 KB/s, 0 seconds passed... 20%, 26208 KB, 50762 KB/s, 0 seconds passed... 20%, 26240 KB, 50796 KB/s, 0 seconds passed... 20%, 26272 KB, 50830 KB/s, 0 seconds passed... 20%, 26304 KB, 50864 KB/s, 0 seconds passed... 20%, 26336 KB, 50885 KB/s, 0 seconds passed... 20%, 26368 KB, 50906 KB/s, 0 seconds passed... 20%, 26400 KB, 50935 KB/s, 0 seconds passed... 20%, 26432 KB, 50968 KB/s, 0 seconds passed... 21%, 26464 KB, 50999 KB/s, 0 seconds passed... 21%, 26496 KB, 51033 KB/s, 0 seconds passed... 21%, 26528 KB, 51066 KB/s, 0 seconds passed... 21%, 26560 KB, 51099 KB/s, 0 seconds passed... 21%, 26592 KB, 51132 KB/s, 0 seconds passed... 21%, 26624 KB, 51163 KB/s, 0 seconds passed... 21%, 26656 KB, 51196 KB/s, 0 seconds passed... 21%, 26688 KB, 51229 KB/s, 0 seconds passed... 21%, 26720 KB, 51262 KB/s, 0 seconds passed... 21%, 26752 KB, 51293 KB/s, 0 seconds passed... 21%, 26784 KB, 51325 KB/s, 0 seconds passed... 21%, 26816 KB, 51358 KB/s, 0 seconds passed... 21%, 26848 KB, 51392 KB/s, 0 seconds passed... 21%, 26880 KB, 51425 KB/s, 0 seconds passed... 21%, 26912 KB, 51457 KB/s, 0 seconds passed... 21%, 26944 KB, 51489 KB/s, 0 seconds passed... 21%, 26976 KB, 51522 KB/s, 0 seconds passed... 21%, 27008 KB, 51554 KB/s, 0 seconds passed... 21%, 27040 KB, 51587 KB/s, 0 seconds passed... 21%, 27072 KB, 51620 KB/s, 0 seconds passed... 21%, 27104 KB, 51653 KB/s, 0 seconds passed... 21%, 27136 KB, 51685 KB/s, 0 seconds passed... 21%, 27168 KB, 51716 KB/s, 0 seconds passed... 21%, 27200 KB, 51744 KB/s, 0 seconds passed... 21%, 27232 KB, 51776 KB/s, 0 seconds passed... 21%, 27264 KB, 51808 KB/s, 0 seconds passed... 21%, 27296 KB, 51840 KB/s, 0 seconds passed... 21%, 27328 KB, 51871 KB/s, 0 seconds passed... 21%, 27360 KB, 51903 KB/s, 0 seconds passed... 21%, 27392 KB, 51941 KB/s, 0 seconds passed... 21%, 27424 KB, 51981 KB/s, 0 seconds passed... 21%, 27456 KB, 52021 KB/s, 0 seconds passed... 21%, 27488 KB, 52061 KB/s, 0 seconds passed... 21%, 27520 KB, 52102 KB/s, 0 seconds passed... 21%, 27552 KB, 52142 KB/s, 0 seconds passed... 21%, 27584 KB, 52183 KB/s, 0 seconds passed... 21%, 27616 KB, 52224 KB/s, 0 seconds passed... 21%, 27648 KB, 52264 KB/s, 0 seconds passed... 21%, 27680 KB, 52304 KB/s, 0 seconds passed... 22%, 27712 KB, 52343 KB/s, 0 seconds passed... 22%, 27744 KB, 52383 KB/s, 0 seconds passed... 22%, 27776 KB, 52423 KB/s, 0 seconds passed... 22%, 27808 KB, 52464 KB/s, 0 seconds passed... 22%, 27840 KB, 52503 KB/s, 0 seconds passed... 22%, 27872 KB, 52542 KB/s, 0 seconds passed... 22%, 27904 KB, 52582 KB/s, 0 seconds passed... 22%, 27936 KB, 52616 KB/s, 0 seconds passed... 22%, 27968 KB, 52645 KB/s, 0 seconds passed... 22%, 28000 KB, 52679 KB/s, 0 seconds passed... 22%, 28032 KB, 52714 KB/s, 0 seconds passed... 22%, 28064 KB, 52748 KB/s, 0 seconds passed... 22%, 28096 KB, 52782 KB/s, 0 seconds passed... 22%, 28128 KB, 52815 KB/s, 0 seconds passed... 22%, 28160 KB, 52845 KB/s, 0 seconds passed... 22%, 28192 KB, 52878 KB/s, 0 seconds passed... 22%, 28224 KB, 52912 KB/s, 0 seconds passed... 22%, 28256 KB, 52938 KB/s, 0 seconds passed... 22%, 28288 KB, 52966 KB/s, 0 seconds passed... 22%, 28320 KB, 52999 KB/s, 0 seconds passed... 22%, 28352 KB, 53039 KB/s, 0 seconds passed... 22%, 28384 KB, 53070 KB/s, 0 seconds passed... 22%, 28416 KB, 53104 KB/s, 0 seconds passed... 22%, 28448 KB, 53138 KB/s, 0 seconds passed... 22%, 28480 KB, 53171 KB/s, 0 seconds passed... 22%, 28512 KB, 53199 KB/s, 0 seconds passed... 22%, 28544 KB, 53234 KB/s, 0 seconds passed... 22%, 28576 KB, 53261 KB/s, 0 seconds passed... 22%, 28608 KB, 53295 KB/s, 0 seconds passed... 22%, 28640 KB, 53328 KB/s, 0 seconds passed... 22%, 28672 KB, 53356 KB/s, 0 seconds passed... 22%, 28704 KB, 53390 KB/s, 0 seconds passed... 22%, 28736 KB, 53424 KB/s, 0 seconds passed... 22%, 28768 KB, 53456 KB/s, 0 seconds passed... 22%, 28800 KB, 53490 KB/s, 0 seconds passed... 22%, 28832 KB, 53523 KB/s, 0 seconds passed... 22%, 28864 KB, 53549 KB/s, 0 seconds passed... 22%, 28896 KB, 53584 KB/s, 0 seconds passed... 22%, 28928 KB, 53617 KB/s, 0 seconds passed... 22%, 28960 KB, 53649 KB/s, 0 seconds passed... 23%, 28992 KB, 53682 KB/s, 0 seconds passed... 23%, 29024 KB, 53709 KB/s, 0 seconds passed... 23%, 29056 KB, 53742 KB/s, 0 seconds passed... 23%, 29088 KB, 53776 KB/s, 0 seconds passed... 23%, 29120 KB, 53808 KB/s, 0 seconds passed... 23%, 29152 KB, 53834 KB/s, 0 seconds passed... 23%, 29184 KB, 53858 KB/s, 0 seconds passed... 23%, 29216 KB, 53887 KB/s, 0 seconds passed... 23%, 29248 KB, 53914 KB/s, 0 seconds passed... 23%, 29280 KB, 53945 KB/s, 0 seconds passed... 23%, 29312 KB, 53983 KB/s, 0 seconds passed... 23%, 29344 KB, 54011 KB/s, 0 seconds passed... 23%, 29376 KB, 54039 KB/s, 0 seconds passed... 23%, 29408 KB, 54066 KB/s, 0 seconds passed... 23%, 29440 KB, 54093 KB/s, 0 seconds passed... 23%, 29472 KB, 54121 KB/s, 0 seconds passed... 23%, 29504 KB, 54161 KB/s, 0 seconds passed... 23%, 29536 KB, 54204 KB/s, 0 seconds passed... 23%, 29568 KB, 54242 KB/s, 0 seconds passed... 23%, 29600 KB, 54269 KB/s, 0 seconds passed... 23%, 29632 KB, 54301 KB/s, 0 seconds passed... 23%, 29664 KB, 54334 KB/s, 0 seconds passed... 23%, 29696 KB, 54359 KB/s, 0 seconds passed... 23%, 29728 KB, 54393 KB/s, 0 seconds passed... 23%, 29760 KB, 54413 KB/s, 0 seconds passed... 23%, 29792 KB, 54446 KB/s, 0 seconds passed... 23%, 29824 KB, 54478 KB/s, 0 seconds passed... 23%, 29856 KB, 54504 KB/s, 0 seconds passed... 23%, 29888 KB, 54537 KB/s, 0 seconds passed... 23%, 29920 KB, 54574 KB/s, 0 seconds passed... 23%, 29952 KB, 54600 KB/s, 0 seconds passed... 23%, 29984 KB, 54633 KB/s, 0 seconds passed... 23%, 30016 KB, 54665 KB/s, 0 seconds passed... 23%, 30048 KB, 54696 KB/s, 0 seconds passed... 23%, 30080 KB, 54728 KB/s, 0 seconds passed... 23%, 30112 KB, 54759 KB/s, 0 seconds passed... 23%, 30144 KB, 54792 KB/s, 0 seconds passed... 23%, 30176 KB, 54822 KB/s, 0 seconds passed... 23%, 30208 KB, 54854 KB/s, 0 seconds passed... 24%, 30240 KB, 54881 KB/s, 0 seconds passed... 24%, 30272 KB, 54912 KB/s, 0 seconds passed... 24%, 30304 KB, 54944 KB/s, 0 seconds passed... 24%, 30336 KB, 54976 KB/s, 0 seconds passed... 24%, 30368 KB, 55006 KB/s, 0 seconds passed... 24%, 30400 KB, 55033 KB/s, 0 seconds passed... 24%, 30432 KB, 55065 KB/s, 0 seconds passed... 24%, 30464 KB, 55091 KB/s, 0 seconds passed... 24%, 30496 KB, 55122 KB/s, 0 seconds passed... 24%, 30528 KB, 55153 KB/s, 0 seconds passed... 24%, 30560 KB, 55185 KB/s, 0 seconds passed... 24%, 30592 KB, 55216 KB/s, 0 seconds passed... 24%, 30624 KB, 55247 KB/s, 0 seconds passed... 24%, 30656 KB, 55273 KB/s, 0 seconds passed... 24%, 30688 KB, 55304 KB/s, 0 seconds passed... 24%, 30720 KB, 55329 KB/s, 0 seconds passed... 24%, 30752 KB, 55362 KB/s, 0 seconds passed... 24%, 30784 KB, 55392 KB/s, 0 seconds passed... 24%, 30816 KB, 55418 KB/s, 0 seconds passed... 24%, 30848 KB, 55443 KB/s, 0 seconds passed... 24%, 30880 KB, 55474 KB/s, 0 seconds passed... 24%, 30912 KB, 55506 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 1%, 1856 KB, 3233 KB/s, 0 seconds passed
-... 1%, 1888 KB, 3282 KB/s, 0 seconds passed
-... 1%, 1920 KB, 3334 KB/s, 0 seconds passed
-... 1%, 1952 KB, 3273 KB/s, 0 seconds passed
+    ... 24%, 30944 KB, 55530 KB/s, 0 seconds passed... 24%, 30976 KB, 55561 KB/s, 0 seconds passed... 24%, 31008 KB, 55593 KB/s, 0 seconds passed... 24%, 31040 KB, 55624 KB/s, 0 seconds passed... 24%, 31072 KB, 55654 KB/s, 0 seconds passed... 24%, 31104 KB, 55691 KB/s, 0 seconds passed... 24%, 31136 KB, 55722 KB/s, 0 seconds passed... 24%, 31168 KB, 55752 KB/s, 0 seconds passed... 24%, 31200 KB, 55777 KB/s, 0 seconds passed... 24%, 31232 KB, 55808 KB/s, 0 seconds passed... 24%, 31264 KB, 55838 KB/s, 0 seconds passed... 24%, 31296 KB, 55868 KB/s, 0 seconds passed... 24%, 31328 KB, 55894 KB/s, 0 seconds passed... 24%, 31360 KB, 55914 KB/s, 0 seconds passed... 24%, 31392 KB, 55950 KB/s, 0 seconds passed... 24%, 31424 KB, 55974 KB/s, 0 seconds passed... 24%, 31456 KB, 56006 KB/s, 0 seconds passed... 24%, 31488 KB, 56042 KB/s, 0 seconds passed... 25%, 31520 KB, 56073 KB/s, 0 seconds passed... 25%, 31552 KB, 56087 KB/s, 0 seconds passed... 25%, 31584 KB, 56129 KB/s, 0 seconds passed... 25%, 31616 KB, 56159 KB/s, 0 seconds passed... 25%, 31648 KB, 56189 KB/s, 0 seconds passed... 25%, 31680 KB, 56219 KB/s, 0 seconds passed... 25%, 31712 KB, 56244 KB/s, 0 seconds passed... 25%, 31744 KB, 56274 KB/s, 0 seconds passed... 25%, 31776 KB, 56305 KB/s, 0 seconds passed... 25%, 31808 KB, 56336 KB/s, 0 seconds passed... 25%, 31840 KB, 56355 KB/s, 0 seconds passed... 25%, 31872 KB, 56380 KB/s, 0 seconds passed... 25%, 31904 KB, 56410 KB/s, 0 seconds passed... 25%, 31936 KB, 56440 KB/s, 0 seconds passed... 25%, 31968 KB, 56471 KB/s, 0 seconds passed... 25%, 32000 KB, 56506 KB/s, 0 seconds passed... 25%, 32032 KB, 56535 KB/s, 0 seconds passed... 25%, 32064 KB, 56561 KB/s, 0 seconds passed... 25%, 32096 KB, 56591 KB/s, 0 seconds passed... 25%, 32128 KB, 56620 KB/s, 0 seconds passed... 25%, 32160 KB, 56651 KB/s, 0 seconds passed... 25%, 32192 KB, 56675 KB/s, 0 seconds passed... 25%, 32224 KB, 56695 KB/s, 0 seconds passed... 25%, 32256 KB, 56735 KB/s, 0 seconds passed... 25%, 32288 KB, 56759 KB/s, 0 seconds passed... 25%, 32320 KB, 56779 KB/s, 0 seconds passed... 25%, 32352 KB, 56807 KB/s, 0 seconds passed... 25%, 32384 KB, 56833 KB/s, 0 seconds passed... 25%, 32416 KB, 56863 KB/s, 0 seconds passed... 25%, 32448 KB, 56893 KB/s, 0 seconds passed... 25%, 32480 KB, 56932 KB/s, 0 seconds passed... 25%, 32512 KB, 56957 KB/s, 0 seconds passed... 25%, 32544 KB, 56987 KB/s, 0 seconds passed... 25%, 32576 KB, 57016 KB/s, 0 seconds passed... 25%, 32608 KB, 57046 KB/s, 0 seconds passed... 25%, 32640 KB, 57070 KB/s, 0 seconds passed... 25%, 32672 KB, 57099 KB/s, 0 seconds passed... 25%, 32704 KB, 57129 KB/s, 0 seconds passed... 25%, 32736 KB, 57159 KB/s, 0 seconds passed... 26%, 32768 KB, 57183 KB/s, 0 seconds passed... 26%, 32800 KB, 57201 KB/s, 0 seconds passed... 26%, 32832 KB, 57231 KB/s, 0 seconds passed... 26%, 32864 KB, 57260 KB/s, 0 seconds passed... 26%, 32896 KB, 57284 KB/s, 0 seconds passed... 26%, 32928 KB, 57314 KB/s, 0 seconds passed... 26%, 32960 KB, 57343 KB/s, 0 seconds passed... 26%, 32992 KB, 57366 KB/s, 0 seconds passed... 26%, 33024 KB, 57401 KB/s, 0 seconds passed... 26%, 33056 KB, 57425 KB/s, 0 seconds passed... 26%, 33088 KB, 57454 KB/s, 0 seconds passed... 26%, 33120 KB, 57484 KB/s, 0 seconds passed... 26%, 33152 KB, 57508 KB/s, 0 seconds passed... 26%, 33184 KB, 57536 KB/s, 0 seconds passed... 26%, 33216 KB, 57566 KB/s, 0 seconds passed... 26%, 33248 KB, 57595 KB/s, 0 seconds passed... 26%, 33280 KB, 57629 KB/s, 0 seconds passed... 26%, 33312 KB, 57653 KB/s, 0 seconds passed... 26%, 33344 KB, 57682 KB/s, 0 seconds passed... 26%, 33376 KB, 57711 KB/s, 0 seconds passed... 26%, 33408 KB, 57734 KB/s, 0 seconds passed... 26%, 33440 KB, 57763 KB/s, 0 seconds passed... 26%, 33472 KB, 57792 KB/s, 0 seconds passed... 26%, 33504 KB, 57816 KB/s, 0 seconds passed... 26%, 33536 KB, 57839 KB/s, 0 seconds passed... 26%, 33568 KB, 57862 KB/s, 0 seconds passed... 26%, 33600 KB, 57891 KB/s, 0 seconds passed... 26%, 33632 KB, 57919 KB/s, 0 seconds passed... 26%, 33664 KB, 57949 KB/s, 0 seconds passed... 26%, 33696 KB, 57972 KB/s, 0 seconds passed... 26%, 33728 KB, 58000 KB/s, 0 seconds passed... 26%, 33760 KB, 58029 KB/s, 0 seconds passed... 26%, 33792 KB, 58061 KB/s, 0 seconds passed... 26%, 33824 KB, 58084 KB/s, 0 seconds passed... 26%, 33856 KB, 58110 KB/s, 0 seconds passed... 26%, 33888 KB, 58143 KB/s, 0 seconds passed... 26%, 33920 KB, 58167 KB/s, 0 seconds passed... 26%, 33952 KB, 58200 KB/s, 0 seconds passed... 26%, 33984 KB, 58229 KB/s, 0 seconds passed... 27%, 34016 KB, 58242 KB/s, 0 seconds passed... 27%, 34048 KB, 58283 KB/s, 0 seconds passed... 27%, 34080 KB, 58309 KB/s, 0 seconds passed... 27%, 34112 KB, 58326 KB/s, 0 seconds passed... 27%, 34144 KB, 58364 KB/s, 0 seconds passed... 27%, 34176 KB, 58388 KB/s, 0 seconds passed... 27%, 34208 KB, 58406 KB/s, 0 seconds passed... 27%, 34240 KB, 58434 KB/s, 0 seconds passed... 27%, 34272 KB, 58462 KB/s, 0 seconds passed... 27%, 34304 KB, 58496 KB/s, 0 seconds passed... 27%, 34336 KB, 58523 KB/s, 0 seconds passed... 27%, 34368 KB, 58552 KB/s, 0 seconds passed... 27%, 34400 KB, 58564 KB/s, 0 seconds passed... 27%, 34432 KB, 58593 KB/s, 0 seconds passed... 27%, 34464 KB, 58621 KB/s, 0 seconds passed... 27%, 34496 KB, 58649 KB/s, 0 seconds passed... 27%, 34528 KB, 58671 KB/s, 0 seconds passed... 27%, 34560 KB, 58699 KB/s, 0 seconds passed... 27%, 34592 KB, 58727 KB/s, 0 seconds passed... 27%, 34624 KB, 58765 KB/s, 0 seconds passed... 27%, 34656 KB, 58789 KB/s, 0 seconds passed... 27%, 34688 KB, 58816 KB/s, 0 seconds passed... 27%, 34720 KB, 58843 KB/s, 0 seconds passed... 27%, 34752 KB, 58855 KB/s, 0 seconds passed... 27%, 34784 KB, 58884 KB/s, 0 seconds passed... 27%, 34816 KB, 58921 KB/s, 0 seconds passed... 27%, 34848 KB, 58950 KB/s, 0 seconds passed... 27%, 34880 KB, 58958 KB/s, 0 seconds passed... 27%, 34912 KB, 58979 KB/s, 0 seconds passed... 27%, 34944 KB, 59002 KB/s, 0 seconds passed... 27%, 34976 KB, 59024 KB/s, 0 seconds passed... 27%, 35008 KB, 59055 KB/s, 0 seconds passed... 27%, 35040 KB, 59095 KB/s, 0 seconds passed... 27%, 35072 KB, 59131 KB/s, 0 seconds passed... 27%, 35104 KB, 59159 KB/s, 0 seconds passed... 27%, 35136 KB, 59168 KB/s, 0 seconds passed... 27%, 35168 KB, 59190 KB/s, 0 seconds passed... 27%, 35200 KB, 59212 KB/s, 0 seconds passed... 27%, 35232 KB, 59241 KB/s, 0 seconds passed... 27%, 35264 KB, 59281 KB/s, 0 seconds passed... 28%, 35296 KB, 59308 KB/s, 0 seconds passed... 28%, 35328 KB, 59341 KB/s, 0 seconds passed... 28%, 35360 KB, 59367 KB/s, 0 seconds passed... 28%, 35392 KB, 59379 KB/s, 0 seconds passed... 28%, 35424 KB, 59407 KB/s, 0 seconds passed... 28%, 35456 KB, 59434 KB/s, 0 seconds passed... 28%, 35488 KB, 59456 KB/s, 0 seconds passed... 28%, 35520 KB, 59483 KB/s, 0 seconds passed... 28%, 35552 KB, 59510 KB/s, 0 seconds passed... 28%, 35584 KB, 59537 KB/s, 0 seconds passed... 28%, 35616 KB, 59565 KB/s, 0 seconds passed... 28%, 35648 KB, 59592 KB/s, 0 seconds passed... 28%, 35680 KB, 59613 KB/s, 0 seconds passed... 28%, 35712 KB, 59641 KB/s, 0 seconds passed... 28%, 35744 KB, 59678 KB/s, 0 seconds passed... 28%, 35776 KB, 59697 KB/s, 0 seconds passed... 28%, 35808 KB, 59727 KB/s, 0 seconds passed... 28%, 35840 KB, 59738 KB/s, 0 seconds passed... 28%, 35872 KB, 59765 KB/s, 0 seconds passed... 28%, 35904 KB, 59792 KB/s, 0 seconds passed... 28%, 35936 KB, 59813 KB/s, 0 seconds passed... 28%, 35968 KB, 59674 KB/s, 0 seconds passed... 28%, 36000 KB, 59700 KB/s, 0 seconds passed... 28%, 36032 KB, 59723 KB/s, 0 seconds passed... 28%, 36064 KB, 59750 KB/s, 0 seconds passed... 28%, 36096 KB, 59766 KB/s, 0 seconds passed... 28%, 36128 KB, 59793 KB/s, 0 seconds passed... 28%, 36160 KB, 59819 KB/s, 0 seconds passed... 28%, 36192 KB, 59846 KB/s, 0 seconds passed... 28%, 36224 KB, 59679 KB/s, 0 seconds passed... 28%, 36256 KB, 59705 KB/s, 0 seconds passed... 28%, 36288 KB, 59727 KB/s, 0 seconds passed... 28%, 36320 KB, 59755 KB/s, 0 seconds passed... 28%, 36352 KB, 59775 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 1%, 1984 KB, 3260 KB/s, 0 seconds passed
-... 1%, 2016 KB, 3304 KB/s, 0 seconds passed
-... 1%, 2048 KB, 3354 KB/s, 0 seconds passed
-... 1%, 2080 KB, 3295 KB/s, 0 seconds passed
-... 1%, 2112 KB, 3285 KB/s, 0 seconds passed
-... 1%, 2144 KB, 3326 KB/s, 0 seconds passed
-... 1%, 2176 KB, 3373 KB/s, 0 seconds passed
+    ... 28%, 36384 KB, 59796 KB/s, 0 seconds passed... 28%, 36416 KB, 59817 KB/s, 0 seconds passed... 28%, 36448 KB, 59841 KB/s, 0 seconds passed... 28%, 36480 KB, 59862 KB/s, 0 seconds passed... 28%, 36512 KB, 59885 KB/s, 0 seconds passed... 29%, 36544 KB, 59909 KB/s, 0 seconds passed... 29%, 36576 KB, 59932 KB/s, 0 seconds passed... 29%, 36608 KB, 59956 KB/s, 0 seconds passed... 29%, 36640 KB, 59980 KB/s, 0 seconds passed... 29%, 36672 KB, 60003 KB/s, 0 seconds passed... 29%, 36704 KB, 60028 KB/s, 0 seconds passed... 29%, 36736 KB, 60051 KB/s, 0 seconds passed... 29%, 36768 KB, 60074 KB/s, 0 seconds passed... 29%, 36800 KB, 60097 KB/s, 0 seconds passed... 29%, 36832 KB, 60121 KB/s, 0 seconds passed... 29%, 36864 KB, 60144 KB/s, 0 seconds passed... 29%, 36896 KB, 60168 KB/s, 0 seconds passed... 29%, 36928 KB, 60188 KB/s, 0 seconds passed... 29%, 36960 KB, 60211 KB/s, 0 seconds passed... 29%, 36992 KB, 60235 KB/s, 0 seconds passed... 29%, 37024 KB, 60259 KB/s, 0 seconds passed... 29%, 37056 KB, 60282 KB/s, 0 seconds passed... 29%, 37088 KB, 60306 KB/s, 0 seconds passed... 29%, 37120 KB, 60330 KB/s, 0 seconds passed... 29%, 37152 KB, 59965 KB/s, 0 seconds passed... 29%, 37184 KB, 59984 KB/s, 0 seconds passed... 29%, 37216 KB, 60008 KB/s, 0 seconds passed... 29%, 37248 KB, 60030 KB/s, 0 seconds passed... 29%, 37280 KB, 60053 KB/s, 0 seconds passed... 29%, 37312 KB, 60076 KB/s, 0 seconds passed... 29%, 37344 KB, 60098 KB/s, 0 seconds passed... 29%, 37376 KB, 60121 KB/s, 0 seconds passed... 29%, 37408 KB, 60142 KB/s, 0 seconds passed... 29%, 37440 KB, 60165 KB/s, 0 seconds passed... 29%, 37472 KB, 60188 KB/s, 0 seconds passed... 29%, 37504 KB, 60211 KB/s, 0 seconds passed... 29%, 37536 KB, 60234 KB/s, 0 seconds passed... 29%, 37568 KB, 60257 KB/s, 0 seconds passed... 29%, 37600 KB, 60280 KB/s, 0 seconds passed... 29%, 37632 KB, 60304 KB/s, 0 seconds passed... 29%, 37664 KB, 60327 KB/s, 0 seconds passed... 29%, 37696 KB, 60348 KB/s, 0 seconds passed... 29%, 37728 KB, 60371 KB/s, 0 seconds passed... 29%, 37760 KB, 60394 KB/s, 0 seconds passed... 30%, 37792 KB, 60413 KB/s, 0 seconds passed... 30%, 37824 KB, 60433 KB/s, 0 seconds passed... 30%, 37856 KB, 60456 KB/s, 0 seconds passed... 30%, 37888 KB, 60478 KB/s, 0 seconds passed... 30%, 37920 KB, 60501 KB/s, 0 seconds passed... 30%, 37952 KB, 60524 KB/s, 0 seconds passed... 30%, 37984 KB, 60547 KB/s, 0 seconds passed... 30%, 38016 KB, 60569 KB/s, 0 seconds passed... 30%, 38048 KB, 60592 KB/s, 0 seconds passed... 30%, 38080 KB, 60614 KB/s, 0 seconds passed... 30%, 38112 KB, 60637 KB/s, 0 seconds passed... 30%, 38144 KB, 60660 KB/s, 0 seconds passed... 30%, 38176 KB, 60683 KB/s, 0 seconds passed... 30%, 38208 KB, 60711 KB/s, 0 seconds passed... 30%, 38240 KB, 60737 KB/s, 0 seconds passed... 30%, 38272 KB, 60766 KB/s, 0 seconds passed... 30%, 38304 KB, 60795 KB/s, 0 seconds passed... 30%, 38336 KB, 59398 KB/s, 0 seconds passed... 30%, 38368 KB, 59030 KB/s, 0 seconds passed... 30%, 38400 KB, 59040 KB/s, 0 seconds passed... 30%, 38432 KB, 59059 KB/s, 0 seconds passed... 30%, 38464 KB, 59079 KB/s, 0 seconds passed... 30%, 38496 KB, 59100 KB/s, 0 seconds passed... 30%, 38528 KB, 59122 KB/s, 0 seconds passed... 30%, 38560 KB, 59145 KB/s, 0 seconds passed... 30%, 38592 KB, 59167 KB/s, 0 seconds passed... 30%, 38624 KB, 59189 KB/s, 0 seconds passed... 30%, 38656 KB, 59210 KB/s, 0 seconds passed... 30%, 38688 KB, 59232 KB/s, 0 seconds passed... 30%, 38720 KB, 59251 KB/s, 0 seconds passed... 30%, 38752 KB, 59272 KB/s, 0 seconds passed... 30%, 38784 KB, 59294 KB/s, 0 seconds passed... 30%, 38816 KB, 59316 KB/s, 0 seconds passed... 30%, 38848 KB, 59337 KB/s, 0 seconds passed... 30%, 38880 KB, 59359 KB/s, 0 seconds passed... 30%, 38912 KB, 59381 KB/s, 0 seconds passed... 30%, 38944 KB, 59402 KB/s, 0 seconds passed... 30%, 38976 KB, 59424 KB/s, 0 seconds passed... 30%, 39008 KB, 59445 KB/s, 0 seconds passed... 30%, 39040 KB, 59467 KB/s, 0 seconds passed... 31%, 39072 KB, 59489 KB/s, 0 seconds passed... 31%, 39104 KB, 59509 KB/s, 0 seconds passed... 31%, 39136 KB, 59529 KB/s, 0 seconds passed... 31%, 39168 KB, 59550 KB/s, 0 seconds passed... 31%, 39200 KB, 59573 KB/s, 0 seconds passed... 31%, 39232 KB, 59595 KB/s, 0 seconds passed... 31%, 39264 KB, 59616 KB/s, 0 seconds passed... 31%, 39296 KB, 59636 KB/s, 0 seconds passed... 31%, 39328 KB, 59659 KB/s, 0 seconds passed... 31%, 39360 KB, 59681 KB/s, 0 seconds passed... 31%, 39392 KB, 59704 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 1%, 2208 KB, 3317 KB/s, 0 seconds passed
-... 1%, 2240 KB, 3305 KB/s, 0 seconds passed
-... 1%, 2272 KB, 3345 KB/s, 0 seconds passed
-... 1%, 2304 KB, 3389 KB/s, 0 seconds passed
-... 1%, 2336 KB, 3335 KB/s, 0 seconds passed
+    ... 31%, 39424 KB, 59728 KB/s, 0 seconds passed... 31%, 39456 KB, 59755 KB/s, 0 seconds passed... 31%, 39488 KB, 59781 KB/s, 0 seconds passed... 31%, 39520 KB, 59807 KB/s, 0 seconds passed... 31%, 39552 KB, 59833 KB/s, 0 seconds passed... 31%, 39584 KB, 59858 KB/s, 0 seconds passed... 31%, 39616 KB, 59883 KB/s, 0 seconds passed... 31%, 39648 KB, 59909 KB/s, 0 seconds passed... 31%, 39680 KB, 59935 KB/s, 0 seconds passed... 31%, 39712 KB, 59961 KB/s, 0 seconds passed... 31%, 39744 KB, 59987 KB/s, 0 seconds passed... 31%, 39776 KB, 60011 KB/s, 0 seconds passed... 31%, 39808 KB, 60037 KB/s, 0 seconds passed... 31%, 39840 KB, 60063 KB/s, 0 seconds passed... 31%, 39872 KB, 60090 KB/s, 0 seconds passed... 31%, 39904 KB, 60116 KB/s, 0 seconds passed... 31%, 39936 KB, 60142 KB/s, 0 seconds passed... 31%, 39968 KB, 60168 KB/s, 0 seconds passed... 31%, 40000 KB, 60194 KB/s, 0 seconds passed... 31%, 40032 KB, 60220 KB/s, 0 seconds passed... 31%, 40064 KB, 60246 KB/s, 0 seconds passed... 31%, 40096 KB, 60272 KB/s, 0 seconds passed... 31%, 40128 KB, 60296 KB/s, 0 seconds passed... 31%, 40160 KB, 60323 KB/s, 0 seconds passed... 31%, 40192 KB, 60349 KB/s, 0 seconds passed... 31%, 40224 KB, 60375 KB/s, 0 seconds passed... 31%, 40256 KB, 60401 KB/s, 0 seconds passed... 31%, 40288 KB, 60426 KB/s, 0 seconds passed... 32%, 40320 KB, 60452 KB/s, 0 seconds passed... 32%, 40352 KB, 60478 KB/s, 0 seconds passed... 32%, 40384 KB, 60504 KB/s, 0 seconds passed... 32%, 40416 KB, 60529 KB/s, 0 seconds passed... 32%, 40448 KB, 60555 KB/s, 0 seconds passed... 32%, 40480 KB, 60578 KB/s, 0 seconds passed... 32%, 40512 KB, 60596 KB/s, 0 seconds passed... 32%, 40544 KB, 60621 KB/s, 0 seconds passed... 32%, 40576 KB, 60644 KB/s, 0 seconds passed... 32%, 40608 KB, 60667 KB/s, 0 seconds passed... 32%, 40640 KB, 60688 KB/s, 0 seconds passed... 32%, 40672 KB, 60712 KB/s, 0 seconds passed... 32%, 40704 KB, 60735 KB/s, 0 seconds passed... 32%, 40736 KB, 60759 KB/s, 0 seconds passed... 32%, 40768 KB, 60778 KB/s, 0 seconds passed... 32%, 40800 KB, 60801 KB/s, 0 seconds passed... 32%, 40832 KB, 60825 KB/s, 0 seconds passed... 32%, 40864 KB, 60848 KB/s, 0 seconds passed... 32%, 40896 KB, 60867 KB/s, 0 seconds passed... 32%, 40928 KB, 60891 KB/s, 0 seconds passed... 32%, 40960 KB, 60908 KB/s, 0 seconds passed... 32%, 40992 KB, 60933 KB/s, 0 seconds passed... 32%, 41024 KB, 60911 KB/s, 0 seconds passed... 32%, 41056 KB, 60936 KB/s, 0 seconds passed... 32%, 41088 KB, 60961 KB/s, 0 seconds passed... 32%, 41120 KB, 60985 KB/s, 0 seconds passed... 32%, 41152 KB, 61007 KB/s, 0 seconds passed... 32%, 41184 KB, 61026 KB/s, 0 seconds passed... 32%, 41216 KB, 61050 KB/s, 0 seconds passed... 32%, 41248 KB, 61073 KB/s, 0 seconds passed... 32%, 41280 KB, 61097 KB/s, 0 seconds passed... 32%, 41312 KB, 61120 KB/s, 0 seconds passed... 32%, 41344 KB, 61139 KB/s, 0 seconds passed... 32%, 41376 KB, 61162 KB/s, 0 seconds passed... 32%, 41408 KB, 61185 KB/s, 0 seconds passed... 32%, 41440 KB, 61209 KB/s, 0 seconds passed... 32%, 41472 KB, 61227 KB/s, 0 seconds passed... 32%, 41504 KB, 61250 KB/s, 0 seconds passed... 32%, 41536 KB, 60877 KB/s, 0 seconds passed... 33%, 41568 KB, 60897 KB/s, 0 seconds passed... 33%, 41600 KB, 60918 KB/s, 0 seconds passed... 33%, 41632 KB, 60938 KB/s, 0 seconds passed... 33%, 41664 KB, 60957 KB/s, 0 seconds passed... 33%, 41696 KB, 60978 KB/s, 0 seconds passed... 33%, 41728 KB, 60999 KB/s, 0 seconds passed... 33%, 41760 KB, 61019 KB/s, 0 seconds passed... 33%, 41792 KB, 61039 KB/s, 0 seconds passed... 33%, 41824 KB, 61060 KB/s, 0 seconds passed... 33%, 41856 KB, 61080 KB/s, 0 seconds passed... 33%, 41888 KB, 61099 KB/s, 0 seconds passed... 33%, 41920 KB, 61120 KB/s, 0 seconds passed... 33%, 41952 KB, 61140 KB/s, 0 seconds passed... 33%, 41984 KB, 61161 KB/s, 0 seconds passed... 33%, 42016 KB, 61181 KB/s, 0 seconds passed... 33%, 42048 KB, 61200 KB/s, 0 seconds passed... 33%, 42080 KB, 61220 KB/s, 0 seconds passed... 33%, 42112 KB, 61241 KB/s, 0 seconds passed... 33%, 42144 KB, 61262 KB/s, 0 seconds passed... 33%, 42176 KB, 61282 KB/s, 0 seconds passed... 33%, 42208 KB, 61303 KB/s, 0 seconds passed... 33%, 42240 KB, 61322 KB/s, 0 seconds passed... 33%, 42272 KB, 61341 KB/s, 0 seconds passed... 33%, 42304 KB, 61359 KB/s, 0 seconds passed... 33%, 42336 KB, 61378 KB/s, 0 seconds passed... 33%, 42368 KB, 61400 KB/s, 0 seconds passed... 33%, 42400 KB, 61422 KB/s, 0 seconds passed... 33%, 42432 KB, 61444 KB/s, 0 seconds passed... 33%, 42464 KB, 61465 KB/s, 0 seconds passed... 33%, 42496 KB, 61487 KB/s, 0 seconds passed... 33%, 42528 KB, 61506 KB/s, 0 seconds passed... 33%, 42560 KB, 61528 KB/s, 0 seconds passed... 33%, 42592 KB, 61550 KB/s, 0 seconds passed... 33%, 42624 KB, 61572 KB/s, 0 seconds passed... 33%, 42656 KB, 61593 KB/s, 0 seconds passed... 33%, 42688 KB, 61615 KB/s, 0 seconds passed... 33%, 42720 KB, 61637 KB/s, 0 seconds passed... 33%, 42752 KB, 61658 KB/s, 0 seconds passed... 33%, 42784 KB, 61679 KB/s, 0 seconds passed... 33%, 42816 KB, 61700 KB/s, 0 seconds passed... 34%, 42848 KB, 61721 KB/s, 0 seconds passed... 34%, 42880 KB, 61743 KB/s, 0 seconds passed... 34%, 42912 KB, 61763 KB/s, 0 seconds passed... 34%, 42944 KB, 61784 KB/s, 0 seconds passed... 34%, 42976 KB, 61806 KB/s, 0 seconds passed... 34%, 43008 KB, 61826 KB/s, 0 seconds passed... 34%, 43040 KB, 61847 KB/s, 0 seconds passed... 34%, 43072 KB, 61868 KB/s, 0 seconds passed... 34%, 43104 KB, 61890 KB/s, 0 seconds passed... 34%, 43136 KB, 61912 KB/s, 0 seconds passed... 34%, 43168 KB, 61933 KB/s, 0 seconds passed... 34%, 43200 KB, 61953 KB/s, 0 seconds passed... 34%, 43232 KB, 61971 KB/s, 0 seconds passed... 34%, 43264 KB, 61992 KB/s, 0 seconds passed... 34%, 43296 KB, 62014 KB/s, 0 seconds passed... 34%, 43328 KB, 62035 KB/s, 0 seconds passed... 34%, 43360 KB, 62056 KB/s, 0 seconds passed... 34%, 43392 KB, 62077 KB/s, 0 seconds passed... 34%, 43424 KB, 62097 KB/s, 0 seconds passed... 34%, 43456 KB, 62119 KB/s, 0 seconds passed... 34%, 43488 KB, 62143 KB/s, 0 seconds passed... 34%, 43520 KB, 62173 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 1%, 2368 KB, 3323 KB/s, 0 seconds passed
-... 1%, 2400 KB, 3361 KB/s, 0 seconds passed
-... 1%, 2432 KB, 3403 KB/s, 0 seconds passed
-... 1%, 2464 KB, 3306 KB/s, 0 seconds passed
-... 1%, 2496 KB, 3339 KB/s, 0 seconds passed
-... 2%, 2528 KB, 3375 KB/s, 0 seconds passed
-... 2%, 2560 KB, 3415 KB/s, 0 seconds passed
+    ... 34%, 43552 KB, 59148 KB/s, 0 seconds passed... 34%, 43584 KB, 59155 KB/s, 0 seconds passed... 34%, 43616 KB, 59134 KB/s, 0 seconds passed... 34%, 43648 KB, 59151 KB/s, 0 seconds passed... 34%, 43680 KB, 59170 KB/s, 0 seconds passed... 34%, 43712 KB, 59190 KB/s, 0 seconds passed... 34%, 43744 KB, 59208 KB/s, 0 seconds passed... 34%, 43776 KB, 59228 KB/s, 0 seconds passed... 34%, 43808 KB, 59247 KB/s, 0 seconds passed... 34%, 43840 KB, 59265 KB/s, 0 seconds passed... 34%, 43872 KB, 59284 KB/s, 0 seconds passed... 34%, 43904 KB, 59305 KB/s, 0 seconds passed... 34%, 43936 KB, 59323 KB/s, 0 seconds passed... 34%, 43968 KB, 59341 KB/s, 0 seconds passed... 34%, 44000 KB, 59360 KB/s, 0 seconds passed... 34%, 44032 KB, 59377 KB/s, 0 seconds passed... 34%, 44064 KB, 59396 KB/s, 0 seconds passed... 35%, 44096 KB, 59415 KB/s, 0 seconds passed... 35%, 44128 KB, 59434 KB/s, 0 seconds passed... 35%, 44160 KB, 59451 KB/s, 0 seconds passed... 35%, 44192 KB, 59471 KB/s, 0 seconds passed... 35%, 44224 KB, 59490 KB/s, 0 seconds passed... 35%, 44256 KB, 59509 KB/s, 0 seconds passed... 35%, 44288 KB, 59528 KB/s, 0 seconds passed... 35%, 44320 KB, 59547 KB/s, 0 seconds passed... 35%, 44352 KB, 59566 KB/s, 0 seconds passed... 35%, 44384 KB, 59586 KB/s, 0 seconds passed... 35%, 44416 KB, 59605 KB/s, 0 seconds passed... 35%, 44448 KB, 59623 KB/s, 0 seconds passed... 35%, 44480 KB, 59642 KB/s, 0 seconds passed... 35%, 44512 KB, 59661 KB/s, 0 seconds passed... 35%, 44544 KB, 59679 KB/s, 0 seconds passed... 35%, 44576 KB, 59698 KB/s, 0 seconds passed... 35%, 44608 KB, 59717 KB/s, 0 seconds passed... 35%, 44640 KB, 59736 KB/s, 0 seconds passed... 35%, 44672 KB, 59756 KB/s, 0 seconds passed... 35%, 44704 KB, 59775 KB/s, 0 seconds passed... 35%, 44736 KB, 59794 KB/s, 0 seconds passed... 35%, 44768 KB, 59812 KB/s, 0 seconds passed... 35%, 44800 KB, 59831 KB/s, 0 seconds passed... 35%, 44832 KB, 59850 KB/s, 0 seconds passed... 35%, 44864 KB, 59867 KB/s, 0 seconds passed... 35%, 44896 KB, 59884 KB/s, 0 seconds passed... 35%, 44928 KB, 59909 KB/s, 0 seconds passed... 35%, 44960 KB, 59936 KB/s, 0 seconds passed... 35%, 44992 KB, 59962 KB/s, 0 seconds passed... 35%, 45024 KB, 59988 KB/s, 0 seconds passed... 35%, 45056 KB, 60013 KB/s, 0 seconds passed... 35%, 45088 KB, 60040 KB/s, 0 seconds passed... 35%, 45120 KB, 60067 KB/s, 0 seconds passed... 35%, 45152 KB, 60093 KB/s, 0 seconds passed... 35%, 45184 KB, 60119 KB/s, 0 seconds passed... 35%, 45216 KB, 60146 KB/s, 0 seconds passed... 35%, 45248 KB, 60172 KB/s, 0 seconds passed... 35%, 45280 KB, 60199 KB/s, 0 seconds passed... 35%, 45312 KB, 60225 KB/s, 0 seconds passed... 36%, 45344 KB, 60252 KB/s, 0 seconds passed... 36%, 45376 KB, 60276 KB/s, 0 seconds passed... 36%, 45408 KB, 60297 KB/s, 0 seconds passed... 36%, 45440 KB, 60314 KB/s, 0 seconds passed... 36%, 45472 KB, 60335 KB/s, 0 seconds passed... 36%, 45504 KB, 60356 KB/s, 0 seconds passed... 36%, 45536 KB, 60373 KB/s, 0 seconds passed... 36%, 45568 KB, 60394 KB/s, 0 seconds passed... 36%, 45600 KB, 60414 KB/s, 0 seconds passed... 36%, 45632 KB, 60436 KB/s, 0 seconds passed... 36%, 45664 KB, 60457 KB/s, 0 seconds passed... 36%, 45696 KB, 60478 KB/s, 0 seconds passed... 36%, 45728 KB, 60495 KB/s, 0 seconds passed... 36%, 45760 KB, 60516 KB/s, 0 seconds passed... 36%, 45792 KB, 60536 KB/s, 0 seconds passed... 36%, 45824 KB, 60554 KB/s, 0 seconds passed... 36%, 45856 KB, 60575 KB/s, 0 seconds passed... 36%, 45888 KB, 60595 KB/s, 0 seconds passed... 36%, 45920 KB, 60616 KB/s, 0 seconds passed... 36%, 45952 KB, 60633 KB/s, 0 seconds passed... 36%, 45984 KB, 60653 KB/s, 0 seconds passed... 36%, 46016 KB, 60675 KB/s, 0 seconds passed... 36%, 46048 KB, 60691 KB/s, 0 seconds passed... 36%, 46080 KB, 60713 KB/s, 0 seconds passed... 36%, 46112 KB, 60733 KB/s, 0 seconds passed... 36%, 46144 KB, 60759 KB/s, 0 seconds passed... 36%, 46176 KB, 60775 KB/s, 0 seconds passed... 36%, 46208 KB, 60797 KB/s, 0 seconds passed... 36%, 46240 KB, 60818 KB/s, 0 seconds passed... 36%, 46272 KB, 60837 KB/s, 0 seconds passed... 36%, 46304 KB, 60859 KB/s, 0 seconds passed... 36%, 46336 KB, 60867 KB/s, 0 seconds passed... 36%, 46368 KB, 60892 KB/s, 0 seconds passed... 36%, 46400 KB, 60913 KB/s, 0 seconds passed... 36%, 46432 KB, 60933 KB/s, 0 seconds passed... 36%, 46464 KB, 60954 KB/s, 0 seconds passed... 36%, 46496 KB, 60975 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 2%, 2592 KB, 3324 KB/s, 0 seconds passed
-... 2%, 2624 KB, 3355 KB/s, 0 seconds passed
-... 2%, 2656 KB, 3390 KB/s, 0 seconds passed
-... 2%, 2688 KB, 3428 KB/s, 0 seconds passed
+    ... 36%, 46528 KB, 60991 KB/s, 0 seconds passed... 36%, 46560 KB, 61012 KB/s, 0 seconds passed... 36%, 46592 KB, 61033 KB/s, 0 seconds passed... 37%, 46624 KB, 61054 KB/s, 0 seconds passed... 37%, 46656 KB, 61074 KB/s, 0 seconds passed... 37%, 46688 KB, 61091 KB/s, 0 seconds passed... 37%, 46720 KB, 61110 KB/s, 0 seconds passed... 37%, 46752 KB, 61131 KB/s, 0 seconds passed... 37%, 46784 KB, 61152 KB/s, 0 seconds passed... 37%, 46816 KB, 61167 KB/s, 0 seconds passed... 37%, 46848 KB, 61188 KB/s, 0 seconds passed... 37%, 46880 KB, 61209 KB/s, 0 seconds passed... 37%, 46912 KB, 61228 KB/s, 0 seconds passed... 37%, 46944 KB, 61244 KB/s, 0 seconds passed... 37%, 46976 KB, 61266 KB/s, 0 seconds passed... 37%, 47008 KB, 61282 KB/s, 0 seconds passed... 37%, 47040 KB, 61303 KB/s, 0 seconds passed... 37%, 47072 KB, 61323 KB/s, 0 seconds passed... 37%, 47104 KB, 61344 KB/s, 0 seconds passed... 37%, 47136 KB, 61360 KB/s, 0 seconds passed... 37%, 47168 KB, 61378 KB/s, 0 seconds passed... 37%, 47200 KB, 61394 KB/s, 0 seconds passed... 37%, 47232 KB, 61410 KB/s, 0 seconds passed... 37%, 47264 KB, 61435 KB/s, 0 seconds passed... 37%, 47296 KB, 61461 KB/s, 0 seconds passed... 37%, 47328 KB, 61482 KB/s, 0 seconds passed... 37%, 47360 KB, 61502 KB/s, 0 seconds passed... 37%, 47392 KB, 61519 KB/s, 0 seconds passed... 37%, 47424 KB, 61539 KB/s, 0 seconds passed... 37%, 47456 KB, 61559 KB/s, 0 seconds passed... 37%, 47488 KB, 61571 KB/s, 0 seconds passed... 37%, 47520 KB, 61591 KB/s, 0 seconds passed... 37%, 47552 KB, 61607 KB/s, 0 seconds passed... 37%, 47584 KB, 61628 KB/s, 0 seconds passed... 37%, 47616 KB, 61648 KB/s, 0 seconds passed... 37%, 47648 KB, 61667 KB/s, 0 seconds passed... 37%, 47680 KB, 61684 KB/s, 0 seconds passed... 37%, 47712 KB, 61704 KB/s, 0 seconds passed... 37%, 47744 KB, 61727 KB/s, 0 seconds passed... 37%, 47776 KB, 61744 KB/s, 0 seconds passed... 37%, 47808 KB, 61765 KB/s, 0 seconds passed... 37%, 47840 KB, 61784 KB/s, 0 seconds passed... 38%, 47872 KB, 61805 KB/s, 0 seconds passed... 38%, 47904 KB, 61825 KB/s, 0 seconds passed... 38%, 47936 KB, 61841 KB/s, 0 seconds passed... 38%, 47968 KB, 61861 KB/s, 0 seconds passed... 38%, 48000 KB, 61873 KB/s, 0 seconds passed... 38%, 48032 KB, 61893 KB/s, 0 seconds passed... 38%, 48064 KB, 61913 KB/s, 0 seconds passed... 38%, 48096 KB, 61927 KB/s, 0 seconds passed... 38%, 48128 KB, 61942 KB/s, 0 seconds passed... 38%, 48160 KB, 61958 KB/s, 0 seconds passed... 38%, 48192 KB, 61972 KB/s, 0 seconds passed... 38%, 48224 KB, 62000 KB/s, 0 seconds passed... 38%, 48256 KB, 62029 KB/s, 0 seconds passed... 38%, 48288 KB, 62048 KB/s, 0 seconds passed... 38%, 48320 KB, 62069 KB/s, 0 seconds passed... 38%, 48352 KB, 62084 KB/s, 0 seconds passed... 38%, 48384 KB, 62104 KB/s, 0 seconds passed... 38%, 48416 KB, 62124 KB/s, 0 seconds passed... 38%, 48448 KB, 62144 KB/s, 0 seconds passed... 38%, 48480 KB, 62164 KB/s, 0 seconds passed... 38%, 48512 KB, 62184 KB/s, 0 seconds passed... 38%, 48544 KB, 62204 KB/s, 0 seconds passed... 38%, 48576 KB, 62223 KB/s, 0 seconds passed... 38%, 48608 KB, 62235 KB/s, 0 seconds passed... 38%, 48640 KB, 62255 KB/s, 0 seconds passed... 38%, 48672 KB, 62271 KB/s, 0 seconds passed... 38%, 48704 KB, 62286 KB/s, 0 seconds passed... 38%, 48736 KB, 62302 KB/s, 0 seconds passed... 38%, 48768 KB, 62317 KB/s, 0 seconds passed... 38%, 48800 KB, 62341 KB/s, 0 seconds passed... 38%, 48832 KB, 62365 KB/s, 0 seconds passed... 38%, 48864 KB, 62385 KB/s, 0 seconds passed... 38%, 48896 KB, 62405 KB/s, 0 seconds passed... 38%, 48928 KB, 62424 KB/s, 0 seconds passed... 38%, 48960 KB, 62440 KB/s, 0 seconds passed... 38%, 48992 KB, 62464 KB/s, 0 seconds passed... 38%, 49024 KB, 62479 KB/s, 0 seconds passed... 38%, 49056 KB, 62494 KB/s, 0 seconds passed... 38%, 49088 KB, 62514 KB/s, 0 seconds passed... 38%, 49120 KB, 62533 KB/s, 0 seconds passed... 39%, 49152 KB, 62547 KB/s, 0 seconds passed... 39%, 49184 KB, 62562 KB/s, 0 seconds passed... 39%, 49216 KB, 62577 KB/s, 0 seconds passed... 39%, 49248 KB, 62605 KB/s, 0 seconds passed... 39%, 49280 KB, 62627 KB/s, 0 seconds passed... 39%, 49312 KB, 62642 KB/s, 0 seconds passed... 39%, 49344 KB, 62662 KB/s, 0 seconds passed... 39%, 49376 KB, 62678 KB/s, 0 seconds passed... 39%, 49408 KB, 62681 KB/s, 0 seconds passed... 39%, 49440 KB, 62696 KB/s, 0 seconds passed... 39%, 49472 KB, 62714 KB/s, 0 seconds passed... 39%, 49504 KB, 62730 KB/s, 0 seconds passed... 39%, 49536 KB, 62730 KB/s, 0 seconds passed... 39%, 49568 KB, 62740 KB/s, 0 seconds passed... 39%, 49600 KB, 62754 KB/s, 0 seconds passed... 39%, 49632 KB, 62770 KB/s, 0 seconds passed... 39%, 49664 KB, 62796 KB/s, 0 seconds passed... 39%, 49696 KB, 62815 KB/s, 0 seconds passed... 39%, 49728 KB, 62834 KB/s, 0 seconds passed... 39%, 49760 KB, 62854 KB/s, 0 seconds passed... 39%, 49792 KB, 62873 KB/s, 0 seconds passed... 39%, 49824 KB, 62888 KB/s, 0 seconds passed... 39%, 49856 KB, 62904 KB/s, 0 seconds passed... 39%, 49888 KB, 62927 KB/s, 0 seconds passed... 39%, 49920 KB, 62942 KB/s, 0 seconds passed... 39%, 49952 KB, 62962 KB/s, 0 seconds passed... 39%, 49984 KB, 62980 KB/s, 0 seconds passed... 39%, 50016 KB, 63000 KB/s, 0 seconds passed... 39%, 50048 KB, 63015 KB/s, 0 seconds passed... 39%, 50080 KB, 63034 KB/s, 0 seconds passed... 39%, 50112 KB, 63047 KB/s, 0 seconds passed... 39%, 50144 KB, 63062 KB/s, 0 seconds passed... 39%, 50176 KB, 63077 KB/s, 0 seconds passed... 39%, 50208 KB, 63100 KB/s, 0 seconds passed... 39%, 50240 KB, 63122 KB/s, 0 seconds passed... 39%, 50272 KB, 63145 KB/s, 0 seconds passed... 39%, 50304 KB, 63165 KB/s, 0 seconds passed... 39%, 50336 KB, 63184 KB/s, 0 seconds passed... 39%, 50368 KB, 63198 KB/s, 0 seconds passed... 40%, 50400 KB, 63218 KB/s, 0 seconds passed... 40%, 50432 KB, 63237 KB/s, 0 seconds passed... 40%, 50464 KB, 63256 KB/s, 0 seconds passed... 40%, 50496 KB, 63271 KB/s, 0 seconds passed... 40%, 50528 KB, 63294 KB/s, 0 seconds passed... 40%, 50560 KB, 63314 KB/s, 0 seconds passed... 40%, 50592 KB, 63332 KB/s, 0 seconds passed... 40%, 50624 KB, 63344 KB/s, 0 seconds passed... 40%, 50656 KB, 63358 KB/s, 0 seconds passed... 40%, 50688 KB, 63380 KB/s, 0 seconds passed... 40%, 50720 KB, 63400 KB/s, 0 seconds passed... 40%, 50752 KB, 63419 KB/s, 0 seconds passed... 40%, 50784 KB, 63430 KB/s, 0 seconds passed... 40%, 50816 KB, 63448 KB/s, 0 seconds passed... 40%, 50848 KB, 63468 KB/s, 0 seconds passed... 40%, 50880 KB, 63482 KB/s, 0 seconds passed... 40%, 50912 KB, 63501 KB/s, 0 seconds passed... 40%, 50944 KB, 63520 KB/s, 0 seconds passed... 40%, 50976 KB, 63539 KB/s, 0 seconds passed... 40%, 51008 KB, 63553 KB/s, 0 seconds passed... 40%, 51040 KB, 63577 KB/s, 0 seconds passed... 40%, 51072 KB, 63596 KB/s, 0 seconds passed... 40%, 51104 KB, 63615 KB/s, 0 seconds passed... 40%, 51136 KB, 63630 KB/s, 0 seconds passed... 40%, 51168 KB, 63648 KB/s, 0 seconds passed... 40%, 51200 KB, 63178 KB/s, 0 seconds passed... 40%, 51232 KB, 63198 KB/s, 0 seconds passed... 40%, 51264 KB, 63214 KB/s, 0 seconds passed... 40%, 51296 KB, 63231 KB/s, 0 seconds passed... 40%, 51328 KB, 63247 KB/s, 0 seconds passed... 40%, 51360 KB, 63263 KB/s, 0 seconds passed... 40%, 51392 KB, 63279 KB/s, 0 seconds passed... 40%, 51424 KB, 63296 KB/s, 0 seconds passed... 40%, 51456 KB, 63312 KB/s, 0 seconds passed... 40%, 51488 KB, 63329 KB/s, 0 seconds passed... 40%, 51520 KB, 63345 KB/s, 0 seconds passed... 40%, 51552 KB, 63361 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 2%, 2720 KB, 3341 KB/s, 0 seconds passed
-... 2%, 2752 KB, 3370 KB/s, 0 seconds passed
-... 2%, 2784 KB, 3403 KB/s, 0 seconds passed
-... 2%, 2816 KB, 3440 KB/s, 0 seconds passed
-... 2%, 2848 KB, 3355 KB/s, 0 seconds passed
-... 2%, 2880 KB, 3383 KB/s, 0 seconds passed
-... 2%, 2912 KB, 3414 KB/s, 0 seconds passed
-... 2%, 2944 KB, 3450 KB/s, 0 seconds passed
+    ... 40%, 51584 KB, 63376 KB/s, 0 seconds passed... 40%, 51616 KB, 63392 KB/s, 0 seconds passed... 41%, 51648 KB, 63408 KB/s, 0 seconds passed... 41%, 51680 KB, 63425 KB/s, 0 seconds passed... 41%, 51712 KB, 63441 KB/s, 0 seconds passed... 41%, 51744 KB, 63458 KB/s, 0 seconds passed... 41%, 51776 KB, 63475 KB/s, 0 seconds passed... 41%, 51808 KB, 63491 KB/s, 0 seconds passed... 41%, 51840 KB, 63508 KB/s, 0 seconds passed... 41%, 51872 KB, 63525 KB/s, 0 seconds passed... 41%, 51904 KB, 63541 KB/s, 0 seconds passed... 41%, 51936 KB, 63558 KB/s, 0 seconds passed... 41%, 51968 KB, 63572 KB/s, 0 seconds passed... 41%, 52000 KB, 63588 KB/s, 0 seconds passed... 41%, 52032 KB, 63605 KB/s, 0 seconds passed... 41%, 52064 KB, 63621 KB/s, 0 seconds passed... 41%, 52096 KB, 63637 KB/s, 0 seconds passed... 41%, 52128 KB, 63654 KB/s, 0 seconds passed... 41%, 52160 KB, 63671 KB/s, 0 seconds passed... 41%, 52192 KB, 63687 KB/s, 0 seconds passed... 41%, 52224 KB, 63703 KB/s, 0 seconds passed... 41%, 52256 KB, 63720 KB/s, 0 seconds passed... 41%, 52288 KB, 63737 KB/s, 0 seconds passed... 41%, 52320 KB, 63754 KB/s, 0 seconds passed... 41%, 52352 KB, 63694 KB/s, 0 seconds passed... 41%, 52384 KB, 63699 KB/s, 0 seconds passed... 41%, 52416 KB, 63718 KB/s, 0 seconds passed... 41%, 52448 KB, 63732 KB/s, 0 seconds passed... 41%, 52480 KB, 63751 KB/s, 0 seconds passed... 41%, 52512 KB, 63769 KB/s, 0 seconds passed... 41%, 52544 KB, 63787 KB/s, 0 seconds passed... 41%, 52576 KB, 63805 KB/s, 0 seconds passed... 41%, 52608 KB, 63826 KB/s, 0 seconds passed... 41%, 52640 KB, 63842 KB/s, 0 seconds passed... 41%, 52672 KB, 63860 KB/s, 0 seconds passed... 41%, 52704 KB, 63878 KB/s, 0 seconds passed... 41%, 52736 KB, 63893 KB/s, 0 seconds passed... 41%, 52768 KB, 63911 KB/s, 0 seconds passed... 41%, 52800 KB, 63929 KB/s, 0 seconds passed... 41%, 52832 KB, 63947 KB/s, 0 seconds passed... 41%, 52864 KB, 63965 KB/s, 0 seconds passed... 41%, 52896 KB, 61641 KB/s, 0 seconds passed... 42%, 52928 KB, 61646 KB/s, 0 seconds passed... 42%, 52960 KB, 61657 KB/s, 0 seconds passed... 42%, 52992 KB, 61672 KB/s, 0 seconds passed... 42%, 53024 KB, 61687 KB/s, 0 seconds passed... 42%, 53056 KB, 61702 KB/s, 0 seconds passed... 42%, 53088 KB, 61717 KB/s, 0 seconds passed... 42%, 53120 KB, 61733 KB/s, 0 seconds passed... 42%, 53152 KB, 61748 KB/s, 0 seconds passed... 42%, 53184 KB, 61763 KB/s, 0 seconds passed... 42%, 53216 KB, 61778 KB/s, 0 seconds passed... 42%, 53248 KB, 61793 KB/s, 0 seconds passed... 42%, 53280 KB, 61808 KB/s, 0 seconds passed... 42%, 53312 KB, 61824 KB/s, 0 seconds passed... 42%, 53344 KB, 61840 KB/s, 0 seconds passed... 42%, 53376 KB, 61856 KB/s, 0 seconds passed... 42%, 53408 KB, 61871 KB/s, 0 seconds passed... 42%, 53440 KB, 61885 KB/s, 0 seconds passed... 42%, 53472 KB, 61900 KB/s, 0 seconds passed... 42%, 53504 KB, 61916 KB/s, 0 seconds passed... 42%, 53536 KB, 61932 KB/s, 0 seconds passed... 42%, 53568 KB, 61948 KB/s, 0 seconds passed... 42%, 53600 KB, 61964 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 2%, 2976 KB, 3368 KB/s, 0 seconds passed
-... 2%, 3008 KB, 3396 KB/s, 0 seconds passed
-... 2%, 3040 KB, 3427 KB/s, 0 seconds passed
-... 2%, 3072 KB, 3460 KB/s, 0 seconds passed
+    ... 42%, 53632 KB, 61978 KB/s, 0 seconds passed... 42%, 53664 KB, 61993 KB/s, 0 seconds passed... 42%, 53696 KB, 62009 KB/s, 0 seconds passed... 42%, 53728 KB, 62025 KB/s, 0 seconds passed... 42%, 53760 KB, 62040 KB/s, 0 seconds passed... 42%, 53792 KB, 62055 KB/s, 0 seconds passed... 42%, 53824 KB, 62070 KB/s, 0 seconds passed... 42%, 53856 KB, 62086 KB/s, 0 seconds passed... 42%, 53888 KB, 62100 KB/s, 0 seconds passed... 42%, 53920 KB, 62115 KB/s, 0 seconds passed... 42%, 53952 KB, 62130 KB/s, 0 seconds passed... 42%, 53984 KB, 62146 KB/s, 0 seconds passed... 42%, 54016 KB, 62162 KB/s, 0 seconds passed... 42%, 54048 KB, 62178 KB/s, 0 seconds passed... 42%, 54080 KB, 62192 KB/s, 0 seconds passed... 42%, 54112 KB, 62207 KB/s, 0 seconds passed... 42%, 54144 KB, 62222 KB/s, 0 seconds passed... 43%, 54176 KB, 62237 KB/s, 0 seconds passed... 43%, 54208 KB, 62253 KB/s, 0 seconds passed... 43%, 54240 KB, 62267 KB/s, 0 seconds passed... 43%, 54272 KB, 62287 KB/s, 0 seconds passed... 43%, 54304 KB, 62310 KB/s, 0 seconds passed... 43%, 54336 KB, 62331 KB/s, 0 seconds passed... 43%, 54368 KB, 62353 KB/s, 0 seconds passed... 43%, 54400 KB, 62375 KB/s, 0 seconds passed... 43%, 54432 KB, 62397 KB/s, 0 seconds passed... 43%, 54464 KB, 62420 KB/s, 0 seconds passed... 43%, 54496 KB, 62442 KB/s, 0 seconds passed... 43%, 54528 KB, 62464 KB/s, 0 seconds passed... 43%, 54560 KB, 62487 KB/s, 0 seconds passed... 43%, 54592 KB, 62509 KB/s, 0 seconds passed... 43%, 54624 KB, 62530 KB/s, 0 seconds passed... 43%, 54656 KB, 62552 KB/s, 0 seconds passed... 43%, 54688 KB, 62574 KB/s, 0 seconds passed... 43%, 54720 KB, 62596 KB/s, 0 seconds passed... 43%, 54752 KB, 62619 KB/s, 0 seconds passed... 43%, 54784 KB, 62642 KB/s, 0 seconds passed... 43%, 54816 KB, 62664 KB/s, 0 seconds passed... 43%, 54848 KB, 61246 KB/s, 0 seconds passed... 43%, 54880 KB, 61253 KB/s, 0 seconds passed... 43%, 54912 KB, 61266 KB/s, 0 seconds passed... 43%, 54944 KB, 61281 KB/s, 0 seconds passed... 43%, 54976 KB, 61295 KB/s, 0 seconds passed... 43%, 55008 KB, 61309 KB/s, 0 seconds passed... 43%, 55040 KB, 61321 KB/s, 0 seconds passed... 43%, 55072 KB, 61336 KB/s, 0 seconds passed... 43%, 55104 KB, 61351 KB/s, 0 seconds passed... 43%, 55136 KB, 61365 KB/s, 0 seconds passed... 43%, 55168 KB, 61379 KB/s, 0 seconds passed... 43%, 55200 KB, 61394 KB/s, 0 seconds passed... 43%, 55232 KB, 61409 KB/s, 0 seconds passed... 43%, 55264 KB, 61423 KB/s, 0 seconds passed... 43%, 55296 KB, 61439 KB/s, 0 seconds passed... 43%, 55328 KB, 61453 KB/s, 0 seconds passed... 43%, 55360 KB, 61469 KB/s, 0 seconds passed... 43%, 55392 KB, 61483 KB/s, 0 seconds passed... 44%, 55424 KB, 61499 KB/s, 0 seconds passed... 44%, 55456 KB, 61512 KB/s, 0 seconds passed... 44%, 55488 KB, 61527 KB/s, 0 seconds passed... 44%, 55520 KB, 61541 KB/s, 0 seconds passed... 44%, 55552 KB, 61556 KB/s, 0 seconds passed... 44%, 55584 KB, 61570 KB/s, 0 seconds passed... 44%, 55616 KB, 61585 KB/s, 0 seconds passed... 44%, 55648 KB, 61599 KB/s, 0 seconds passed... 44%, 55680 KB, 61614 KB/s, 0 seconds passed... 44%, 55712 KB, 61626 KB/s, 0 seconds passed... 44%, 55744 KB, 61641 KB/s, 0 seconds passed... 44%, 55776 KB, 61656 KB/s, 0 seconds passed... 44%, 55808 KB, 61671 KB/s, 0 seconds passed... 44%, 55840 KB, 61686 KB/s, 0 seconds passed... 44%, 55872 KB, 61697 KB/s, 0 seconds passed... 44%, 55904 KB, 61711 KB/s, 0 seconds passed... 44%, 55936 KB, 61725 KB/s, 0 seconds passed... 44%, 55968 KB, 61738 KB/s, 0 seconds passed... 44%, 56000 KB, 61753 KB/s, 0 seconds passed... 44%, 56032 KB, 61768 KB/s, 0 seconds passed... 44%, 56064 KB, 61783 KB/s, 0 seconds passed... 44%, 56096 KB, 61797 KB/s, 0 seconds passed... 44%, 56128 KB, 61810 KB/s, 0 seconds passed... 44%, 56160 KB, 61825 KB/s, 0 seconds passed... 44%, 56192 KB, 61839 KB/s, 0 seconds passed... 44%, 56224 KB, 61855 KB/s, 0 seconds passed... 44%, 56256 KB, 61871 KB/s, 0 seconds passed... 44%, 56288 KB, 61886 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 2%, 3104 KB, 3382 KB/s, 0 seconds passed
-... 2%, 3136 KB, 3409 KB/s, 0 seconds passed
-... 2%, 3168 KB, 3439 KB/s, 0 seconds passed
-... 2%, 3200 KB, 3470 KB/s, 0 seconds passed
-... 2%, 3232 KB, 3431 KB/s, 0 seconds passed
-... 2%, 3264 KB, 3421 KB/s, 0 seconds passed
-... 2%, 3296 KB, 3449 KB/s, 0 seconds passed
-... 2%, 3328 KB, 3478 KB/s, 0 seconds passed
+    ... 44%, 56320 KB, 59898 KB/s, 0 seconds passed... 44%, 56352 KB, 59902 KB/s, 0 seconds passed... 44%, 56384 KB, 59914 KB/s, 0 seconds passed... 44%, 56416 KB, 59926 KB/s, 0 seconds passed... 44%, 56448 KB, 59940 KB/s, 0 seconds passed... 44%, 56480 KB, 59955 KB/s, 0 seconds passed... 44%, 56512 KB, 59970 KB/s, 0 seconds passed... 44%, 56544 KB, 59985 KB/s, 0 seconds passed... 44%, 56576 KB, 59999 KB/s, 0 seconds passed... 44%, 56608 KB, 60014 KB/s, 0 seconds passed... 44%, 56640 KB, 60028 KB/s, 0 seconds passed... 44%, 56672 KB, 60043 KB/s, 0 seconds passed... 45%, 56704 KB, 60059 KB/s, 0 seconds passed... 45%, 56736 KB, 60073 KB/s, 0 seconds passed... 45%, 56768 KB, 60086 KB/s, 0 seconds passed... 45%, 56800 KB, 60101 KB/s, 0 seconds passed... 45%, 56832 KB, 60114 KB/s, 0 seconds passed... 45%, 56864 KB, 60130 KB/s, 0 seconds passed... 45%, 56896 KB, 59917 KB/s, 0 seconds passed... 45%, 56928 KB, 59922 KB/s, 0 seconds passed... 45%, 56960 KB, 59934 KB/s, 0 seconds passed... 45%, 56992 KB, 59949 KB/s, 0 seconds passed... 45%, 57024 KB, 59963 KB/s, 0 seconds passed... 45%, 57056 KB, 59978 KB/s, 0 seconds passed... 45%, 57088 KB, 59991 KB/s, 0 seconds passed... 45%, 57120 KB, 60006 KB/s, 0 seconds passed... 45%, 57152 KB, 60020 KB/s, 0 seconds passed... 45%, 57184 KB, 60034 KB/s, 0 seconds passed... 45%, 57216 KB, 60048 KB/s, 0 seconds passed... 45%, 57248 KB, 60063 KB/s, 0 seconds passed... 45%, 57280 KB, 60077 KB/s, 0 seconds passed... 45%, 57312 KB, 60092 KB/s, 0 seconds passed... 45%, 57344 KB, 60107 KB/s, 0 seconds passed... 45%, 57376 KB, 60122 KB/s, 0 seconds passed... 45%, 57408 KB, 60136 KB/s, 0 seconds passed... 45%, 57440 KB, 60152 KB/s, 0 seconds passed... 45%, 57472 KB, 60165 KB/s, 0 seconds passed... 45%, 57504 KB, 60180 KB/s, 0 seconds passed... 45%, 57536 KB, 60195 KB/s, 0 seconds passed... 45%, 57568 KB, 60211 KB/s, 0 seconds passed... 45%, 57600 KB, 60225 KB/s, 0 seconds passed... 45%, 57632 KB, 60241 KB/s, 0 seconds passed... 45%, 57664 KB, 60255 KB/s, 0 seconds passed... 45%, 57696 KB, 60270 KB/s, 0 seconds passed... 45%, 57728 KB, 60283 KB/s, 0 seconds passed... 45%, 57760 KB, 60298 KB/s, 0 seconds passed... 45%, 57792 KB, 60313 KB/s, 0 seconds passed... 45%, 57824 KB, 60327 KB/s, 0 seconds passed... 45%, 57856 KB, 60343 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 2%, 3360 KB, 3441 KB/s, 0 seconds passed
-... 2%, 3392 KB, 3430 KB/s, 0 seconds passed
-... 2%, 3424 KB, 3458 KB/s, 0 seconds passed
-... 2%, 3456 KB, 3487 KB/s, 0 seconds passed
-... 2%, 3488 KB, 3451 KB/s, 1 seconds passed
+    ... 45%, 57888 KB, 58798 KB/s, 0 seconds passed... 45%, 57920 KB, 58804 KB/s, 0 seconds passed... 46%, 57952 KB, 58817 KB/s, 0 seconds passed... 46%, 57984 KB, 58830 KB/s, 0 seconds passed... 46%, 58016 KB, 58843 KB/s, 0 seconds passed... 46%, 58048 KB, 58858 KB/s, 0 seconds passed... 46%, 58080 KB, 58872 KB/s, 0 seconds passed... 46%, 58112 KB, 58887 KB/s, 0 seconds passed... 46%, 58144 KB, 58901 KB/s, 0 seconds passed... 46%, 58176 KB, 58915 KB/s, 0 seconds passed... 46%, 58208 KB, 58929 KB/s, 0 seconds passed... 46%, 58240 KB, 58943 KB/s, 0 seconds passed... 46%, 58272 KB, 58958 KB/s, 0 seconds passed... 46%, 58304 KB, 58972 KB/s, 0 seconds passed... 46%, 58336 KB, 58987 KB/s, 0 seconds passed... 46%, 58368 KB, 59002 KB/s, 0 seconds passed... 46%, 58400 KB, 59015 KB/s, 0 seconds passed... 46%, 58432 KB, 59029 KB/s, 0 seconds passed... 46%, 58464 KB, 59043 KB/s, 0 seconds passed... 46%, 58496 KB, 59057 KB/s, 0 seconds passed... 46%, 58528 KB, 59071 KB/s, 0 seconds passed... 46%, 58560 KB, 59086 KB/s, 0 seconds passed... 46%, 58592 KB, 59101 KB/s, 0 seconds passed... 46%, 58624 KB, 59115 KB/s, 0 seconds passed... 46%, 58656 KB, 59130 KB/s, 0 seconds passed... 46%, 58688 KB, 59144 KB/s, 0 seconds passed... 46%, 58720 KB, 59159 KB/s, 0 seconds passed... 46%, 58752 KB, 59173 KB/s, 0 seconds passed... 46%, 58784 KB, 59188 KB/s, 0 seconds passed... 46%, 58816 KB, 59201 KB/s, 0 seconds passed... 46%, 58848 KB, 59215 KB/s, 0 seconds passed... 46%, 58880 KB, 59230 KB/s, 0 seconds passed... 46%, 58912 KB, 59243 KB/s, 0 seconds passed... 46%, 58944 KB, 59257 KB/s, 0 seconds passed... 46%, 58976 KB, 59271 KB/s, 0 seconds passed... 46%, 59008 KB, 59286 KB/s, 0 seconds passed... 46%, 59040 KB, 59299 KB/s, 0 seconds passed... 46%, 59072 KB, 59314 KB/s, 0 seconds passed... 46%, 59104 KB, 59328 KB/s, 0 seconds passed... 46%, 59136 KB, 59342 KB/s, 0 seconds passed... 46%, 59168 KB, 59356 KB/s, 0 seconds passed... 47%, 59200 KB, 59371 KB/s, 0 seconds passed... 47%, 59232 KB, 59384 KB/s, 0 seconds passed... 47%, 59264 KB, 59398 KB/s, 0 seconds passed... 47%, 59296 KB, 59412 KB/s, 0 seconds passed... 47%, 59328 KB, 59426 KB/s, 0 seconds passed... 47%, 59360 KB, 59440 KB/s, 0 seconds passed... 47%, 59392 KB, 59455 KB/s, 0 seconds passed... 47%, 59424 KB, 59469 KB/s, 0 seconds passed... 47%, 59456 KB, 59484 KB/s, 0 seconds passed... 47%, 59488 KB, 59498 KB/s, 0 seconds passed... 47%, 59520 KB, 59513 KB/s, 1 seconds passed... 47%, 59552 KB, 59527 KB/s, 1 seconds passed... 47%, 59584 KB, 59541 KB/s, 1 seconds passed... 47%, 59616 KB, 59556 KB/s, 1 seconds passed... 47%, 59648 KB, 59570 KB/s, 1 seconds passed... 47%, 59680 KB, 59584 KB/s, 1 seconds passed... 47%, 59712 KB, 59598 KB/s, 1 seconds passed... 47%, 59744 KB, 59614 KB/s, 1 seconds passed... 47%, 59776 KB, 59634 KB/s, 1 seconds passed... 47%, 59808 KB, 59654 KB/s, 1 seconds passed... 47%, 59840 KB, 59674 KB/s, 1 seconds passed... 47%, 59872 KB, 59694 KB/s, 1 seconds passed... 47%, 59904 KB, 59714 KB/s, 1 seconds passed... 47%, 59936 KB, 59733 KB/s, 1 seconds passed... 47%, 59968 KB, 59754 KB/s, 1 seconds passed... 47%, 60000 KB, 59774 KB/s, 1 seconds passed... 47%, 60032 KB, 59794 KB/s, 1 seconds passed... 47%, 60064 KB, 59814 KB/s, 1 seconds passed... 47%, 60096 KB, 59833 KB/s, 1 seconds passed... 47%, 60128 KB, 59853 KB/s, 1 seconds passed... 47%, 60160 KB, 59873 KB/s, 1 seconds passed... 47%, 60192 KB, 59893 KB/s, 1 seconds passed... 47%, 60224 KB, 59913 KB/s, 1 seconds passed... 47%, 60256 KB, 59932 KB/s, 1 seconds passed... 47%, 60288 KB, 59952 KB/s, 1 seconds passed... 47%, 60320 KB, 59969 KB/s, 1 seconds passed... 47%, 60352 KB, 59982 KB/s, 1 seconds passed... 47%, 60384 KB, 59994 KB/s, 1 seconds passed... 47%, 60416 KB, 60010 KB/s, 1 seconds passed... 47%, 60448 KB, 60026 KB/s, 1 seconds passed... 48%, 60480 KB, 60042 KB/s, 1 seconds passed... 48%, 60512 KB, 60058 KB/s, 1 seconds passed... 48%, 60544 KB, 60071 KB/s, 1 seconds passed... 48%, 60576 KB, 60086 KB/s, 1 seconds passed... 48%, 60608 KB, 60102 KB/s, 1 seconds passed... 48%, 60640 KB, 60118 KB/s, 1 seconds passed... 48%, 60672 KB, 60130 KB/s, 1 seconds passed... 48%, 60704 KB, 60147 KB/s, 1 seconds passed... 48%, 60736 KB, 60165 KB/s, 1 seconds passed... 48%, 60768 KB, 60178 KB/s, 1 seconds passed... 48%, 60800 KB, 60194 KB/s, 1 seconds passed... 48%, 60832 KB, 60207 KB/s, 1 seconds passed... 48%, 60864 KB, 60222 KB/s, 1 seconds passed... 48%, 60896 KB, 60238 KB/s, 1 seconds passed... 48%, 60928 KB, 60254 KB/s, 1 seconds passed... 48%, 60960 KB, 60269 KB/s, 1 seconds passed... 48%, 60992 KB, 60285 KB/s, 1 seconds passed... 48%, 61024 KB, 60301 KB/s, 1 seconds passed... 48%, 61056 KB, 60317 KB/s, 1 seconds passed... 48%, 61088 KB, 60330 KB/s, 1 seconds passed... 48%, 61120 KB, 60342 KB/s, 1 seconds passed... 48%, 61152 KB, 60357 KB/s, 1 seconds passed... 48%, 61184 KB, 60374 KB/s, 1 seconds passed... 48%, 61216 KB, 60389 KB/s, 1 seconds passed... 48%, 61248 KB, 60403 KB/s, 1 seconds passed... 48%, 61280 KB, 60413 KB/s, 1 seconds passed... 48%, 61312 KB, 60424 KB/s, 1 seconds passed... 48%, 61344 KB, 60444 KB/s, 1 seconds passed... 48%, 61376 KB, 60458 KB/s, 1 seconds passed... 48%, 61408 KB, 60476 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 2%, 3520 KB, 3442 KB/s, 1 seconds passed
-... 2%, 3552 KB, 3467 KB/s, 1 seconds passed
-... 2%, 3584 KB, 3493 KB/s, 1 seconds passed
-... 2%, 3616 KB, 3423 KB/s, 1 seconds passed
-... 2%, 3648 KB, 3447 KB/s, 1 seconds passed
-... 2%, 3680 KB, 3472 KB/s, 1 seconds passed
-... 2%, 3712 KB, 3500 KB/s, 1 seconds passed
+    ... 48%, 61440 KB, 59365 KB/s, 1 seconds passed... 48%, 61472 KB, 59367 KB/s, 1 seconds passed... 48%, 61504 KB, 59376 KB/s, 1 seconds passed... 48%, 61536 KB, 59390 KB/s, 1 seconds passed... 48%, 61568 KB, 59297 KB/s, 1 seconds passed... 48%, 61600 KB, 59300 KB/s, 1 seconds passed... 48%, 61632 KB, 59312 KB/s, 1 seconds passed... 48%, 61664 KB, 59325 KB/s, 1 seconds passed... 48%, 61696 KB, 59338 KB/s, 1 seconds passed... 49%, 61728 KB, 59352 KB/s, 1 seconds passed... 49%, 61760 KB, 59365 KB/s, 1 seconds passed... 49%, 61792 KB, 59378 KB/s, 1 seconds passed... 49%, 61824 KB, 59392 KB/s, 1 seconds passed... 49%, 61856 KB, 59406 KB/s, 1 seconds passed... 49%, 61888 KB, 59418 KB/s, 1 seconds passed... 49%, 61920 KB, 59431 KB/s, 1 seconds passed... 49%, 61952 KB, 59445 KB/s, 1 seconds passed... 49%, 61984 KB, 59458 KB/s, 1 seconds passed... 49%, 62016 KB, 59471 KB/s, 1 seconds passed... 49%, 62048 KB, 59485 KB/s, 1 seconds passed... 49%, 62080 KB, 59499 KB/s, 1 seconds passed... 49%, 62112 KB, 59514 KB/s, 1 seconds passed... 49%, 62144 KB, 59385 KB/s, 1 seconds passed... 49%, 62176 KB, 59391 KB/s, 1 seconds passed... 49%, 62208 KB, 59403 KB/s, 1 seconds passed... 49%, 62240 KB, 59416 KB/s, 1 seconds passed... 49%, 62272 KB, 59430 KB/s, 1 seconds passed... 49%, 62304 KB, 59444 KB/s, 1 seconds passed... 49%, 62336 KB, 59457 KB/s, 1 seconds passed... 49%, 62368 KB, 59470 KB/s, 1 seconds passed... 49%, 62400 KB, 59483 KB/s, 1 seconds passed... 49%, 62432 KB, 59495 KB/s, 1 seconds passed... 49%, 62464 KB, 59508 KB/s, 1 seconds passed... 49%, 62496 KB, 59521 KB/s, 1 seconds passed... 49%, 62528 KB, 59533 KB/s, 1 seconds passed... 49%, 62560 KB, 59546 KB/s, 1 seconds passed... 49%, 62592 KB, 59560 KB/s, 1 seconds passed... 49%, 62624 KB, 59573 KB/s, 1 seconds passed... 49%, 62656 KB, 59587 KB/s, 1 seconds passed... 49%, 62688 KB, 59600 KB/s, 1 seconds passed... 49%, 62720 KB, 59613 KB/s, 1 seconds passed... 49%, 62752 KB, 59627 KB/s, 1 seconds passed... 49%, 62784 KB, 59640 KB/s, 1 seconds passed... 49%, 62816 KB, 59654 KB/s, 1 seconds passed... 49%, 62848 KB, 59667 KB/s, 1 seconds passed... 49%, 62880 KB, 59682 KB/s, 1 seconds passed... 49%, 62912 KB, 59698 KB/s, 1 seconds passed... 49%, 62944 KB, 59713 KB/s, 1 seconds passed... 49%, 62976 KB, 59728 KB/s, 1 seconds passed... 50%, 63008 KB, 59743 KB/s, 1 seconds passed... 50%, 63040 KB, 59758 KB/s, 1 seconds passed... 50%, 63072 KB, 59774 KB/s, 1 seconds passed... 50%, 63104 KB, 59789 KB/s, 1 seconds passed... 50%, 63136 KB, 59804 KB/s, 1 seconds passed... 50%, 63168 KB, 59819 KB/s, 1 seconds passed... 50%, 63200 KB, 59834 KB/s, 1 seconds passed... 50%, 63232 KB, 59850 KB/s, 1 seconds passed... 50%, 63264 KB, 59865 KB/s, 1 seconds passed... 50%, 63296 KB, 59880 KB/s, 1 seconds passed... 50%, 63328 KB, 59894 KB/s, 1 seconds passed... 50%, 63360 KB, 59910 KB/s, 1 seconds passed... 50%, 63392 KB, 59925 KB/s, 1 seconds passed... 50%, 63424 KB, 59940 KB/s, 1 seconds passed... 50%, 63456 KB, 59955 KB/s, 1 seconds passed... 50%, 63488 KB, 59970 KB/s, 1 seconds passed... 50%, 63520 KB, 59986 KB/s, 1 seconds passed... 50%, 63552 KB, 60001 KB/s, 1 seconds passed... 50%, 63584 KB, 60016 KB/s, 1 seconds passed... 50%, 63616 KB, 60031 KB/s, 1 seconds passed... 50%, 63648 KB, 60045 KB/s, 1 seconds passed... 50%, 63680 KB, 60060 KB/s, 1 seconds passed... 50%, 63712 KB, 60076 KB/s, 1 seconds passed... 50%, 63744 KB, 60091 KB/s, 1 seconds passed... 50%, 63776 KB, 60106 KB/s, 1 seconds passed... 50%, 63808 KB, 60121 KB/s, 1 seconds passed... 50%, 63840 KB, 60136 KB/s, 1 seconds passed... 50%, 63872 KB, 60151 KB/s, 1 seconds passed... 50%, 63904 KB, 60166 KB/s, 1 seconds passed... 50%, 63936 KB, 60182 KB/s, 1 seconds passed... 50%, 63968 KB, 60197 KB/s, 1 seconds passed... 50%, 64000 KB, 60213 KB/s, 1 seconds passed... 50%, 64032 KB, 60229 KB/s, 1 seconds passed... 50%, 64064 KB, 60244 KB/s, 1 seconds passed... 50%, 64096 KB, 60263 KB/s, 1 seconds passed... 50%, 64128 KB, 60281 KB/s, 1 seconds passed... 50%, 64160 KB, 60296 KB/s, 1 seconds passed... 50%, 64192 KB, 60311 KB/s, 1 seconds passed... 50%, 64224 KB, 60324 KB/s, 1 seconds passed... 51%, 64256 KB, 60335 KB/s, 1 seconds passed... 51%, 64288 KB, 60347 KB/s, 1 seconds passed... 51%, 64320 KB, 60358 KB/s, 1 seconds passed... 51%, 64352 KB, 60376 KB/s, 1 seconds passed... 51%, 64384 KB, 60396 KB/s, 1 seconds passed... 51%, 64416 KB, 60406 KB/s, 1 seconds passed... 51%, 64448 KB, 60418 KB/s, 1 seconds passed... 51%, 64480 KB, 60433 KB/s, 1 seconds passed... 51%, 64512 KB, 60448 KB/s, 1 seconds passed... 51%, 64544 KB, 60463 KB/s, 1 seconds passed... 51%, 64576 KB, 60475 KB/s, 1 seconds passed... 51%, 64608 KB, 60490 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 2%, 3744 KB, 3434 KB/s, 1 seconds passed
-... 2%, 3776 KB, 3457 KB/s, 1 seconds passed
-... 3%, 3808 KB, 3482 KB/s, 1 seconds passed
-... 3%, 3840 KB, 3507 KB/s, 1 seconds passed
+    ... 51%, 64640 KB, 59651 KB/s, 1 seconds passed... 51%, 64672 KB, 59656 KB/s, 1 seconds passed... 51%, 64704 KB, 59667 KB/s, 1 seconds passed... 51%, 64736 KB, 59680 KB/s, 1 seconds passed... 51%, 64768 KB, 59692 KB/s, 1 seconds passed... 51%, 64800 KB, 59704 KB/s, 1 seconds passed... 51%, 64832 KB, 59716 KB/s, 1 seconds passed... 51%, 64864 KB, 59729 KB/s, 1 seconds passed... 51%, 64896 KB, 59742 KB/s, 1 seconds passed... 51%, 64928 KB, 59755 KB/s, 1 seconds passed... 51%, 64960 KB, 59767 KB/s, 1 seconds passed... 51%, 64992 KB, 59780 KB/s, 1 seconds passed... 51%, 65024 KB, 59793 KB/s, 1 seconds passed... 51%, 65056 KB, 59805 KB/s, 1 seconds passed... 51%, 65088 KB, 59818 KB/s, 1 seconds passed... 51%, 65120 KB, 59831 KB/s, 1 seconds passed... 51%, 65152 KB, 59844 KB/s, 1 seconds passed... 51%, 65184 KB, 59857 KB/s, 1 seconds passed... 51%, 65216 KB, 59870 KB/s, 1 seconds passed... 51%, 65248 KB, 59883 KB/s, 1 seconds passed... 51%, 65280 KB, 59894 KB/s, 1 seconds passed... 51%, 65312 KB, 59907 KB/s, 1 seconds passed... 51%, 65344 KB, 59920 KB/s, 1 seconds passed... 51%, 65376 KB, 59933 KB/s, 1 seconds passed... 51%, 65408 KB, 59946 KB/s, 1 seconds passed... 51%, 65440 KB, 59960 KB/s, 1 seconds passed... 51%, 65472 KB, 59972 KB/s, 1 seconds passed... 52%, 65504 KB, 59986 KB/s, 1 seconds passed... 52%, 65536 KB, 59998 KB/s, 1 seconds passed... 52%, 65568 KB, 60011 KB/s, 1 seconds passed... 52%, 65600 KB, 60024 KB/s, 1 seconds passed... 52%, 65632 KB, 60036 KB/s, 1 seconds passed... 52%, 65664 KB, 60049 KB/s, 1 seconds passed... 52%, 65696 KB, 60065 KB/s, 1 seconds passed... 52%, 65728 KB, 60082 KB/s, 1 seconds passed... 52%, 65760 KB, 60098 KB/s, 1 seconds passed... 52%, 65792 KB, 60114 KB/s, 1 seconds passed... 52%, 65824 KB, 60130 KB/s, 1 seconds passed... 52%, 65856 KB, 60146 KB/s, 1 seconds passed... 52%, 65888 KB, 60162 KB/s, 1 seconds passed... 52%, 65920 KB, 60179 KB/s, 1 seconds passed... 52%, 65952 KB, 60195 KB/s, 1 seconds passed... 52%, 65984 KB, 60212 KB/s, 1 seconds passed... 52%, 66016 KB, 60228 KB/s, 1 seconds passed... 52%, 66048 KB, 60244 KB/s, 1 seconds passed... 52%, 66080 KB, 60260 KB/s, 1 seconds passed... 52%, 66112 KB, 60276 KB/s, 1 seconds passed... 52%, 66144 KB, 60293 KB/s, 1 seconds passed... 52%, 66176 KB, 60310 KB/s, 1 seconds passed... 52%, 66208 KB, 60325 KB/s, 1 seconds passed... 52%, 66240 KB, 60340 KB/s, 1 seconds passed... 52%, 66272 KB, 60355 KB/s, 1 seconds passed... 52%, 66304 KB, 60372 KB/s, 1 seconds passed... 52%, 66336 KB, 60389 KB/s, 1 seconds passed... 52%, 66368 KB, 60405 KB/s, 1 seconds passed... 52%, 66400 KB, 60419 KB/s, 1 seconds passed... 52%, 66432 KB, 60433 KB/s, 1 seconds passed... 52%, 66464 KB, 60450 KB/s, 1 seconds passed... 52%, 66496 KB, 60463 KB/s, 1 seconds passed... 52%, 66528 KB, 60477 KB/s, 1 seconds passed... 52%, 66560 KB, 59982 KB/s, 1 seconds passed... 52%, 66592 KB, 59996 KB/s, 1 seconds passed... 52%, 66624 KB, 60011 KB/s, 1 seconds passed... 52%, 66656 KB, 60025 KB/s, 1 seconds passed... 52%, 66688 KB, 59689 KB/s, 1 seconds passed... 52%, 66720 KB, 59623 KB/s, 1 seconds passed... 52%, 66752 KB, 59630 KB/s, 1 seconds passed... 53%, 66784 KB, 59642 KB/s, 1 seconds passed... 53%, 66816 KB, 59655 KB/s, 1 seconds passed... 53%, 66848 KB, 59668 KB/s, 1 seconds passed... 53%, 66880 KB, 59680 KB/s, 1 seconds passed... 53%, 66912 KB, 59693 KB/s, 1 seconds passed... 53%, 66944 KB, 59706 KB/s, 1 seconds passed... 53%, 66976 KB, 59717 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 3%, 3872 KB, 3442 KB/s, 1 seconds passed
-... 3%, 3904 KB, 3464 KB/s, 1 seconds passed
-... 3%, 3936 KB, 3488 KB/s, 1 seconds passed
-... 3%, 3968 KB, 3513 KB/s, 1 seconds passed
-... 3%, 4000 KB, 3449 KB/s, 1 seconds passed
-... 3%, 4032 KB, 3471 KB/s, 1 seconds passed
-... 3%, 4064 KB, 3496 KB/s, 1 seconds passed
-... 3%, 4096 KB, 3520 KB/s, 1 seconds passed
+    ... 53%, 67008 KB, 59730 KB/s, 1 seconds passed... 53%, 67040 KB, 59742 KB/s, 1 seconds passed... 53%, 67072 KB, 59754 KB/s, 1 seconds passed... 53%, 67104 KB, 59766 KB/s, 1 seconds passed... 53%, 67136 KB, 59779 KB/s, 1 seconds passed... 53%, 67168 KB, 59792 KB/s, 1 seconds passed... 53%, 67200 KB, 59804 KB/s, 1 seconds passed... 53%, 67232 KB, 59817 KB/s, 1 seconds passed... 53%, 67264 KB, 59829 KB/s, 1 seconds passed... 53%, 67296 KB, 59841 KB/s, 1 seconds passed... 53%, 67328 KB, 59854 KB/s, 1 seconds passed... 53%, 67360 KB, 59867 KB/s, 1 seconds passed... 53%, 67392 KB, 59878 KB/s, 1 seconds passed... 53%, 67424 KB, 59891 KB/s, 1 seconds passed... 53%, 67456 KB, 59904 KB/s, 1 seconds passed... 53%, 67488 KB, 59915 KB/s, 1 seconds passed... 53%, 67520 KB, 59928 KB/s, 1 seconds passed... 53%, 67552 KB, 59941 KB/s, 1 seconds passed... 53%, 67584 KB, 59953 KB/s, 1 seconds passed... 53%, 67616 KB, 59966 KB/s, 1 seconds passed... 53%, 67648 KB, 59978 KB/s, 1 seconds passed... 53%, 67680 KB, 59991 KB/s, 1 seconds passed... 53%, 67712 KB, 60004 KB/s, 1 seconds passed... 53%, 67744 KB, 60016 KB/s, 1 seconds passed... 53%, 67776 KB, 60029 KB/s, 1 seconds passed... 53%, 67808 KB, 60041 KB/s, 1 seconds passed... 53%, 67840 KB, 60054 KB/s, 1 seconds passed... 53%, 67872 KB, 60067 KB/s, 1 seconds passed... 53%, 67904 KB, 59928 KB/s, 1 seconds passed... 53%, 67936 KB, 59938 KB/s, 1 seconds passed... 53%, 67968 KB, 59948 KB/s, 1 seconds passed... 53%, 68000 KB, 59960 KB/s, 1 seconds passed... 54%, 68032 KB, 59972 KB/s, 1 seconds passed... 54%, 68064 KB, 59984 KB/s, 1 seconds passed... 54%, 68096 KB, 59996 KB/s, 1 seconds passed... 54%, 68128 KB, 60008 KB/s, 1 seconds passed... 54%, 68160 KB, 60020 KB/s, 1 seconds passed... 54%, 68192 KB, 60033 KB/s, 1 seconds passed... 54%, 68224 KB, 60045 KB/s, 1 seconds passed... 54%, 68256 KB, 60058 KB/s, 1 seconds passed... 54%, 68288 KB, 60070 KB/s, 1 seconds passed... 54%, 68320 KB, 60082 KB/s, 1 seconds passed... 54%, 68352 KB, 60094 KB/s, 1 seconds passed... 54%, 68384 KB, 60106 KB/s, 1 seconds passed... 54%, 68416 KB, 60118 KB/s, 1 seconds passed... 54%, 68448 KB, 60130 KB/s, 1 seconds passed... 54%, 68480 KB, 60143 KB/s, 1 seconds passed... 54%, 68512 KB, 60155 KB/s, 1 seconds passed... 54%, 68544 KB, 60168 KB/s, 1 seconds passed... 54%, 68576 KB, 60180 KB/s, 1 seconds passed... 54%, 68608 KB, 60192 KB/s, 1 seconds passed... 54%, 68640 KB, 60204 KB/s, 1 seconds passed... 54%, 68672 KB, 60217 KB/s, 1 seconds passed... 54%, 68704 KB, 60230 KB/s, 1 seconds passed... 54%, 68736 KB, 59152 KB/s, 1 seconds passed... 54%, 68768 KB, 59002 KB/s, 1 seconds passed... 54%, 68800 KB, 59013 KB/s, 1 seconds passed... 54%, 68832 KB, 59024 KB/s, 1 seconds passed... 54%, 68864 KB, 59036 KB/s, 1 seconds passed... 54%, 68896 KB, 59047 KB/s, 1 seconds passed... 54%, 68928 KB, 59060 KB/s, 1 seconds passed... 54%, 68960 KB, 59072 KB/s, 1 seconds passed... 54%, 68992 KB, 59084 KB/s, 1 seconds passed... 54%, 69024 KB, 59096 KB/s, 1 seconds passed... 54%, 69056 KB, 59108 KB/s, 1 seconds passed... 54%, 69088 KB, 59120 KB/s, 1 seconds passed... 54%, 69120 KB, 59133 KB/s, 1 seconds passed... 54%, 69152 KB, 59145 KB/s, 1 seconds passed... 54%, 69184 KB, 59156 KB/s, 1 seconds passed... 54%, 69216 KB, 59168 KB/s, 1 seconds passed... 54%, 69248 KB, 59179 KB/s, 1 seconds passed... 55%, 69280 KB, 59192 KB/s, 1 seconds passed... 55%, 69312 KB, 59204 KB/s, 1 seconds passed... 55%, 69344 KB, 59216 KB/s, 1 seconds passed... 55%, 69376 KB, 59228 KB/s, 1 seconds passed... 55%, 69408 KB, 59241 KB/s, 1 seconds passed... 55%, 69440 KB, 59253 KB/s, 1 seconds passed... 55%, 69472 KB, 59265 KB/s, 1 seconds passed... 55%, 69504 KB, 59277 KB/s, 1 seconds passed... 55%, 69536 KB, 59289 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 3%, 4128 KB, 3458 KB/s, 1 seconds passed
-... 3%, 4160 KB, 3480 KB/s, 1 seconds passed
-... 3%, 4192 KB, 3503 KB/s, 1 seconds passed
-... 3%, 4224 KB, 3525 KB/s, 1 seconds passed
-... 3%, 4256 KB, 3495 KB/s, 1 seconds passed
+    ... 55%, 69568 KB, 59302 KB/s, 1 seconds passed... 55%, 69600 KB, 59313 KB/s, 1 seconds passed... 55%, 69632 KB, 59326 KB/s, 1 seconds passed... 55%, 69664 KB, 59339 KB/s, 1 seconds passed... 55%, 69696 KB, 59353 KB/s, 1 seconds passed... 55%, 69728 KB, 59367 KB/s, 1 seconds passed... 55%, 69760 KB, 59381 KB/s, 1 seconds passed... 55%, 69792 KB, 59395 KB/s, 1 seconds passed... 55%, 69824 KB, 59409 KB/s, 1 seconds passed... 55%, 69856 KB, 59423 KB/s, 1 seconds passed... 55%, 69888 KB, 59436 KB/s, 1 seconds passed... 55%, 69920 KB, 59451 KB/s, 1 seconds passed... 55%, 69952 KB, 59465 KB/s, 1 seconds passed... 55%, 69984 KB, 59478 KB/s, 1 seconds passed... 55%, 70016 KB, 59492 KB/s, 1 seconds passed... 55%, 70048 KB, 59507 KB/s, 1 seconds passed... 55%, 70080 KB, 59520 KB/s, 1 seconds passed... 55%, 70112 KB, 59534 KB/s, 1 seconds passed... 55%, 70144 KB, 59548 KB/s, 1 seconds passed... 55%, 70176 KB, 59562 KB/s, 1 seconds passed... 55%, 70208 KB, 59575 KB/s, 1 seconds passed... 55%, 70240 KB, 59588 KB/s, 1 seconds passed... 55%, 70272 KB, 59601 KB/s, 1 seconds passed... 55%, 70304 KB, 59615 KB/s, 1 seconds passed... 55%, 70336 KB, 59628 KB/s, 1 seconds passed... 55%, 70368 KB, 59643 KB/s, 1 seconds passed... 55%, 70400 KB, 59656 KB/s, 1 seconds passed... 55%, 70432 KB, 59666 KB/s, 1 seconds passed... 55%, 70464 KB, 59680 KB/s, 1 seconds passed... 55%, 70496 KB, 59693 KB/s, 1 seconds passed... 55%, 70528 KB, 59707 KB/s, 1 seconds passed... 56%, 70560 KB, 59720 KB/s, 1 seconds passed... 56%, 70592 KB, 59734 KB/s, 1 seconds passed... 56%, 70624 KB, 59748 KB/s, 1 seconds passed... 56%, 70656 KB, 59762 KB/s, 1 seconds passed... 56%, 70688 KB, 59776 KB/s, 1 seconds passed... 56%, 70720 KB, 59790 KB/s, 1 seconds passed... 56%, 70752 KB, 59798 KB/s, 1 seconds passed... 56%, 70784 KB, 59811 KB/s, 1 seconds passed... 56%, 70816 KB, 59825 KB/s, 1 seconds passed... 56%, 70848 KB, 59839 KB/s, 1 seconds passed... 56%, 70880 KB, 59857 KB/s, 1 seconds passed... 56%, 70912 KB, 59868 KB/s, 1 seconds passed... 56%, 70944 KB, 59877 KB/s, 1 seconds passed... 56%, 70976 KB, 59890 KB/s, 1 seconds passed... 56%, 71008 KB, 59901 KB/s, 1 seconds passed... 56%, 71040 KB, 59915 KB/s, 1 seconds passed... 56%, 71072 KB, 59928 KB/s, 1 seconds passed... 56%, 71104 KB, 59941 KB/s, 1 seconds passed... 56%, 71136 KB, 59957 KB/s, 1 seconds passed... 56%, 71168 KB, 59971 KB/s, 1 seconds passed... 56%, 71200 KB, 59979 KB/s, 1 seconds passed... 56%, 71232 KB, 59993 KB/s, 1 seconds passed... 56%, 71264 KB, 60007 KB/s, 1 seconds passed... 56%, 71296 KB, 60017 KB/s, 1 seconds passed... 56%, 71328 KB, 60031 KB/s, 1 seconds passed... 56%, 71360 KB, 60044 KB/s, 1 seconds passed... 56%, 71392 KB, 60062 KB/s, 1 seconds passed... 56%, 71424 KB, 60074 KB/s, 1 seconds passed... 56%, 71456 KB, 60087 KB/s, 1 seconds passed... 56%, 71488 KB, 60101 KB/s, 1 seconds passed... 56%, 71520 KB, 60109 KB/s, 1 seconds passed... 56%, 71552 KB, 60119 KB/s, 1 seconds passed... 56%, 71584 KB, 60133 KB/s, 1 seconds passed... 56%, 71616 KB, 60147 KB/s, 1 seconds passed... 56%, 71648 KB, 60160 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 3%, 4288 KB, 3487 KB/s, 1 seconds passed
-... 3%, 4320 KB, 3509 KB/s, 1 seconds passed
-... 3%, 4352 KB, 3531 KB/s, 1 seconds passed
-... 3%, 4384 KB, 3501 KB/s, 1 seconds passed
-... 3%, 4416 KB, 3493 KB/s, 1 seconds passed
-... 3%, 4448 KB, 3515 KB/s, 1 seconds passed
-... 3%, 4480 KB, 3536 KB/s, 1 seconds passed
+    ... 56%, 71680 KB, 58456 KB/s, 1 seconds passed... 56%, 71712 KB, 58461 KB/s, 1 seconds passed... 56%, 71744 KB, 58472 KB/s, 1 seconds passed... 56%, 71776 KB, 58483 KB/s, 1 seconds passed... 57%, 71808 KB, 58213 KB/s, 1 seconds passed... 57%, 71840 KB, 58217 KB/s, 1 seconds passed... 57%, 71872 KB, 58227 KB/s, 1 seconds passed... 57%, 71904 KB, 58239 KB/s, 1 seconds passed... 57%, 71936 KB, 58182 KB/s, 1 seconds passed... 57%, 71968 KB, 58187 KB/s, 1 seconds passed... 57%, 72000 KB, 58198 KB/s, 1 seconds passed... 57%, 72032 KB, 58208 KB/s, 1 seconds passed... 57%, 72064 KB, 58219 KB/s, 1 seconds passed... 57%, 72096 KB, 58231 KB/s, 1 seconds passed... 57%, 72128 KB, 58242 KB/s, 1 seconds passed... 57%, 72160 KB, 58254 KB/s, 1 seconds passed... 57%, 72192 KB, 58265 KB/s, 1 seconds passed... 57%, 72224 KB, 58276 KB/s, 1 seconds passed... 57%, 72256 KB, 58288 KB/s, 1 seconds passed... 57%, 72288 KB, 58300 KB/s, 1 seconds passed... 57%, 72320 KB, 58195 KB/s, 1 seconds passed... 57%, 72352 KB, 58206 KB/s, 1 seconds passed... 57%, 72384 KB, 58218 KB/s, 1 seconds passed... 57%, 72416 KB, 58230 KB/s, 1 seconds passed... 57%, 72448 KB, 58242 KB/s, 1 seconds passed... 57%, 72480 KB, 58253 KB/s, 1 seconds passed... 57%, 72512 KB, 58265 KB/s, 1 seconds passed... 57%, 72544 KB, 58276 KB/s, 1 seconds passed... 57%, 72576 KB, 58288 KB/s, 1 seconds passed... 57%, 72608 KB, 58299 KB/s, 1 seconds passed... 57%, 72640 KB, 58256 KB/s, 1 seconds passed... 57%, 72672 KB, 58268 KB/s, 1 seconds passed... 57%, 72704 KB, 58279 KB/s, 1 seconds passed... 57%, 72736 KB, 58291 KB/s, 1 seconds passed... 57%, 72768 KB, 58302 KB/s, 1 seconds passed... 57%, 72800 KB, 58314 KB/s, 1 seconds passed... 57%, 72832 KB, 58325 KB/s, 1 seconds passed... 57%, 72864 KB, 58337 KB/s, 1 seconds passed... 57%, 72896 KB, 58349 KB/s, 1 seconds passed... 57%, 72928 KB, 58358 KB/s, 1 seconds passed... 57%, 72960 KB, 58370 KB/s, 1 seconds passed... 57%, 72992 KB, 58382 KB/s, 1 seconds passed... 57%, 73024 KB, 58393 KB/s, 1 seconds passed... 58%, 73056 KB, 58405 KB/s, 1 seconds passed... 58%, 73088 KB, 58416 KB/s, 1 seconds passed... 58%, 73120 KB, 58428 KB/s, 1 seconds passed... 58%, 73152 KB, 58439 KB/s, 1 seconds passed... 58%, 73184 KB, 58452 KB/s, 1 seconds passed... 58%, 73216 KB, 58463 KB/s, 1 seconds passed... 58%, 73248 KB, 58474 KB/s, 1 seconds passed... 58%, 73280 KB, 58486 KB/s, 1 seconds passed... 58%, 73312 KB, 58497 KB/s, 1 seconds passed... 58%, 73344 KB, 58508 KB/s, 1 seconds passed... 58%, 73376 KB, 58520 KB/s, 1 seconds passed... 58%, 73408 KB, 58532 KB/s, 1 seconds passed... 58%, 73440 KB, 58543 KB/s, 1 seconds passed... 58%, 73472 KB, 58555 KB/s, 1 seconds passed... 58%, 73504 KB, 58570 KB/s, 1 seconds passed... 58%, 73536 KB, 58584 KB/s, 1 seconds passed... 58%, 73568 KB, 58599 KB/s, 1 seconds passed... 58%, 73600 KB, 58613 KB/s, 1 seconds passed... 58%, 73632 KB, 58628 KB/s, 1 seconds passed... 58%, 73664 KB, 58642 KB/s, 1 seconds passed... 58%, 73696 KB, 58656 KB/s, 1 seconds passed... 58%, 73728 KB, 58670 KB/s, 1 seconds passed... 58%, 73760 KB, 58685 KB/s, 1 seconds passed... 58%, 73792 KB, 58699 KB/s, 1 seconds passed... 58%, 73824 KB, 58713 KB/s, 1 seconds passed... 58%, 73856 KB, 58727 KB/s, 1 seconds passed... 58%, 73888 KB, 58741 KB/s, 1 seconds passed... 58%, 73920 KB, 58756 KB/s, 1 seconds passed... 58%, 73952 KB, 58770 KB/s, 1 seconds passed... 58%, 73984 KB, 58784 KB/s, 1 seconds passed... 58%, 74016 KB, 58797 KB/s, 1 seconds passed... 58%, 74048 KB, 58810 KB/s, 1 seconds passed... 58%, 74080 KB, 58822 KB/s, 1 seconds passed... 58%, 74112 KB, 58833 KB/s, 1 seconds passed... 58%, 74144 KB, 58846 KB/s, 1 seconds passed... 58%, 74176 KB, 58854 KB/s, 1 seconds passed... 58%, 74208 KB, 58867 KB/s, 1 seconds passed... 58%, 74240 KB, 58880 KB/s, 1 seconds passed... 58%, 74272 KB, 58893 KB/s, 1 seconds passed... 58%, 74304 KB, 58904 KB/s, 1 seconds passed... 59%, 74336 KB, 58917 KB/s, 1 seconds passed... 59%, 74368 KB, 58929 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 3%, 4512 KB, 3507 KB/s, 1 seconds passed
-... 3%, 4544 KB, 3498 KB/s, 1 seconds passed
-... 3%, 4576 KB, 3519 KB/s, 1 seconds passed
-... 3%, 4608 KB, 3540 KB/s, 1 seconds passed
-... 3%, 4640 KB, 3512 KB/s, 1 seconds passed
+    ... 59%, 74400 KB, 58139 KB/s, 1 seconds passed... 59%, 74432 KB, 58145 KB/s, 1 seconds passed... 59%, 74464 KB, 58155 KB/s, 1 seconds passed... 59%, 74496 KB, 58167 KB/s, 1 seconds passed... 59%, 74528 KB, 58177 KB/s, 1 seconds passed... 59%, 74560 KB, 58187 KB/s, 1 seconds passed... 59%, 74592 KB, 58199 KB/s, 1 seconds passed... 59%, 74624 KB, 58210 KB/s, 1 seconds passed... 59%, 74656 KB, 58221 KB/s, 1 seconds passed... 59%, 74688 KB, 58232 KB/s, 1 seconds passed... 59%, 74720 KB, 58244 KB/s, 1 seconds passed... 59%, 74752 KB, 58255 KB/s, 1 seconds passed... 59%, 74784 KB, 58266 KB/s, 1 seconds passed... 59%, 74816 KB, 58277 KB/s, 1 seconds passed... 59%, 74848 KB, 58289 KB/s, 1 seconds passed... 59%, 74880 KB, 58300 KB/s, 1 seconds passed... 59%, 74912 KB, 58311 KB/s, 1 seconds passed... 59%, 74944 KB, 58321 KB/s, 1 seconds passed... 59%, 74976 KB, 58332 KB/s, 1 seconds passed... 59%, 75008 KB, 58343 KB/s, 1 seconds passed... 59%, 75040 KB, 58354 KB/s, 1 seconds passed... 59%, 75072 KB, 58365 KB/s, 1 seconds passed... 59%, 75104 KB, 58377 KB/s, 1 seconds passed... 59%, 75136 KB, 58388 KB/s, 1 seconds passed... 59%, 75168 KB, 58399 KB/s, 1 seconds passed... 59%, 75200 KB, 58411 KB/s, 1 seconds passed... 59%, 75232 KB, 58422 KB/s, 1 seconds passed... 59%, 75264 KB, 58433 KB/s, 1 seconds passed... 59%, 75296 KB, 58444 KB/s, 1 seconds passed... 59%, 75328 KB, 58456 KB/s, 1 seconds passed... 59%, 75360 KB, 58467 KB/s, 1 seconds passed... 59%, 75392 KB, 58478 KB/s, 1 seconds passed... 59%, 75424 KB, 58489 KB/s, 1 seconds passed... 59%, 75456 KB, 58500 KB/s, 1 seconds passed... 59%, 75488 KB, 58510 KB/s, 1 seconds passed... 59%, 75520 KB, 58521 KB/s, 1 seconds passed... 59%, 75552 KB, 58532 KB/s, 1 seconds passed... 60%, 75584 KB, 58543 KB/s, 1 seconds passed... 60%, 75616 KB, 58554 KB/s, 1 seconds passed... 60%, 75648 KB, 58564 KB/s, 1 seconds passed... 60%, 75680 KB, 58575 KB/s, 1 seconds passed... 60%, 75712 KB, 58587 KB/s, 1 seconds passed... 60%, 75744 KB, 58595 KB/s, 1 seconds passed... 60%, 75776 KB, 58602 KB/s, 1 seconds passed... 60%, 75808 KB, 58603 KB/s, 1 seconds passed... 60%, 75840 KB, 58613 KB/s, 1 seconds passed... 60%, 75872 KB, 58624 KB/s, 1 seconds passed... 60%, 75904 KB, 58634 KB/s, 1 seconds passed... 60%, 75936 KB, 58648 KB/s, 1 seconds passed... 60%, 75968 KB, 58662 KB/s, 1 seconds passed... 60%, 76000 KB, 58673 KB/s, 1 seconds passed... 60%, 76032 KB, 58688 KB/s, 1 seconds passed... 60%, 76064 KB, 58697 KB/s, 1 seconds passed... 60%, 76096 KB, 58706 KB/s, 1 seconds passed... 60%, 76128 KB, 58005 KB/s, 1 seconds passed... 60%, 76160 KB, 58011 KB/s, 1 seconds passed... 60%, 76192 KB, 58020 KB/s, 1 seconds passed... 60%, 76224 KB, 58030 KB/s, 1 seconds passed... 60%, 76256 KB, 58040 KB/s, 1 seconds passed... 60%, 76288 KB, 58051 KB/s, 1 seconds passed... 60%, 76320 KB, 58062 KB/s, 1 seconds passed... 60%, 76352 KB, 58073 KB/s, 1 seconds passed... 60%, 76384 KB, 58084 KB/s, 1 seconds passed... 60%, 76416 KB, 58095 KB/s, 1 seconds passed... 60%, 76448 KB, 58106 KB/s, 1 seconds passed... 60%, 76480 KB, 58117 KB/s, 1 seconds passed... 60%, 76512 KB, 58128 KB/s, 1 seconds passed... 60%, 76544 KB, 58139 KB/s, 1 seconds passed... 60%, 76576 KB, 58150 KB/s, 1 seconds passed... 60%, 76608 KB, 58161 KB/s, 1 seconds passed... 60%, 76640 KB, 58171 KB/s, 1 seconds passed... 60%, 76672 KB, 58182 KB/s, 1 seconds passed... 60%, 76704 KB, 58193 KB/s, 1 seconds passed... 60%, 76736 KB, 58205 KB/s, 1 seconds passed... 60%, 76768 KB, 58216 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 3%, 4672 KB, 3503 KB/s, 1 seconds passed
-... 3%, 4704 KB, 3523 KB/s, 1 seconds passed
-... 3%, 4736 KB, 3542 KB/s, 1 seconds passed
-... 3%, 4768 KB, 3488 KB/s, 1 seconds passed
-... 3%, 4800 KB, 3507 KB/s, 1 seconds passed
-... 3%, 4832 KB, 3527 KB/s, 1 seconds passed
-... 3%, 4864 KB, 3545 KB/s, 1 seconds passed
+    ... 60%, 76800 KB, 57793 KB/s, 1 seconds passed... 61%, 76832 KB, 57798 KB/s, 1 seconds passed... 61%, 76864 KB, 57806 KB/s, 1 seconds passed... 61%, 76896 KB, 57816 KB/s, 1 seconds passed... 61%, 76928 KB, 57827 KB/s, 1 seconds passed... 61%, 76960 KB, 57838 KB/s, 1 seconds passed... 61%, 76992 KB, 57849 KB/s, 1 seconds passed... 61%, 77024 KB, 57859 KB/s, 1 seconds passed... 61%, 77056 KB, 57870 KB/s, 1 seconds passed... 61%, 77088 KB, 57881 KB/s, 1 seconds passed... 61%, 77120 KB, 57892 KB/s, 1 seconds passed... 61%, 77152 KB, 57903 KB/s, 1 seconds passed... 61%, 77184 KB, 57913 KB/s, 1 seconds passed... 61%, 77216 KB, 57924 KB/s, 1 seconds passed... 61%, 77248 KB, 57934 KB/s, 1 seconds passed... 61%, 77280 KB, 57945 KB/s, 1 seconds passed... 61%, 77312 KB, 57956 KB/s, 1 seconds passed... 61%, 77344 KB, 57967 KB/s, 1 seconds passed... 61%, 77376 KB, 57978 KB/s, 1 seconds passed... 61%, 77408 KB, 57989 KB/s, 1 seconds passed... 61%, 77440 KB, 58000 KB/s, 1 seconds passed... 61%, 77472 KB, 58011 KB/s, 1 seconds passed... 61%, 77504 KB, 58022 KB/s, 1 seconds passed... 61%, 77536 KB, 58033 KB/s, 1 seconds passed... 61%, 77568 KB, 58044 KB/s, 1 seconds passed... 61%, 77600 KB, 58055 KB/s, 1 seconds passed... 61%, 77632 KB, 58066 KB/s, 1 seconds passed... 61%, 77664 KB, 58077 KB/s, 1 seconds passed... 61%, 77696 KB, 58087 KB/s, 1 seconds passed... 61%, 77728 KB, 58098 KB/s, 1 seconds passed... 61%, 77760 KB, 58109 KB/s, 1 seconds passed... 61%, 77792 KB, 58120 KB/s, 1 seconds passed... 61%, 77824 KB, 58131 KB/s, 1 seconds passed... 61%, 77856 KB, 58142 KB/s, 1 seconds passed... 61%, 77888 KB, 58153 KB/s, 1 seconds passed... 61%, 77920 KB, 58165 KB/s, 1 seconds passed... 61%, 77952 KB, 58175 KB/s, 1 seconds passed... 61%, 77984 KB, 58187 KB/s, 1 seconds passed... 61%, 78016 KB, 58197 KB/s, 1 seconds passed... 61%, 78048 KB, 58208 KB/s, 1 seconds passed... 61%, 78080 KB, 58220 KB/s, 1 seconds passed... 62%, 78112 KB, 58230 KB/s, 1 seconds passed... 62%, 78144 KB, 58241 KB/s, 1 seconds passed... 62%, 78176 KB, 58252 KB/s, 1 seconds passed... 62%, 78208 KB, 58262 KB/s, 1 seconds passed... 62%, 78240 KB, 58273 KB/s, 1 seconds passed... 62%, 78272 KB, 58284 KB/s, 1 seconds passed... 62%, 78304 KB, 58294 KB/s, 1 seconds passed... 62%, 78336 KB, 58306 KB/s, 1 seconds passed... 62%, 78368 KB, 58317 KB/s, 1 seconds passed... 62%, 78400 KB, 58328 KB/s, 1 seconds passed... 62%, 78432 KB, 58339 KB/s, 1 seconds passed... 62%, 78464 KB, 58350 KB/s, 1 seconds passed... 62%, 78496 KB, 58365 KB/s, 1 seconds passed... 62%, 78528 KB, 58380 KB/s, 1 seconds passed... 62%, 78560 KB, 58395 KB/s, 1 seconds passed... 62%, 78592 KB, 58410 KB/s, 1 seconds passed... 62%, 78624 KB, 58425 KB/s, 1 seconds passed... 62%, 78656 KB, 58438 KB/s, 1 seconds passed... 62%, 78688 KB, 58448 KB/s, 1 seconds passed... 62%, 78720 KB, 57395 KB/s, 1 seconds passed... 62%, 78752 KB, 57398 KB/s, 1 seconds passed... 62%, 78784 KB, 57407 KB/s, 1 seconds passed... 62%, 78816 KB, 57416 KB/s, 1 seconds passed... 62%, 78848 KB, 57426 KB/s, 1 seconds passed... 62%, 78880 KB, 57436 KB/s, 1 seconds passed... 62%, 78912 KB, 57446 KB/s, 1 seconds passed... 62%, 78944 KB, 57457 KB/s, 1 seconds passed... 62%, 78976 KB, 57468 KB/s, 1 seconds passed... 62%, 79008 KB, 57479 KB/s, 1 seconds passed... 62%, 79040 KB, 57490 KB/s, 1 seconds passed... 62%, 79072 KB, 57500 KB/s, 1 seconds passed... 62%, 79104 KB, 57511 KB/s, 1 seconds passed... 62%, 79136 KB, 57522 KB/s, 1 seconds passed... 62%, 79168 KB, 57533 KB/s, 1 seconds passed... 62%, 79200 KB, 57544 KB/s, 1 seconds passed... 62%, 79232 KB, 57555 KB/s, 1 seconds passed... 62%, 79264 KB, 57565 KB/s, 1 seconds passed... 62%, 79296 KB, 57576 KB/s, 1 seconds passed... 62%, 79328 KB, 57586 KB/s, 1 seconds passed... 63%, 79360 KB, 57597 KB/s, 1 seconds passed... 63%, 79392 KB, 57607 KB/s, 1 seconds passed... 63%, 79424 KB, 57617 KB/s, 1 seconds passed... 63%, 79456 KB, 57628 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 3%, 4896 KB, 3494 KB/s, 1 seconds passed
-... 3%, 4928 KB, 3511 KB/s, 1 seconds passed
-... 3%, 4960 KB, 3531 KB/s, 1 seconds passed
-... 3%, 4992 KB, 3506 KB/s, 1 seconds passed
+    ... 63%, 79488 KB, 57639 KB/s, 1 seconds passed... 63%, 79520 KB, 57650 KB/s, 1 seconds passed... 63%, 79552 KB, 57661 KB/s, 1 seconds passed... 63%, 79584 KB, 57672 KB/s, 1 seconds passed... 63%, 79616 KB, 57683 KB/s, 1 seconds passed... 63%, 79648 KB, 57694 KB/s, 1 seconds passed... 63%, 79680 KB, 57704 KB/s, 1 seconds passed... 63%, 79712 KB, 57715 KB/s, 1 seconds passed... 63%, 79744 KB, 57725 KB/s, 1 seconds passed... 63%, 79776 KB, 57736 KB/s, 1 seconds passed... 63%, 79808 KB, 57746 KB/s, 1 seconds passed... 63%, 79840 KB, 57757 KB/s, 1 seconds passed... 63%, 79872 KB, 57768 KB/s, 1 seconds passed... 63%, 79904 KB, 57779 KB/s, 1 seconds passed... 63%, 79936 KB, 57790 KB/s, 1 seconds passed... 63%, 79968 KB, 57800 KB/s, 1 seconds passed... 63%, 80000 KB, 57810 KB/s, 1 seconds passed... 63%, 80032 KB, 57820 KB/s, 1 seconds passed... 63%, 80064 KB, 57831 KB/s, 1 seconds passed... 63%, 80096 KB, 57841 KB/s, 1 seconds passed... 63%, 80128 KB, 57852 KB/s, 1 seconds passed... 63%, 80160 KB, 57863 KB/s, 1 seconds passed... 63%, 80192 KB, 57878 KB/s, 1 seconds passed... 63%, 80224 KB, 57893 KB/s, 1 seconds passed... 63%, 80256 KB, 57907 KB/s, 1 seconds passed... 63%, 80288 KB, 57922 KB/s, 1 seconds passed... 63%, 80320 KB, 57937 KB/s, 1 seconds passed... 63%, 80352 KB, 57951 KB/s, 1 seconds passed... 63%, 80384 KB, 57966 KB/s, 1 seconds passed... 63%, 80416 KB, 57981 KB/s, 1 seconds passed... 63%, 80448 KB, 57996 KB/s, 1 seconds passed... 63%, 80480 KB, 58011 KB/s, 1 seconds passed... 63%, 80512 KB, 58026 KB/s, 1 seconds passed... 63%, 80544 KB, 58040 KB/s, 1 seconds passed... 63%, 80576 KB, 58055 KB/s, 1 seconds passed... 63%, 80608 KB, 58070 KB/s, 1 seconds passed... 64%, 80640 KB, 58084 KB/s, 1 seconds passed... 64%, 80672 KB, 58099 KB/s, 1 seconds passed... 64%, 80704 KB, 58110 KB/s, 1 seconds passed... 64%, 80736 KB, 58125 KB/s, 1 seconds passed... 64%, 80768 KB, 58136 KB/s, 1 seconds passed... 64%, 80800 KB, 58147 KB/s, 1 seconds passed... 64%, 80832 KB, 58160 KB/s, 1 seconds passed... 64%, 80864 KB, 58171 KB/s, 1 seconds passed... 64%, 80896 KB, 58183 KB/s, 1 seconds passed... 64%, 80928 KB, 58187 KB/s, 1 seconds passed... 64%, 80960 KB, 58198 KB/s, 1 seconds passed... 64%, 80992 KB, 58210 KB/s, 1 seconds passed... 64%, 81024 KB, 58217 KB/s, 1 seconds passed... 64%, 81056 KB, 58229 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 3%, 5024 KB, 3498 KB/s, 1 seconds passed
-... 4%, 5056 KB, 3515 KB/s, 1 seconds passed
-... 4%, 5088 KB, 3534 KB/s, 1 seconds passed
-... 4%, 5120 KB, 3510 KB/s, 1 seconds passed
-... 4%, 5152 KB, 3502 KB/s, 1 seconds passed
-... 4%, 5184 KB, 3519 KB/s, 1 seconds passed
-... 4%, 5216 KB, 3539 KB/s, 1 seconds passed
+    ... 64%, 81088 KB, 50895 KB/s, 1 seconds passed... 64%, 81120 KB, 50898 KB/s, 1 seconds passed... 64%, 81152 KB, 50908 KB/s, 1 seconds passed... 64%, 81184 KB, 50918 KB/s, 1 seconds passed... 64%, 81216 KB, 50927 KB/s, 1 seconds passed... 64%, 81248 KB, 50938 KB/s, 1 seconds passed... 64%, 81280 KB, 50948 KB/s, 1 seconds passed... 64%, 81312 KB, 50958 KB/s, 1 seconds passed... 64%, 81344 KB, 50969 KB/s, 1 seconds passed... 64%, 81376 KB, 50979 KB/s, 1 seconds passed... 64%, 81408 KB, 50989 KB/s, 1 seconds passed... 64%, 81440 KB, 50999 KB/s, 1 seconds passed... 64%, 81472 KB, 51010 KB/s, 1 seconds passed... 64%, 81504 KB, 51020 KB/s, 1 seconds passed... 64%, 81536 KB, 51030 KB/s, 1 seconds passed... 64%, 81568 KB, 51040 KB/s, 1 seconds passed... 64%, 81600 KB, 51051 KB/s, 1 seconds passed... 64%, 81632 KB, 51061 KB/s, 1 seconds passed... 64%, 81664 KB, 51072 KB/s, 1 seconds passed... 64%, 81696 KB, 51082 KB/s, 1 seconds passed... 64%, 81728 KB, 51093 KB/s, 1 seconds passed... 64%, 81760 KB, 51103 KB/s, 1 seconds passed... 64%, 81792 KB, 51114 KB/s, 1 seconds passed... 64%, 81824 KB, 51124 KB/s, 1 seconds passed... 64%, 81856 KB, 51135 KB/s, 1 seconds passed... 65%, 81888 KB, 51146 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 4%, 5248 KB, 3514 KB/s, 1 seconds passed
-... 4%, 5280 KB, 3507 KB/s, 1 seconds passed
-... 4%, 5312 KB, 3524 KB/s, 1 seconds passed
-... 4%, 5344 KB, 3543 KB/s, 1 seconds passed
-... 4%, 5376 KB, 3519 KB/s, 1 seconds passed
+    ... 65%, 81920 KB, 49104 KB/s, 1 seconds passed... 65%, 81952 KB, 49109 KB/s, 1 seconds passed... 65%, 81984 KB, 49119 KB/s, 1 seconds passed... 65%, 82016 KB, 49129 KB/s, 1 seconds passed... 65%, 82048 KB, 49077 KB/s, 1 seconds passed... 65%, 82080 KB, 49083 KB/s, 1 seconds passed... 65%, 82112 KB, 48971 KB/s, 1 seconds passed... 65%, 82144 KB, 48978 KB/s, 1 seconds passed... 65%, 82176 KB, 48987 KB/s, 1 seconds passed... 65%, 82208 KB, 48997 KB/s, 1 seconds passed... 65%, 82240 KB, 49007 KB/s, 1 seconds passed... 65%, 82272 KB, 49017 KB/s, 1 seconds passed... 65%, 82304 KB, 49027 KB/s, 1 seconds passed... 65%, 82336 KB, 49037 KB/s, 1 seconds passed... 65%, 82368 KB, 49048 KB/s, 1 seconds passed... 65%, 82400 KB, 49058 KB/s, 1 seconds passed... 65%, 82432 KB, 49068 KB/s, 1 seconds passed... 65%, 82464 KB, 49078 KB/s, 1 seconds passed... 65%, 82496 KB, 49088 KB/s, 1 seconds passed... 65%, 82528 KB, 49098 KB/s, 1 seconds passed... 65%, 82560 KB, 49108 KB/s, 1 seconds passed... 65%, 82592 KB, 49118 KB/s, 1 seconds passed... 65%, 82624 KB, 49128 KB/s, 1 seconds passed... 65%, 82656 KB, 49138 KB/s, 1 seconds passed... 65%, 82688 KB, 49149 KB/s, 1 seconds passed... 65%, 82720 KB, 49159 KB/s, 1 seconds passed... 65%, 82752 KB, 49169 KB/s, 1 seconds passed... 65%, 82784 KB, 49179 KB/s, 1 seconds passed... 65%, 82816 KB, 49189 KB/s, 1 seconds passed... 65%, 82848 KB, 49199 KB/s, 1 seconds passed... 65%, 82880 KB, 49210 KB/s, 1 seconds passed... 65%, 82912 KB, 49220 KB/s, 1 seconds passed... 65%, 82944 KB, 49230 KB/s, 1 seconds passed... 65%, 82976 KB, 49241 KB/s, 1 seconds passed... 65%, 83008 KB, 49250 KB/s, 1 seconds passed... 65%, 83040 KB, 49260 KB/s, 1 seconds passed... 65%, 83072 KB, 49270 KB/s, 1 seconds passed... 65%, 83104 KB, 49280 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 4%, 5408 KB, 3512 KB/s, 1 seconds passed
-... 4%, 5440 KB, 3528 KB/s, 1 seconds passed
-... 4%, 5472 KB, 3546 KB/s, 1 seconds passed
-... 4%, 5504 KB, 3523 KB/s, 1 seconds passed
-... 4%, 5536 KB, 3516 KB/s, 1 seconds passed
-... 4%, 5568 KB, 3532 KB/s, 1 seconds passed
-... 4%, 5600 KB, 3550 KB/s, 1 seconds passed
+    ... 66%, 83136 KB, 49290 KB/s, 1 seconds passed... 66%, 83168 KB, 49301 KB/s, 1 seconds passed... 66%, 83200 KB, 49311 KB/s, 1 seconds passed... 66%, 83232 KB, 49321 KB/s, 1 seconds passed... 66%, 83264 KB, 49332 KB/s, 1 seconds passed... 66%, 83296 KB, 49342 KB/s, 1 seconds passed... 66%, 83328 KB, 49352 KB/s, 1 seconds passed... 66%, 83360 KB, 49362 KB/s, 1 seconds passed... 66%, 83392 KB, 49375 KB/s, 1 seconds passed... 66%, 83424 KB, 49388 KB/s, 1 seconds passed... 66%, 83456 KB, 49400 KB/s, 1 seconds passed... 66%, 83488 KB, 49413 KB/s, 1 seconds passed... 66%, 83520 KB, 49427 KB/s, 1 seconds passed... 66%, 83552 KB, 49440 KB/s, 1 seconds passed... 66%, 83584 KB, 49452 KB/s, 1 seconds passed... 66%, 83616 KB, 49465 KB/s, 1 seconds passed... 66%, 83648 KB, 49479 KB/s, 1 seconds passed... 66%, 83680 KB, 49491 KB/s, 1 seconds passed... 66%, 83712 KB, 49504 KB/s, 1 seconds passed... 66%, 83744 KB, 49517 KB/s, 1 seconds passed... 66%, 83776 KB, 49530 KB/s, 1 seconds passed... 66%, 83808 KB, 49543 KB/s, 1 seconds passed... 66%, 83840 KB, 49556 KB/s, 1 seconds passed... 66%, 83872 KB, 49567 KB/s, 1 seconds passed... 66%, 83904 KB, 49577 KB/s, 1 seconds passed... 66%, 83936 KB, 48912 KB/s, 1 seconds passed... 66%, 83968 KB, 48920 KB/s, 1 seconds passed... 66%, 84000 KB, 48930 KB/s, 1 seconds passed... 66%, 84032 KB, 48940 KB/s, 1 seconds passed... 66%, 84064 KB, 48950 KB/s, 1 seconds passed... 66%, 84096 KB, 48961 KB/s, 1 seconds passed... 66%, 84128 KB, 48972 KB/s, 1 seconds passed... 66%, 84160 KB, 48983 KB/s, 1 seconds passed... 66%, 84192 KB, 48994 KB/s, 1 seconds passed... 66%, 84224 KB, 49005 KB/s, 1 seconds passed... 66%, 84256 KB, 49015 KB/s, 1 seconds passed... 66%, 84288 KB, 49025 KB/s, 1 seconds passed... 66%, 84320 KB, 49035 KB/s, 1 seconds passed... 66%, 84352 KB, 49045 KB/s, 1 seconds passed... 66%, 84384 KB, 49055 KB/s, 1 seconds passed... 67%, 84416 KB, 49065 KB/s, 1 seconds passed... 67%, 84448 KB, 49075 KB/s, 1 seconds passed... 67%, 84480 KB, 49085 KB/s, 1 seconds passed... 67%, 84512 KB, 49095 KB/s, 1 seconds passed... 67%, 84544 KB, 49104 KB/s, 1 seconds passed... 67%, 84576 KB, 49115 KB/s, 1 seconds passed... 67%, 84608 KB, 49125 KB/s, 1 seconds passed... 67%, 84640 KB, 49135 KB/s, 1 seconds passed... 67%, 84672 KB, 49145 KB/s, 1 seconds passed... 67%, 84704 KB, 49155 KB/s, 1 seconds passed... 67%, 84736 KB, 49165 KB/s, 1 seconds passed... 67%, 84768 KB, 49175 KB/s, 1 seconds passed... 67%, 84800 KB, 49185 KB/s, 1 seconds passed... 67%, 84832 KB, 49195 KB/s, 1 seconds passed... 67%, 84864 KB, 49205 KB/s, 1 seconds passed... 67%, 84896 KB, 49215 KB/s, 1 seconds passed... 67%, 84928 KB, 49225 KB/s, 1 seconds passed... 67%, 84960 KB, 49234 KB/s, 1 seconds passed... 67%, 84992 KB, 49245 KB/s, 1 seconds passed... 67%, 85024 KB, 49255 KB/s, 1 seconds passed... 67%, 85056 KB, 49265 KB/s, 1 seconds passed... 67%, 85088 KB, 49275 KB/s, 1 seconds passed... 67%, 85120 KB, 49284 KB/s, 1 seconds passed... 67%, 85152 KB, 49294 KB/s, 1 seconds passed... 67%, 85184 KB, 49305 KB/s, 1 seconds passed... 67%, 85216 KB, 49315 KB/s, 1 seconds passed... 67%, 85248 KB, 49325 KB/s, 1 seconds passed... 67%, 85280 KB, 49335 KB/s, 1 seconds passed... 67%, 85312 KB, 49346 KB/s, 1 seconds passed... 67%, 85344 KB, 49356 KB/s, 1 seconds passed... 67%, 85376 KB, 49364 KB/s, 1 seconds passed... 67%, 85408 KB, 49376 KB/s, 1 seconds passed... 67%, 85440 KB, 49389 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 4%, 5632 KB, 3527 KB/s, 1 seconds passed
-... 4%, 5664 KB, 3520 KB/s, 1 seconds passed
-... 4%, 5696 KB, 3536 KB/s, 1 seconds passed
-... 4%, 5728 KB, 3553 KB/s, 1 seconds passed
-... 4%, 5760 KB, 3530 KB/s, 1 seconds passed
+    ... 67%, 85472 KB, 49110 KB/s, 1 seconds passed... 67%, 85504 KB, 49115 KB/s, 1 seconds passed... 67%, 85536 KB, 49124 KB/s, 1 seconds passed... 67%, 85568 KB, 49130 KB/s, 1 seconds passed... 67%, 85600 KB, 49139 KB/s, 1 seconds passed... 67%, 85632 KB, 49143 KB/s, 1 seconds passed... 68%, 85664 KB, 49152 KB/s, 1 seconds passed... 68%, 85696 KB, 49161 KB/s, 1 seconds passed... 68%, 85728 KB, 49171 KB/s, 1 seconds passed... 68%, 85760 KB, 49181 KB/s, 1 seconds passed... 68%, 85792 KB, 49191 KB/s, 1 seconds passed... 68%, 85824 KB, 49201 KB/s, 1 seconds passed... 68%, 85856 KB, 49211 KB/s, 1 seconds passed... 68%, 85888 KB, 49220 KB/s, 1 seconds passed... 68%, 85920 KB, 49230 KB/s, 1 seconds passed... 68%, 85952 KB, 49239 KB/s, 1 seconds passed... 68%, 85984 KB, 49248 KB/s, 1 seconds passed... 68%, 86016 KB, 49257 KB/s, 1 seconds passed... 68%, 86048 KB, 49267 KB/s, 1 seconds passed... 68%, 86080 KB, 49277 KB/s, 1 seconds passed... 68%, 86112 KB, 49286 KB/s, 1 seconds passed... 68%, 86144 KB, 49296 KB/s, 1 seconds passed... 68%, 86176 KB, 49306 KB/s, 1 seconds passed... 68%, 86208 KB, 49308 KB/s, 1 seconds passed... 68%, 86240 KB, 49217 KB/s, 1 seconds passed... 68%, 86272 KB, 49228 KB/s, 1 seconds passed... 68%, 86304 KB, 49238 KB/s, 1 seconds passed... 68%, 86336 KB, 49249 KB/s, 1 seconds passed... 68%, 86368 KB, 49258 KB/s, 1 seconds passed... 68%, 86400 KB, 49269 KB/s, 1 seconds passed... 68%, 86432 KB, 49280 KB/s, 1 seconds passed... 68%, 86464 KB, 49291 KB/s, 1 seconds passed... 68%, 86496 KB, 49301 KB/s, 1 seconds passed... 68%, 86528 KB, 49311 KB/s, 1 seconds passed... 68%, 86560 KB, 49322 KB/s, 1 seconds passed... 68%, 86592 KB, 49333 KB/s, 1 seconds passed... 68%, 86624 KB, 49343 KB/s, 1 seconds passed... 68%, 86656 KB, 49354 KB/s, 1 seconds passed... 68%, 86688 KB, 49365 KB/s, 1 seconds passed... 68%, 86720 KB, 49376 KB/s, 1 seconds passed... 68%, 86752 KB, 49387 KB/s, 1 seconds passed... 68%, 86784 KB, 49397 KB/s, 1 seconds passed... 68%, 86816 KB, 49407 KB/s, 1 seconds passed... 68%, 86848 KB, 49414 KB/s, 1 seconds passed... 68%, 86880 KB, 49421 KB/s, 1 seconds passed... 69%, 86912 KB, 49432 KB/s, 1 seconds passed... 69%, 86944 KB, 49443 KB/s, 1 seconds passed... 69%, 86976 KB, 49454 KB/s, 1 seconds passed... 69%, 87008 KB, 49465 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 4%, 5792 KB, 3523 KB/s, 1 seconds passed
-... 4%, 5824 KB, 3539 KB/s, 1 seconds passed
-... 4%, 5856 KB, 3556 KB/s, 1 seconds passed
-... 4%, 5888 KB, 3532 KB/s, 1 seconds passed
-... 4%, 5920 KB, 3529 KB/s, 1 seconds passed
-... 4%, 5952 KB, 3543 KB/s, 1 seconds passed
-... 4%, 5984 KB, 3560 KB/s, 1 seconds passed
+    ... 69%, 87040 KB, 48162 KB/s, 1 seconds passed... 69%, 87072 KB, 48168 KB/s, 1 seconds passed... 69%, 87104 KB, 48177 KB/s, 1 seconds passed... 69%, 87136 KB, 48186 KB/s, 1 seconds passed... 69%, 87168 KB, 48195 KB/s, 1 seconds passed... 69%, 87200 KB, 48205 KB/s, 1 seconds passed... 69%, 87232 KB, 48214 KB/s, 1 seconds passed... 69%, 87264 KB, 48223 KB/s, 1 seconds passed... 69%, 87296 KB, 48233 KB/s, 1 seconds passed... 69%, 87328 KB, 48243 KB/s, 1 seconds passed... 69%, 87360 KB, 48252 KB/s, 1 seconds passed... 69%, 87392 KB, 48261 KB/s, 1 seconds passed... 69%, 87424 KB, 48271 KB/s, 1 seconds passed... 69%, 87456 KB, 48281 KB/s, 1 seconds passed... 69%, 87488 KB, 48291 KB/s, 1 seconds passed... 69%, 87520 KB, 48300 KB/s, 1 seconds passed... 69%, 87552 KB, 48310 KB/s, 1 seconds passed... 69%, 87584 KB, 48320 KB/s, 1 seconds passed... 69%, 87616 KB, 48329 KB/s, 1 seconds passed... 69%, 87648 KB, 48339 KB/s, 1 seconds passed... 69%, 87680 KB, 48348 KB/s, 1 seconds passed... 69%, 87712 KB, 48358 KB/s, 1 seconds passed... 69%, 87744 KB, 48367 KB/s, 1 seconds passed... 69%, 87776 KB, 48377 KB/s, 1 seconds passed... 69%, 87808 KB, 48387 KB/s, 1 seconds passed... 69%, 87840 KB, 48396 KB/s, 1 seconds passed... 69%, 87872 KB, 48406 KB/s, 1 seconds passed... 69%, 87904 KB, 48416 KB/s, 1 seconds passed... 69%, 87936 KB, 48425 KB/s, 1 seconds passed... 69%, 87968 KB, 48434 KB/s, 1 seconds passed... 69%, 88000 KB, 48444 KB/s, 1 seconds passed... 69%, 88032 KB, 48454 KB/s, 1 seconds passed... 69%, 88064 KB, 48464 KB/s, 1 seconds passed... 69%, 88096 KB, 48472 KB/s, 1 seconds passed... 69%, 88128 KB, 48482 KB/s, 1 seconds passed... 69%, 88160 KB, 48491 KB/s, 1 seconds passed... 70%, 88192 KB, 48501 KB/s, 1 seconds passed... 70%, 88224 KB, 48511 KB/s, 1 seconds passed... 70%, 88256 KB, 48521 KB/s, 1 seconds passed... 70%, 88288 KB, 48523 KB/s, 1 seconds passed... 70%, 88320 KB, 48533 KB/s, 1 seconds passed... 70%, 88352 KB, 48544 KB/s, 1 seconds passed... 70%, 88384 KB, 48554 KB/s, 1 seconds passed... 70%, 88416 KB, 48564 KB/s, 1 seconds passed... 70%, 88448 KB, 48574 KB/s, 1 seconds passed... 70%, 88480 KB, 48585 KB/s, 1 seconds passed... 70%, 88512 KB, 48594 KB/s, 1 seconds passed... 70%, 88544 KB, 48604 KB/s, 1 seconds passed... 70%, 88576 KB, 48614 KB/s, 1 seconds passed... 70%, 88608 KB, 48624 KB/s, 1 seconds passed... 70%, 88640 KB, 48634 KB/s, 1 seconds passed... 70%, 88672 KB, 48645 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 4%, 6016 KB, 3536 KB/s, 1 seconds passed
-... 4%, 6048 KB, 3533 KB/s, 1 seconds passed
-... 4%, 6080 KB, 3546 KB/s, 1 seconds passed
-... 4%, 6112 KB, 3563 KB/s, 1 seconds passed
-... 4%, 6144 KB, 3579 KB/s, 1 seconds passed
+    ... 70%, 88704 KB, 47947 KB/s, 1 seconds passed... 70%, 88736 KB, 47953 KB/s, 1 seconds passed... 70%, 88768 KB, 47945 KB/s, 1 seconds passed... 70%, 88800 KB, 47954 KB/s, 1 seconds passed... 70%, 88832 KB, 47962 KB/s, 1 seconds passed... 70%, 88864 KB, 47970 KB/s, 1 seconds passed... 70%, 88896 KB, 47979 KB/s, 1 seconds passed... 70%, 88928 KB, 47988 KB/s, 1 seconds passed... 70%, 88960 KB, 47997 KB/s, 1 seconds passed... 70%, 88992 KB, 48006 KB/s, 1 seconds passed... 70%, 89024 KB, 48015 KB/s, 1 seconds passed... 70%, 89056 KB, 48025 KB/s, 1 seconds passed... 70%, 89088 KB, 48034 KB/s, 1 seconds passed... 70%, 89120 KB, 48044 KB/s, 1 seconds passed... 70%, 89152 KB, 48053 KB/s, 1 seconds passed... 70%, 89184 KB, 48063 KB/s, 1 seconds passed... 70%, 89216 KB, 48072 KB/s, 1 seconds passed... 70%, 89248 KB, 48081 KB/s, 1 seconds passed... 70%, 89280 KB, 48091 KB/s, 1 seconds passed... 70%, 89312 KB, 48096 KB/s, 1 seconds passed... 70%, 89344 KB, 48102 KB/s, 1 seconds passed... 70%, 89376 KB, 48112 KB/s, 1 seconds passed... 70%, 89408 KB, 48121 KB/s, 1 seconds passed... 71%, 89440 KB, 48130 KB/s, 1 seconds passed... 71%, 89472 KB, 48139 KB/s, 1 seconds passed... 71%, 89504 KB, 48149 KB/s, 1 seconds passed... 71%, 89536 KB, 48158 KB/s, 1 seconds passed... 71%, 89568 KB, 48168 KB/s, 1 seconds passed... 71%, 89600 KB, 48178 KB/s, 1 seconds passed... 71%, 89632 KB, 48189 KB/s, 1 seconds passed... 71%, 89664 KB, 48199 KB/s, 1 seconds passed... 71%, 89696 KB, 48210 KB/s, 1 seconds passed... 71%, 89728 KB, 48179 KB/s, 1 seconds passed... 71%, 89760 KB, 48185 KB/s, 1 seconds passed... 71%, 89792 KB, 48195 KB/s, 1 seconds passed... 71%, 89824 KB, 48205 KB/s, 1 seconds passed... 71%, 89856 KB, 48216 KB/s, 1 seconds passed... 71%, 89888 KB, 48227 KB/s, 1 seconds passed... 71%, 89920 KB, 48238 KB/s, 1 seconds passed... 71%, 89952 KB, 48248 KB/s, 1 seconds passed... 71%, 89984 KB, 48259 KB/s, 1 seconds passed... 71%, 90016 KB, 48270 KB/s, 1 seconds passed... 71%, 90048 KB, 48281 KB/s, 1 seconds passed... 71%, 90080 KB, 48291 KB/s, 1 seconds passed... 71%, 90112 KB, 48301 KB/s, 1 seconds passed... 71%, 90144 KB, 48312 KB/s, 1 seconds passed... 71%, 90176 KB, 48322 KB/s, 1 seconds passed... 71%, 90208 KB, 48333 KB/s, 1 seconds passed... 71%, 90240 KB, 48342 KB/s, 1 seconds passed... 71%, 90272 KB, 48352 KB/s, 1 seconds passed... 71%, 90304 KB, 48362 KB/s, 1 seconds passed... 71%, 90336 KB, 48373 KB/s, 1 seconds passed... 71%, 90368 KB, 48380 KB/s, 1 seconds passed... 71%, 90400 KB, 48390 KB/s, 1 seconds passed... 71%, 90432 KB, 48399 KB/s, 1 seconds passed... 71%, 90464 KB, 48409 KB/s, 1 seconds passed... 71%, 90496 KB, 48419 KB/s, 1 seconds passed... 71%, 90528 KB, 48429 KB/s, 1 seconds passed... 71%, 90560 KB, 48439 KB/s, 1 seconds passed... 71%, 90592 KB, 48450 KB/s, 1 seconds passed... 71%, 90624 KB, 48460 KB/s, 1 seconds passed... 71%, 90656 KB, 48470 KB/s, 1 seconds passed... 72%, 90688 KB, 48480 KB/s, 1 seconds passed... 72%, 90720 KB, 48490 KB/s, 1 seconds passed... 72%, 90752 KB, 48500 KB/s, 1 seconds passed... 72%, 90784 KB, 48509 KB/s, 1 seconds passed... 72%, 90816 KB, 48519 KB/s, 1 seconds passed... 72%, 90848 KB, 48526 KB/s, 1 seconds passed... 72%, 90880 KB, 48539 KB/s, 1 seconds passed... 72%, 90912 KB, 48550 KB/s, 1 seconds passed... 72%, 90944 KB, 48560 KB/s, 1 seconds passed... 72%, 90976 KB, 48570 KB/s, 1 seconds passed... 72%, 91008 KB, 48579 KB/s, 1 seconds passed... 72%, 91040 KB, 48589 KB/s, 1 seconds passed... 72%, 91072 KB, 48599 KB/s, 1 seconds passed... 72%, 91104 KB, 48608 KB/s, 1 seconds passed... 72%, 91136 KB, 48617 KB/s, 1 seconds passed... 72%, 91168 KB, 48627 KB/s, 1 seconds passed... 72%, 91200 KB, 48638 KB/s, 1 seconds passed... 72%, 91232 KB, 48649 KB/s, 1 seconds passed... 72%, 91264 KB, 48659 KB/s, 1 seconds passed... 72%, 91296 KB, 48667 KB/s, 1 seconds passed... 72%, 91328 KB, 48480 KB/s, 1 seconds passed... 72%, 91360 KB, 48488 KB/s, 1 seconds passed... 72%, 91392 KB, 48497 KB/s, 1 seconds passed... 72%, 91424 KB, 48508 KB/s, 1 seconds passed... 72%, 91456 KB, 48519 KB/s, 1 seconds passed... 72%, 91488 KB, 48529 KB/s, 1 seconds passed... 72%, 91520 KB, 48459 KB/s, 1 seconds passed... 72%, 91552 KB, 48468 KB/s, 1 seconds passed... 72%, 91584 KB, 48478 KB/s, 1 seconds passed... 72%, 91616 KB, 48488 KB/s, 1 seconds passed... 72%, 91648 KB, 48497 KB/s, 1 seconds passed... 72%, 91680 KB, 48506 KB/s, 1 seconds passed... 72%, 91712 KB, 48516 KB/s, 1 seconds passed... 72%, 91744 KB, 48527 KB/s, 1 seconds passed... 72%, 91776 KB, 48536 KB/s, 1 seconds passed... 72%, 91808 KB, 48545 KB/s, 1 seconds passed... 72%, 91840 KB, 48553 KB/s, 1 seconds passed... 72%, 91872 KB, 48562 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 4%, 6176 KB, 3537 KB/s, 1 seconds passed
-... 4%, 6208 KB, 3551 KB/s, 1 seconds passed
-... 4%, 6240 KB, 3566 KB/s, 1 seconds passed
-... 4%, 6272 KB, 3546 KB/s, 1 seconds passed
-... 5%, 6304 KB, 3540 KB/s, 1 seconds passed
-... 5%, 6336 KB, 3554 KB/s, 1 seconds passed
-... 5%, 6368 KB, 3568 KB/s, 1 seconds passed
+    ... 72%, 91904 KB, 48572 KB/s, 1 seconds passed... 72%, 91936 KB, 48581 KB/s, 1 seconds passed... 73%, 91968 KB, 48590 KB/s, 1 seconds passed... 73%, 92000 KB, 48599 KB/s, 1 seconds passed... 73%, 92032 KB, 48608 KB/s, 1 seconds passed... 73%, 92064 KB, 48617 KB/s, 1 seconds passed... 73%, 92096 KB, 48626 KB/s, 1 seconds passed... 73%, 92128 KB, 48636 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 5%, 6400 KB, 3546 KB/s, 1 seconds passed
-... 5%, 6432 KB, 3541 KB/s, 1 seconds passed
-... 5%, 6464 KB, 3555 KB/s, 1 seconds passed
-... 5%, 6496 KB, 3570 KB/s, 1 seconds passed
+    ... 73%, 92160 KB, 46466 KB/s, 1 seconds passed... 73%, 92192 KB, 46472 KB/s, 1 seconds passed... 73%, 92224 KB, 46480 KB/s, 1 seconds passed... 73%, 92256 KB, 46489 KB/s, 1 seconds passed... 73%, 92288 KB, 46498 KB/s, 1 seconds passed... 73%, 92320 KB, 46507 KB/s, 1 seconds passed... 73%, 92352 KB, 46515 KB/s, 1 seconds passed... 73%, 92384 KB, 46524 KB/s, 1 seconds passed... 73%, 92416 KB, 46509 KB/s, 1 seconds passed... 73%, 92448 KB, 46514 KB/s, 1 seconds passed... 73%, 92480 KB, 46522 KB/s, 1 seconds passed... 73%, 92512 KB, 46531 KB/s, 1 seconds passed... 73%, 92544 KB, 46540 KB/s, 1 seconds passed... 73%, 92576 KB, 46549 KB/s, 1 seconds passed... 73%, 92608 KB, 46558 KB/s, 1 seconds passed... 73%, 92640 KB, 46567 KB/s, 1 seconds passed... 73%, 92672 KB, 46576 KB/s, 1 seconds passed... 73%, 92704 KB, 46585 KB/s, 1 seconds passed
 
 .. parsed-literal::
 
-    ... 5%, 6528 KB, 3548 KB/s, 1 seconds passed
-... 5%, 6560 KB, 3544 KB/s, 1 seconds passed
-... 5%, 6592 KB, 3558 KB/s, 1 seconds passed
-... 5%, 6624 KB, 3573 KB/s, 1 seconds passed
-... 5%, 6656 KB, 3551 KB/s, 1 seconds passed
-... 5%, 6688 KB, 3547 KB/s, 1 seconds passed
-... 5%, 6720 KB, 3561 KB/s, 1 seconds passed
+    ... 73%, 92736 KB, 46322 KB/s, 2 seconds passed... 73%, 92768 KB, 46328 KB/s, 2 seconds passed... 73%, 92800 KB, 46336 KB/s, 2 seconds passed... 73%, 92832 KB, 46345 KB/s, 2 seconds passed... 73%, 92864 KB, 46354 KB/s, 2 seconds passed... 73%, 92896 KB, 46363 KB/s, 2 seconds passed... 73%, 92928 KB, 46372 KB/s, 2 seconds passed... 73%, 92960 KB, 46381 KB/s, 2 seconds passed... 73%, 92992 KB, 46390 KB/s, 2 seconds passed... 73%, 93024 KB, 46399 KB/s, 2 seconds passed... 73%, 93056 KB, 46408 KB/s, 2 seconds passed... 73%, 93088 KB, 46416 KB/s, 2 seconds passed... 73%, 93120 KB, 46425 KB/s, 2 seconds passed... 73%, 93152 KB, 46434 KB/s, 2 seconds passed... 73%, 93184 KB, 46443 KB/s, 2 seconds passed... 74%, 93216 KB, 46452 KB/s, 2 seconds passed... 74%, 93248 KB, 46461 KB/s, 2 seconds passed... 74%, 93280 KB, 46470 KB/s, 2 seconds passed... 74%, 93312 KB, 46479 KB/s, 2 seconds passed... 74%, 93344 KB, 46488 KB/s, 2 seconds passed... 74%, 93376 KB, 46497 KB/s, 2 seconds passed... 74%, 93408 KB, 46506 KB/s, 2 seconds passed... 74%, 93440 KB, 46515 KB/s, 2 seconds passed... 74%, 93472 KB, 46524 KB/s, 2 seconds passed... 74%, 93504 KB, 46533 KB/s, 2 seconds passed... 74%, 93536 KB, 46542 KB/s, 2 seconds passed... 74%, 93568 KB, 46551 KB/s, 2 seconds passed... 74%, 93600 KB, 46559 KB/s, 2 seconds passed... 74%, 93632 KB, 46568 KB/s, 2 seconds passed... 74%, 93664 KB, 46578 KB/s, 2 seconds passed... 74%, 93696 KB, 46108 KB/s, 2 seconds passed... 74%, 93728 KB, 46114 KB/s, 2 seconds passed... 74%, 93760 KB, 46122 KB/s, 2 seconds passed... 74%, 93792 KB, 46129 KB/s, 2 seconds passed... 74%, 93824 KB, 46138 KB/s, 2 seconds passed... 74%, 93856 KB, 46147 KB/s, 2 seconds passed... 74%, 93888 KB, 46155 KB/s, 2 seconds passed... 74%, 93920 KB, 46164 KB/s, 2 seconds passed... 74%, 93952 KB, 46173 KB/s, 2 seconds passed... 74%, 93984 KB, 46182 KB/s, 2 seconds passed... 74%, 94016 KB, 46191 KB/s, 2 seconds passed... 74%, 94048 KB, 46200 KB/s, 2 seconds passed... 74%, 94080 KB, 46209 KB/s, 2 seconds passed... 74%, 94112 KB, 46218 KB/s, 2 seconds passed... 74%, 94144 KB, 46227 KB/s, 2 seconds passed... 74%, 94176 KB, 46236 KB/s, 2 seconds passed... 74%, 94208 KB, 46244 KB/s, 2 seconds passed... 74%, 94240 KB, 46253 KB/s, 2 seconds passed... 74%, 94272 KB, 46262 KB/s, 2 seconds passed... 74%, 94304 KB, 46271 KB/s, 2 seconds passed... 74%, 94336 KB, 46279 KB/s, 2 seconds passed... 74%, 94368 KB, 46288 KB/s, 2 seconds passed... 74%, 94400 KB, 46297 KB/s, 2 seconds passed... 74%, 94432 KB, 46306 KB/s, 2 seconds passed... 74%, 94464 KB, 46315 KB/s, 2 seconds passed... 75%, 94496 KB, 46323 KB/s, 2 seconds passed... 75%, 94528 KB, 46332 KB/s, 2 seconds passed... 75%, 94560 KB, 46341 KB/s, 2 seconds passed... 75%, 94592 KB, 46350 KB/s, 2 seconds passed... 75%, 94624 KB, 46359 KB/s, 2 seconds passed... 75%, 94656 KB, 46368 KB/s, 2 seconds passed... 75%, 94688 KB, 46376 KB/s, 2 seconds passed... 75%, 94720 KB, 46385 KB/s, 2 seconds passed... 75%, 94752 KB, 46395 KB/s, 2 seconds passed... 75%, 94784 KB, 46405 KB/s, 2 seconds passed... 75%, 94816 KB, 46416 KB/s, 2 seconds passed... 75%, 94848 KB, 46427 KB/s, 2 seconds passed... 75%, 94880 KB, 46438 KB/s, 2 seconds passed... 75%, 94912 KB, 46448 KB/s, 2 seconds passed... 75%, 94944 KB, 46459 KB/s, 2 seconds passed... 75%, 94976 KB, 46469 KB/s, 2 seconds passed... 75%, 95008 KB, 46480 KB/s, 2 seconds passed... 75%, 95040 KB, 46490 KB/s, 2 seconds passed... 75%, 95072 KB, 46501 KB/s, 2 seconds passed... 75%, 95104 KB, 46511 KB/s, 2 seconds passed... 75%, 95136 KB, 46522 KB/s, 2 seconds passed... 75%, 95168 KB, 46532 KB/s, 2 seconds passed... 75%, 95200 KB, 46541 KB/s, 2 seconds passed... 75%, 95232 KB, 46550 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 5%, 6752 KB, 3575 KB/s, 1 seconds passed
-... 5%, 6784 KB, 3554 KB/s, 1 seconds passed
-... 5%, 6816 KB, 3552 KB/s, 1 seconds passed
-... 5%, 6848 KB, 3565 KB/s, 1 seconds passed
-... 5%, 6880 KB, 3578 KB/s, 1 seconds passed
+    ... 75%, 95264 KB, 46560 KB/s, 2 seconds passed... 75%, 95296 KB, 46569 KB/s, 2 seconds passed... 75%, 95328 KB, 46578 KB/s, 2 seconds passed... 75%, 95360 KB, 46589 KB/s, 2 seconds passed... 75%, 95392 KB, 46598 KB/s, 2 seconds passed... 75%, 95424 KB, 46607 KB/s, 2 seconds passed... 75%, 95456 KB, 46617 KB/s, 2 seconds passed... 75%, 95488 KB, 46626 KB/s, 2 seconds passed... 75%, 95520 KB, 46636 KB/s, 2 seconds passed... 75%, 95552 KB, 46644 KB/s, 2 seconds passed... 75%, 95584 KB, 46652 KB/s, 2 seconds passed... 75%, 95616 KB, 46662 KB/s, 2 seconds passed... 75%, 95648 KB, 46671 KB/s, 2 seconds passed... 75%, 95680 KB, 46681 KB/s, 2 seconds passed... 75%, 95712 KB, 46690 KB/s, 2 seconds passed... 76%, 95744 KB, 46699 KB/s, 2 seconds passed... 76%, 95776 KB, 46708 KB/s, 2 seconds passed... 76%, 95808 KB, 46718 KB/s, 2 seconds passed... 76%, 95840 KB, 46727 KB/s, 2 seconds passed... 76%, 95872 KB, 46737 KB/s, 2 seconds passed... 76%, 95904 KB, 46746 KB/s, 2 seconds passed... 76%, 95936 KB, 46756 KB/s, 2 seconds passed... 76%, 95968 KB, 46764 KB/s, 2 seconds passed... 76%, 96000 KB, 46774 KB/s, 2 seconds passed... 76%, 96032 KB, 46784 KB/s, 2 seconds passed... 76%, 96064 KB, 46793 KB/s, 2 seconds passed... 76%, 96096 KB, 46802 KB/s, 2 seconds passed... 76%, 96128 KB, 46811 KB/s, 2 seconds passed... 76%, 96160 KB, 46820 KB/s, 2 seconds passed... 76%, 96192 KB, 46830 KB/s, 2 seconds passed... 76%, 96224 KB, 46839 KB/s, 2 seconds passed... 76%, 96256 KB, 46847 KB/s, 2 seconds passed... 76%, 96288 KB, 46857 KB/s, 2 seconds passed... 76%, 96320 KB, 46867 KB/s, 2 seconds passed... 76%, 96352 KB, 46876 KB/s, 2 seconds passed... 76%, 96384 KB, 46885 KB/s, 2 seconds passed... 76%, 96416 KB, 46895 KB/s, 2 seconds passed... 76%, 96448 KB, 46904 KB/s, 2 seconds passed... 76%, 96480 KB, 46913 KB/s, 2 seconds passed... 76%, 96512 KB, 46922 KB/s, 2 seconds passed... 76%, 96544 KB, 46931 KB/s, 2 seconds passed... 76%, 96576 KB, 46941 KB/s, 2 seconds passed... 76%, 96608 KB, 46950 KB/s, 2 seconds passed... 76%, 96640 KB, 46960 KB/s, 2 seconds passed... 76%, 96672 KB, 46968 KB/s, 2 seconds passed... 76%, 96704 KB, 46976 KB/s, 2 seconds passed... 76%, 96736 KB, 46986 KB/s, 2 seconds passed... 76%, 96768 KB, 46995 KB/s, 2 seconds passed... 76%, 96800 KB, 47003 KB/s, 2 seconds passed... 76%, 96832 KB, 47013 KB/s, 2 seconds passed... 76%, 96864 KB, 47022 KB/s, 2 seconds passed... 76%, 96896 KB, 47031 KB/s, 2 seconds passed... 76%, 96928 KB, 47040 KB/s, 2 seconds passed... 76%, 96960 KB, 47050 KB/s, 2 seconds passed... 77%, 96992 KB, 47059 KB/s, 2 seconds passed... 77%, 97024 KB, 47068 KB/s, 2 seconds passed... 77%, 97056 KB, 47078 KB/s, 2 seconds passed... 77%, 97088 KB, 47086 KB/s, 2 seconds passed... 77%, 97120 KB, 47096 KB/s, 2 seconds passed... 77%, 97152 KB, 47105 KB/s, 2 seconds passed... 77%, 97184 KB, 47115 KB/s, 2 seconds passed... 77%, 97216 KB, 47123 KB/s, 2 seconds passed... 77%, 97248 KB, 47132 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 5%, 6912 KB, 3557 KB/s, 1 seconds passed
-... 5%, 6944 KB, 3554 KB/s, 1 seconds passed
-... 5%, 6976 KB, 3568 KB/s, 1 seconds passed
-... 5%, 7008 KB, 3580 KB/s, 1 seconds passed
-... 5%, 7040 KB, 3560 KB/s, 1 seconds passed
-... 5%, 7072 KB, 3559 KB/s, 1 seconds passed
-... 5%, 7104 KB, 3570 KB/s, 1 seconds passed
+    ... 77%, 97280 KB, 46085 KB/s, 2 seconds passed... 77%, 97312 KB, 46091 KB/s, 2 seconds passed... 77%, 97344 KB, 46098 KB/s, 2 seconds passed... 77%, 97376 KB, 46107 KB/s, 2 seconds passed... 77%, 97408 KB, 45997 KB/s, 2 seconds passed... 77%, 97440 KB, 46003 KB/s, 2 seconds passed... 77%, 97472 KB, 46011 KB/s, 2 seconds passed... 77%, 97504 KB, 46019 KB/s, 2 seconds passed... 77%, 97536 KB, 46027 KB/s, 2 seconds passed... 77%, 97568 KB, 46036 KB/s, 2 seconds passed... 77%, 97600 KB, 46044 KB/s, 2 seconds passed... 77%, 97632 KB, 46053 KB/s, 2 seconds passed... 77%, 97664 KB, 46061 KB/s, 2 seconds passed... 77%, 97696 KB, 46070 KB/s, 2 seconds passed... 77%, 97728 KB, 46078 KB/s, 2 seconds passed... 77%, 97760 KB, 46087 KB/s, 2 seconds passed... 77%, 97792 KB, 45938 KB/s, 2 seconds passed... 77%, 97824 KB, 45943 KB/s, 2 seconds passed... 77%, 97856 KB, 45950 KB/s, 2 seconds passed... 77%, 97888 KB, 45958 KB/s, 2 seconds passed... 77%, 97920 KB, 45966 KB/s, 2 seconds passed... 77%, 97952 KB, 45975 KB/s, 2 seconds passed... 77%, 97984 KB, 45983 KB/s, 2 seconds passed... 77%, 98016 KB, 45992 KB/s, 2 seconds passed... 77%, 98048 KB, 46000 KB/s, 2 seconds passed... 77%, 98080 KB, 46009 KB/s, 2 seconds passed... 77%, 98112 KB, 46017 KB/s, 2 seconds passed... 77%, 98144 KB, 46026 KB/s, 2 seconds passed... 77%, 98176 KB, 46035 KB/s, 2 seconds passed... 77%, 98208 KB, 46043 KB/s, 2 seconds passed... 77%, 98240 KB, 46051 KB/s, 2 seconds passed... 78%, 98272 KB, 46059 KB/s, 2 seconds passed... 78%, 98304 KB, 46068 KB/s, 2 seconds passed... 78%, 98336 KB, 46076 KB/s, 2 seconds passed... 78%, 98368 KB, 46085 KB/s, 2 seconds passed... 78%, 98400 KB, 46093 KB/s, 2 seconds passed... 78%, 98432 KB, 46102 KB/s, 2 seconds passed... 78%, 98464 KB, 46110 KB/s, 2 seconds passed... 78%, 98496 KB, 46119 KB/s, 2 seconds passed... 78%, 98528 KB, 46127 KB/s, 2 seconds passed... 78%, 98560 KB, 46136 KB/s, 2 seconds passed... 78%, 98592 KB, 46144 KB/s, 2 seconds passed... 78%, 98624 KB, 46152 KB/s, 2 seconds passed... 78%, 98656 KB, 46161 KB/s, 2 seconds passed... 78%, 98688 KB, 46169 KB/s, 2 seconds passed... 78%, 98720 KB, 46177 KB/s, 2 seconds passed... 78%, 98752 KB, 46185 KB/s, 2 seconds passed... 78%, 98784 KB, 46194 KB/s, 2 seconds passed... 78%, 98816 KB, 46203 KB/s, 2 seconds passed... 78%, 98848 KB, 46211 KB/s, 2 seconds passed... 78%, 98880 KB, 46219 KB/s, 2 seconds passed... 78%, 98912 KB, 46228 KB/s, 2 seconds passed... 78%, 98944 KB, 46236 KB/s, 2 seconds passed... 78%, 98976 KB, 46245 KB/s, 2 seconds passed... 78%, 99008 KB, 46253 KB/s, 2 seconds passed... 78%, 99040 KB, 46262 KB/s, 2 seconds passed... 78%, 99072 KB, 46271 KB/s, 2 seconds passed... 78%, 99104 KB, 46279 KB/s, 2 seconds passed... 78%, 99136 KB, 46287 KB/s, 2 seconds passed... 78%, 99168 KB, 46295 KB/s, 2 seconds passed... 78%, 99200 KB, 46304 KB/s, 2 seconds passed... 78%, 99232 KB, 46312 KB/s, 2 seconds passed... 78%, 99264 KB, 46320 KB/s, 2 seconds passed... 78%, 99296 KB, 46330 KB/s, 2 seconds passed... 78%, 99328 KB, 46341 KB/s, 2 seconds passed... 78%, 99360 KB, 46351 KB/s, 2 seconds passed... 78%, 99392 KB, 46362 KB/s, 2 seconds passed... 78%, 99424 KB, 46372 KB/s, 2 seconds passed... 78%, 99456 KB, 46383 KB/s, 2 seconds passed... 78%, 99488 KB, 46393 KB/s, 2 seconds passed... 79%, 99520 KB, 46404 KB/s, 2 seconds passed... 79%, 99552 KB, 46414 KB/s, 2 seconds passed... 79%, 99584 KB, 46425 KB/s, 2 seconds passed... 79%, 99616 KB, 46436 KB/s, 2 seconds passed... 79%, 99648 KB, 46446 KB/s, 2 seconds passed... 79%, 99680 KB, 46456 KB/s, 2 seconds passed... 79%, 99712 KB, 46467 KB/s, 2 seconds passed... 79%, 99744 KB, 46478 KB/s, 2 seconds passed... 79%, 99776 KB, 46487 KB/s, 2 seconds passed... 79%, 99808 KB, 46495 KB/s, 2 seconds passed... 79%, 99840 KB, 46502 KB/s, 2 seconds passed... 79%, 99872 KB, 46510 KB/s, 2 seconds passed... 79%, 99904 KB, 46518 KB/s, 2 seconds passed... 79%, 99936 KB, 46528 KB/s, 2 seconds passed... 79%, 99968 KB, 46539 KB/s, 2 seconds passed... 79%, 100000 KB, 46546 KB/s, 2 seconds passed... 79%, 100032 KB, 46556 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 5%, 7136 KB, 3584 KB/s, 1 seconds passed
-... 5%, 7168 KB, 3565 KB/s, 2 seconds passed
-... 5%, 7200 KB, 3561 KB/s, 2 seconds passed
-... 5%, 7232 KB, 3572 KB/s, 2 seconds passed
-... 5%, 7264 KB, 3586 KB/s, 2 seconds passed
+    ... 79%, 100064 KB, 46565 KB/s, 2 seconds passed... 79%, 100096 KB, 46337 KB/s, 2 seconds passed... 79%, 100128 KB, 46342 KB/s, 2 seconds passed... 79%, 100160 KB, 46351 KB/s, 2 seconds passed... 79%, 100192 KB, 46361 KB/s, 2 seconds passed... 79%, 100224 KB, 46359 KB/s, 2 seconds passed... 79%, 100256 KB, 46366 KB/s, 2 seconds passed... 79%, 100288 KB, 46359 KB/s, 2 seconds passed... 79%, 100320 KB, 46365 KB/s, 2 seconds passed... 79%, 100352 KB, 46360 KB/s, 2 seconds passed... 79%, 100384 KB, 46369 KB/s, 2 seconds passed... 79%, 100416 KB, 46378 KB/s, 2 seconds passed... 79%, 100448 KB, 46387 KB/s, 2 seconds passed... 79%, 100480 KB, 46396 KB/s, 2 seconds passed... 79%, 100512 KB, 46405 KB/s, 2 seconds passed... 79%, 100544 KB, 46414 KB/s, 2 seconds passed... 79%, 100576 KB, 46423 KB/s, 2 seconds passed... 79%, 100608 KB, 46432 KB/s, 2 seconds passed... 79%, 100640 KB, 46438 KB/s, 2 seconds passed... 79%, 100672 KB, 46447 KB/s, 2 seconds passed... 79%, 100704 KB, 46456 KB/s, 2 seconds passed... 79%, 100736 KB, 46464 KB/s, 2 seconds passed... 80%, 100768 KB, 46473 KB/s, 2 seconds passed... 80%, 100800 KB, 46482 KB/s, 2 seconds passed... 80%, 100832 KB, 46491 KB/s, 2 seconds passed... 80%, 100864 KB, 46501 KB/s, 2 seconds passed... 80%, 100896 KB, 46509 KB/s, 2 seconds passed... 80%, 100928 KB, 46518 KB/s, 2 seconds passed... 80%, 100960 KB, 46527 KB/s, 2 seconds passed... 80%, 100992 KB, 46536 KB/s, 2 seconds passed... 80%, 101024 KB, 46544 KB/s, 2 seconds passed... 80%, 101056 KB, 46553 KB/s, 2 seconds passed... 80%, 101088 KB, 46562 KB/s, 2 seconds passed... 80%, 101120 KB, 46571 KB/s, 2 seconds passed... 80%, 101152 KB, 46580 KB/s, 2 seconds passed... 80%, 101184 KB, 46589 KB/s, 2 seconds passed... 80%, 101216 KB, 46599 KB/s, 2 seconds passed... 80%, 101248 KB, 46605 KB/s, 2 seconds passed... 80%, 101280 KB, 46614 KB/s, 2 seconds passed... 80%, 101312 KB, 46622 KB/s, 2 seconds passed... 80%, 101344 KB, 46631 KB/s, 2 seconds passed... 80%, 101376 KB, 46640 KB/s, 2 seconds passed... 80%, 101408 KB, 46649 KB/s, 2 seconds passed... 80%, 101440 KB, 46658 KB/s, 2 seconds passed... 80%, 101472 KB, 46667 KB/s, 2 seconds passed... 80%, 101504 KB, 46676 KB/s, 2 seconds passed... 80%, 101536 KB, 46685 KB/s, 2 seconds passed... 80%, 101568 KB, 46694 KB/s, 2 seconds passed... 80%, 101600 KB, 46702 KB/s, 2 seconds passed... 80%, 101632 KB, 46711 KB/s, 2 seconds passed... 80%, 101664 KB, 46720 KB/s, 2 seconds passed... 80%, 101696 KB, 46729 KB/s, 2 seconds passed... 80%, 101728 KB, 46738 KB/s, 2 seconds passed... 80%, 101760 KB, 46747 KB/s, 2 seconds passed... 80%, 101792 KB, 46755 KB/s, 2 seconds passed... 80%, 101824 KB, 46763 KB/s, 2 seconds passed... 80%, 101856 KB, 46772 KB/s, 2 seconds passed... 80%, 101888 KB, 46781 KB/s, 2 seconds passed... 80%, 101920 KB, 46789 KB/s, 2 seconds passed... 80%, 101952 KB, 46798 KB/s, 2 seconds passed... 80%, 101984 KB, 46807 KB/s, 2 seconds passed... 80%, 102016 KB, 46816 KB/s, 2 seconds passed... 81%, 102048 KB, 46825 KB/s, 2 seconds passed... 81%, 102080 KB, 46834 KB/s, 2 seconds passed... 81%, 102112 KB, 46842 KB/s, 2 seconds passed... 81%, 102144 KB, 46851 KB/s, 2 seconds passed... 81%, 102176 KB, 46860 KB/s, 2 seconds passed... 81%, 102208 KB, 46869 KB/s, 2 seconds passed... 81%, 102240 KB, 46877 KB/s, 2 seconds passed... 81%, 102272 KB, 46887 KB/s, 2 seconds passed... 81%, 102304 KB, 46895 KB/s, 2 seconds passed... 81%, 102336 KB, 46903 KB/s, 2 seconds passed... 81%, 102368 KB, 46912 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 5%, 7296 KB, 3566 KB/s, 2 seconds passed
-... 5%, 7328 KB, 3561 KB/s, 2 seconds passed
-... 5%, 7360 KB, 3574 KB/s, 2 seconds passed
-... 5%, 7392 KB, 3586 KB/s, 2 seconds passed
-... 5%, 7424 KB, 3567 KB/s, 2 seconds passed
-... 5%, 7456 KB, 3563 KB/s, 2 seconds passed
+    ... 81%, 102400 KB, 46105 KB/s, 2 seconds passed... 81%, 102432 KB, 46110 KB/s, 2 seconds passed... 81%, 102464 KB, 46114 KB/s, 2 seconds passed... 81%, 102496 KB, 46122 KB/s, 2 seconds passed... 81%, 102528 KB, 46130 KB/s, 2 seconds passed... 81%, 102560 KB, 46138 KB/s, 2 seconds passed... 81%, 102592 KB, 46146 KB/s, 2 seconds passed... 81%, 102624 KB, 46154 KB/s, 2 seconds passed... 81%, 102656 KB, 46162 KB/s, 2 seconds passed... 81%, 102688 KB, 46170 KB/s, 2 seconds passed... 81%, 102720 KB, 46179 KB/s, 2 seconds passed... 81%, 102752 KB, 46187 KB/s, 2 seconds passed... 81%, 102784 KB, 46194 KB/s, 2 seconds passed... 81%, 102816 KB, 46203 KB/s, 2 seconds passed... 81%, 102848 KB, 46210 KB/s, 2 seconds passed... 81%, 102880 KB, 46219 KB/s, 2 seconds passed... 81%, 102912 KB, 46227 KB/s, 2 seconds passed... 81%, 102944 KB, 46235 KB/s, 2 seconds passed... 81%, 102976 KB, 46243 KB/s, 2 seconds passed... 81%, 103008 KB, 46251 KB/s, 2 seconds passed... 81%, 103040 KB, 46259 KB/s, 2 seconds passed... 81%, 103072 KB, 46267 KB/s, 2 seconds passed... 81%, 103104 KB, 46276 KB/s, 2 seconds passed... 81%, 103136 KB, 46284 KB/s, 2 seconds passed... 81%, 103168 KB, 46292 KB/s, 2 seconds passed... 81%, 103200 KB, 46300 KB/s, 2 seconds passed... 81%, 103232 KB, 46308 KB/s, 2 seconds passed... 81%, 103264 KB, 46316 KB/s, 2 seconds passed... 82%, 103296 KB, 46324 KB/s, 2 seconds passed... 82%, 103328 KB, 46332 KB/s, 2 seconds passed... 82%, 103360 KB, 46233 KB/s, 2 seconds passed... 82%, 103392 KB, 46241 KB/s, 2 seconds passed... 82%, 103424 KB, 46248 KB/s, 2 seconds passed... 82%, 103456 KB, 46256 KB/s, 2 seconds passed... 82%, 103488 KB, 46264 KB/s, 2 seconds passed... 82%, 103520 KB, 46272 KB/s, 2 seconds passed... 82%, 103552 KB, 46279 KB/s, 2 seconds passed... 82%, 103584 KB, 46287 KB/s, 2 seconds passed... 82%, 103616 KB, 46296 KB/s, 2 seconds passed... 82%, 103648 KB, 46304 KB/s, 2 seconds passed... 82%, 103680 KB, 46312 KB/s, 2 seconds passed... 82%, 103712 KB, 46320 KB/s, 2 seconds passed... 82%, 103744 KB, 46328 KB/s, 2 seconds passed... 82%, 103776 KB, 46336 KB/s, 2 seconds passed... 82%, 103808 KB, 46344 KB/s, 2 seconds passed... 82%, 103840 KB, 46352 KB/s, 2 seconds passed... 82%, 103872 KB, 46360 KB/s, 2 seconds passed... 82%, 103904 KB, 46368 KB/s, 2 seconds passed... 82%, 103936 KB, 46377 KB/s, 2 seconds passed... 82%, 103968 KB, 46384 KB/s, 2 seconds passed... 82%, 104000 KB, 46392 KB/s, 2 seconds passed... 82%, 104032 KB, 46400 KB/s, 2 seconds passed... 82%, 104064 KB, 46408 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 5%, 7488 KB, 3575 KB/s, 2 seconds passed
-... 5%, 7520 KB, 3588 KB/s, 2 seconds passed
-... 5%, 7552 KB, 3569 KB/s, 2 seconds passed
-... 6%, 7584 KB, 3567 KB/s, 2 seconds passed
-... 6%, 7616 KB, 3579 KB/s, 2 seconds passed
-... 6%, 7648 KB, 3591 KB/s, 2 seconds passed
+    ... 82%, 104096 KB, 45986 KB/s, 2 seconds passed... 82%, 104128 KB, 45991 KB/s, 2 seconds passed... 82%, 104160 KB, 45998 KB/s, 2 seconds passed... 82%, 104192 KB, 46006 KB/s, 2 seconds passed... 82%, 104224 KB, 46014 KB/s, 2 seconds passed... 82%, 104256 KB, 46022 KB/s, 2 seconds passed... 82%, 104288 KB, 46030 KB/s, 2 seconds passed... 82%, 104320 KB, 46038 KB/s, 2 seconds passed... 82%, 104352 KB, 46046 KB/s, 2 seconds passed... 82%, 104384 KB, 46054 KB/s, 2 seconds passed... 82%, 104416 KB, 46062 KB/s, 2 seconds passed... 82%, 104448 KB, 46070 KB/s, 2 seconds passed... 82%, 104480 KB, 46078 KB/s, 2 seconds passed... 82%, 104512 KB, 46085 KB/s, 2 seconds passed... 83%, 104544 KB, 46093 KB/s, 2 seconds passed... 83%, 104576 KB, 46102 KB/s, 2 seconds passed... 83%, 104608 KB, 46110 KB/s, 2 seconds passed... 83%, 104640 KB, 46118 KB/s, 2 seconds passed... 83%, 104672 KB, 46126 KB/s, 2 seconds passed... 83%, 104704 KB, 46133 KB/s, 2 seconds passed... 83%, 104736 KB, 46141 KB/s, 2 seconds passed... 83%, 104768 KB, 46149 KB/s, 2 seconds passed... 83%, 104800 KB, 46157 KB/s, 2 seconds passed... 83%, 104832 KB, 46166 KB/s, 2 seconds passed... 83%, 104864 KB, 46173 KB/s, 2 seconds passed... 83%, 104896 KB, 46182 KB/s, 2 seconds passed... 83%, 104928 KB, 46189 KB/s, 2 seconds passed... 83%, 104960 KB, 46197 KB/s, 2 seconds passed... 83%, 104992 KB, 46205 KB/s, 2 seconds passed... 83%, 105024 KB, 46213 KB/s, 2 seconds passed... 83%, 105056 KB, 46221 KB/s, 2 seconds passed... 83%, 105088 KB, 46229 KB/s, 2 seconds passed... 83%, 105120 KB, 46236 KB/s, 2 seconds passed... 83%, 105152 KB, 46244 KB/s, 2 seconds passed... 83%, 105184 KB, 46252 KB/s, 2 seconds passed... 83%, 105216 KB, 46261 KB/s, 2 seconds passed... 83%, 105248 KB, 46271 KB/s, 2 seconds passed... 83%, 105280 KB, 46281 KB/s, 2 seconds passed... 83%, 105312 KB, 46290 KB/s, 2 seconds passed... 83%, 105344 KB, 46300 KB/s, 2 seconds passed... 83%, 105376 KB, 46310 KB/s, 2 seconds passed... 83%, 105408 KB, 46320 KB/s, 2 seconds passed... 83%, 105440 KB, 46330 KB/s, 2 seconds passed... 83%, 105472 KB, 46340 KB/s, 2 seconds passed... 83%, 105504 KB, 46350 KB/s, 2 seconds passed... 83%, 105536 KB, 46359 KB/s, 2 seconds passed... 83%, 105568 KB, 46369 KB/s, 2 seconds passed... 83%, 105600 KB, 46379 KB/s, 2 seconds passed... 83%, 105632 KB, 46389 KB/s, 2 seconds passed... 83%, 105664 KB, 46399 KB/s, 2 seconds passed... 83%, 105696 KB, 46409 KB/s, 2 seconds passed... 83%, 105728 KB, 46418 KB/s, 2 seconds passed... 83%, 105760 KB, 46427 KB/s, 2 seconds passed... 83%, 105792 KB, 46435 KB/s, 2 seconds passed... 84%, 105824 KB, 46442 KB/s, 2 seconds passed... 84%, 105856 KB, 46450 KB/s, 2 seconds passed... 84%, 105888 KB, 46458 KB/s, 2 seconds passed... 84%, 105920 KB, 46467 KB/s, 2 seconds passed... 84%, 105952 KB, 46475 KB/s, 2 seconds passed... 84%, 105984 KB, 46484 KB/s, 2 seconds passed... 84%, 106016 KB, 46492 KB/s, 2 seconds passed... 84%, 106048 KB, 46501 KB/s, 2 seconds passed... 84%, 106080 KB, 46510 KB/s, 2 seconds passed... 84%, 106112 KB, 46518 KB/s, 2 seconds passed... 84%, 106144 KB, 46525 KB/s, 2 seconds passed... 84%, 106176 KB, 46533 KB/s, 2 seconds passed... 84%, 106208 KB, 46543 KB/s, 2 seconds passed... 84%, 106240 KB, 46550 KB/s, 2 seconds passed... 84%, 106272 KB, 46559 KB/s, 2 seconds passed... 84%, 106304 KB, 46567 KB/s, 2 seconds passed... 84%, 106336 KB, 46576 KB/s, 2 seconds passed... 84%, 106368 KB, 46585 KB/s, 2 seconds passed... 84%, 106400 KB, 46593 KB/s, 2 seconds passed... 84%, 106432 KB, 46600 KB/s, 2 seconds passed... 84%, 106464 KB, 46609 KB/s, 2 seconds passed... 84%, 106496 KB, 46618 KB/s, 2 seconds passed... 84%, 106528 KB, 46626 KB/s, 2 seconds passed... 84%, 106560 KB, 46634 KB/s, 2 seconds passed... 84%, 106592 KB, 46642 KB/s, 2 seconds passed... 84%, 106624 KB, 46651 KB/s, 2 seconds passed... 84%, 106656 KB, 46659 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 6%, 7680 KB, 3572 KB/s, 2 seconds passed
-... 6%, 7712 KB, 3569 KB/s, 2 seconds passed
-... 6%, 7744 KB, 3581 KB/s, 2 seconds passed
-... 6%, 7776 KB, 3593 KB/s, 2 seconds passed
-... 6%, 7808 KB, 3574 KB/s, 2 seconds passed
-... 6%, 7840 KB, 3571 KB/s, 2 seconds passed
+    ... 84%, 106688 KB, 46062 KB/s, 2 seconds passed... 84%, 106720 KB, 46067 KB/s, 2 seconds passed... 84%, 106752 KB, 46075 KB/s, 2 seconds passed... 84%, 106784 KB, 46082 KB/s, 2 seconds passed... 84%, 106816 KB, 46090 KB/s, 2 seconds passed... 84%, 106848 KB, 46056 KB/s, 2 seconds passed... 84%, 106880 KB, 46064 KB/s, 2 seconds passed... 84%, 106912 KB, 46071 KB/s, 2 seconds passed... 84%, 106944 KB, 46079 KB/s, 2 seconds passed... 84%, 106976 KB, 46087 KB/s, 2 seconds passed... 84%, 107008 KB, 46095 KB/s, 2 seconds passed... 84%, 107040 KB, 46102 KB/s, 2 seconds passed... 85%, 107072 KB, 46110 KB/s, 2 seconds passed... 85%, 107104 KB, 46118 KB/s, 2 seconds passed... 85%, 107136 KB, 46125 KB/s, 2 seconds passed... 85%, 107168 KB, 46133 KB/s, 2 seconds passed... 85%, 107200 KB, 46141 KB/s, 2 seconds passed... 85%, 107232 KB, 46149 KB/s, 2 seconds passed... 85%, 107264 KB, 46156 KB/s, 2 seconds passed... 85%, 107296 KB, 46164 KB/s, 2 seconds passed... 85%, 107328 KB, 46172 KB/s, 2 seconds passed... 85%, 107360 KB, 46180 KB/s, 2 seconds passed... 85%, 107392 KB, 46188 KB/s, 2 seconds passed... 85%, 107424 KB, 46195 KB/s, 2 seconds passed... 85%, 107456 KB, 46203 KB/s, 2 seconds passed... 85%, 107488 KB, 46211 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 6%, 7872 KB, 3583 KB/s, 2 seconds passed
-... 6%, 7904 KB, 3595 KB/s, 2 seconds passed
-... 6%, 7936 KB, 3577 KB/s, 2 seconds passed
-... 6%, 7968 KB, 3575 KB/s, 2 seconds passed
-... 6%, 8000 KB, 3585 KB/s, 2 seconds passed
-... 6%, 8032 KB, 3597 KB/s, 2 seconds passed
+    ... 85%, 107520 KB, 45054 KB/s, 2 seconds passed... 85%, 107552 KB, 44997 KB/s, 2 seconds passed... 85%, 107584 KB, 45002 KB/s, 2 seconds passed... 85%, 107616 KB, 45009 KB/s, 2 seconds passed... 85%, 107648 KB, 45016 KB/s, 2 seconds passed... 85%, 107680 KB, 45024 KB/s, 2 seconds passed... 85%, 107712 KB, 45031 KB/s, 2 seconds passed... 85%, 107744 KB, 45039 KB/s, 2 seconds passed... 85%, 107776 KB, 45047 KB/s, 2 seconds passed... 85%, 107808 KB, 45055 KB/s, 2 seconds passed... 85%, 107840 KB, 45062 KB/s, 2 seconds passed... 85%, 107872 KB, 45070 KB/s, 2 seconds passed... 85%, 107904 KB, 45077 KB/s, 2 seconds passed... 85%, 107936 KB, 45085 KB/s, 2 seconds passed... 85%, 107968 KB, 45093 KB/s, 2 seconds passed... 85%, 108000 KB, 45101 KB/s, 2 seconds passed... 85%, 108032 KB, 45108 KB/s, 2 seconds passed... 85%, 108064 KB, 45115 KB/s, 2 seconds passed... 85%, 108096 KB, 45123 KB/s, 2 seconds passed... 85%, 108128 KB, 45131 KB/s, 2 seconds passed... 85%, 108160 KB, 45139 KB/s, 2 seconds passed... 85%, 108192 KB, 45050 KB/s, 2 seconds passed... 85%, 108224 KB, 45055 KB/s, 2 seconds passed... 85%, 108256 KB, 45062 KB/s, 2 seconds passed... 85%, 108288 KB, 45070 KB/s, 2 seconds passed... 86%, 108320 KB, 45077 KB/s, 2 seconds passed... 86%, 108352 KB, 45085 KB/s, 2 seconds passed... 86%, 108384 KB, 45092 KB/s, 2 seconds passed... 86%, 108416 KB, 45100 KB/s, 2 seconds passed... 86%, 108448 KB, 45107 KB/s, 2 seconds passed... 86%, 108480 KB, 45115 KB/s, 2 seconds passed... 86%, 108512 KB, 45123 KB/s, 2 seconds passed... 86%, 108544 KB, 45130 KB/s, 2 seconds passed... 86%, 108576 KB, 45138 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 6%, 8064 KB, 3578 KB/s, 2 seconds passed
-... 6%, 8096 KB, 3577 KB/s, 2 seconds passed
-... 6%, 8128 KB, 3587 KB/s, 2 seconds passed
-... 6%, 8160 KB, 3599 KB/s, 2 seconds passed
-... 6%, 8192 KB, 3568 KB/s, 2 seconds passed
+    ... 86%, 108608 KB, 45145 KB/s, 2 seconds passed... 86%, 108640 KB, 45153 KB/s, 2 seconds passed... 86%, 108672 KB, 45161 KB/s, 2 seconds passed... 86%, 108704 KB, 45168 KB/s, 2 seconds passed... 86%, 108736 KB, 45176 KB/s, 2 seconds passed... 86%, 108768 KB, 45184 KB/s, 2 seconds passed... 86%, 108800 KB, 45192 KB/s, 2 seconds passed... 86%, 108832 KB, 45199 KB/s, 2 seconds passed... 86%, 108864 KB, 45207 KB/s, 2 seconds passed... 86%, 108896 KB, 45215 KB/s, 2 seconds passed... 86%, 108928 KB, 45222 KB/s, 2 seconds passed... 86%, 108960 KB, 45230 KB/s, 2 seconds passed... 86%, 108992 KB, 45237 KB/s, 2 seconds passed... 86%, 109024 KB, 45245 KB/s, 2 seconds passed... 86%, 109056 KB, 45252 KB/s, 2 seconds passed... 86%, 109088 KB, 45260 KB/s, 2 seconds passed... 86%, 109120 KB, 45268 KB/s, 2 seconds passed... 86%, 109152 KB, 45275 KB/s, 2 seconds passed... 86%, 109184 KB, 45283 KB/s, 2 seconds passed... 86%, 109216 KB, 45291 KB/s, 2 seconds passed... 86%, 109248 KB, 45298 KB/s, 2 seconds passed... 86%, 109280 KB, 45306 KB/s, 2 seconds passed... 86%, 109312 KB, 45314 KB/s, 2 seconds passed... 86%, 109344 KB, 45321 KB/s, 2 seconds passed... 86%, 109376 KB, 45329 KB/s, 2 seconds passed... 86%, 109408 KB, 45337 KB/s, 2 seconds passed... 86%, 109440 KB, 45344 KB/s, 2 seconds passed... 86%, 109472 KB, 45352 KB/s, 2 seconds passed... 86%, 109504 KB, 45359 KB/s, 2 seconds passed... 86%, 109536 KB, 45367 KB/s, 2 seconds passed... 86%, 109568 KB, 45374 KB/s, 2 seconds passed... 87%, 109600 KB, 45382 KB/s, 2 seconds passed... 87%, 109632 KB, 45390 KB/s, 2 seconds passed... 87%, 109664 KB, 45397 KB/s, 2 seconds passed... 87%, 109696 KB, 45407 KB/s, 2 seconds passed... 87%, 109728 KB, 45416 KB/s, 2 seconds passed... 87%, 109760 KB, 45426 KB/s, 2 seconds passed... 87%, 109792 KB, 45435 KB/s, 2 seconds passed... 87%, 109824 KB, 45445 KB/s, 2 seconds passed... 87%, 109856 KB, 45454 KB/s, 2 seconds passed... 87%, 109888 KB, 45464 KB/s, 2 seconds passed... 87%, 109920 KB, 45473 KB/s, 2 seconds passed... 87%, 109952 KB, 45482 KB/s, 2 seconds passed... 87%, 109984 KB, 45492 KB/s, 2 seconds passed... 87%, 110016 KB, 45501 KB/s, 2 seconds passed... 87%, 110048 KB, 45511 KB/s, 2 seconds passed... 87%, 110080 KB, 45520 KB/s, 2 seconds passed... 87%, 110112 KB, 45530 KB/s, 2 seconds passed... 87%, 110144 KB, 45539 KB/s, 2 seconds passed... 87%, 110176 KB, 45548 KB/s, 2 seconds passed... 87%, 110208 KB, 45555 KB/s, 2 seconds passed... 87%, 110240 KB, 45563 KB/s, 2 seconds passed... 87%, 110272 KB, 45570 KB/s, 2 seconds passed... 87%, 110304 KB, 45580 KB/s, 2 seconds passed... 87%, 110336 KB, 45588 KB/s, 2 seconds passed... 87%, 110368 KB, 45596 KB/s, 2 seconds passed... 87%, 110400 KB, 45603 KB/s, 2 seconds passed... 87%, 110432 KB, 45611 KB/s, 2 seconds passed... 87%, 110464 KB, 45618 KB/s, 2 seconds passed... 87%, 110496 KB, 45626 KB/s, 2 seconds passed... 87%, 110528 KB, 45634 KB/s, 2 seconds passed... 87%, 110560 KB, 45642 KB/s, 2 seconds passed... 87%, 110592 KB, 45650 KB/s, 2 seconds passed... 87%, 110624 KB, 45659 KB/s, 2 seconds passed... 87%, 110656 KB, 45667 KB/s, 2 seconds passed... 87%, 110688 KB, 45675 KB/s, 2 seconds passed... 87%, 110720 KB, 45681 KB/s, 2 seconds passed... 87%, 110752 KB, 45688 KB/s, 2 seconds passed... 87%, 110784 KB, 45696 KB/s, 2 seconds passed... 87%, 110816 KB, 45706 KB/s, 2 seconds passed... 88%, 110848 KB, 45715 KB/s, 2 seconds passed... 88%, 110880 KB, 45612 KB/s, 2 seconds passed... 88%, 110912 KB, 45621 KB/s, 2 seconds passed... 88%, 110944 KB, 45629 KB/s, 2 seconds passed... 88%, 110976 KB, 45637 KB/s, 2 seconds passed... 88%, 111008 KB, 45645 KB/s, 2 seconds passed... 88%, 111040 KB, 45652 KB/s, 2 seconds passed... 88%, 111072 KB, 45628 KB/s, 2 seconds passed... 88%, 111104 KB, 45636 KB/s, 2 seconds passed... 88%, 111136 KB, 45641 KB/s, 2 seconds passed... 88%, 111168 KB, 45649 KB/s, 2 seconds passed... 88%, 111200 KB, 45657 KB/s, 2 seconds passed... 88%, 111232 KB, 45665 KB/s, 2 seconds passed... 88%, 111264 KB, 45673 KB/s, 2 seconds passed... 88%, 111296 KB, 45681 KB/s, 2 seconds passed... 88%, 111328 KB, 45688 KB/s, 2 seconds passed... 88%, 111360 KB, 45695 KB/s, 2 seconds passed... 88%, 111392 KB, 45704 KB/s, 2 seconds passed... 88%, 111424 KB, 45711 KB/s, 2 seconds passed... 88%, 111456 KB, 45720 KB/s, 2 seconds passed... 88%, 111488 KB, 45728 KB/s, 2 seconds passed... 88%, 111520 KB, 45735 KB/s, 2 seconds passed... 88%, 111552 KB, 45743 KB/s, 2 seconds passed... 88%, 111584 KB, 45750 KB/s, 2 seconds passed... 88%, 111616 KB, 45758 KB/s, 2 seconds passed... 88%, 111648 KB, 45766 KB/s, 2 seconds passed... 88%, 111680 KB, 45774 KB/s, 2 seconds passed... 88%, 111712 KB, 45782 KB/s, 2 seconds passed... 88%, 111744 KB, 45790 KB/s, 2 seconds passed... 88%, 111776 KB, 45798 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 6%, 8224 KB, 3575 KB/s, 2 seconds passed
-... 6%, 8256 KB, 3588 KB/s, 2 seconds passed
-... 6%, 8288 KB, 3599 KB/s, 2 seconds passed
-... 6%, 8320 KB, 3571 KB/s, 2 seconds passed
-... 6%, 8352 KB, 3577 KB/s, 2 seconds passed
-... 6%, 8384 KB, 3590 KB/s, 2 seconds passed
-... 6%, 8416 KB, 3601 KB/s, 2 seconds passed
+    ... 88%, 111808 KB, 45190 KB/s, 2 seconds passed... 88%, 111840 KB, 45165 KB/s, 2 seconds passed... 88%, 111872 KB, 45171 KB/s, 2 seconds passed... 88%, 111904 KB, 45178 KB/s, 2 seconds passed... 88%, 111936 KB, 45186 KB/s, 2 seconds passed... 88%, 111968 KB, 45193 KB/s, 2 seconds passed... 88%, 112000 KB, 45200 KB/s, 2 seconds passed... 88%, 112032 KB, 45207 KB/s, 2 seconds passed... 88%, 112064 KB, 45214 KB/s, 2 seconds passed... 88%, 112096 KB, 45222 KB/s, 2 seconds passed... 89%, 112128 KB, 45229 KB/s, 2 seconds passed... 89%, 112160 KB, 45236 KB/s, 2 seconds passed... 89%, 112192 KB, 45244 KB/s, 2 seconds passed... 89%, 112224 KB, 45251 KB/s, 2 seconds passed... 89%, 112256 KB, 45258 KB/s, 2 seconds passed... 89%, 112288 KB, 45266 KB/s, 2 seconds passed... 89%, 112320 KB, 45273 KB/s, 2 seconds passed... 89%, 112352 KB, 45280 KB/s, 2 seconds passed... 89%, 112384 KB, 45287 KB/s, 2 seconds passed... 89%, 112416 KB, 45295 KB/s, 2 seconds passed... 89%, 112448 KB, 45302 KB/s, 2 seconds passed... 89%, 112480 KB, 45309 KB/s, 2 seconds passed... 89%, 112512 KB, 45317 KB/s, 2 seconds passed... 89%, 112544 KB, 45324 KB/s, 2 seconds passed... 89%, 112576 KB, 45332 KB/s, 2 seconds passed... 89%, 112608 KB, 45339 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 6%, 8448 KB, 3583 KB/s, 2 seconds passed
-... 6%, 8480 KB, 3579 KB/s, 2 seconds passed
-... 6%, 8512 KB, 3591 KB/s, 2 seconds passed
-... 6%, 8544 KB, 3602 KB/s, 2 seconds passed
-... 6%, 8576 KB, 3575 KB/s, 2 seconds passed
+    ... 89%, 112640 KB, 44517 KB/s, 2 seconds passed... 89%, 112672 KB, 44521 KB/s, 2 seconds passed... 89%, 112704 KB, 44528 KB/s, 2 seconds passed... 89%, 112736 KB, 44535 KB/s, 2 seconds passed... 89%, 112768 KB, 44542 KB/s, 2 seconds passed... 89%, 112800 KB, 44549 KB/s, 2 seconds passed... 89%, 112832 KB, 44557 KB/s, 2 seconds passed... 89%, 112864 KB, 44564 KB/s, 2 seconds passed... 89%, 112896 KB, 44571 KB/s, 2 seconds passed... 89%, 112928 KB, 44578 KB/s, 2 seconds passed... 89%, 112960 KB, 44585 KB/s, 2 seconds passed... 89%, 112992 KB, 44593 KB/s, 2 seconds passed... 89%, 113024 KB, 44600 KB/s, 2 seconds passed... 89%, 113056 KB, 44607 KB/s, 2 seconds passed... 89%, 113088 KB, 44615 KB/s, 2 seconds passed... 89%, 113120 KB, 44622 KB/s, 2 seconds passed... 89%, 113152 KB, 44629 KB/s, 2 seconds passed... 89%, 113184 KB, 44637 KB/s, 2 seconds passed... 89%, 113216 KB, 44644 KB/s, 2 seconds passed... 89%, 113248 KB, 44651 KB/s, 2 seconds passed... 89%, 113280 KB, 44658 KB/s, 2 seconds passed... 89%, 113312 KB, 44666 KB/s, 2 seconds passed... 89%, 113344 KB, 44673 KB/s, 2 seconds passed... 90%, 113376 KB, 44679 KB/s, 2 seconds passed... 90%, 113408 KB, 44686 KB/s, 2 seconds passed... 90%, 113440 KB, 44694 KB/s, 2 seconds passed... 90%, 113472 KB, 44701 KB/s, 2 seconds passed... 90%, 113504 KB, 44708 KB/s, 2 seconds passed... 90%, 113536 KB, 44716 KB/s, 2 seconds passed... 90%, 113568 KB, 44723 KB/s, 2 seconds passed... 90%, 113600 KB, 44730 KB/s, 2 seconds passed... 90%, 113632 KB, 44737 KB/s, 2 seconds passed... 90%, 113664 KB, 44745 KB/s, 2 seconds passed... 90%, 113696 KB, 44752 KB/s, 2 seconds passed... 90%, 113728 KB, 44759 KB/s, 2 seconds passed... 90%, 113760 KB, 44766 KB/s, 2 seconds passed... 90%, 113792 KB, 44773 KB/s, 2 seconds passed... 90%, 113824 KB, 44780 KB/s, 2 seconds passed... 90%, 113856 KB, 44788 KB/s, 2 seconds passed... 90%, 113888 KB, 44794 KB/s, 2 seconds passed... 90%, 113920 KB, 44802 KB/s, 2 seconds passed... 90%, 113952 KB, 44809 KB/s, 2 seconds passed... 90%, 113984 KB, 44816 KB/s, 2 seconds passed... 90%, 114016 KB, 44824 KB/s, 2 seconds passed... 90%, 114048 KB, 44831 KB/s, 2 seconds passed... 90%, 114080 KB, 44839 KB/s, 2 seconds passed... 90%, 114112 KB, 44846 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 6%, 8608 KB, 3581 KB/s, 2 seconds passed
-... 6%, 8640 KB, 3593 KB/s, 2 seconds passed
-... 6%, 8672 KB, 3603 KB/s, 2 seconds passed
-... 6%, 8704 KB, 3576 KB/s, 2 seconds passed
-... 6%, 8736 KB, 3583 KB/s, 2 seconds passed
-... 6%, 8768 KB, 3594 KB/s, 2 seconds passed
-... 6%, 8800 KB, 3604 KB/s, 2 seconds passed
+    ... 90%, 114144 KB, 44216 KB/s, 2 seconds passed... 90%, 114176 KB, 44221 KB/s, 2 seconds passed... 90%, 114208 KB, 44227 KB/s, 2 seconds passed... 90%, 114240 KB, 44234 KB/s, 2 seconds passed... 90%, 114272 KB, 44242 KB/s, 2 seconds passed... 90%, 114304 KB, 44249 KB/s, 2 seconds passed... 90%, 114336 KB, 44256 KB/s, 2 seconds passed... 90%, 114368 KB, 44263 KB/s, 2 seconds passed... 90%, 114400 KB, 44270 KB/s, 2 seconds passed... 90%, 114432 KB, 44277 KB/s, 2 seconds passed... 90%, 114464 KB, 44284 KB/s, 2 seconds passed... 90%, 114496 KB, 44292 KB/s, 2 seconds passed... 90%, 114528 KB, 44299 KB/s, 2 seconds passed... 90%, 114560 KB, 44306 KB/s, 2 seconds passed... 90%, 114592 KB, 44313 KB/s, 2 seconds passed... 91%, 114624 KB, 44320 KB/s, 2 seconds passed... 91%, 114656 KB, 44327 KB/s, 2 seconds passed... 91%, 114688 KB, 44334 KB/s, 2 seconds passed... 91%, 114720 KB, 44342 KB/s, 2 seconds passed... 91%, 114752 KB, 44349 KB/s, 2 seconds passed... 91%, 114784 KB, 44356 KB/s, 2 seconds passed... 91%, 114816 KB, 44363 KB/s, 2 seconds passed... 91%, 114848 KB, 44370 KB/s, 2 seconds passed... 91%, 114880 KB, 44377 KB/s, 2 seconds passed... 91%, 114912 KB, 44384 KB/s, 2 seconds passed... 91%, 114944 KB, 44392 KB/s, 2 seconds passed... 91%, 114976 KB, 44399 KB/s, 2 seconds passed... 91%, 115008 KB, 44406 KB/s, 2 seconds passed... 91%, 115040 KB, 44413 KB/s, 2 seconds passed... 91%, 115072 KB, 44420 KB/s, 2 seconds passed... 91%, 115104 KB, 44427 KB/s, 2 seconds passed... 91%, 115136 KB, 44434 KB/s, 2 seconds passed... 91%, 115168 KB, 44442 KB/s, 2 seconds passed... 91%, 115200 KB, 44449 KB/s, 2 seconds passed... 91%, 115232 KB, 44456 KB/s, 2 seconds passed... 91%, 115264 KB, 44463 KB/s, 2 seconds passed... 91%, 115296 KB, 44471 KB/s, 2 seconds passed... 91%, 115328 KB, 44478 KB/s, 2 seconds passed... 91%, 115360 KB, 44485 KB/s, 2 seconds passed... 91%, 115392 KB, 44492 KB/s, 2 seconds passed... 91%, 115424 KB, 44499 KB/s, 2 seconds passed... 91%, 115456 KB, 44506 KB/s, 2 seconds passed... 91%, 115488 KB, 44513 KB/s, 2 seconds passed... 91%, 115520 KB, 44521 KB/s, 2 seconds passed... 91%, 115552 KB, 44528 KB/s, 2 seconds passed... 91%, 115584 KB, 44534 KB/s, 2 seconds passed... 91%, 115616 KB, 44542 KB/s, 2 seconds passed... 91%, 115648 KB, 44549 KB/s, 2 seconds passed... 91%, 115680 KB, 44556 KB/s, 2 seconds passed... 91%, 115712 KB, 44563 KB/s, 2 seconds passed... 91%, 115744 KB, 44571 KB/s, 2 seconds passed... 91%, 115776 KB, 44578 KB/s, 2 seconds passed... 91%, 115808 KB, 44587 KB/s, 2 seconds passed... 91%, 115840 KB, 44596 KB/s, 2 seconds passed... 91%, 115872 KB, 44604 KB/s, 2 seconds passed... 92%, 115904 KB, 44613 KB/s, 2 seconds passed... 92%, 115936 KB, 44622 KB/s, 2 seconds passed... 92%, 115968 KB, 44631 KB/s, 2 seconds passed... 92%, 116000 KB, 44640 KB/s, 2 seconds passed... 92%, 116032 KB, 44649 KB/s, 2 seconds passed... 92%, 116064 KB, 44658 KB/s, 2 seconds passed... 92%, 116096 KB, 44667 KB/s, 2 seconds passed... 92%, 116128 KB, 44675 KB/s, 2 seconds passed... 92%, 116160 KB, 44684 KB/s, 2 seconds passed... 92%, 116192 KB, 44693 KB/s, 2 seconds passed... 92%, 116224 KB, 44702 KB/s, 2 seconds passed... 92%, 116256 KB, 44711 KB/s, 2 seconds passed... 92%, 116288 KB, 44720 KB/s, 2 seconds passed... 92%, 116320 KB, 44729 KB/s, 2 seconds passed... 92%, 116352 KB, 44738 KB/s, 2 seconds passed... 92%, 116384 KB, 44746 KB/s, 2 seconds passed... 92%, 116416 KB, 44754 KB/s, 2 seconds passed... 92%, 116448 KB, 44761 KB/s, 2 seconds passed... 92%, 116480 KB, 44769 KB/s, 2 seconds passed... 92%, 116512 KB, 44776 KB/s, 2 seconds passed... 92%, 116544 KB, 44784 KB/s, 2 seconds passed... 92%, 116576 KB, 44791 KB/s, 2 seconds passed... 92%, 116608 KB, 44798 KB/s, 2 seconds passed... 92%, 116640 KB, 44806 KB/s, 2 seconds passed... 92%, 116672 KB, 44814 KB/s, 2 seconds passed... 92%, 116704 KB, 44821 KB/s, 2 seconds passed... 92%, 116736 KB, 44829 KB/s, 2 seconds passed... 92%, 116768 KB, 44836 KB/s, 2 seconds passed... 92%, 116800 KB, 44844 KB/s, 2 seconds passed... 92%, 116832 KB, 44851 KB/s, 2 seconds passed... 92%, 116864 KB, 44859 KB/s, 2 seconds passed... 92%, 116896 KB, 44867 KB/s, 2 seconds passed... 92%, 116928 KB, 44873 KB/s, 2 seconds passed... 92%, 116960 KB, 44881 KB/s, 2 seconds passed... 92%, 116992 KB, 44889 KB/s, 2 seconds passed... 92%, 117024 KB, 44896 KB/s, 2 seconds passed... 92%, 117056 KB, 44903 KB/s, 2 seconds passed... 92%, 117088 KB, 44911 KB/s, 2 seconds passed... 92%, 117120 KB, 44918 KB/s, 2 seconds passed... 93%, 117152 KB, 44926 KB/s, 2 seconds passed... 93%, 117184 KB, 44933 KB/s, 2 seconds passed... 93%, 117216 KB, 44941 KB/s, 2 seconds passed... 93%, 117248 KB, 44949 KB/s, 2 seconds passed... 93%, 117280 KB, 44956 KB/s, 2 seconds passed... 93%, 117312 KB, 44964 KB/s, 2 seconds passed... 93%, 117344 KB, 44971 KB/s, 2 seconds passed... 93%, 117376 KB, 44979 KB/s, 2 seconds passed... 93%, 117408 KB, 44986 KB/s, 2 seconds passed... 93%, 117440 KB, 44993 KB/s, 2 seconds passed... 93%, 117472 KB, 45001 KB/s, 2 seconds passed... 93%, 117504 KB, 45009 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 7%, 8832 KB, 3578 KB/s, 2 seconds passed
-... 7%, 8864 KB, 3584 KB/s, 2 seconds passed
-... 7%, 8896 KB, 3596 KB/s, 2 seconds passed
-... 7%, 8928 KB, 3606 KB/s, 2 seconds passed
-... 7%, 8960 KB, 3579 KB/s, 2 seconds passed
+    ... 93%, 117536 KB, 45016 KB/s, 2 seconds passed... 93%, 117568 KB, 45024 KB/s, 2 seconds passed... 93%, 117600 KB, 45031 KB/s, 2 seconds passed... 93%, 117632 KB, 45039 KB/s, 2 seconds passed... 93%, 117664 KB, 45046 KB/s, 2 seconds passed... 93%, 117696 KB, 45054 KB/s, 2 seconds passed... 93%, 117728 KB, 45061 KB/s, 2 seconds passed... 93%, 117760 KB, 45069 KB/s, 2 seconds passed... 93%, 117792 KB, 45075 KB/s, 2 seconds passed... 93%, 117824 KB, 45083 KB/s, 2 seconds passed... 93%, 117856 KB, 45089 KB/s, 2 seconds passed... 93%, 117888 KB, 45097 KB/s, 2 seconds passed... 93%, 117920 KB, 45105 KB/s, 2 seconds passed... 93%, 117952 KB, 45113 KB/s, 2 seconds passed... 93%, 117984 KB, 45119 KB/s, 2 seconds passed... 93%, 118016 KB, 45127 KB/s, 2 seconds passed... 93%, 118048 KB, 45135 KB/s, 2 seconds passed... 93%, 118080 KB, 45142 KB/s, 2 seconds passed... 93%, 118112 KB, 45149 KB/s, 2 seconds passed... 93%, 118144 KB, 45157 KB/s, 2 seconds passed... 93%, 118176 KB, 45165 KB/s, 2 seconds passed... 93%, 118208 KB, 45172 KB/s, 2 seconds passed... 93%, 118240 KB, 45179 KB/s, 2 seconds passed... 93%, 118272 KB, 45187 KB/s, 2 seconds passed... 93%, 118304 KB, 45195 KB/s, 2 seconds passed... 93%, 118336 KB, 45201 KB/s, 2 seconds passed... 93%, 118368 KB, 45209 KB/s, 2 seconds passed... 94%, 118400 KB, 45217 KB/s, 2 seconds passed... 94%, 118432 KB, 45224 KB/s, 2 seconds passed... 94%, 118464 KB, 45232 KB/s, 2 seconds passed... 94%, 118496 KB, 45239 KB/s, 2 seconds passed... 94%, 118528 KB, 45247 KB/s, 2 seconds passed... 94%, 118560 KB, 45254 KB/s, 2 seconds passed... 94%, 118592 KB, 45261 KB/s, 2 seconds passed... 94%, 118624 KB, 45269 KB/s, 2 seconds passed... 94%, 118656 KB, 45275 KB/s, 2 seconds passed... 94%, 118688 KB, 45281 KB/s, 2 seconds passed... 94%, 118720 KB, 45289 KB/s, 2 seconds passed... 94%, 118752 KB, 45296 KB/s, 2 seconds passed... 94%, 118784 KB, 45302 KB/s, 2 seconds passed... 94%, 118816 KB, 45309 KB/s, 2 seconds passed... 94%, 118848 KB, 45317 KB/s, 2 seconds passed... 94%, 118880 KB, 45326 KB/s, 2 seconds passed... 94%, 118912 KB, 45334 KB/s, 2 seconds passed... 94%, 118944 KB, 45342 KB/s, 2 seconds passed... 94%, 118976 KB, 45350 KB/s, 2 seconds passed... 94%, 119008 KB, 45356 KB/s, 2 seconds passed... 94%, 119040 KB, 45364 KB/s, 2 seconds passed... 94%, 119072 KB, 45371 KB/s, 2 seconds passed... 94%, 119104 KB, 45379 KB/s, 2 seconds passed... 94%, 119136 KB, 45386 KB/s, 2 seconds passed... 94%, 119168 KB, 45394 KB/s, 2 seconds passed... 94%, 119200 KB, 45401 KB/s, 2 seconds passed... 94%, 119232 KB, 45409 KB/s, 2 seconds passed... 94%, 119264 KB, 45416 KB/s, 2 seconds passed... 94%, 119296 KB, 45423 KB/s, 2 seconds passed... 94%, 119328 KB, 45431 KB/s, 2 seconds passed... 94%, 119360 KB, 45439 KB/s, 2 seconds passed... 94%, 119392 KB, 45444 KB/s, 2 seconds passed... 94%, 119424 KB, 45450 KB/s, 2 seconds passed... 94%, 119456 KB, 45458 KB/s, 2 seconds passed... 94%, 119488 KB, 45466 KB/s, 2 seconds passed... 94%, 119520 KB, 45473 KB/s, 2 seconds passed... 94%, 119552 KB, 45481 KB/s, 2 seconds passed... 94%, 119584 KB, 45489 KB/s, 2 seconds passed... 94%, 119616 KB, 45496 KB/s, 2 seconds passed... 94%, 119648 KB, 45504 KB/s, 2 seconds passed... 95%, 119680 KB, 45511 KB/s, 2 seconds passed... 95%, 119712 KB, 45519 KB/s, 2 seconds passed... 95%, 119744 KB, 45526 KB/s, 2 seconds passed... 95%, 119776 KB, 45533 KB/s, 2 seconds passed... 95%, 119808 KB, 45541 KB/s, 2 seconds passed... 95%, 119840 KB, 45548 KB/s, 2 seconds passed... 95%, 119872 KB, 45556 KB/s, 2 seconds passed... 95%, 119904 KB, 45561 KB/s, 2 seconds passed... 95%, 119936 KB, 45567 KB/s, 2 seconds passed... 95%, 119968 KB, 45575 KB/s, 2 seconds passed... 95%, 120000 KB, 45583 KB/s, 2 seconds passed... 95%, 120032 KB, 45590 KB/s, 2 seconds passed... 95%, 120064 KB, 45597 KB/s, 2 seconds passed... 95%, 120096 KB, 45603 KB/s, 2 seconds passed... 95%, 120128 KB, 45612 KB/s, 2 seconds passed... 95%, 120160 KB, 45621 KB/s, 2 seconds passed... 95%, 120192 KB, 45628 KB/s, 2 seconds passed... 95%, 120224 KB, 45635 KB/s, 2 seconds passed... 95%, 120256 KB, 45643 KB/s, 2 seconds passed... 95%, 120288 KB, 45650 KB/s, 2 seconds passed... 95%, 120320 KB, 45658 KB/s, 2 seconds passed... 95%, 120352 KB, 45664 KB/s, 2 seconds passed... 95%, 120384 KB, 45672 KB/s, 2 seconds passed... 95%, 120416 KB, 45680 KB/s, 2 seconds passed... 95%, 120448 KB, 45687 KB/s, 2 seconds passed... 95%, 120480 KB, 45694 KB/s, 2 seconds passed... 95%, 120512 KB, 45700 KB/s, 2 seconds passed... 95%, 120544 KB, 45707 KB/s, 2 seconds passed... 95%, 120576 KB, 45714 KB/s, 2 seconds passed... 95%, 120608 KB, 45724 KB/s, 2 seconds passed... 95%, 120640 KB, 45730 KB/s, 2 seconds passed... 95%, 120672 KB, 45737 KB/s, 2 seconds passed... 95%, 120704 KB, 45744 KB/s, 2 seconds passed... 95%, 120736 KB, 45751 KB/s, 2 seconds passed... 95%, 120768 KB, 45758 KB/s, 2 seconds passed... 95%, 120800 KB, 45766 KB/s, 2 seconds passed... 95%, 120832 KB, 45773 KB/s, 2 seconds passed... 95%, 120864 KB, 45780 KB/s, 2 seconds passed... 95%, 120896 KB, 45788 KB/s, 2 seconds passed... 96%, 120928 KB, 45795 KB/s, 2 seconds passed... 96%, 120960 KB, 45802 KB/s, 2 seconds passed... 96%, 120992 KB, 45810 KB/s, 2 seconds passed... 96%, 121024 KB, 45817 KB/s, 2 seconds passed... 96%, 121056 KB, 45824 KB/s, 2 seconds passed... 96%, 121088 KB, 45832 KB/s, 2 seconds passed... 96%, 121120 KB, 45839 KB/s, 2 seconds passed... 96%, 121152 KB, 45846 KB/s, 2 seconds passed... 96%, 121184 KB, 45852 KB/s, 2 seconds passed... 96%, 121216 KB, 45857 KB/s, 2 seconds passed... 96%, 121248 KB, 45862 KB/s, 2 seconds passed... 96%, 121280 KB, 45867 KB/s, 2 seconds passed... 96%, 121312 KB, 45873 KB/s, 2 seconds passed... 96%, 121344 KB, 45880 KB/s, 2 seconds passed... 96%, 121376 KB, 45888 KB/s, 2 seconds passed... 96%, 121408 KB, 45895 KB/s, 2 seconds passed... 96%, 121440 KB, 45902 KB/s, 2 seconds passed... 96%, 121472 KB, 45909 KB/s, 2 seconds passed... 96%, 121504 KB, 45917 KB/s, 2 seconds passed... 96%, 121536 KB, 45924 KB/s, 2 seconds passed... 96%, 121568 KB, 45931 KB/s, 2 seconds passed... 96%, 121600 KB, 45939 KB/s, 2 seconds passed... 96%, 121632 KB, 45946 KB/s, 2 seconds passed... 96%, 121664 KB, 45954 KB/s, 2 seconds passed... 96%, 121696 KB, 45960 KB/s, 2 seconds passed... 96%, 121728 KB, 45968 KB/s, 2 seconds passed... 96%, 121760 KB, 45976 KB/s, 2 seconds passed... 96%, 121792 KB, 45985 KB/s, 2 seconds passed... 96%, 121824 KB, 45992 KB/s, 2 seconds passed... 96%, 121856 KB, 45999 KB/s, 2 seconds passed... 96%, 121888 KB, 46007 KB/s, 2 seconds passed... 96%, 121920 KB, 46014 KB/s, 2 seconds passed... 96%, 121952 KB, 46020 KB/s, 2 seconds passed... 96%, 121984 KB, 46028 KB/s, 2 seconds passed... 96%, 122016 KB, 46035 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 7%, 8992 KB, 3586 KB/s, 2 seconds passed
-... 7%, 9024 KB, 3597 KB/s, 2 seconds passed
-... 7%, 9056 KB, 3607 KB/s, 2 seconds passed
-... 7%, 9088 KB, 3581 KB/s, 2 seconds passed
-... 7%, 9120 KB, 3588 KB/s, 2 seconds passed
-... 7%, 9152 KB, 3599 KB/s, 2 seconds passed
-... 7%, 9184 KB, 3608 KB/s, 2 seconds passed
+    ... 96%, 122048 KB, 45262 KB/s, 2 seconds passed... 96%, 122080 KB, 45266 KB/s, 2 seconds passed... 96%, 122112 KB, 45248 KB/s, 2 seconds passed... 96%, 122144 KB, 45253 KB/s, 2 seconds passed... 97%, 122176 KB, 45260 KB/s, 2 seconds passed... 97%, 122208 KB, 45266 KB/s, 2 seconds passed... 97%, 122240 KB, 45273 KB/s, 2 seconds passed... 97%, 122272 KB, 45280 KB/s, 2 seconds passed... 97%, 122304 KB, 45286 KB/s, 2 seconds passed... 97%, 122336 KB, 45293 KB/s, 2 seconds passed... 97%, 122368 KB, 45293 KB/s, 2 seconds passed... 97%, 122400 KB, 45299 KB/s, 2 seconds passed... 97%, 122432 KB, 45306 KB/s, 2 seconds passed... 97%, 122464 KB, 45313 KB/s, 2 seconds passed... 97%, 122496 KB, 45319 KB/s, 2 seconds passed... 97%, 122528 KB, 45326 KB/s, 2 seconds passed... 97%, 122560 KB, 45333 KB/s, 2 seconds passed... 97%, 122592 KB, 45339 KB/s, 2 seconds passed... 97%, 122624 KB, 45346 KB/s, 2 seconds passed... 97%, 122656 KB, 45353 KB/s, 2 seconds passed... 97%, 122688 KB, 45360 KB/s, 2 seconds passed... 97%, 122720 KB, 45366 KB/s, 2 seconds passed... 97%, 122752 KB, 45373 KB/s, 2 seconds passed... 97%, 122784 KB, 45380 KB/s, 2 seconds passed... 97%, 122816 KB, 45386 KB/s, 2 seconds passed... 97%, 122848 KB, 45394 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 7%, 9216 KB, 3583 KB/s, 2 seconds passed
-... 7%, 9248 KB, 3589 KB/s, 2 seconds passed
-... 7%, 9280 KB, 3600 KB/s, 2 seconds passed
-... 7%, 9312 KB, 3609 KB/s, 2 seconds passed
-... 7%, 9344 KB, 3596 KB/s, 2 seconds passed
+    ... 97%, 122880 KB, 44867 KB/s, 2 seconds passed... 97%, 122912 KB, 44871 KB/s, 2 seconds passed... 97%, 122944 KB, 44878 KB/s, 2 seconds passed... 97%, 122976 KB, 44884 KB/s, 2 seconds passed... 97%, 123008 KB, 44628 KB/s, 2 seconds passed... 97%, 123040 KB, 44632 KB/s, 2 seconds passed... 97%, 123072 KB, 44638 KB/s, 2 seconds passed... 97%, 123104 KB, 44644 KB/s, 2 seconds passed... 97%, 123136 KB, 44650 KB/s, 2 seconds passed... 97%, 123168 KB, 44657 KB/s, 2 seconds passed... 97%, 123200 KB, 44664 KB/s, 2 seconds passed... 97%, 123232 KB, 44670 KB/s, 2 seconds passed... 97%, 123264 KB, 44677 KB/s, 2 seconds passed... 97%, 123296 KB, 44683 KB/s, 2 seconds passed... 97%, 123328 KB, 44690 KB/s, 2 seconds passed... 97%, 123360 KB, 44697 KB/s, 2 seconds passed... 97%, 123392 KB, 44704 KB/s, 2 seconds passed... 97%, 123424 KB, 44710 KB/s, 2 seconds passed... 98%, 123456 KB, 44717 KB/s, 2 seconds passed... 98%, 123488 KB, 44723 KB/s, 2 seconds passed... 98%, 123520 KB, 44730 KB/s, 2 seconds passed... 98%, 123552 KB, 44737 KB/s, 2 seconds passed... 98%, 123584 KB, 44743 KB/s, 2 seconds passed... 98%, 123616 KB, 44750 KB/s, 2 seconds passed... 98%, 123648 KB, 44757 KB/s, 2 seconds passed... 98%, 123680 KB, 44763 KB/s, 2 seconds passed... 98%, 123712 KB, 44770 KB/s, 2 seconds passed... 98%, 123744 KB, 44777 KB/s, 2 seconds passed... 98%, 123776 KB, 44784 KB/s, 2 seconds passed... 98%, 123808 KB, 44790 KB/s, 2 seconds passed... 98%, 123840 KB, 44797 KB/s, 2 seconds passed... 98%, 123872 KB, 44804 KB/s, 2 seconds passed
 
 .. parsed-literal::
 
-    ... 7%, 9376 KB, 3593 KB/s, 2 seconds passed
-... 7%, 9408 KB, 3602 KB/s, 2 seconds passed
-... 7%, 9440 KB, 3612 KB/s, 2 seconds passed
-... 7%, 9472 KB, 3597 KB/s, 2 seconds passed
-... 7%, 9504 KB, 3594 KB/s, 2 seconds passed
-... 7%, 9536 KB, 3603 KB/s, 2 seconds passed
-... 7%, 9568 KB, 3613 KB/s, 2 seconds passed
+    ... 98%, 123904 KB, 44810 KB/s, 2 seconds passed... 98%, 123936 KB, 44817 KB/s, 2 seconds passed... 98%, 123968 KB, 44823 KB/s, 2 seconds passed... 98%, 124000 KB, 44830 KB/s, 2 seconds passed... 98%, 124032 KB, 44837 KB/s, 2 seconds passed... 98%, 124064 KB, 44843 KB/s, 2 seconds passed... 98%, 124096 KB, 44850 KB/s, 2 seconds passed... 98%, 124128 KB, 44856 KB/s, 2 seconds passed... 98%, 124160 KB, 44863 KB/s, 2 seconds passed... 98%, 124192 KB, 44870 KB/s, 2 seconds passed... 98%, 124224 KB, 44876 KB/s, 2 seconds passed... 98%, 124256 KB, 44883 KB/s, 2 seconds passed... 98%, 124288 KB, 44890 KB/s, 2 seconds passed... 98%, 124320 KB, 44897 KB/s, 2 seconds passed... 98%, 124352 KB, 44904 KB/s, 2 seconds passed... 98%, 124384 KB, 44912 KB/s, 2 seconds passed... 98%, 124416 KB, 44778 KB/s, 2 seconds passed... 98%, 124448 KB, 44785 KB/s, 2 seconds passed... 98%, 124480 KB, 44793 KB/s, 2 seconds passed... 98%, 124512 KB, 44801 KB/s, 2 seconds passed... 98%, 124544 KB, 44806 KB/s, 2 seconds passed... 98%, 124576 KB, 44813 KB/s, 2 seconds passed... 98%, 124608 KB, 44820 KB/s, 2 seconds passed... 98%, 124640 KB, 44828 KB/s, 2 seconds passed... 98%, 124672 KB, 44835 KB/s, 2 seconds passed... 99%, 124704 KB, 44841 KB/s, 2 seconds passed... 99%, 124736 KB, 44848 KB/s, 2 seconds passed... 99%, 124768 KB, 44855 KB/s, 2 seconds passed... 99%, 124800 KB, 44862 KB/s, 2 seconds passed... 99%, 124832 KB, 44870 KB/s, 2 seconds passed... 99%, 124864 KB, 44877 KB/s, 2 seconds passed... 99%, 124896 KB, 44884 KB/s, 2 seconds passed... 99%, 124928 KB, 44892 KB/s, 2 seconds passed... 99%, 124960 KB, 44898 KB/s, 2 seconds passed... 99%, 124992 KB, 44905 KB/s, 2 seconds passed... 99%, 125024 KB, 44912 KB/s, 2 seconds passed... 99%, 125056 KB, 44920 KB/s, 2 seconds passed... 99%, 125088 KB, 44927 KB/s, 2 seconds passed... 99%, 125120 KB, 44934 KB/s, 2 seconds passed... 99%, 125152 KB, 44941 KB/s, 2 seconds passed... 99%, 125184 KB, 44948 KB/s, 2 seconds passed... 99%, 125216 KB, 44955 KB/s, 2 seconds passed... 99%, 125248 KB, 44962 KB/s, 2 seconds passed... 99%, 125280 KB, 44969 KB/s, 2 seconds passed... 99%, 125312 KB, 44975 KB/s, 2 seconds passed... 99%, 125344 KB, 44983 KB/s, 2 seconds passed... 99%, 125376 KB, 44990 KB/s, 2 seconds passed... 99%, 125408 KB, 44997 KB/s, 2 seconds passed... 99%, 125440 KB, 45004 KB/s, 2 seconds passed... 99%, 125472 KB, 45011 KB/s, 2 seconds passed... 99%, 125504 KB, 45019 KB/s, 2 seconds passed... 99%, 125536 KB, 45023 KB/s, 2 seconds passed... 99%, 125568 KB, 45030 KB/s, 2 seconds passed... 99%, 125600 KB, 45037 KB/s, 2 seconds passed... 99%, 125632 KB, 45045 KB/s, 2 seconds passed... 99%, 125664 KB, 45052 KB/s, 2 seconds passed... 99%, 125696 KB, 45059 KB/s, 2 seconds passed... 99%, 125728 KB, 45066 KB/s, 2 seconds passed... 99%, 125760 KB, 45073 KB/s, 2 seconds passed... 99%, 125792 KB, 45080 KB/s, 2 seconds passed... 99%, 125824 KB, 45087 KB/s, 2 seconds passed... 99%, 125856 KB, 45094 KB/s, 2 seconds passed... 99%, 125888 KB, 45101 KB/s, 2 seconds passed... 99%, 125920 KB, 45109 KB/s, 2 seconds passed... 99%, 125952 KB, 45116 KB/s, 2 seconds passed... 100%, 125953 KB, 45113 KB/s, 2 seconds passed
 
-.. parsed-literal::
-
-    ... 7%, 9600 KB, 3588 KB/s, 2 seconds passed
-... 7%, 9632 KB, 3595 KB/s, 2 seconds passed
-... 7%, 9664 KB, 3605 KB/s, 2 seconds passed
-... 7%, 9696 KB, 3614 KB/s, 2 seconds passed
-
-.. parsed-literal::
-
-    ... 7%, 9728 KB, 3590 KB/s, 2 seconds passed
-... 7%, 9760 KB, 3596 KB/s, 2 seconds passed
-... 7%, 9792 KB, 3606 KB/s, 2 seconds passed
-... 7%, 9824 KB, 3615 KB/s, 2 seconds passed
-... 7%, 9856 KB, 3591 KB/s, 2 seconds passed
-... 7%, 9888 KB, 3597 KB/s, 2 seconds passed
-... 7%, 9920 KB, 3607 KB/s, 2 seconds passed
-... 7%, 9952 KB, 3616 KB/s, 2 seconds passed
-
-.. parsed-literal::
-
-    ... 7%, 9984 KB, 3592 KB/s, 2 seconds passed
-... 7%, 10016 KB, 3598 KB/s, 2 seconds passed
-... 7%, 10048 KB, 3608 KB/s, 2 seconds passed
-... 8%, 10080 KB, 3616 KB/s, 2 seconds passed
-
-.. parsed-literal::
-
-    ... 8%, 10112 KB, 3593 KB/s, 2 seconds passed
-... 8%, 10144 KB, 3599 KB/s, 2 seconds passed
-... 8%, 10176 KB, 3609 KB/s, 2 seconds passed
-... 8%, 10208 KB, 3617 KB/s, 2 seconds passed
-... 8%, 10240 KB, 3596 KB/s, 2 seconds passed
-... 8%, 10272 KB, 3602 KB/s, 2 seconds passed
-... 8%, 10304 KB, 3611 KB/s, 2 seconds passed
-... 8%, 10336 KB, 3620 KB/s, 2 seconds passed
-
-.. parsed-literal::
-
-    ... 8%, 10368 KB, 3598 KB/s, 2 seconds passed
-... 8%, 10400 KB, 3602 KB/s, 2 seconds passed
-... 8%, 10432 KB, 3612 KB/s, 2 seconds passed
-... 8%, 10464 KB, 3620 KB/s, 2 seconds passed
-
-.. parsed-literal::
-
-    ... 8%, 10496 KB, 3598 KB/s, 2 seconds passed
-... 8%, 10528 KB, 3603 KB/s, 2 seconds passed
-... 8%, 10560 KB, 3614 KB/s, 2 seconds passed
-... 8%, 10592 KB, 3622 KB/s, 2 seconds passed
-... 8%, 10624 KB, 3600 KB/s, 2 seconds passed
-... 8%, 10656 KB, 3605 KB/s, 2 seconds passed
-... 8%, 10688 KB, 3615 KB/s, 2 seconds passed
-... 8%, 10720 KB, 3623 KB/s, 2 seconds passed
-
-.. parsed-literal::
-
-    ... 8%, 10752 KB, 3601 KB/s, 2 seconds passed
-... 8%, 10784 KB, 3606 KB/s, 2 seconds passed
-... 8%, 10816 KB, 3616 KB/s, 2 seconds passed
-... 8%, 10848 KB, 3623 KB/s, 2 seconds passed
-
-.. parsed-literal::
-
-    ... 8%, 10880 KB, 3602 KB/s, 3 seconds passed
-... 8%, 10912 KB, 3607 KB/s, 3 seconds passed
-... 8%, 10944 KB, 3617 KB/s, 3 seconds passed
-... 8%, 10976 KB, 3624 KB/s, 3 seconds passed
-... 8%, 11008 KB, 3603 KB/s, 3 seconds passed
-... 8%, 11040 KB, 3608 KB/s, 3 seconds passed
-... 8%, 11072 KB, 3617 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 8%, 11104 KB, 3606 KB/s, 3 seconds passed
-... 8%, 11136 KB, 3603 KB/s, 3 seconds passed
-... 8%, 11168 KB, 3608 KB/s, 3 seconds passed
-... 8%, 11200 KB, 3618 KB/s, 3 seconds passed
-... 8%, 11232 KB, 3607 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 8%, 11264 KB, 3605 KB/s, 3 seconds passed
-... 8%, 11296 KB, 3610 KB/s, 3 seconds passed
-... 8%, 11328 KB, 3619 KB/s, 3 seconds passed
-... 9%, 11360 KB, 3611 KB/s, 3 seconds passed
-... 9%, 11392 KB, 3605 KB/s, 3 seconds passed
-... 9%, 11424 KB, 3611 KB/s, 3 seconds passed
-... 9%, 11456 KB, 3620 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 9%, 11488 KB, 3608 KB/s, 3 seconds passed
-... 9%, 11520 KB, 3602 KB/s, 3 seconds passed
-... 9%, 11552 KB, 3611 KB/s, 3 seconds passed
-... 9%, 11584 KB, 3620 KB/s, 3 seconds passed
-... 9%, 11616 KB, 3609 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 9%, 11648 KB, 3604 KB/s, 3 seconds passed
-... 9%, 11680 KB, 3613 KB/s, 3 seconds passed
-... 9%, 11712 KB, 3621 KB/s, 3 seconds passed
-... 9%, 11744 KB, 3611 KB/s, 3 seconds passed
-... 9%, 11776 KB, 3605 KB/s, 3 seconds passed
-... 9%, 11808 KB, 3614 KB/s, 3 seconds passed
-... 9%, 11840 KB, 3622 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 9%, 11872 KB, 3612 KB/s, 3 seconds passed
-... 9%, 11904 KB, 3605 KB/s, 3 seconds passed
-... 9%, 11936 KB, 3615 KB/s, 3 seconds passed
-... 9%, 11968 KB, 3623 KB/s, 3 seconds passed
-... 9%, 12000 KB, 3612 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 9%, 12032 KB, 3607 KB/s, 3 seconds passed
-... 9%, 12064 KB, 3615 KB/s, 3 seconds passed
-... 9%, 12096 KB, 3624 KB/s, 3 seconds passed
-... 9%, 12128 KB, 3613 KB/s, 3 seconds passed
-... 9%, 12160 KB, 3607 KB/s, 3 seconds passed
-... 9%, 12192 KB, 3616 KB/s, 3 seconds passed
-... 9%, 12224 KB, 3624 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 9%, 12256 KB, 3614 KB/s, 3 seconds passed
-... 9%, 12288 KB, 3608 KB/s, 3 seconds passed
-... 9%, 12320 KB, 3617 KB/s, 3 seconds passed
-... 9%, 12352 KB, 3625 KB/s, 3 seconds passed
-... 9%, 12384 KB, 3615 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 9%, 12416 KB, 3609 KB/s, 3 seconds passed
-... 9%, 12448 KB, 3618 KB/s, 3 seconds passed
-... 9%, 12480 KB, 3625 KB/s, 3 seconds passed
-... 9%, 12512 KB, 3615 KB/s, 3 seconds passed
-... 9%, 12544 KB, 3610 KB/s, 3 seconds passed
-... 9%, 12576 KB, 3619 KB/s, 3 seconds passed
-... 10%, 12608 KB, 3626 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 10%, 12640 KB, 3616 KB/s, 3 seconds passed
-... 10%, 12672 KB, 3611 KB/s, 3 seconds passed
-... 10%, 12704 KB, 3619 KB/s, 3 seconds passed
-... 10%, 12736 KB, 3628 KB/s, 3 seconds passed
-... 10%, 12768 KB, 3619 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 10%, 12800 KB, 3613 KB/s, 3 seconds passed
-... 10%, 12832 KB, 3620 KB/s, 3 seconds passed
-... 10%, 12864 KB, 3629 KB/s, 3 seconds passed
-... 10%, 12896 KB, 3618 KB/s, 3 seconds passed
-... 10%, 12928 KB, 3614 KB/s, 3 seconds passed
-... 10%, 12960 KB, 3621 KB/s, 3 seconds passed
-... 10%, 12992 KB, 3629 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 10%, 13024 KB, 3619 KB/s, 3 seconds passed
-... 10%, 13056 KB, 3615 KB/s, 3 seconds passed
-... 10%, 13088 KB, 3622 KB/s, 3 seconds passed
-... 10%, 13120 KB, 3630 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 10%, 13152 KB, 3620 KB/s, 3 seconds passed
-... 10%, 13184 KB, 3616 KB/s, 3 seconds passed
-... 10%, 13216 KB, 3622 KB/s, 3 seconds passed
-... 10%, 13248 KB, 3630 KB/s, 3 seconds passed
-... 10%, 13280 KB, 3613 KB/s, 3 seconds passed
-... 10%, 13312 KB, 3615 KB/s, 3 seconds passed
-... 10%, 13344 KB, 3623 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 10%, 13376 KB, 3630 KB/s, 3 seconds passed
-... 10%, 13408 KB, 3614 KB/s, 3 seconds passed
-... 10%, 13440 KB, 3616 KB/s, 3 seconds passed
-... 10%, 13472 KB, 3624 KB/s, 3 seconds passed
-... 10%, 13504 KB, 3632 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 10%, 13536 KB, 3615 KB/s, 3 seconds passed
-... 10%, 13568 KB, 3617 KB/s, 3 seconds passed
-... 10%, 13600 KB, 3625 KB/s, 3 seconds passed
-... 10%, 13632 KB, 3632 KB/s, 3 seconds passed
-... 10%, 13664 KB, 3616 KB/s, 3 seconds passed
-... 10%, 13696 KB, 3618 KB/s, 3 seconds passed
-... 10%, 13728 KB, 3625 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 10%, 13760 KB, 3633 KB/s, 3 seconds passed
-... 10%, 13792 KB, 3617 KB/s, 3 seconds passed
-... 10%, 13824 KB, 3619 KB/s, 3 seconds passed
-... 11%, 13856 KB, 3626 KB/s, 3 seconds passed
-... 11%, 13888 KB, 3633 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 11%, 13920 KB, 3617 KB/s, 3 seconds passed
-... 11%, 13952 KB, 3620 KB/s, 3 seconds passed
-... 11%, 13984 KB, 3627 KB/s, 3 seconds passed
-... 11%, 14016 KB, 3635 KB/s, 3 seconds passed
-... 11%, 14048 KB, 3618 KB/s, 3 seconds passed
-... 11%, 14080 KB, 3621 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 11%, 14112 KB, 3628 KB/s, 3 seconds passed
-... 11%, 14144 KB, 3635 KB/s, 3 seconds passed
-... 11%, 14176 KB, 3619 KB/s, 3 seconds passed
-... 11%, 14208 KB, 3621 KB/s, 3 seconds passed
-... 11%, 14240 KB, 3628 KB/s, 3 seconds passed
-... 11%, 14272 KB, 3636 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 11%, 14304 KB, 3619 KB/s, 3 seconds passed
-... 11%, 14336 KB, 3622 KB/s, 3 seconds passed
-... 11%, 14368 KB, 3629 KB/s, 3 seconds passed
-... 11%, 14400 KB, 3636 KB/s, 3 seconds passed
-... 11%, 14432 KB, 3620 KB/s, 3 seconds passed
-... 11%, 14464 KB, 3623 KB/s, 3 seconds passed
-
-.. parsed-literal::
-
-    ... 11%, 14496 KB, 3630 KB/s, 3 seconds passed
-... 11%, 14528 KB, 3637 KB/s, 3 seconds passed
-... 11%, 14560 KB, 3629 KB/s, 4 seconds passed
-... 11%, 14592 KB, 3624 KB/s, 4 seconds passed
-... 11%, 14624 KB, 3630 KB/s, 4 seconds passed
-... 11%, 14656 KB, 3637 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 11%, 14688 KB, 3621 KB/s, 4 seconds passed
-... 11%, 14720 KB, 3624 KB/s, 4 seconds passed
-... 11%, 14752 KB, 3630 KB/s, 4 seconds passed
-... 11%, 14784 KB, 3638 KB/s, 4 seconds passed
-... 11%, 14816 KB, 3622 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 11%, 14848 KB, 3624 KB/s, 4 seconds passed
-... 11%, 14880 KB, 3631 KB/s, 4 seconds passed
-... 11%, 14912 KB, 3638 KB/s, 4 seconds passed
-... 11%, 14944 KB, 3623 KB/s, 4 seconds passed
-... 11%, 14976 KB, 3625 KB/s, 4 seconds passed
-... 11%, 15008 KB, 3632 KB/s, 4 seconds passed
-... 11%, 15040 KB, 3639 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 11%, 15072 KB, 3623 KB/s, 4 seconds passed
-... 11%, 15104 KB, 3625 KB/s, 4 seconds passed
-... 12%, 15136 KB, 3633 KB/s, 4 seconds passed
-... 12%, 15168 KB, 3639 KB/s, 4 seconds passed
-... 12%, 15200 KB, 3624 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 12%, 15232 KB, 3626 KB/s, 4 seconds passed
-... 12%, 15264 KB, 3633 KB/s, 4 seconds passed
-... 12%, 15296 KB, 3639 KB/s, 4 seconds passed
-... 12%, 15328 KB, 3624 KB/s, 4 seconds passed
-... 12%, 15360 KB, 3627 KB/s, 4 seconds passed
-... 12%, 15392 KB, 3634 KB/s, 4 seconds passed
-... 12%, 15424 KB, 3641 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 12%, 15456 KB, 3626 KB/s, 4 seconds passed
-... 12%, 15488 KB, 3629 KB/s, 4 seconds passed
-... 12%, 15520 KB, 3634 KB/s, 4 seconds passed
-... 12%, 15552 KB, 3641 KB/s, 4 seconds passed
-... 12%, 15584 KB, 3625 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 12%, 15616 KB, 3628 KB/s, 4 seconds passed
-... 12%, 15648 KB, 3634 KB/s, 4 seconds passed
-... 12%, 15680 KB, 3630 KB/s, 4 seconds passed
-... 12%, 15712 KB, 3626 KB/s, 4 seconds passed
-... 12%, 15744 KB, 3628 KB/s, 4 seconds passed
-... 12%, 15776 KB, 3635 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 12%, 15808 KB, 3631 KB/s, 4 seconds passed
-... 12%, 15840 KB, 3627 KB/s, 4 seconds passed
-... 12%, 15872 KB, 3629 KB/s, 4 seconds passed
-... 12%, 15904 KB, 3636 KB/s, 4 seconds passed
-... 12%, 15936 KB, 3634 KB/s, 4 seconds passed
-... 12%, 15968 KB, 3628 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 12%, 16000 KB, 3630 KB/s, 4 seconds passed
-... 12%, 16032 KB, 3636 KB/s, 4 seconds passed
-... 12%, 16064 KB, 3632 KB/s, 4 seconds passed
-... 12%, 16096 KB, 3628 KB/s, 4 seconds passed
-... 12%, 16128 KB, 3630 KB/s, 4 seconds passed
-... 12%, 16160 KB, 3637 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 12%, 16192 KB, 3632 KB/s, 4 seconds passed
-... 12%, 16224 KB, 3629 KB/s, 4 seconds passed
-... 12%, 16256 KB, 3631 KB/s, 4 seconds passed
-... 12%, 16288 KB, 3637 KB/s, 4 seconds passed
-... 12%, 16320 KB, 3633 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 12%, 16352 KB, 3629 KB/s, 4 seconds passed
-... 13%, 16384 KB, 3631 KB/s, 4 seconds passed
-... 13%, 16416 KB, 3637 KB/s, 4 seconds passed
-... 13%, 16448 KB, 3633 KB/s, 4 seconds passed
-... 13%, 16480 KB, 3630 KB/s, 4 seconds passed
-... 13%, 16512 KB, 3632 KB/s, 4 seconds passed
-... 13%, 16544 KB, 3638 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 13%, 16576 KB, 3633 KB/s, 4 seconds passed
-... 13%, 16608 KB, 3630 KB/s, 4 seconds passed
-... 13%, 16640 KB, 3632 KB/s, 4 seconds passed
-... 13%, 16672 KB, 3638 KB/s, 4 seconds passed
-... 13%, 16704 KB, 3635 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 13%, 16736 KB, 3631 KB/s, 4 seconds passed
-... 13%, 16768 KB, 3633 KB/s, 4 seconds passed
-... 13%, 16800 KB, 3639 KB/s, 4 seconds passed
-... 13%, 16832 KB, 3635 KB/s, 4 seconds passed
-... 13%, 16864 KB, 3631 KB/s, 4 seconds passed
-... 13%, 16896 KB, 3633 KB/s, 4 seconds passed
-... 13%, 16928 KB, 3639 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 13%, 16960 KB, 3636 KB/s, 4 seconds passed
-... 13%, 16992 KB, 3632 KB/s, 4 seconds passed
-... 13%, 17024 KB, 3635 KB/s, 4 seconds passed
-... 13%, 17056 KB, 3640 KB/s, 4 seconds passed
-... 13%, 17088 KB, 3637 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 13%, 17120 KB, 3633 KB/s, 4 seconds passed
-... 13%, 17152 KB, 3634 KB/s, 4 seconds passed
-... 13%, 17184 KB, 3640 KB/s, 4 seconds passed
-... 13%, 17216 KB, 3636 KB/s, 4 seconds passed
-... 13%, 17248 KB, 3632 KB/s, 4 seconds passed
-... 13%, 17280 KB, 3635 KB/s, 4 seconds passed
-... 13%, 17312 KB, 3641 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 13%, 17344 KB, 3629 KB/s, 4 seconds passed
-... 13%, 17376 KB, 3633 KB/s, 4 seconds passed
-... 13%, 17408 KB, 3635 KB/s, 4 seconds passed
-... 13%, 17440 KB, 3641 KB/s, 4 seconds passed
-... 13%, 17472 KB, 3637 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 13%, 17504 KB, 3634 KB/s, 4 seconds passed
-... 13%, 17536 KB, 3635 KB/s, 4 seconds passed
-... 13%, 17568 KB, 3642 KB/s, 4 seconds passed
-... 13%, 17600 KB, 3637 KB/s, 4 seconds passed
-... 13%, 17632 KB, 3634 KB/s, 4 seconds passed
-... 14%, 17664 KB, 3637 KB/s, 4 seconds passed
-... 14%, 17696 KB, 3642 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 14%, 17728 KB, 3638 KB/s, 4 seconds passed
-... 14%, 17760 KB, 3635 KB/s, 4 seconds passed
-... 14%, 17792 KB, 3636 KB/s, 4 seconds passed
-... 14%, 17824 KB, 3642 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 14%, 17856 KB, 3631 KB/s, 4 seconds passed
-... 14%, 17888 KB, 3635 KB/s, 4 seconds passed
-... 14%, 17920 KB, 3637 KB/s, 4 seconds passed
-... 14%, 17952 KB, 3643 KB/s, 4 seconds passed
-... 14%, 17984 KB, 3632 KB/s, 4 seconds passed
-... 14%, 18016 KB, 3635 KB/s, 4 seconds passed
-... 14%, 18048 KB, 3637 KB/s, 4 seconds passed
-... 14%, 18080 KB, 3643 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 14%, 18112 KB, 3632 KB/s, 4 seconds passed
-... 14%, 18144 KB, 3636 KB/s, 4 seconds passed
-... 14%, 18176 KB, 3637 KB/s, 4 seconds passed
-... 14%, 18208 KB, 3643 KB/s, 4 seconds passed
-
-.. parsed-literal::
-
-    ... 14%, 18240 KB, 3633 KB/s, 5 seconds passed
-... 14%, 18272 KB, 3636 KB/s, 5 seconds passed
-... 14%, 18304 KB, 3638 KB/s, 5 seconds passed
-... 14%, 18336 KB, 3644 KB/s, 5 seconds passed
-... 14%, 18368 KB, 3633 KB/s, 5 seconds passed
-... 14%, 18400 KB, 3637 KB/s, 5 seconds passed
-... 14%, 18432 KB, 3638 KB/s, 5 seconds passed
-... 14%, 18464 KB, 3644 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 14%, 18496 KB, 3633 KB/s, 5 seconds passed
-... 14%, 18528 KB, 3637 KB/s, 5 seconds passed
-... 14%, 18560 KB, 3638 KB/s, 5 seconds passed
-... 14%, 18592 KB, 3644 KB/s, 5 seconds passed
-... 14%, 18624 KB, 3642 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 14%, 18656 KB, 3639 KB/s, 5 seconds passed
-... 14%, 18688 KB, 3641 KB/s, 5 seconds passed
-... 14%, 18720 KB, 3645 KB/s, 5 seconds passed
-... 14%, 18752 KB, 3642 KB/s, 5 seconds passed
-... 14%, 18784 KB, 3639 KB/s, 5 seconds passed
-... 14%, 18816 KB, 3640 KB/s, 5 seconds passed
-... 14%, 18848 KB, 3645 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 14%, 18880 KB, 3635 KB/s, 5 seconds passed
-... 15%, 18912 KB, 3639 KB/s, 5 seconds passed
-... 15%, 18944 KB, 3640 KB/s, 5 seconds passed
-... 15%, 18976 KB, 3645 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 15%, 19008 KB, 3635 KB/s, 5 seconds passed
-... 15%, 19040 KB, 3640 KB/s, 5 seconds passed
-... 15%, 19072 KB, 3641 KB/s, 5 seconds passed
-... 15%, 19104 KB, 3646 KB/s, 5 seconds passed
-... 15%, 19136 KB, 3637 KB/s, 5 seconds passed
-... 15%, 19168 KB, 3640 KB/s, 5 seconds passed
-... 15%, 19200 KB, 3640 KB/s, 5 seconds passed
-... 15%, 19232 KB, 3646 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 15%, 19264 KB, 3636 KB/s, 5 seconds passed
-... 15%, 19296 KB, 3640 KB/s, 5 seconds passed
-... 15%, 19328 KB, 3641 KB/s, 5 seconds passed
-... 15%, 19360 KB, 3646 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 15%, 19392 KB, 3637 KB/s, 5 seconds passed
-... 15%, 19424 KB, 3641 KB/s, 5 seconds passed
-... 15%, 19456 KB, 3641 KB/s, 5 seconds passed
-... 15%, 19488 KB, 3646 KB/s, 5 seconds passed
-... 15%, 19520 KB, 3637 KB/s, 5 seconds passed
-... 15%, 19552 KB, 3640 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 15%, 19584 KB, 3641 KB/s, 5 seconds passed
-... 15%, 19616 KB, 3641 KB/s, 5 seconds passed
-... 15%, 19648 KB, 3637 KB/s, 5 seconds passed
-... 15%, 19680 KB, 3640 KB/s, 5 seconds passed
-... 15%, 19712 KB, 3641 KB/s, 5 seconds passed
-... 15%, 19744 KB, 3647 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 15%, 19776 KB, 3638 KB/s, 5 seconds passed
-... 15%, 19808 KB, 3641 KB/s, 5 seconds passed
-... 15%, 19840 KB, 3642 KB/s, 5 seconds passed
-... 15%, 19872 KB, 3647 KB/s, 5 seconds passed
-... 15%, 19904 KB, 3639 KB/s, 5 seconds passed
-... 15%, 19936 KB, 3641 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 15%, 19968 KB, 3642 KB/s, 5 seconds passed
-... 15%, 20000 KB, 3648 KB/s, 5 seconds passed
-... 15%, 20032 KB, 3639 KB/s, 5 seconds passed
-... 15%, 20064 KB, 3642 KB/s, 5 seconds passed
-... 15%, 20096 KB, 3643 KB/s, 5 seconds passed
-... 15%, 20128 KB, 3648 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 16%, 20160 KB, 3640 KB/s, 5 seconds passed
-... 16%, 20192 KB, 3642 KB/s, 5 seconds passed
-... 16%, 20224 KB, 3643 KB/s, 5 seconds passed
-... 16%, 20256 KB, 3649 KB/s, 5 seconds passed
-... 16%, 20288 KB, 3640 KB/s, 5 seconds passed
-... 16%, 20320 KB, 3643 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 16%, 20352 KB, 3644 KB/s, 5 seconds passed
-... 16%, 20384 KB, 3648 KB/s, 5 seconds passed
-... 16%, 20416 KB, 3640 KB/s, 5 seconds passed
-... 16%, 20448 KB, 3643 KB/s, 5 seconds passed
-... 16%, 20480 KB, 3643 KB/s, 5 seconds passed
-... 16%, 20512 KB, 3644 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 16%, 20544 KB, 3641 KB/s, 5 seconds passed
-... 16%, 20576 KB, 3643 KB/s, 5 seconds passed
-... 16%, 20608 KB, 3643 KB/s, 5 seconds passed
-... 16%, 20640 KB, 3645 KB/s, 5 seconds passed
-... 16%, 20672 KB, 3641 KB/s, 5 seconds passed
-... 16%, 20704 KB, 3643 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 16%, 20736 KB, 3644 KB/s, 5 seconds passed
-... 16%, 20768 KB, 3645 KB/s, 5 seconds passed
-... 16%, 20800 KB, 3641 KB/s, 5 seconds passed
-... 16%, 20832 KB, 3643 KB/s, 5 seconds passed
-... 16%, 20864 KB, 3644 KB/s, 5 seconds passed
-... 16%, 20896 KB, 3645 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 16%, 20928 KB, 3641 KB/s, 5 seconds passed
-... 16%, 20960 KB, 3644 KB/s, 5 seconds passed
-... 16%, 20992 KB, 3644 KB/s, 5 seconds passed
-... 16%, 21024 KB, 3645 KB/s, 5 seconds passed
-... 16%, 21056 KB, 3642 KB/s, 5 seconds passed
-... 16%, 21088 KB, 3644 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 16%, 21120 KB, 3644 KB/s, 5 seconds passed
-... 16%, 21152 KB, 3645 KB/s, 5 seconds passed
-... 16%, 21184 KB, 3642 KB/s, 5 seconds passed
-... 16%, 21216 KB, 3645 KB/s, 5 seconds passed
-... 16%, 21248 KB, 3645 KB/s, 5 seconds passed
-... 16%, 21280 KB, 3646 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 16%, 21312 KB, 3642 KB/s, 5 seconds passed
-... 16%, 21344 KB, 3645 KB/s, 5 seconds passed
-... 16%, 21376 KB, 3645 KB/s, 5 seconds passed
-... 16%, 21408 KB, 3646 KB/s, 5 seconds passed
-... 17%, 21440 KB, 3643 KB/s, 5 seconds passed
-... 17%, 21472 KB, 3646 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 17%, 21504 KB, 3645 KB/s, 5 seconds passed
-... 17%, 21536 KB, 3647 KB/s, 5 seconds passed
-... 17%, 21568 KB, 3643 KB/s, 5 seconds passed
-... 17%, 21600 KB, 3646 KB/s, 5 seconds passed
-... 17%, 21632 KB, 3647 KB/s, 5 seconds passed
-... 17%, 21664 KB, 3649 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 17%, 21696 KB, 3644 KB/s, 5 seconds passed
-... 17%, 21728 KB, 3647 KB/s, 5 seconds passed
-... 17%, 21760 KB, 3647 KB/s, 5 seconds passed
-... 17%, 21792 KB, 3649 KB/s, 5 seconds passed
-... 17%, 21824 KB, 3645 KB/s, 5 seconds passed
-... 17%, 21856 KB, 3648 KB/s, 5 seconds passed
-
-.. parsed-literal::
-
-    ... 17%, 21888 KB, 3648 KB/s, 5 seconds passed
-... 17%, 21920 KB, 3641 KB/s, 6 seconds passed
-... 17%, 21952 KB, 3644 KB/s, 6 seconds passed
-... 17%, 21984 KB, 3647 KB/s, 6 seconds passed
-... 17%, 22016 KB, 3647 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 17%, 22048 KB, 3642 KB/s, 6 seconds passed
-... 17%, 22080 KB, 3644 KB/s, 6 seconds passed
-... 17%, 22112 KB, 3647 KB/s, 6 seconds passed
-... 17%, 22144 KB, 3647 KB/s, 6 seconds passed
-... 17%, 22176 KB, 3642 KB/s, 6 seconds passed
-... 17%, 22208 KB, 3645 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 17%, 22240 KB, 3647 KB/s, 6 seconds passed
-... 17%, 22272 KB, 3647 KB/s, 6 seconds passed
-... 17%, 22304 KB, 3643 KB/s, 6 seconds passed
-... 17%, 22336 KB, 3645 KB/s, 6 seconds passed
-... 17%, 22368 KB, 3647 KB/s, 6 seconds passed
-... 17%, 22400 KB, 3648 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 17%, 22432 KB, 3649 KB/s, 6 seconds passed
-... 17%, 22464 KB, 3646 KB/s, 6 seconds passed
-... 17%, 22496 KB, 3648 KB/s, 6 seconds passed
-... 17%, 22528 KB, 3648 KB/s, 6 seconds passed
-... 17%, 22560 KB, 3643 KB/s, 6 seconds passed
-... 17%, 22592 KB, 3646 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 17%, 22624 KB, 3649 KB/s, 6 seconds passed
-... 17%, 22656 KB, 3648 KB/s, 6 seconds passed
-... 18%, 22688 KB, 3650 KB/s, 6 seconds passed
-... 18%, 22720 KB, 3646 KB/s, 6 seconds passed
-... 18%, 22752 KB, 3649 KB/s, 6 seconds passed
-... 18%, 22784 KB, 3649 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 18%, 22816 KB, 3650 KB/s, 6 seconds passed
-... 18%, 22848 KB, 3644 KB/s, 6 seconds passed
-... 18%, 22880 KB, 3648 KB/s, 6 seconds passed
-... 18%, 22912 KB, 3649 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 18%, 22944 KB, 3636 KB/s, 6 seconds passed
-... 18%, 22976 KB, 3641 KB/s, 6 seconds passed
-... 18%, 23008 KB, 3645 KB/s, 6 seconds passed
-... 18%, 23040 KB, 3649 KB/s, 6 seconds passed
-... 18%, 23072 KB, 3636 KB/s, 6 seconds passed
-... 18%, 23104 KB, 3641 KB/s, 6 seconds passed
-... 18%, 23136 KB, 3646 KB/s, 6 seconds passed
-... 18%, 23168 KB, 3650 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 18%, 23200 KB, 3637 KB/s, 6 seconds passed
-... 18%, 23232 KB, 3641 KB/s, 6 seconds passed
-... 18%, 23264 KB, 3646 KB/s, 6 seconds passed
-... 18%, 23296 KB, 3650 KB/s, 6 seconds passed
-... 18%, 23328 KB, 3652 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 18%, 23360 KB, 3642 KB/s, 6 seconds passed
-... 18%, 23392 KB, 3646 KB/s, 6 seconds passed
-... 18%, 23424 KB, 3651 KB/s, 6 seconds passed
-... 18%, 23456 KB, 3652 KB/s, 6 seconds passed
-... 18%, 23488 KB, 3642 KB/s, 6 seconds passed
-... 18%, 23520 KB, 3647 KB/s, 6 seconds passed
-... 18%, 23552 KB, 3651 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 18%, 23584 KB, 3653 KB/s, 6 seconds passed
-... 18%, 23616 KB, 3642 KB/s, 6 seconds passed
-... 18%, 23648 KB, 3647 KB/s, 6 seconds passed
-... 18%, 23680 KB, 3651 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 18%, 23712 KB, 3638 KB/s, 6 seconds passed
-... 18%, 23744 KB, 3643 KB/s, 6 seconds passed
-... 18%, 23776 KB, 3647 KB/s, 6 seconds passed
-... 18%, 23808 KB, 3651 KB/s, 6 seconds passed
-... 18%, 23840 KB, 3638 KB/s, 6 seconds passed
-... 18%, 23872 KB, 3643 KB/s, 6 seconds passed
-... 18%, 23904 KB, 3647 KB/s, 6 seconds passed
-... 19%, 23936 KB, 3651 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 19%, 23968 KB, 3639 KB/s, 6 seconds passed
-... 19%, 24000 KB, 3643 KB/s, 6 seconds passed
-... 19%, 24032 KB, 3648 KB/s, 6 seconds passed
-... 19%, 24064 KB, 3652 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 19%, 24096 KB, 3639 KB/s, 6 seconds passed
-... 19%, 24128 KB, 3644 KB/s, 6 seconds passed
-... 19%, 24160 KB, 3648 KB/s, 6 seconds passed
-... 19%, 24192 KB, 3652 KB/s, 6 seconds passed
-... 19%, 24224 KB, 3639 KB/s, 6 seconds passed
-... 19%, 24256 KB, 3644 KB/s, 6 seconds passed
-... 19%, 24288 KB, 3648 KB/s, 6 seconds passed
-... 19%, 24320 KB, 3652 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 19%, 24352 KB, 3639 KB/s, 6 seconds passed
-... 19%, 24384 KB, 3644 KB/s, 6 seconds passed
-... 19%, 24416 KB, 3648 KB/s, 6 seconds passed
-... 19%, 24448 KB, 3652 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 19%, 24480 KB, 3639 KB/s, 6 seconds passed
-... 19%, 24512 KB, 3644 KB/s, 6 seconds passed
-... 19%, 24544 KB, 3648 KB/s, 6 seconds passed
-... 19%, 24576 KB, 3652 KB/s, 6 seconds passed
-... 19%, 24608 KB, 3640 KB/s, 6 seconds passed
-... 19%, 24640 KB, 3644 KB/s, 6 seconds passed
-... 19%, 24672 KB, 3649 KB/s, 6 seconds passed
-... 19%, 24704 KB, 3653 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 19%, 24736 KB, 3642 KB/s, 6 seconds passed
-... 19%, 24768 KB, 3644 KB/s, 6 seconds passed
-... 19%, 24800 KB, 3649 KB/s, 6 seconds passed
-... 19%, 24832 KB, 3653 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 19%, 24864 KB, 3642 KB/s, 6 seconds passed
-... 19%, 24896 KB, 3645 KB/s, 6 seconds passed
-... 19%, 24928 KB, 3649 KB/s, 6 seconds passed
-... 19%, 24960 KB, 3654 KB/s, 6 seconds passed
-... 19%, 24992 KB, 3642 KB/s, 6 seconds passed
-... 19%, 25024 KB, 3645 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 19%, 25056 KB, 3649 KB/s, 6 seconds passed
-... 19%, 25088 KB, 3654 KB/s, 6 seconds passed
-... 19%, 25120 KB, 3641 KB/s, 6 seconds passed
-... 19%, 25152 KB, 3645 KB/s, 6 seconds passed
-... 19%, 25184 KB, 3649 KB/s, 6 seconds passed
-... 20%, 25216 KB, 3654 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 20%, 25248 KB, 3641 KB/s, 6 seconds passed
-... 20%, 25280 KB, 3645 KB/s, 6 seconds passed
-... 20%, 25312 KB, 3650 KB/s, 6 seconds passed
-... 20%, 25344 KB, 3654 KB/s, 6 seconds passed
-... 20%, 25376 KB, 3642 KB/s, 6 seconds passed
-
-.. parsed-literal::
-
-    ... 20%, 25408 KB, 3646 KB/s, 6 seconds passed
-... 20%, 25440 KB, 3650 KB/s, 6 seconds passed
-... 20%, 25472 KB, 3654 KB/s, 6 seconds passed
-... 20%, 25504 KB, 3642 KB/s, 7 seconds passed
-... 20%, 25536 KB, 3646 KB/s, 7 seconds passed
-... 20%, 25568 KB, 3650 KB/s, 7 seconds passed
-... 20%, 25600 KB, 3654 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 20%, 25632 KB, 3642 KB/s, 7 seconds passed
-... 20%, 25664 KB, 3646 KB/s, 7 seconds passed
-... 20%, 25696 KB, 3650 KB/s, 7 seconds passed
-... 20%, 25728 KB, 3655 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 20%, 25760 KB, 3642 KB/s, 7 seconds passed
-... 20%, 25792 KB, 3646 KB/s, 7 seconds passed
-... 20%, 25824 KB, 3651 KB/s, 7 seconds passed
-... 20%, 25856 KB, 3655 KB/s, 7 seconds passed
-... 20%, 25888 KB, 3644 KB/s, 7 seconds passed
-... 20%, 25920 KB, 3647 KB/s, 7 seconds passed
-... 20%, 25952 KB, 3651 KB/s, 7 seconds passed
-... 20%, 25984 KB, 3655 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 20%, 26016 KB, 3643 KB/s, 7 seconds passed
-... 20%, 26048 KB, 3647 KB/s, 7 seconds passed
-... 20%, 26080 KB, 3651 KB/s, 7 seconds passed
-... 20%, 26112 KB, 3655 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 20%, 26144 KB, 3643 KB/s, 7 seconds passed
-... 20%, 26176 KB, 3647 KB/s, 7 seconds passed
-... 20%, 26208 KB, 3651 KB/s, 7 seconds passed
-... 20%, 26240 KB, 3655 KB/s, 7 seconds passed
-... 20%, 26272 KB, 3644 KB/s, 7 seconds passed
-... 20%, 26304 KB, 3647 KB/s, 7 seconds passed
-... 20%, 26336 KB, 3652 KB/s, 7 seconds passed
-... 20%, 26368 KB, 3656 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 20%, 26400 KB, 3644 KB/s, 7 seconds passed
-... 20%, 26432 KB, 3648 KB/s, 7 seconds passed
-... 21%, 26464 KB, 3652 KB/s, 7 seconds passed
-... 21%, 26496 KB, 3656 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 21%, 26528 KB, 3644 KB/s, 7 seconds passed
-... 21%, 26560 KB, 3648 KB/s, 7 seconds passed
-... 21%, 26592 KB, 3652 KB/s, 7 seconds passed
-... 21%, 26624 KB, 3656 KB/s, 7 seconds passed
-... 21%, 26656 KB, 3645 KB/s, 7 seconds passed
-... 21%, 26688 KB, 3648 KB/s, 7 seconds passed
-... 21%, 26720 KB, 3652 KB/s, 7 seconds passed
-... 21%, 26752 KB, 3656 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 21%, 26784 KB, 3645 KB/s, 7 seconds passed
-... 21%, 26816 KB, 3648 KB/s, 7 seconds passed
-... 21%, 26848 KB, 3653 KB/s, 7 seconds passed
-... 21%, 26880 KB, 3657 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 21%, 26912 KB, 3645 KB/s, 7 seconds passed
-... 21%, 26944 KB, 3649 KB/s, 7 seconds passed
-... 21%, 26976 KB, 3653 KB/s, 7 seconds passed
-... 21%, 27008 KB, 3657 KB/s, 7 seconds passed
-... 21%, 27040 KB, 3645 KB/s, 7 seconds passed
-... 21%, 27072 KB, 3649 KB/s, 7 seconds passed
-... 21%, 27104 KB, 3653 KB/s, 7 seconds passed
-... 21%, 27136 KB, 3657 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 21%, 27168 KB, 3645 KB/s, 7 seconds passed
-... 21%, 27200 KB, 3649 KB/s, 7 seconds passed
-... 21%, 27232 KB, 3653 KB/s, 7 seconds passed
-... 21%, 27264 KB, 3657 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 21%, 27296 KB, 3645 KB/s, 7 seconds passed
-... 21%, 27328 KB, 3649 KB/s, 7 seconds passed
-... 21%, 27360 KB, 3653 KB/s, 7 seconds passed
-... 21%, 27392 KB, 3658 KB/s, 7 seconds passed
-... 21%, 27424 KB, 3647 KB/s, 7 seconds passed
-... 21%, 27456 KB, 3650 KB/s, 7 seconds passed
-... 21%, 27488 KB, 3654 KB/s, 7 seconds passed
-... 21%, 27520 KB, 3658 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 21%, 27552 KB, 3647 KB/s, 7 seconds passed
-... 21%, 27584 KB, 3650 KB/s, 7 seconds passed
-... 21%, 27616 KB, 3654 KB/s, 7 seconds passed
-... 21%, 27648 KB, 3645 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 21%, 27680 KB, 3646 KB/s, 7 seconds passed
-... 22%, 27712 KB, 3650 KB/s, 7 seconds passed
-... 22%, 27744 KB, 3654 KB/s, 7 seconds passed
-... 22%, 27776 KB, 3645 KB/s, 7 seconds passed
-... 22%, 27808 KB, 3646 KB/s, 7 seconds passed
-... 22%, 27840 KB, 3650 KB/s, 7 seconds passed
-... 22%, 27872 KB, 3654 KB/s, 7 seconds passed
-... 22%, 27904 KB, 3658 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 22%, 27936 KB, 3647 KB/s, 7 seconds passed
-... 22%, 27968 KB, 3651 KB/s, 7 seconds passed
-... 22%, 28000 KB, 3654 KB/s, 7 seconds passed
-... 22%, 28032 KB, 3658 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 22%, 28064 KB, 3647 KB/s, 7 seconds passed
-... 22%, 28096 KB, 3651 KB/s, 7 seconds passed
-... 22%, 28128 KB, 3655 KB/s, 7 seconds passed
-... 22%, 28160 KB, 3646 KB/s, 7 seconds passed
-... 22%, 28192 KB, 3647 KB/s, 7 seconds passed
-... 22%, 28224 KB, 3651 KB/s, 7 seconds passed
-... 22%, 28256 KB, 3655 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 22%, 28288 KB, 3647 KB/s, 7 seconds passed
-... 22%, 28320 KB, 3648 KB/s, 7 seconds passed
-... 22%, 28352 KB, 3651 KB/s, 7 seconds passed
-... 22%, 28384 KB, 3655 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 22%, 28416 KB, 3647 KB/s, 7 seconds passed
-... 22%, 28448 KB, 3648 KB/s, 7 seconds passed
-... 22%, 28480 KB, 3652 KB/s, 7 seconds passed
-... 22%, 28512 KB, 3655 KB/s, 7 seconds passed
-... 22%, 28544 KB, 3647 KB/s, 7 seconds passed
-... 22%, 28576 KB, 3648 KB/s, 7 seconds passed
-... 22%, 28608 KB, 3652 KB/s, 7 seconds passed
-... 22%, 28640 KB, 3656 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 22%, 28672 KB, 3648 KB/s, 7 seconds passed
-... 22%, 28704 KB, 3648 KB/s, 7 seconds passed
-... 22%, 28736 KB, 3652 KB/s, 7 seconds passed
-... 22%, 28768 KB, 3656 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 22%, 28800 KB, 3648 KB/s, 7 seconds passed
-... 22%, 28832 KB, 3649 KB/s, 7 seconds passed
-... 22%, 28864 KB, 3652 KB/s, 7 seconds passed
-... 22%, 28896 KB, 3656 KB/s, 7 seconds passed
-... 22%, 28928 KB, 3648 KB/s, 7 seconds passed
-... 22%, 28960 KB, 3649 KB/s, 7 seconds passed
-... 23%, 28992 KB, 3652 KB/s, 7 seconds passed
-... 23%, 29024 KB, 3656 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 23%, 29056 KB, 3648 KB/s, 7 seconds passed
-... 23%, 29088 KB, 3649 KB/s, 7 seconds passed
-... 23%, 29120 KB, 3653 KB/s, 7 seconds passed
-... 23%, 29152 KB, 3656 KB/s, 7 seconds passed
-
-.. parsed-literal::
-
-    ... 23%, 29184 KB, 3647 KB/s, 8 seconds passed
-... 23%, 29216 KB, 3649 KB/s, 8 seconds passed
-... 23%, 29248 KB, 3653 KB/s, 8 seconds passed
-... 23%, 29280 KB, 3657 KB/s, 8 seconds passed
-... 23%, 29312 KB, 3648 KB/s, 8 seconds passed
-... 23%, 29344 KB, 3649 KB/s, 8 seconds passed
-... 23%, 29376 KB, 3653 KB/s, 8 seconds passed
-... 23%, 29408 KB, 3657 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 23%, 29440 KB, 3648 KB/s, 8 seconds passed
-... 23%, 29472 KB, 3649 KB/s, 8 seconds passed
-... 23%, 29504 KB, 3653 KB/s, 8 seconds passed
-... 23%, 29536 KB, 3657 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 23%, 29568 KB, 3648 KB/s, 8 seconds passed
-... 23%, 29600 KB, 3650 KB/s, 8 seconds passed
-... 23%, 29632 KB, 3653 KB/s, 8 seconds passed
-... 23%, 29664 KB, 3657 KB/s, 8 seconds passed
-... 23%, 29696 KB, 3648 KB/s, 8 seconds passed
-... 23%, 29728 KB, 3650 KB/s, 8 seconds passed
-... 23%, 29760 KB, 3654 KB/s, 8 seconds passed
-... 23%, 29792 KB, 3657 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 23%, 29824 KB, 3648 KB/s, 8 seconds passed
-... 23%, 29856 KB, 3650 KB/s, 8 seconds passed
-... 23%, 29888 KB, 3654 KB/s, 8 seconds passed
-... 23%, 29920 KB, 3657 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 23%, 29952 KB, 3649 KB/s, 8 seconds passed
-... 23%, 29984 KB, 3650 KB/s, 8 seconds passed
-... 23%, 30016 KB, 3654 KB/s, 8 seconds passed
-... 23%, 30048 KB, 3658 KB/s, 8 seconds passed
-... 23%, 30080 KB, 3649 KB/s, 8 seconds passed
-... 23%, 30112 KB, 3651 KB/s, 8 seconds passed
-... 23%, 30144 KB, 3654 KB/s, 8 seconds passed
-... 23%, 30176 KB, 3658 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 23%, 30208 KB, 3648 KB/s, 8 seconds passed
-... 24%, 30240 KB, 3651 KB/s, 8 seconds passed
-... 24%, 30272 KB, 3654 KB/s, 8 seconds passed
-... 24%, 30304 KB, 3658 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 24%, 30336 KB, 3649 KB/s, 8 seconds passed
-... 24%, 30368 KB, 3651 KB/s, 8 seconds passed
-... 24%, 30400 KB, 3654 KB/s, 8 seconds passed
-... 24%, 30432 KB, 3658 KB/s, 8 seconds passed
-... 24%, 30464 KB, 3649 KB/s, 8 seconds passed
-... 24%, 30496 KB, 3651 KB/s, 8 seconds passed
-... 24%, 30528 KB, 3655 KB/s, 8 seconds passed
-... 24%, 30560 KB, 3658 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 24%, 30592 KB, 3649 KB/s, 8 seconds passed
-... 24%, 30624 KB, 3651 KB/s, 8 seconds passed
-... 24%, 30656 KB, 3655 KB/s, 8 seconds passed
-... 24%, 30688 KB, 3658 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 24%, 30720 KB, 3650 KB/s, 8 seconds passed
-... 24%, 30752 KB, 3652 KB/s, 8 seconds passed
-... 24%, 30784 KB, 3655 KB/s, 8 seconds passed
-... 24%, 30816 KB, 3658 KB/s, 8 seconds passed
-... 24%, 30848 KB, 3651 KB/s, 8 seconds passed
-... 24%, 30880 KB, 3653 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 24%, 30912 KB, 3655 KB/s, 8 seconds passed
-... 24%, 30944 KB, 3659 KB/s, 8 seconds passed
-... 24%, 30976 KB, 3651 KB/s, 8 seconds passed
-... 24%, 31008 KB, 3653 KB/s, 8 seconds passed
-... 24%, 31040 KB, 3655 KB/s, 8 seconds passed
-... 24%, 31072 KB, 3659 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 24%, 31104 KB, 3651 KB/s, 8 seconds passed
-... 24%, 31136 KB, 3653 KB/s, 8 seconds passed
-... 24%, 31168 KB, 3655 KB/s, 8 seconds passed
-... 24%, 31200 KB, 3659 KB/s, 8 seconds passed
-... 24%, 31232 KB, 3650 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 24%, 31264 KB, 3652 KB/s, 8 seconds passed
-... 24%, 31296 KB, 3655 KB/s, 8 seconds passed
-... 24%, 31328 KB, 3659 KB/s, 8 seconds passed
-... 24%, 31360 KB, 3650 KB/s, 8 seconds passed
-... 24%, 31392 KB, 3653 KB/s, 8 seconds passed
-... 24%, 31424 KB, 3656 KB/s, 8 seconds passed
-... 24%, 31456 KB, 3659 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 24%, 31488 KB, 3651 KB/s, 8 seconds passed
-... 25%, 31520 KB, 3653 KB/s, 8 seconds passed
-... 25%, 31552 KB, 3656 KB/s, 8 seconds passed
-... 25%, 31584 KB, 3659 KB/s, 8 seconds passed
-... 25%, 31616 KB, 3651 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 25%, 31648 KB, 3653 KB/s, 8 seconds passed
-... 25%, 31680 KB, 3656 KB/s, 8 seconds passed
-... 25%, 31712 KB, 3659 KB/s, 8 seconds passed
-... 25%, 31744 KB, 3651 KB/s, 8 seconds passed
-... 25%, 31776 KB, 3654 KB/s, 8 seconds passed
-... 25%, 31808 KB, 3656 KB/s, 8 seconds passed
-... 25%, 31840 KB, 3660 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 25%, 31872 KB, 3651 KB/s, 8 seconds passed
-... 25%, 31904 KB, 3653 KB/s, 8 seconds passed
-... 25%, 31936 KB, 3656 KB/s, 8 seconds passed
-... 25%, 31968 KB, 3660 KB/s, 8 seconds passed
-... 25%, 32000 KB, 3652 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 25%, 32032 KB, 3654 KB/s, 8 seconds passed
-... 25%, 32064 KB, 3657 KB/s, 8 seconds passed
-... 25%, 32096 KB, 3660 KB/s, 8 seconds passed
-... 25%, 32128 KB, 3652 KB/s, 8 seconds passed
-... 25%, 32160 KB, 3654 KB/s, 8 seconds passed
-... 25%, 32192 KB, 3657 KB/s, 8 seconds passed
-... 25%, 32224 KB, 3660 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 25%, 32256 KB, 3652 KB/s, 8 seconds passed
-... 25%, 32288 KB, 3655 KB/s, 8 seconds passed
-... 25%, 32320 KB, 3657 KB/s, 8 seconds passed
-... 25%, 32352 KB, 3660 KB/s, 8 seconds passed
-... 25%, 32384 KB, 3652 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 25%, 32416 KB, 3655 KB/s, 8 seconds passed
-... 25%, 32448 KB, 3657 KB/s, 8 seconds passed
-... 25%, 32480 KB, 3652 KB/s, 8 seconds passed
-... 25%, 32512 KB, 3652 KB/s, 8 seconds passed
-... 25%, 32544 KB, 3655 KB/s, 8 seconds passed
-... 25%, 32576 KB, 3657 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 25%, 32608 KB, 3653 KB/s, 8 seconds passed
-... 25%, 32640 KB, 3652 KB/s, 8 seconds passed
-... 25%, 32672 KB, 3655 KB/s, 8 seconds passed
-... 25%, 32704 KB, 3658 KB/s, 8 seconds passed
-... 25%, 32736 KB, 3653 KB/s, 8 seconds passed
-
-.. parsed-literal::
-
-    ... 26%, 32768 KB, 3652 KB/s, 8 seconds passed
-... 26%, 32800 KB, 3655 KB/s, 8 seconds passed
-... 26%, 32832 KB, 3658 KB/s, 8 seconds passed
-... 26%, 32864 KB, 3653 KB/s, 8 seconds passed
-... 26%, 32896 KB, 3653 KB/s, 9 seconds passed
-... 26%, 32928 KB, 3655 KB/s, 9 seconds passed
-... 26%, 32960 KB, 3658 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 26%, 32992 KB, 3653 KB/s, 9 seconds passed
-... 26%, 33024 KB, 3653 KB/s, 9 seconds passed
-... 26%, 33056 KB, 3655 KB/s, 9 seconds passed
-... 26%, 33088 KB, 3658 KB/s, 9 seconds passed
-... 26%, 33120 KB, 3653 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 26%, 33152 KB, 3653 KB/s, 9 seconds passed
-... 26%, 33184 KB, 3655 KB/s, 9 seconds passed
-... 26%, 33216 KB, 3658 KB/s, 9 seconds passed
-... 26%, 33248 KB, 3653 KB/s, 9 seconds passed
-... 26%, 33280 KB, 3653 KB/s, 9 seconds passed
-... 26%, 33312 KB, 3655 KB/s, 9 seconds passed
-... 26%, 33344 KB, 3658 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 26%, 33376 KB, 3653 KB/s, 9 seconds passed
-... 26%, 33408 KB, 3653 KB/s, 9 seconds passed
-... 26%, 33440 KB, 3656 KB/s, 9 seconds passed
-... 26%, 33472 KB, 3659 KB/s, 9 seconds passed
-... 26%, 33504 KB, 3654 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 26%, 33536 KB, 3654 KB/s, 9 seconds passed
-... 26%, 33568 KB, 3656 KB/s, 9 seconds passed
-... 26%, 33600 KB, 3659 KB/s, 9 seconds passed
-... 26%, 33632 KB, 3654 KB/s, 9 seconds passed
-... 26%, 33664 KB, 3654 KB/s, 9 seconds passed
-... 26%, 33696 KB, 3656 KB/s, 9 seconds passed
-... 26%, 33728 KB, 3659 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 26%, 33760 KB, 3655 KB/s, 9 seconds passed
-... 26%, 33792 KB, 3654 KB/s, 9 seconds passed
-... 26%, 33824 KB, 3657 KB/s, 9 seconds passed
-... 26%, 33856 KB, 3659 KB/s, 9 seconds passed
-... 26%, 33888 KB, 3654 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 26%, 33920 KB, 3655 KB/s, 9 seconds passed
-... 26%, 33952 KB, 3657 KB/s, 9 seconds passed
-... 26%, 33984 KB, 3660 KB/s, 9 seconds passed
-... 27%, 34016 KB, 3663 KB/s, 9 seconds passed
-... 27%, 34048 KB, 3655 KB/s, 9 seconds passed
-... 27%, 34080 KB, 3658 KB/s, 9 seconds passed
-... 27%, 34112 KB, 3660 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 27%, 34144 KB, 3656 KB/s, 9 seconds passed
-... 27%, 34176 KB, 3655 KB/s, 9 seconds passed
-... 27%, 34208 KB, 3657 KB/s, 9 seconds passed
-... 27%, 34240 KB, 3660 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 27%, 34272 KB, 3654 KB/s, 9 seconds passed
-... 27%, 34304 KB, 3655 KB/s, 9 seconds passed
-... 27%, 34336 KB, 3657 KB/s, 9 seconds passed
-... 27%, 34368 KB, 3660 KB/s, 9 seconds passed
-... 27%, 34400 KB, 3654 KB/s, 9 seconds passed
-... 27%, 34432 KB, 3655 KB/s, 9 seconds passed
-... 27%, 34464 KB, 3657 KB/s, 9 seconds passed
-... 27%, 34496 KB, 3660 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 27%, 34528 KB, 3655 KB/s, 9 seconds passed
-... 27%, 34560 KB, 3655 KB/s, 9 seconds passed
-... 27%, 34592 KB, 3658 KB/s, 9 seconds passed
-... 27%, 34624 KB, 3660 KB/s, 9 seconds passed
-... 27%, 34656 KB, 3655 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 27%, 34688 KB, 3656 KB/s, 9 seconds passed
-... 27%, 34720 KB, 3658 KB/s, 9 seconds passed
-... 27%, 34752 KB, 3661 KB/s, 9 seconds passed
-... 27%, 34784 KB, 3655 KB/s, 9 seconds passed
-... 27%, 34816 KB, 3656 KB/s, 9 seconds passed
-... 27%, 34848 KB, 3658 KB/s, 9 seconds passed
-... 27%, 34880 KB, 3661 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 27%, 34912 KB, 3656 KB/s, 9 seconds passed
-... 27%, 34944 KB, 3656 KB/s, 9 seconds passed
-... 27%, 34976 KB, 3658 KB/s, 9 seconds passed
-... 27%, 35008 KB, 3661 KB/s, 9 seconds passed
-... 27%, 35040 KB, 3656 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 27%, 35072 KB, 3656 KB/s, 9 seconds passed
-... 27%, 35104 KB, 3658 KB/s, 9 seconds passed
-... 27%, 35136 KB, 3661 KB/s, 9 seconds passed
-... 27%, 35168 KB, 3656 KB/s, 9 seconds passed
-... 27%, 35200 KB, 3656 KB/s, 9 seconds passed
-... 27%, 35232 KB, 3658 KB/s, 9 seconds passed
-... 27%, 35264 KB, 3661 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 28%, 35296 KB, 3656 KB/s, 9 seconds passed
-... 28%, 35328 KB, 3657 KB/s, 9 seconds passed
-... 28%, 35360 KB, 3659 KB/s, 9 seconds passed
-... 28%, 35392 KB, 3662 KB/s, 9 seconds passed
-... 28%, 35424 KB, 3656 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 28%, 35456 KB, 3657 KB/s, 9 seconds passed
-... 28%, 35488 KB, 3659 KB/s, 9 seconds passed
-... 28%, 35520 KB, 3662 KB/s, 9 seconds passed
-... 28%, 35552 KB, 3656 KB/s, 9 seconds passed
-... 28%, 35584 KB, 3657 KB/s, 9 seconds passed
-... 28%, 35616 KB, 3659 KB/s, 9 seconds passed
-... 28%, 35648 KB, 3662 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 28%, 35680 KB, 3656 KB/s, 9 seconds passed
-... 28%, 35712 KB, 3657 KB/s, 9 seconds passed
-... 28%, 35744 KB, 3659 KB/s, 9 seconds passed
-... 28%, 35776 KB, 3662 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 28%, 35808 KB, 3656 KB/s, 9 seconds passed
-... 28%, 35840 KB, 3657 KB/s, 9 seconds passed
-... 28%, 35872 KB, 3659 KB/s, 9 seconds passed
-... 28%, 35904 KB, 3662 KB/s, 9 seconds passed
-... 28%, 35936 KB, 3656 KB/s, 9 seconds passed
-... 28%, 35968 KB, 3657 KB/s, 9 seconds passed
-... 28%, 36000 KB, 3659 KB/s, 9 seconds passed
-... 28%, 36032 KB, 3662 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 28%, 36064 KB, 3656 KB/s, 9 seconds passed
-... 28%, 36096 KB, 3657 KB/s, 9 seconds passed
-... 28%, 36128 KB, 3659 KB/s, 9 seconds passed
-... 28%, 36160 KB, 3662 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 28%, 36192 KB, 3656 KB/s, 9 seconds passed
-... 28%, 36224 KB, 3657 KB/s, 9 seconds passed
-... 28%, 36256 KB, 3659 KB/s, 9 seconds passed
-... 28%, 36288 KB, 3662 KB/s, 9 seconds passed
-... 28%, 36320 KB, 3656 KB/s, 9 seconds passed
-... 28%, 36352 KB, 3658 KB/s, 9 seconds passed
-... 28%, 36384 KB, 3659 KB/s, 9 seconds passed
-... 28%, 36416 KB, 3662 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 28%, 36448 KB, 3657 KB/s, 9 seconds passed
-... 28%, 36480 KB, 3657 KB/s, 9 seconds passed
-... 28%, 36512 KB, 3659 KB/s, 9 seconds passed
-... 29%, 36544 KB, 3662 KB/s, 9 seconds passed
-
-.. parsed-literal::
-
-    ... 29%, 36576 KB, 3656 KB/s, 10 seconds passed
-... 29%, 36608 KB, 3658 KB/s, 10 seconds passed
-... 29%, 36640 KB, 3659 KB/s, 10 seconds passed
-... 29%, 36672 KB, 3662 KB/s, 10 seconds passed
-... 29%, 36704 KB, 3656 KB/s, 10 seconds passed
-... 29%, 36736 KB, 3658 KB/s, 10 seconds passed
-... 29%, 36768 KB, 3660 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 29%, 36800 KB, 3663 KB/s, 10 seconds passed
-... 29%, 36832 KB, 3656 KB/s, 10 seconds passed
-... 29%, 36864 KB, 3658 KB/s, 10 seconds passed
-... 29%, 36896 KB, 3660 KB/s, 10 seconds passed
-... 29%, 36928 KB, 3663 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 29%, 36960 KB, 3657 KB/s, 10 seconds passed
-... 29%, 36992 KB, 3658 KB/s, 10 seconds passed
-... 29%, 37024 KB, 3660 KB/s, 10 seconds passed
-... 29%, 37056 KB, 3663 KB/s, 10 seconds passed
-... 29%, 37088 KB, 3657 KB/s, 10 seconds passed
-... 29%, 37120 KB, 3658 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 29%, 37152 KB, 3660 KB/s, 10 seconds passed
-... 29%, 37184 KB, 3663 KB/s, 10 seconds passed
-... 29%, 37216 KB, 3657 KB/s, 10 seconds passed
-... 29%, 37248 KB, 3658 KB/s, 10 seconds passed
-... 29%, 37280 KB, 3660 KB/s, 10 seconds passed
-... 29%, 37312 KB, 3663 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 29%, 37344 KB, 3657 KB/s, 10 seconds passed
-... 29%, 37376 KB, 3659 KB/s, 10 seconds passed
-... 29%, 37408 KB, 3661 KB/s, 10 seconds passed
-... 29%, 37440 KB, 3663 KB/s, 10 seconds passed
-... 29%, 37472 KB, 3658 KB/s, 10 seconds passed
-... 29%, 37504 KB, 3659 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 29%, 37536 KB, 3661 KB/s, 10 seconds passed
-... 29%, 37568 KB, 3664 KB/s, 10 seconds passed
-... 29%, 37600 KB, 3658 KB/s, 10 seconds passed
-... 29%, 37632 KB, 3659 KB/s, 10 seconds passed
-... 29%, 37664 KB, 3661 KB/s, 10 seconds passed
-... 29%, 37696 KB, 3664 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 29%, 37728 KB, 3658 KB/s, 10 seconds passed
-... 29%, 37760 KB, 3659 KB/s, 10 seconds passed
-... 30%, 37792 KB, 3661 KB/s, 10 seconds passed
-... 30%, 37824 KB, 3664 KB/s, 10 seconds passed
-... 30%, 37856 KB, 3658 KB/s, 10 seconds passed
-... 30%, 37888 KB, 3660 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 30%, 37920 KB, 3661 KB/s, 10 seconds passed
-... 30%, 37952 KB, 3664 KB/s, 10 seconds passed
-... 30%, 37984 KB, 3658 KB/s, 10 seconds passed
-... 30%, 38016 KB, 3660 KB/s, 10 seconds passed
-... 30%, 38048 KB, 3661 KB/s, 10 seconds passed
-... 30%, 38080 KB, 3664 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 30%, 38112 KB, 3658 KB/s, 10 seconds passed
-... 30%, 38144 KB, 3660 KB/s, 10 seconds passed
-... 30%, 38176 KB, 3661 KB/s, 10 seconds passed
-... 30%, 38208 KB, 3658 KB/s, 10 seconds passed
-... 30%, 38240 KB, 3658 KB/s, 10 seconds passed
-... 30%, 38272 KB, 3660 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 30%, 38304 KB, 3661 KB/s, 10 seconds passed
-... 30%, 38336 KB, 3664 KB/s, 10 seconds passed
-... 30%, 38368 KB, 3659 KB/s, 10 seconds passed
-... 30%, 38400 KB, 3660 KB/s, 10 seconds passed
-... 30%, 38432 KB, 3662 KB/s, 10 seconds passed
-... 30%, 38464 KB, 3664 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 30%, 38496 KB, 3659 KB/s, 10 seconds passed
-... 30%, 38528 KB, 3660 KB/s, 10 seconds passed
-... 30%, 38560 KB, 3662 KB/s, 10 seconds passed
-... 30%, 38592 KB, 3664 KB/s, 10 seconds passed
-... 30%, 38624 KB, 3659 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 30%, 38656 KB, 3660 KB/s, 10 seconds passed
-... 30%, 38688 KB, 3662 KB/s, 10 seconds passed
-... 30%, 38720 KB, 3665 KB/s, 10 seconds passed
-... 30%, 38752 KB, 3659 KB/s, 10 seconds passed
-... 30%, 38784 KB, 3660 KB/s, 10 seconds passed
-... 30%, 38816 KB, 3662 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 30%, 38848 KB, 3660 KB/s, 10 seconds passed
-... 30%, 38880 KB, 3659 KB/s, 10 seconds passed
-... 30%, 38912 KB, 3660 KB/s, 10 seconds passed
-... 30%, 38944 KB, 3662 KB/s, 10 seconds passed
-... 30%, 38976 KB, 3660 KB/s, 10 seconds passed
-... 30%, 39008 KB, 3659 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 30%, 39040 KB, 3661 KB/s, 10 seconds passed
-... 31%, 39072 KB, 3662 KB/s, 10 seconds passed
-... 31%, 39104 KB, 3659 KB/s, 10 seconds passed
-... 31%, 39136 KB, 3659 KB/s, 10 seconds passed
-... 31%, 39168 KB, 3660 KB/s, 10 seconds passed
-... 31%, 39200 KB, 3662 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 31%, 39232 KB, 3659 KB/s, 10 seconds passed
-... 31%, 39264 KB, 3659 KB/s, 10 seconds passed
-... 31%, 39296 KB, 3661 KB/s, 10 seconds passed
-... 31%, 39328 KB, 3662 KB/s, 10 seconds passed
-... 31%, 39360 KB, 3660 KB/s, 10 seconds passed
-... 31%, 39392 KB, 3660 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 31%, 39424 KB, 3661 KB/s, 10 seconds passed
-... 31%, 39456 KB, 3662 KB/s, 10 seconds passed
-... 31%, 39488 KB, 3660 KB/s, 10 seconds passed
-... 31%, 39520 KB, 3660 KB/s, 10 seconds passed
-... 31%, 39552 KB, 3661 KB/s, 10 seconds passed
-... 31%, 39584 KB, 3662 KB/s, 10 seconds passed
-... 31%, 39616 KB, 3665 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 31%, 39648 KB, 3660 KB/s, 10 seconds passed
-... 31%, 39680 KB, 3661 KB/s, 10 seconds passed
-... 31%, 39712 KB, 3663 KB/s, 10 seconds passed
-... 31%, 39744 KB, 3661 KB/s, 10 seconds passed
-... 31%, 39776 KB, 3660 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 31%, 39808 KB, 3661 KB/s, 10 seconds passed
-... 31%, 39840 KB, 3663 KB/s, 10 seconds passed
-... 31%, 39872 KB, 3660 KB/s, 10 seconds passed
-... 31%, 39904 KB, 3660 KB/s, 10 seconds passed
-... 31%, 39936 KB, 3661 KB/s, 10 seconds passed
-... 31%, 39968 KB, 3663 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 31%, 40000 KB, 3660 KB/s, 10 seconds passed
-... 31%, 40032 KB, 3660 KB/s, 10 seconds passed
-... 31%, 40064 KB, 3661 KB/s, 10 seconds passed
-... 31%, 40096 KB, 3663 KB/s, 10 seconds passed
-... 31%, 40128 KB, 3660 KB/s, 10 seconds passed
-
-.. parsed-literal::
-
-    ... 31%, 40160 KB, 3660 KB/s, 10 seconds passed
-... 31%, 40192 KB, 3661 KB/s, 10 seconds passed
-... 31%, 40224 KB, 3663 KB/s, 10 seconds passed
-... 31%, 40256 KB, 3660 KB/s, 10 seconds passed
-... 31%, 40288 KB, 3660 KB/s, 11 seconds passed
-... 32%, 40320 KB, 3662 KB/s, 11 seconds passed
-... 32%, 40352 KB, 3663 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 32%, 40384 KB, 3660 KB/s, 11 seconds passed
-... 32%, 40416 KB, 3660 KB/s, 11 seconds passed
-... 32%, 40448 KB, 3662 KB/s, 11 seconds passed
-... 32%, 40480 KB, 3663 KB/s, 11 seconds passed
-... 32%, 40512 KB, 3660 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 32%, 40544 KB, 3660 KB/s, 11 seconds passed
-... 32%, 40576 KB, 3662 KB/s, 11 seconds passed
-... 32%, 40608 KB, 3663 KB/s, 11 seconds passed
-... 32%, 40640 KB, 3660 KB/s, 11 seconds passed
-... 32%, 40672 KB, 3660 KB/s, 11 seconds passed
-... 32%, 40704 KB, 3662 KB/s, 11 seconds passed
-... 32%, 40736 KB, 3663 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 32%, 40768 KB, 3660 KB/s, 11 seconds passed
-... 32%, 40800 KB, 3660 KB/s, 11 seconds passed
-... 32%, 40832 KB, 3662 KB/s, 11 seconds passed
-... 32%, 40864 KB, 3664 KB/s, 11 seconds passed
-... 32%, 40896 KB, 3661 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 32%, 40928 KB, 3661 KB/s, 11 seconds passed
-... 32%, 40960 KB, 3662 KB/s, 11 seconds passed
-... 32%, 40992 KB, 3664 KB/s, 11 seconds passed
-... 32%, 41024 KB, 3661 KB/s, 11 seconds passed
-... 32%, 41056 KB, 3661 KB/s, 11 seconds passed
-... 32%, 41088 KB, 3662 KB/s, 11 seconds passed
-... 32%, 41120 KB, 3664 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 32%, 41152 KB, 3661 KB/s, 11 seconds passed
-... 32%, 41184 KB, 3661 KB/s, 11 seconds passed
-... 32%, 41216 KB, 3662 KB/s, 11 seconds passed
-... 32%, 41248 KB, 3664 KB/s, 11 seconds passed
-... 32%, 41280 KB, 3661 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 32%, 41312 KB, 3661 KB/s, 11 seconds passed
-... 32%, 41344 KB, 3662 KB/s, 11 seconds passed
-... 32%, 41376 KB, 3664 KB/s, 11 seconds passed
-... 32%, 41408 KB, 3661 KB/s, 11 seconds passed
-... 32%, 41440 KB, 3661 KB/s, 11 seconds passed
-... 32%, 41472 KB, 3662 KB/s, 11 seconds passed
-... 32%, 41504 KB, 3664 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 32%, 41536 KB, 3661 KB/s, 11 seconds passed
-... 33%, 41568 KB, 3661 KB/s, 11 seconds passed
-... 33%, 41600 KB, 3663 KB/s, 11 seconds passed
-... 33%, 41632 KB, 3664 KB/s, 11 seconds passed
-... 33%, 41664 KB, 3661 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 33%, 41696 KB, 3661 KB/s, 11 seconds passed
-... 33%, 41728 KB, 3663 KB/s, 11 seconds passed
-... 33%, 41760 KB, 3665 KB/s, 11 seconds passed
-... 33%, 41792 KB, 3661 KB/s, 11 seconds passed
-... 33%, 41824 KB, 3661 KB/s, 11 seconds passed
-... 33%, 41856 KB, 3663 KB/s, 11 seconds passed
-... 33%, 41888 KB, 3665 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 33%, 41920 KB, 3661 KB/s, 11 seconds passed
-... 33%, 41952 KB, 3661 KB/s, 11 seconds passed
-... 33%, 41984 KB, 3663 KB/s, 11 seconds passed
-... 33%, 42016 KB, 3665 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 33%, 42048 KB, 3661 KB/s, 11 seconds passed
-... 33%, 42080 KB, 3661 KB/s, 11 seconds passed
-... 33%, 42112 KB, 3663 KB/s, 11 seconds passed
-... 33%, 42144 KB, 3665 KB/s, 11 seconds passed
-... 33%, 42176 KB, 3661 KB/s, 11 seconds passed
-... 33%, 42208 KB, 3661 KB/s, 11 seconds passed
-... 33%, 42240 KB, 3663 KB/s, 11 seconds passed
-... 33%, 42272 KB, 3665 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 33%, 42304 KB, 3661 KB/s, 11 seconds passed
-... 33%, 42336 KB, 3661 KB/s, 11 seconds passed
-... 33%, 42368 KB, 3663 KB/s, 11 seconds passed
-... 33%, 42400 KB, 3665 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 33%, 42432 KB, 3662 KB/s, 11 seconds passed
-... 33%, 42464 KB, 3663 KB/s, 11 seconds passed
-... 33%, 42496 KB, 3664 KB/s, 11 seconds passed
-... 33%, 42528 KB, 3665 KB/s, 11 seconds passed
-... 33%, 42560 KB, 3662 KB/s, 11 seconds passed
-... 33%, 42592 KB, 3663 KB/s, 11 seconds passed
-... 33%, 42624 KB, 3664 KB/s, 11 seconds passed
-... 33%, 42656 KB, 3665 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 33%, 42688 KB, 3662 KB/s, 11 seconds passed
-... 33%, 42720 KB, 3663 KB/s, 11 seconds passed
-... 33%, 42752 KB, 3663 KB/s, 11 seconds passed
-... 33%, 42784 KB, 3662 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 33%, 42816 KB, 3662 KB/s, 11 seconds passed
-... 34%, 42848 KB, 3663 KB/s, 11 seconds passed
-... 34%, 42880 KB, 3664 KB/s, 11 seconds passed
-... 34%, 42912 KB, 3666 KB/s, 11 seconds passed
-... 34%, 42944 KB, 3662 KB/s, 11 seconds passed
-... 34%, 42976 KB, 3663 KB/s, 11 seconds passed
-... 34%, 43008 KB, 3664 KB/s, 11 seconds passed
-... 34%, 43040 KB, 3666 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 34%, 43072 KB, 3662 KB/s, 11 seconds passed
-... 34%, 43104 KB, 3662 KB/s, 11 seconds passed
-... 34%, 43136 KB, 3664 KB/s, 11 seconds passed
-... 34%, 43168 KB, 3662 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 34%, 43200 KB, 3662 KB/s, 11 seconds passed
-... 34%, 43232 KB, 3662 KB/s, 11 seconds passed
-... 34%, 43264 KB, 3664 KB/s, 11 seconds passed
-... 34%, 43296 KB, 3666 KB/s, 11 seconds passed
-... 34%, 43328 KB, 3662 KB/s, 11 seconds passed
-... 34%, 43360 KB, 3663 KB/s, 11 seconds passed
-... 34%, 43392 KB, 3664 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 34%, 43424 KB, 3666 KB/s, 11 seconds passed
-... 34%, 43456 KB, 3663 KB/s, 11 seconds passed
-... 34%, 43488 KB, 3663 KB/s, 11 seconds passed
-... 34%, 43520 KB, 3665 KB/s, 11 seconds passed
-... 34%, 43552 KB, 3666 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 34%, 43584 KB, 3663 KB/s, 11 seconds passed
-... 34%, 43616 KB, 3663 KB/s, 11 seconds passed
-... 34%, 43648 KB, 3664 KB/s, 11 seconds passed
-... 34%, 43680 KB, 3662 KB/s, 11 seconds passed
-... 34%, 43712 KB, 3662 KB/s, 11 seconds passed
-... 34%, 43744 KB, 3663 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 34%, 43776 KB, 3664 KB/s, 11 seconds passed
-... 34%, 43808 KB, 3662 KB/s, 11 seconds passed
-... 34%, 43840 KB, 3663 KB/s, 11 seconds passed
-... 34%, 43872 KB, 3663 KB/s, 11 seconds passed
-... 34%, 43904 KB, 3664 KB/s, 11 seconds passed
-
-.. parsed-literal::
-
-    ... 34%, 43936 KB, 3662 KB/s, 11 seconds passed
-... 34%, 43968 KB, 3663 KB/s, 12 seconds passed
-... 34%, 44000 KB, 3663 KB/s, 12 seconds passed
-... 34%, 44032 KB, 3665 KB/s, 12 seconds passed
-... 34%, 44064 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44096 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44128 KB, 3663 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 35%, 44160 KB, 3665 KB/s, 12 seconds passed
-... 35%, 44192 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44224 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44256 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44288 KB, 3665 KB/s, 12 seconds passed
-... 35%, 44320 KB, 3663 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 35%, 44352 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44384 KB, 3664 KB/s, 12 seconds passed
-... 35%, 44416 KB, 3665 KB/s, 12 seconds passed
-... 35%, 44448 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44480 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44512 KB, 3664 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 35%, 44544 KB, 3665 KB/s, 12 seconds passed
-... 35%, 44576 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44608 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44640 KB, 3664 KB/s, 12 seconds passed
-... 35%, 44672 KB, 3665 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 35%, 44704 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44736 KB, 3664 KB/s, 12 seconds passed
-... 35%, 44768 KB, 3664 KB/s, 12 seconds passed
-... 35%, 44800 KB, 3666 KB/s, 12 seconds passed
-... 35%, 44832 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44864 KB, 3664 KB/s, 12 seconds passed
-... 35%, 44896 KB, 3664 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 35%, 44928 KB, 3665 KB/s, 12 seconds passed
-... 35%, 44960 KB, 3663 KB/s, 12 seconds passed
-... 35%, 44992 KB, 3664 KB/s, 12 seconds passed
-... 35%, 45024 KB, 3664 KB/s, 12 seconds passed
-... 35%, 45056 KB, 3666 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 35%, 45088 KB, 3663 KB/s, 12 seconds passed
-... 35%, 45120 KB, 3664 KB/s, 12 seconds passed
-... 35%, 45152 KB, 3664 KB/s, 12 seconds passed
-... 35%, 45184 KB, 3666 KB/s, 12 seconds passed
-... 35%, 45216 KB, 3663 KB/s, 12 seconds passed
-... 35%, 45248 KB, 3664 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 35%, 45280 KB, 3664 KB/s, 12 seconds passed
-... 35%, 45312 KB, 3666 KB/s, 12 seconds passed
-... 36%, 45344 KB, 3663 KB/s, 12 seconds passed
-... 36%, 45376 KB, 3664 KB/s, 12 seconds passed
-... 36%, 45408 KB, 3664 KB/s, 12 seconds passed
-... 36%, 45440 KB, 3666 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 36%, 45472 KB, 3663 KB/s, 12 seconds passed
-... 36%, 45504 KB, 3664 KB/s, 12 seconds passed
-... 36%, 45536 KB, 3664 KB/s, 12 seconds passed
-... 36%, 45568 KB, 3666 KB/s, 12 seconds passed
-... 36%, 45600 KB, 3663 KB/s, 12 seconds passed
-... 36%, 45632 KB, 3664 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 36%, 45664 KB, 3664 KB/s, 12 seconds passed
-... 36%, 45696 KB, 3666 KB/s, 12 seconds passed
-... 36%, 45728 KB, 3663 KB/s, 12 seconds passed
-... 36%, 45760 KB, 3664 KB/s, 12 seconds passed
-... 36%, 45792 KB, 3665 KB/s, 12 seconds passed
-... 36%, 45824 KB, 3666 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 36%, 45856 KB, 3664 KB/s, 12 seconds passed
-... 36%, 45888 KB, 3665 KB/s, 12 seconds passed
-... 36%, 45920 KB, 3665 KB/s, 12 seconds passed
-... 36%, 45952 KB, 3666 KB/s, 12 seconds passed
-... 36%, 45984 KB, 3664 KB/s, 12 seconds passed
-... 36%, 46016 KB, 3665 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 36%, 46048 KB, 3665 KB/s, 12 seconds passed
-... 36%, 46080 KB, 3666 KB/s, 12 seconds passed
-... 36%, 46112 KB, 3663 KB/s, 12 seconds passed
-... 36%, 46144 KB, 3665 KB/s, 12 seconds passed
-... 36%, 46176 KB, 3665 KB/s, 12 seconds passed
-... 36%, 46208 KB, 3666 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 36%, 46240 KB, 3663 KB/s, 12 seconds passed
-... 36%, 46272 KB, 3665 KB/s, 12 seconds passed
-... 36%, 46304 KB, 3665 KB/s, 12 seconds passed
-... 36%, 46336 KB, 3667 KB/s, 12 seconds passed
-... 36%, 46368 KB, 3663 KB/s, 12 seconds passed
-... 36%, 46400 KB, 3664 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 36%, 46432 KB, 3665 KB/s, 12 seconds passed
-... 36%, 46464 KB, 3667 KB/s, 12 seconds passed
-... 36%, 46496 KB, 3665 KB/s, 12 seconds passed
-... 36%, 46528 KB, 3665 KB/s, 12 seconds passed
-... 36%, 46560 KB, 3666 KB/s, 12 seconds passed
-... 36%, 46592 KB, 3667 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 37%, 46624 KB, 3665 KB/s, 12 seconds passed
-... 37%, 46656 KB, 3665 KB/s, 12 seconds passed
-... 37%, 46688 KB, 3666 KB/s, 12 seconds passed
-... 37%, 46720 KB, 3667 KB/s, 12 seconds passed
-... 37%, 46752 KB, 3663 KB/s, 12 seconds passed
-... 37%, 46784 KB, 3665 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 37%, 46816 KB, 3665 KB/s, 12 seconds passed
-... 37%, 46848 KB, 3663 KB/s, 12 seconds passed
-... 37%, 46880 KB, 3664 KB/s, 12 seconds passed
-... 37%, 46912 KB, 3665 KB/s, 12 seconds passed
-... 37%, 46944 KB, 3666 KB/s, 12 seconds passed
-... 37%, 46976 KB, 3667 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 37%, 47008 KB, 3664 KB/s, 12 seconds passed
-... 37%, 47040 KB, 3665 KB/s, 12 seconds passed
-... 37%, 47072 KB, 3666 KB/s, 12 seconds passed
-... 37%, 47104 KB, 3664 KB/s, 12 seconds passed
-... 37%, 47136 KB, 3664 KB/s, 12 seconds passed
-... 37%, 47168 KB, 3665 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 37%, 47200 KB, 3666 KB/s, 12 seconds passed
-... 37%, 47232 KB, 3667 KB/s, 12 seconds passed
-... 37%, 47264 KB, 3664 KB/s, 12 seconds passed
-... 37%, 47296 KB, 3665 KB/s, 12 seconds passed
-... 37%, 47328 KB, 3666 KB/s, 12 seconds passed
-... 37%, 47360 KB, 3668 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 37%, 47392 KB, 3664 KB/s, 12 seconds passed
-... 37%, 47424 KB, 3665 KB/s, 12 seconds passed
-... 37%, 47456 KB, 3666 KB/s, 12 seconds passed
-... 37%, 47488 KB, 3668 KB/s, 12 seconds passed
-... 37%, 47520 KB, 3664 KB/s, 12 seconds passed
-... 37%, 47552 KB, 3666 KB/s, 12 seconds passed
-
-.. parsed-literal::
-
-    ... 37%, 47584 KB, 3666 KB/s, 12 seconds passed
-... 37%, 47616 KB, 3668 KB/s, 12 seconds passed
-... 37%, 47648 KB, 3664 KB/s, 13 seconds passed
-... 37%, 47680 KB, 3666 KB/s, 13 seconds passed
-... 37%, 47712 KB, 3666 KB/s, 13 seconds passed
-... 37%, 47744 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 37%, 47776 KB, 3664 KB/s, 13 seconds passed
-... 37%, 47808 KB, 3666 KB/s, 13 seconds passed
-... 37%, 47840 KB, 3666 KB/s, 13 seconds passed
-... 38%, 47872 KB, 3668 KB/s, 13 seconds passed
-... 38%, 47904 KB, 3664 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 38%, 47936 KB, 3666 KB/s, 13 seconds passed
-... 38%, 47968 KB, 3666 KB/s, 13 seconds passed
-... 38%, 48000 KB, 3668 KB/s, 13 seconds passed
-... 38%, 48032 KB, 3664 KB/s, 13 seconds passed
-... 38%, 48064 KB, 3666 KB/s, 13 seconds passed
-... 38%, 48096 KB, 3666 KB/s, 13 seconds passed
-... 38%, 48128 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 38%, 48160 KB, 3664 KB/s, 13 seconds passed
-... 38%, 48192 KB, 3666 KB/s, 13 seconds passed
-... 38%, 48224 KB, 3667 KB/s, 13 seconds passed
-... 38%, 48256 KB, 3668 KB/s, 13 seconds passed
-... 38%, 48288 KB, 3665 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 38%, 48320 KB, 3666 KB/s, 13 seconds passed
-... 38%, 48352 KB, 3667 KB/s, 13 seconds passed
-... 38%, 48384 KB, 3669 KB/s, 13 seconds passed
-... 38%, 48416 KB, 3665 KB/s, 13 seconds passed
-... 38%, 48448 KB, 3666 KB/s, 13 seconds passed
-... 38%, 48480 KB, 3667 KB/s, 13 seconds passed
-... 38%, 48512 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 38%, 48544 KB, 3665 KB/s, 13 seconds passed
-... 38%, 48576 KB, 3666 KB/s, 13 seconds passed
-... 38%, 48608 KB, 3667 KB/s, 13 seconds passed
-... 38%, 48640 KB, 3668 KB/s, 13 seconds passed
-... 38%, 48672 KB, 3665 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 38%, 48704 KB, 3667 KB/s, 13 seconds passed
-... 38%, 48736 KB, 3667 KB/s, 13 seconds passed
-... 38%, 48768 KB, 3665 KB/s, 13 seconds passed
-... 38%, 48800 KB, 3665 KB/s, 13 seconds passed
-... 38%, 48832 KB, 3667 KB/s, 13 seconds passed
-... 38%, 48864 KB, 3667 KB/s, 13 seconds passed
-... 38%, 48896 KB, 3669 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 38%, 48928 KB, 3665 KB/s, 13 seconds passed
-... 38%, 48960 KB, 3666 KB/s, 13 seconds passed
-... 38%, 48992 KB, 3667 KB/s, 13 seconds passed
-... 38%, 49024 KB, 3664 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 38%, 49056 KB, 3665 KB/s, 13 seconds passed
-... 38%, 49088 KB, 3666 KB/s, 13 seconds passed
-... 38%, 49120 KB, 3667 KB/s, 13 seconds passed
-... 39%, 49152 KB, 3664 KB/s, 13 seconds passed
-... 39%, 49184 KB, 3665 KB/s, 13 seconds passed
-... 39%, 49216 KB, 3666 KB/s, 13 seconds passed
-... 39%, 49248 KB, 3667 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 39%, 49280 KB, 3664 KB/s, 13 seconds passed
-... 39%, 49312 KB, 3665 KB/s, 13 seconds passed
-... 39%, 49344 KB, 3666 KB/s, 13 seconds passed
-... 39%, 49376 KB, 3668 KB/s, 13 seconds passed
-... 39%, 49408 KB, 3665 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 39%, 49440 KB, 3665 KB/s, 13 seconds passed
-... 39%, 49472 KB, 3666 KB/s, 13 seconds passed
-... 39%, 49504 KB, 3668 KB/s, 13 seconds passed
-... 39%, 49536 KB, 3665 KB/s, 13 seconds passed
-... 39%, 49568 KB, 3665 KB/s, 13 seconds passed
-... 39%, 49600 KB, 3666 KB/s, 13 seconds passed
-... 39%, 49632 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 39%, 49664 KB, 3665 KB/s, 13 seconds passed
-... 39%, 49696 KB, 3666 KB/s, 13 seconds passed
-... 39%, 49728 KB, 3666 KB/s, 13 seconds passed
-... 39%, 49760 KB, 3668 KB/s, 13 seconds passed
-... 39%, 49792 KB, 3665 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 39%, 49824 KB, 3666 KB/s, 13 seconds passed
-... 39%, 49856 KB, 3666 KB/s, 13 seconds passed
-... 39%, 49888 KB, 3668 KB/s, 13 seconds passed
-... 39%, 49920 KB, 3665 KB/s, 13 seconds passed
-... 39%, 49952 KB, 3666 KB/s, 13 seconds passed
-... 39%, 49984 KB, 3666 KB/s, 13 seconds passed
-... 39%, 50016 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 39%, 50048 KB, 3665 KB/s, 13 seconds passed
-... 39%, 50080 KB, 3666 KB/s, 13 seconds passed
-... 39%, 50112 KB, 3666 KB/s, 13 seconds passed
-... 39%, 50144 KB, 3668 KB/s, 13 seconds passed
-... 39%, 50176 KB, 3665 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 39%, 50208 KB, 3666 KB/s, 13 seconds passed
-... 39%, 50240 KB, 3666 KB/s, 13 seconds passed
-... 39%, 50272 KB, 3668 KB/s, 13 seconds passed
-... 39%, 50304 KB, 3665 KB/s, 13 seconds passed
-... 39%, 50336 KB, 3666 KB/s, 13 seconds passed
-... 39%, 50368 KB, 3666 KB/s, 13 seconds passed
-... 40%, 50400 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 40%, 50432 KB, 3665 KB/s, 13 seconds passed
-... 40%, 50464 KB, 3666 KB/s, 13 seconds passed
-... 40%, 50496 KB, 3666 KB/s, 13 seconds passed
-... 40%, 50528 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 40%, 50560 KB, 3665 KB/s, 13 seconds passed
-... 40%, 50592 KB, 3666 KB/s, 13 seconds passed
-... 40%, 50624 KB, 3666 KB/s, 13 seconds passed
-... 40%, 50656 KB, 3668 KB/s, 13 seconds passed
-... 40%, 50688 KB, 3665 KB/s, 13 seconds passed
-... 40%, 50720 KB, 3666 KB/s, 13 seconds passed
-... 40%, 50752 KB, 3667 KB/s, 13 seconds passed
-... 40%, 50784 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 40%, 50816 KB, 3666 KB/s, 13 seconds passed
-... 40%, 50848 KB, 3666 KB/s, 13 seconds passed
-... 40%, 50880 KB, 3667 KB/s, 13 seconds passed
-... 40%, 50912 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 40%, 50944 KB, 3666 KB/s, 13 seconds passed
-... 40%, 50976 KB, 3666 KB/s, 13 seconds passed
-... 40%, 51008 KB, 3667 KB/s, 13 seconds passed
-... 40%, 51040 KB, 3668 KB/s, 13 seconds passed
-... 40%, 51072 KB, 3666 KB/s, 13 seconds passed
-... 40%, 51104 KB, 3666 KB/s, 13 seconds passed
-... 40%, 51136 KB, 3667 KB/s, 13 seconds passed
-... 40%, 51168 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 40%, 51200 KB, 3665 KB/s, 13 seconds passed
-... 40%, 51232 KB, 3666 KB/s, 13 seconds passed
-... 40%, 51264 KB, 3667 KB/s, 13 seconds passed
-... 40%, 51296 KB, 3668 KB/s, 13 seconds passed
-
-.. parsed-literal::
-
-    ... 40%, 51328 KB, 3665 KB/s, 14 seconds passed
-... 40%, 51360 KB, 3666 KB/s, 14 seconds passed
-... 40%, 51392 KB, 3667 KB/s, 14 seconds passed
-... 40%, 51424 KB, 3669 KB/s, 14 seconds passed
-... 40%, 51456 KB, 3665 KB/s, 14 seconds passed
-... 40%, 51488 KB, 3667 KB/s, 14 seconds passed
-... 40%, 51520 KB, 3667 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 40%, 51552 KB, 3669 KB/s, 14 seconds passed
-... 40%, 51584 KB, 3666 KB/s, 14 seconds passed
-... 40%, 51616 KB, 3667 KB/s, 14 seconds passed
-... 41%, 51648 KB, 3667 KB/s, 14 seconds passed
-... 41%, 51680 KB, 3669 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 41%, 51712 KB, 3666 KB/s, 14 seconds passed
-... 41%, 51744 KB, 3666 KB/s, 14 seconds passed
-... 41%, 51776 KB, 3667 KB/s, 14 seconds passed
-... 41%, 51808 KB, 3665 KB/s, 14 seconds passed
-... 41%, 51840 KB, 3665 KB/s, 14 seconds passed
-... 41%, 51872 KB, 3666 KB/s, 14 seconds passed
-... 41%, 51904 KB, 3667 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 41%, 51936 KB, 3665 KB/s, 14 seconds passed
-... 41%, 51968 KB, 3666 KB/s, 14 seconds passed
-... 41%, 52000 KB, 3666 KB/s, 14 seconds passed
-... 41%, 52032 KB, 3667 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 41%, 52064 KB, 3665 KB/s, 14 seconds passed
-... 41%, 52096 KB, 3666 KB/s, 14 seconds passed
-... 41%, 52128 KB, 3666 KB/s, 14 seconds passed
-... 41%, 52160 KB, 3667 KB/s, 14 seconds passed
-... 41%, 52192 KB, 3665 KB/s, 14 seconds passed
-... 41%, 52224 KB, 3666 KB/s, 14 seconds passed
-... 41%, 52256 KB, 3667 KB/s, 14 seconds passed
-... 41%, 52288 KB, 3668 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 41%, 52320 KB, 3665 KB/s, 14 seconds passed
-... 41%, 52352 KB, 3666 KB/s, 14 seconds passed
-... 41%, 52384 KB, 3667 KB/s, 14 seconds passed
-... 41%, 52416 KB, 3668 KB/s, 14 seconds passed
-... 41%, 52448 KB, 3667 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 41%, 52480 KB, 3666 KB/s, 14 seconds passed
-... 41%, 52512 KB, 3667 KB/s, 14 seconds passed
-... 41%, 52544 KB, 3668 KB/s, 14 seconds passed
-... 41%, 52576 KB, 3665 KB/s, 14 seconds passed
-... 41%, 52608 KB, 3666 KB/s, 14 seconds passed
-... 41%, 52640 KB, 3667 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 41%, 52672 KB, 3668 KB/s, 14 seconds passed
-... 41%, 52704 KB, 3665 KB/s, 14 seconds passed
-... 41%, 52736 KB, 3666 KB/s, 14 seconds passed
-... 41%, 52768 KB, 3667 KB/s, 14 seconds passed
-... 41%, 52800 KB, 3668 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 41%, 52832 KB, 3665 KB/s, 14 seconds passed
-... 41%, 52864 KB, 3666 KB/s, 14 seconds passed
-... 41%, 52896 KB, 3667 KB/s, 14 seconds passed
-... 42%, 52928 KB, 3668 KB/s, 14 seconds passed
-... 42%, 52960 KB, 3665 KB/s, 14 seconds passed
-... 42%, 52992 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53024 KB, 3667 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 42%, 53056 KB, 3668 KB/s, 14 seconds passed
-... 42%, 53088 KB, 3665 KB/s, 14 seconds passed
-... 42%, 53120 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53152 KB, 3668 KB/s, 14 seconds passed
-... 42%, 53184 KB, 3668 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 42%, 53216 KB, 3666 KB/s, 14 seconds passed
-... 42%, 53248 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53280 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53312 KB, 3668 KB/s, 14 seconds passed
-... 42%, 53344 KB, 3666 KB/s, 14 seconds passed
-... 42%, 53376 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53408 KB, 3667 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 42%, 53440 KB, 3668 KB/s, 14 seconds passed
-... 42%, 53472 KB, 3665 KB/s, 14 seconds passed
-... 42%, 53504 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53536 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53568 KB, 3668 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 42%, 53600 KB, 3665 KB/s, 14 seconds passed
-... 42%, 53632 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53664 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53696 KB, 3668 KB/s, 14 seconds passed
-... 42%, 53728 KB, 3666 KB/s, 14 seconds passed
-... 42%, 53760 KB, 3667 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 42%, 53792 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53824 KB, 3669 KB/s, 14 seconds passed
-... 42%, 53856 KB, 3665 KB/s, 14 seconds passed
-... 42%, 53888 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53920 KB, 3667 KB/s, 14 seconds passed
-... 42%, 53952 KB, 3669 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 42%, 53984 KB, 3666 KB/s, 14 seconds passed
-... 42%, 54016 KB, 3667 KB/s, 14 seconds passed
-... 42%, 54048 KB, 3668 KB/s, 14 seconds passed
-... 42%, 54080 KB, 3668 KB/s, 14 seconds passed
-... 42%, 54112 KB, 3666 KB/s, 14 seconds passed
-... 42%, 54144 KB, 3667 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 43%, 54176 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54208 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54240 KB, 3666 KB/s, 14 seconds passed
-... 43%, 54272 KB, 3667 KB/s, 14 seconds passed
-... 43%, 54304 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54336 KB, 3668 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 43%, 54368 KB, 3666 KB/s, 14 seconds passed
-... 43%, 54400 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54432 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54464 KB, 3669 KB/s, 14 seconds passed
-... 43%, 54496 KB, 3666 KB/s, 14 seconds passed
-... 43%, 54528 KB, 3668 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 43%, 54560 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54592 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54624 KB, 3666 KB/s, 14 seconds passed
-... 43%, 54656 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54688 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54720 KB, 3668 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 43%, 54752 KB, 3666 KB/s, 14 seconds passed
-... 43%, 54784 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54816 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54848 KB, 3669 KB/s, 14 seconds passed
-... 43%, 54880 KB, 3666 KB/s, 14 seconds passed
-... 43%, 54912 KB, 3668 KB/s, 14 seconds passed
-
-.. parsed-literal::
-
-    ... 43%, 54944 KB, 3668 KB/s, 14 seconds passed
-... 43%, 54976 KB, 3669 KB/s, 14 seconds passed
-... 43%, 55008 KB, 3667 KB/s, 15 seconds passed
-... 43%, 55040 KB, 3668 KB/s, 15 seconds passed
-... 43%, 55072 KB, 3668 KB/s, 15 seconds passed
-... 43%, 55104 KB, 3669 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 43%, 55136 KB, 3666 KB/s, 15 seconds passed
-... 43%, 55168 KB, 3668 KB/s, 15 seconds passed
-... 43%, 55200 KB, 3668 KB/s, 15 seconds passed
-... 43%, 55232 KB, 3669 KB/s, 15 seconds passed
-... 43%, 55264 KB, 3666 KB/s, 15 seconds passed
-... 43%, 55296 KB, 3668 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 43%, 55328 KB, 3668 KB/s, 15 seconds passed
-... 43%, 55360 KB, 3669 KB/s, 15 seconds passed
-... 43%, 55392 KB, 3666 KB/s, 15 seconds passed
-... 44%, 55424 KB, 3668 KB/s, 15 seconds passed
-... 44%, 55456 KB, 3668 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 44%, 55488 KB, 3667 KB/s, 15 seconds passed
-... 44%, 55520 KB, 3667 KB/s, 15 seconds passed
-... 44%, 55552 KB, 3668 KB/s, 15 seconds passed
-... 44%, 55584 KB, 3669 KB/s, 15 seconds passed
-... 44%, 55616 KB, 3669 KB/s, 15 seconds passed
-... 44%, 55648 KB, 3667 KB/s, 15 seconds passed
-... 44%, 55680 KB, 3668 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 44%, 55712 KB, 3669 KB/s, 15 seconds passed
-... 44%, 55744 KB, 3669 KB/s, 15 seconds passed
-... 44%, 55776 KB, 3667 KB/s, 15 seconds passed
-... 44%, 55808 KB, 3669 KB/s, 15 seconds passed
-... 44%, 55840 KB, 3669 KB/s, 15 seconds passed
-... 44%, 55872 KB, 3669 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 44%, 55904 KB, 3667 KB/s, 15 seconds passed
-... 44%, 55936 KB, 3669 KB/s, 15 seconds passed
-... 44%, 55968 KB, 3669 KB/s, 15 seconds passed
-... 44%, 56000 KB, 3667 KB/s, 15 seconds passed
-... 44%, 56032 KB, 3667 KB/s, 15 seconds passed
-... 44%, 56064 KB, 3669 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 44%, 56096 KB, 3669 KB/s, 15 seconds passed
-... 44%, 56128 KB, 3668 KB/s, 15 seconds passed
-... 44%, 56160 KB, 3667 KB/s, 15 seconds passed
-... 44%, 56192 KB, 3669 KB/s, 15 seconds passed
-... 44%, 56224 KB, 3669 KB/s, 15 seconds passed
-... 44%, 56256 KB, 3670 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 44%, 56288 KB, 3667 KB/s, 15 seconds passed
-... 44%, 56320 KB, 3669 KB/s, 15 seconds passed
-... 44%, 56352 KB, 3669 KB/s, 15 seconds passed
-... 44%, 56384 KB, 3670 KB/s, 15 seconds passed
-... 44%, 56416 KB, 3667 KB/s, 15 seconds passed
-... 44%, 56448 KB, 3669 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 44%, 56480 KB, 3669 KB/s, 15 seconds passed
-... 44%, 56512 KB, 3670 KB/s, 15 seconds passed
-... 44%, 56544 KB, 3667 KB/s, 15 seconds passed
-... 44%, 56576 KB, 3669 KB/s, 15 seconds passed
-... 44%, 56608 KB, 3669 KB/s, 15 seconds passed
-... 44%, 56640 KB, 3670 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 44%, 56672 KB, 3667 KB/s, 15 seconds passed
-... 45%, 56704 KB, 3669 KB/s, 15 seconds passed
-... 45%, 56736 KB, 3669 KB/s, 15 seconds passed
-... 45%, 56768 KB, 3670 KB/s, 15 seconds passed
-... 45%, 56800 KB, 3667 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 45%, 56832 KB, 3669 KB/s, 15 seconds passed
-... 45%, 56864 KB, 3669 KB/s, 15 seconds passed
-... 45%, 56896 KB, 3668 KB/s, 15 seconds passed
-... 45%, 56928 KB, 3667 KB/s, 15 seconds passed
-... 45%, 56960 KB, 3668 KB/s, 15 seconds passed
-... 45%, 56992 KB, 3669 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 45%, 57024 KB, 3667 KB/s, 15 seconds passed
-... 45%, 57056 KB, 3667 KB/s, 15 seconds passed
-... 45%, 57088 KB, 3668 KB/s, 15 seconds passed
-... 45%, 57120 KB, 3669 KB/s, 15 seconds passed
-... 45%, 57152 KB, 3667 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 45%, 57184 KB, 3667 KB/s, 15 seconds passed
-... 45%, 57216 KB, 3668 KB/s, 15 seconds passed
-... 45%, 57248 KB, 3669 KB/s, 15 seconds passed
-... 45%, 57280 KB, 3667 KB/s, 15 seconds passed
-... 45%, 57312 KB, 3668 KB/s, 15 seconds passed
-... 45%, 57344 KB, 3668 KB/s, 15 seconds passed
-... 45%, 57376 KB, 3670 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 45%, 57408 KB, 3667 KB/s, 15 seconds passed
-... 45%, 57440 KB, 3668 KB/s, 15 seconds passed
-... 45%, 57472 KB, 3668 KB/s, 15 seconds passed
-... 45%, 57504 KB, 3670 KB/s, 15 seconds passed
-... 45%, 57536 KB, 3667 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 45%, 57568 KB, 3668 KB/s, 15 seconds passed
-... 45%, 57600 KB, 3668 KB/s, 15 seconds passed
-... 45%, 57632 KB, 3670 KB/s, 15 seconds passed
-... 45%, 57664 KB, 3667 KB/s, 15 seconds passed
-... 45%, 57696 KB, 3668 KB/s, 15 seconds passed
-... 45%, 57728 KB, 3669 KB/s, 15 seconds passed
-... 45%, 57760 KB, 3670 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 45%, 57792 KB, 3667 KB/s, 15 seconds passed
-... 45%, 57824 KB, 3668 KB/s, 15 seconds passed
-... 45%, 57856 KB, 3669 KB/s, 15 seconds passed
-... 45%, 57888 KB, 3670 KB/s, 15 seconds passed
-... 45%, 57920 KB, 3667 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 46%, 57952 KB, 3668 KB/s, 15 seconds passed
-... 46%, 57984 KB, 3669 KB/s, 15 seconds passed
-... 46%, 58016 KB, 3670 KB/s, 15 seconds passed
-... 46%, 58048 KB, 3667 KB/s, 15 seconds passed
-... 46%, 58080 KB, 3668 KB/s, 15 seconds passed
-... 46%, 58112 KB, 3669 KB/s, 15 seconds passed
-... 46%, 58144 KB, 3670 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 46%, 58176 KB, 3668 KB/s, 15 seconds passed
-... 46%, 58208 KB, 3668 KB/s, 15 seconds passed
-... 46%, 58240 KB, 3669 KB/s, 15 seconds passed
-... 46%, 58272 KB, 3670 KB/s, 15 seconds passed
-... 46%, 58304 KB, 3667 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 46%, 58336 KB, 3668 KB/s, 15 seconds passed
-... 46%, 58368 KB, 3669 KB/s, 15 seconds passed
-... 46%, 58400 KB, 3670 KB/s, 15 seconds passed
-... 46%, 58432 KB, 3667 KB/s, 15 seconds passed
-... 46%, 58464 KB, 3668 KB/s, 15 seconds passed
-... 46%, 58496 KB, 3669 KB/s, 15 seconds passed
-... 46%, 58528 KB, 3670 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 46%, 58560 KB, 3667 KB/s, 15 seconds passed
-... 46%, 58592 KB, 3668 KB/s, 15 seconds passed
-... 46%, 58624 KB, 3669 KB/s, 15 seconds passed
-... 46%, 58656 KB, 3671 KB/s, 15 seconds passed
-... 46%, 58688 KB, 3668 KB/s, 15 seconds passed
-
-.. parsed-literal::
-
-    ... 46%, 58720 KB, 3669 KB/s, 16 seconds passed
-... 46%, 58752 KB, 3670 KB/s, 16 seconds passed
-... 46%, 58784 KB, 3671 KB/s, 16 seconds passed
-... 46%, 58816 KB, 3668 KB/s, 16 seconds passed
-... 46%, 58848 KB, 3669 KB/s, 16 seconds passed
-... 46%, 58880 KB, 3670 KB/s, 16 seconds passed
-... 46%, 58912 KB, 3671 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 46%, 58944 KB, 3668 KB/s, 16 seconds passed
-... 46%, 58976 KB, 3669 KB/s, 16 seconds passed
-... 46%, 59008 KB, 3669 KB/s, 16 seconds passed
-... 46%, 59040 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 46%, 59072 KB, 3668 KB/s, 16 seconds passed
-... 46%, 59104 KB, 3669 KB/s, 16 seconds passed
-... 46%, 59136 KB, 3669 KB/s, 16 seconds passed
-... 46%, 59168 KB, 3670 KB/s, 16 seconds passed
-... 47%, 59200 KB, 3668 KB/s, 16 seconds passed
-... 47%, 59232 KB, 3669 KB/s, 16 seconds passed
-... 47%, 59264 KB, 3669 KB/s, 16 seconds passed
-... 47%, 59296 KB, 3671 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 47%, 59328 KB, 3668 KB/s, 16 seconds passed
-... 47%, 59360 KB, 3669 KB/s, 16 seconds passed
-... 47%, 59392 KB, 3669 KB/s, 16 seconds passed
-... 47%, 59424 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 47%, 59456 KB, 3668 KB/s, 16 seconds passed
-... 47%, 59488 KB, 3669 KB/s, 16 seconds passed
-... 47%, 59520 KB, 3670 KB/s, 16 seconds passed
-... 47%, 59552 KB, 3670 KB/s, 16 seconds passed
-... 47%, 59584 KB, 3668 KB/s, 16 seconds passed
-... 47%, 59616 KB, 3669 KB/s, 16 seconds passed
-... 47%, 59648 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 47%, 59680 KB, 3670 KB/s, 16 seconds passed
-... 47%, 59712 KB, 3668 KB/s, 16 seconds passed
-... 47%, 59744 KB, 3669 KB/s, 16 seconds passed
-... 47%, 59776 KB, 3670 KB/s, 16 seconds passed
-... 47%, 59808 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 47%, 59840 KB, 3668 KB/s, 16 seconds passed
-... 47%, 59872 KB, 3669 KB/s, 16 seconds passed
-... 47%, 59904 KB, 3670 KB/s, 16 seconds passed
-... 47%, 59936 KB, 3670 KB/s, 16 seconds passed
-... 47%, 59968 KB, 3668 KB/s, 16 seconds passed
-... 47%, 60000 KB, 3669 KB/s, 16 seconds passed
-... 47%, 60032 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 47%, 60064 KB, 3670 KB/s, 16 seconds passed
-... 47%, 60096 KB, 3668 KB/s, 16 seconds passed
-... 47%, 60128 KB, 3669 KB/s, 16 seconds passed
-... 47%, 60160 KB, 3670 KB/s, 16 seconds passed
-... 47%, 60192 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 47%, 60224 KB, 3668 KB/s, 16 seconds passed
-... 47%, 60256 KB, 3669 KB/s, 16 seconds passed
-... 47%, 60288 KB, 3670 KB/s, 16 seconds passed
-... 47%, 60320 KB, 3671 KB/s, 16 seconds passed
-... 47%, 60352 KB, 3668 KB/s, 16 seconds passed
-... 47%, 60384 KB, 3669 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 47%, 60416 KB, 3669 KB/s, 16 seconds passed
-... 47%, 60448 KB, 3671 KB/s, 16 seconds passed
-... 48%, 60480 KB, 3668 KB/s, 16 seconds passed
-... 48%, 60512 KB, 3668 KB/s, 16 seconds passed
-... 48%, 60544 KB, 3669 KB/s, 16 seconds passed
-... 48%, 60576 KB, 3669 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 48%, 60608 KB, 3666 KB/s, 16 seconds passed
-... 48%, 60640 KB, 3666 KB/s, 16 seconds passed
-... 48%, 60672 KB, 3668 KB/s, 16 seconds passed
-... 48%, 60704 KB, 3669 KB/s, 16 seconds passed
-... 48%, 60736 KB, 3666 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 48%, 60768 KB, 3666 KB/s, 16 seconds passed
-... 48%, 60800 KB, 3668 KB/s, 16 seconds passed
-... 48%, 60832 KB, 3669 KB/s, 16 seconds passed
-... 48%, 60864 KB, 3666 KB/s, 16 seconds passed
-... 48%, 60896 KB, 3666 KB/s, 16 seconds passed
-... 48%, 60928 KB, 3668 KB/s, 16 seconds passed
-... 48%, 60960 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 48%, 60992 KB, 3666 KB/s, 16 seconds passed
-... 48%, 61024 KB, 3666 KB/s, 16 seconds passed
-... 48%, 61056 KB, 3668 KB/s, 16 seconds passed
-... 48%, 61088 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 48%, 61120 KB, 3666 KB/s, 16 seconds passed
-... 48%, 61152 KB, 3666 KB/s, 16 seconds passed
-... 48%, 61184 KB, 3668 KB/s, 16 seconds passed
-... 48%, 61216 KB, 3670 KB/s, 16 seconds passed
-... 48%, 61248 KB, 3666 KB/s, 16 seconds passed
-... 48%, 61280 KB, 3668 KB/s, 16 seconds passed
-... 48%, 61312 KB, 3668 KB/s, 16 seconds passed
-... 48%, 61344 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 48%, 61376 KB, 3667 KB/s, 16 seconds passed
-... 48%, 61408 KB, 3666 KB/s, 16 seconds passed
-... 48%, 61440 KB, 3668 KB/s, 16 seconds passed
-... 48%, 61472 KB, 3668 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 48%, 61504 KB, 3666 KB/s, 16 seconds passed
-... 48%, 61536 KB, 3668 KB/s, 16 seconds passed
-... 48%, 61568 KB, 3668 KB/s, 16 seconds passed
-... 48%, 61600 KB, 3670 KB/s, 16 seconds passed
-... 48%, 61632 KB, 3667 KB/s, 16 seconds passed
-... 48%, 61664 KB, 3668 KB/s, 16 seconds passed
-... 48%, 61696 KB, 3668 KB/s, 16 seconds passed
-... 49%, 61728 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 49%, 61760 KB, 3667 KB/s, 16 seconds passed
-... 49%, 61792 KB, 3667 KB/s, 16 seconds passed
-... 49%, 61824 KB, 3668 KB/s, 16 seconds passed
-... 49%, 61856 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 49%, 61888 KB, 3667 KB/s, 16 seconds passed
-... 49%, 61920 KB, 3667 KB/s, 16 seconds passed
-... 49%, 61952 KB, 3668 KB/s, 16 seconds passed
-... 49%, 61984 KB, 3670 KB/s, 16 seconds passed
-... 49%, 62016 KB, 3667 KB/s, 16 seconds passed
-... 49%, 62048 KB, 3667 KB/s, 16 seconds passed
-... 49%, 62080 KB, 3668 KB/s, 16 seconds passed
-... 49%, 62112 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 49%, 62144 KB, 3667 KB/s, 16 seconds passed
-... 49%, 62176 KB, 3667 KB/s, 16 seconds passed
-... 49%, 62208 KB, 3668 KB/s, 16 seconds passed
-... 49%, 62240 KB, 3670 KB/s, 16 seconds passed
-
-.. parsed-literal::
-
-    ... 49%, 62272 KB, 3667 KB/s, 16 seconds passed
-... 49%, 62304 KB, 3667 KB/s, 16 seconds passed
-... 49%, 62336 KB, 3669 KB/s, 16 seconds passed
-... 49%, 62368 KB, 3670 KB/s, 16 seconds passed
-... 49%, 62400 KB, 3667 KB/s, 17 seconds passed
-... 49%, 62432 KB, 3667 KB/s, 17 seconds passed
-... 49%, 62464 KB, 3669 KB/s, 17 seconds passed
-... 49%, 62496 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 49%, 62528 KB, 3667 KB/s, 17 seconds passed
-... 49%, 62560 KB, 3667 KB/s, 17 seconds passed
-... 49%, 62592 KB, 3669 KB/s, 17 seconds passed
-... 49%, 62624 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 49%, 62656 KB, 3667 KB/s, 17 seconds passed
-... 49%, 62688 KB, 3667 KB/s, 17 seconds passed
-... 49%, 62720 KB, 3669 KB/s, 17 seconds passed
-... 49%, 62752 KB, 3670 KB/s, 17 seconds passed
-... 49%, 62784 KB, 3667 KB/s, 17 seconds passed
-... 49%, 62816 KB, 3667 KB/s, 17 seconds passed
-... 49%, 62848 KB, 3669 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 49%, 62880 KB, 3670 KB/s, 17 seconds passed
-... 49%, 62912 KB, 3667 KB/s, 17 seconds passed
-... 49%, 62944 KB, 3667 KB/s, 17 seconds passed
-... 49%, 62976 KB, 3669 KB/s, 17 seconds passed
-... 50%, 63008 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 50%, 63040 KB, 3667 KB/s, 17 seconds passed
-... 50%, 63072 KB, 3667 KB/s, 17 seconds passed
-... 50%, 63104 KB, 3669 KB/s, 17 seconds passed
-... 50%, 63136 KB, 3670 KB/s, 17 seconds passed
-... 50%, 63168 KB, 3668 KB/s, 17 seconds passed
-... 50%, 63200 KB, 3667 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 50%, 63232 KB, 3669 KB/s, 17 seconds passed
-... 50%, 63264 KB, 3670 KB/s, 17 seconds passed
-... 50%, 63296 KB, 3668 KB/s, 17 seconds passed
-... 50%, 63328 KB, 3667 KB/s, 17 seconds passed
-... 50%, 63360 KB, 3669 KB/s, 17 seconds passed
-... 50%, 63392 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 50%, 63424 KB, 3668 KB/s, 17 seconds passed
-... 50%, 63456 KB, 3667 KB/s, 17 seconds passed
-... 50%, 63488 KB, 3669 KB/s, 17 seconds passed
-... 50%, 63520 KB, 3670 KB/s, 17 seconds passed
-... 50%, 63552 KB, 3668 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 50%, 63584 KB, 3667 KB/s, 17 seconds passed
-... 50%, 63616 KB, 3669 KB/s, 17 seconds passed
-... 50%, 63648 KB, 3670 KB/s, 17 seconds passed
-... 50%, 63680 KB, 3668 KB/s, 17 seconds passed
-... 50%, 63712 KB, 3668 KB/s, 17 seconds passed
-... 50%, 63744 KB, 3669 KB/s, 17 seconds passed
-... 50%, 63776 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 50%, 63808 KB, 3668 KB/s, 17 seconds passed
-... 50%, 63840 KB, 3667 KB/s, 17 seconds passed
-... 50%, 63872 KB, 3669 KB/s, 17 seconds passed
-... 50%, 63904 KB, 3669 KB/s, 17 seconds passed
-... 50%, 63936 KB, 3668 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 50%, 63968 KB, 3667 KB/s, 17 seconds passed
-... 50%, 64000 KB, 3669 KB/s, 17 seconds passed
-... 50%, 64032 KB, 3669 KB/s, 17 seconds passed
-... 50%, 64064 KB, 3668 KB/s, 17 seconds passed
-... 50%, 64096 KB, 3668 KB/s, 17 seconds passed
-... 50%, 64128 KB, 3669 KB/s, 17 seconds passed
-... 50%, 64160 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 50%, 64192 KB, 3668 KB/s, 17 seconds passed
-... 50%, 64224 KB, 3668 KB/s, 17 seconds passed
-... 51%, 64256 KB, 3669 KB/s, 17 seconds passed
-... 51%, 64288 KB, 3670 KB/s, 17 seconds passed
-... 51%, 64320 KB, 3668 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 51%, 64352 KB, 3668 KB/s, 17 seconds passed
-... 51%, 64384 KB, 3669 KB/s, 17 seconds passed
-... 51%, 64416 KB, 3670 KB/s, 17 seconds passed
-... 51%, 64448 KB, 3668 KB/s, 17 seconds passed
-... 51%, 64480 KB, 3668 KB/s, 17 seconds passed
-... 51%, 64512 KB, 3669 KB/s, 17 seconds passed
-... 51%, 64544 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 51%, 64576 KB, 3668 KB/s, 17 seconds passed
-... 51%, 64608 KB, 3668 KB/s, 17 seconds passed
-... 51%, 64640 KB, 3670 KB/s, 17 seconds passed
-... 51%, 64672 KB, 3667 KB/s, 17 seconds passed
-... 51%, 64704 KB, 3668 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 51%, 64736 KB, 3668 KB/s, 17 seconds passed
-... 51%, 64768 KB, 3669 KB/s, 17 seconds passed
-... 51%, 64800 KB, 3667 KB/s, 17 seconds passed
-... 51%, 64832 KB, 3668 KB/s, 17 seconds passed
-... 51%, 64864 KB, 3668 KB/s, 17 seconds passed
-... 51%, 64896 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 51%, 64928 KB, 3667 KB/s, 17 seconds passed
-... 51%, 64960 KB, 3668 KB/s, 17 seconds passed
-... 51%, 64992 KB, 3668 KB/s, 17 seconds passed
-... 51%, 65024 KB, 3670 KB/s, 17 seconds passed
-... 51%, 65056 KB, 3667 KB/s, 17 seconds passed
-... 51%, 65088 KB, 3669 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 51%, 65120 KB, 3668 KB/s, 17 seconds passed
-... 51%, 65152 KB, 3670 KB/s, 17 seconds passed
-... 51%, 65184 KB, 3670 KB/s, 17 seconds passed
-... 51%, 65216 KB, 3669 KB/s, 17 seconds passed
-... 51%, 65248 KB, 3668 KB/s, 17 seconds passed
-... 51%, 65280 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 51%, 65312 KB, 3667 KB/s, 17 seconds passed
-... 51%, 65344 KB, 3669 KB/s, 17 seconds passed
-... 51%, 65376 KB, 3668 KB/s, 17 seconds passed
-... 51%, 65408 KB, 3670 KB/s, 17 seconds passed
-... 51%, 65440 KB, 3667 KB/s, 17 seconds passed
-... 51%, 65472 KB, 3669 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 52%, 65504 KB, 3668 KB/s, 17 seconds passed
-... 52%, 65536 KB, 3670 KB/s, 17 seconds passed
-... 52%, 65568 KB, 3668 KB/s, 17 seconds passed
-... 52%, 65600 KB, 3669 KB/s, 17 seconds passed
-... 52%, 65632 KB, 3668 KB/s, 17 seconds passed
-... 52%, 65664 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 52%, 65696 KB, 3668 KB/s, 17 seconds passed
-... 52%, 65728 KB, 3669 KB/s, 17 seconds passed
-... 52%, 65760 KB, 3668 KB/s, 17 seconds passed
-... 52%, 65792 KB, 3670 KB/s, 17 seconds passed
-... 52%, 65824 KB, 3668 KB/s, 17 seconds passed
-... 52%, 65856 KB, 3669 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 52%, 65888 KB, 3668 KB/s, 17 seconds passed
-... 52%, 65920 KB, 3670 KB/s, 17 seconds passed
-... 52%, 65952 KB, 3668 KB/s, 17 seconds passed
-... 52%, 65984 KB, 3669 KB/s, 17 seconds passed
-... 52%, 66016 KB, 3669 KB/s, 17 seconds passed
-... 52%, 66048 KB, 3670 KB/s, 17 seconds passed
-
-.. parsed-literal::
-
-    ... 52%, 66080 KB, 3668 KB/s, 18 seconds passed
-... 52%, 66112 KB, 3667 KB/s, 18 seconds passed
-... 52%, 66144 KB, 3668 KB/s, 18 seconds passed
-... 52%, 66176 KB, 3670 KB/s, 18 seconds passed
-... 52%, 66208 KB, 3668 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 52%, 66240 KB, 3667 KB/s, 18 seconds passed
-... 52%, 66272 KB, 3669 KB/s, 18 seconds passed
-... 52%, 66304 KB, 3670 KB/s, 18 seconds passed
-... 52%, 66336 KB, 3668 KB/s, 18 seconds passed
-... 52%, 66368 KB, 3668 KB/s, 18 seconds passed
-... 52%, 66400 KB, 3669 KB/s, 18 seconds passed
-... 52%, 66432 KB, 3670 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 52%, 66464 KB, 3668 KB/s, 18 seconds passed
-... 52%, 66496 KB, 3668 KB/s, 18 seconds passed
-... 52%, 66528 KB, 3669 KB/s, 18 seconds passed
-... 52%, 66560 KB, 3670 KB/s, 18 seconds passed
-... 52%, 66592 KB, 3668 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 52%, 66624 KB, 3668 KB/s, 18 seconds passed
-... 52%, 66656 KB, 3669 KB/s, 18 seconds passed
-... 52%, 66688 KB, 3670 KB/s, 18 seconds passed
-... 52%, 66720 KB, 3668 KB/s, 18 seconds passed
-... 52%, 66752 KB, 3668 KB/s, 18 seconds passed
-... 53%, 66784 KB, 3669 KB/s, 18 seconds passed
-... 53%, 66816 KB, 3670 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 53%, 66848 KB, 3668 KB/s, 18 seconds passed
-... 53%, 66880 KB, 3668 KB/s, 18 seconds passed
-... 53%, 66912 KB, 3669 KB/s, 18 seconds passed
-... 53%, 66944 KB, 3671 KB/s, 18 seconds passed
-... 53%, 66976 KB, 3668 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 53%, 67008 KB, 3668 KB/s, 18 seconds passed
-... 53%, 67040 KB, 3669 KB/s, 18 seconds passed
-... 53%, 67072 KB, 3671 KB/s, 18 seconds passed
-... 53%, 67104 KB, 3668 KB/s, 18 seconds passed
-... 53%, 67136 KB, 3668 KB/s, 18 seconds passed
-... 53%, 67168 KB, 3669 KB/s, 18 seconds passed
-... 53%, 67200 KB, 3671 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 53%, 67232 KB, 3668 KB/s, 18 seconds passed
-... 53%, 67264 KB, 3668 KB/s, 18 seconds passed
-... 53%, 67296 KB, 3669 KB/s, 18 seconds passed
-... 53%, 67328 KB, 3671 KB/s, 18 seconds passed
-... 53%, 67360 KB, 3668 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 53%, 67392 KB, 3668 KB/s, 18 seconds passed
-... 53%, 67424 KB, 3669 KB/s, 18 seconds passed
-... 53%, 67456 KB, 3671 KB/s, 18 seconds passed
-... 53%, 67488 KB, 3668 KB/s, 18 seconds passed
-... 53%, 67520 KB, 3668 KB/s, 18 seconds passed
-... 53%, 67552 KB, 3669 KB/s, 18 seconds passed
-... 53%, 67584 KB, 3671 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 53%, 67616 KB, 3669 KB/s, 18 seconds passed
-... 53%, 67648 KB, 3669 KB/s, 18 seconds passed
-... 53%, 67680 KB, 3670 KB/s, 18 seconds passed
-... 53%, 67712 KB, 3671 KB/s, 18 seconds passed
-... 53%, 67744 KB, 3669 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 53%, 67776 KB, 3670 KB/s, 18 seconds passed
-... 53%, 67808 KB, 3670 KB/s, 18 seconds passed
-... 53%, 67840 KB, 3671 KB/s, 18 seconds passed
-... 53%, 67872 KB, 3669 KB/s, 18 seconds passed
-... 53%, 67904 KB, 3669 KB/s, 18 seconds passed
-... 53%, 67936 KB, 3669 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 53%, 67968 KB, 3670 KB/s, 18 seconds passed
-... 53%, 68000 KB, 3668 KB/s, 18 seconds passed
-... 54%, 68032 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68064 KB, 3670 KB/s, 18 seconds passed
-... 54%, 68096 KB, 3671 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 54%, 68128 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68160 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68192 KB, 3670 KB/s, 18 seconds passed
-... 54%, 68224 KB, 3671 KB/s, 18 seconds passed
-... 54%, 68256 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68288 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68320 KB, 3670 KB/s, 18 seconds passed
-... 54%, 68352 KB, 3671 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 54%, 68384 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68416 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68448 KB, 3670 KB/s, 18 seconds passed
-... 54%, 68480 KB, 3671 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 54%, 68512 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68544 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68576 KB, 3670 KB/s, 18 seconds passed
-... 54%, 68608 KB, 3671 KB/s, 18 seconds passed
-... 54%, 68640 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68672 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68704 KB, 3670 KB/s, 18 seconds passed
-... 54%, 68736 KB, 3671 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 54%, 68768 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68800 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68832 KB, 3670 KB/s, 18 seconds passed
-... 54%, 68864 KB, 3671 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 54%, 68896 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68928 KB, 3669 KB/s, 18 seconds passed
-... 54%, 68960 KB, 3670 KB/s, 18 seconds passed
-... 54%, 68992 KB, 3671 KB/s, 18 seconds passed
-... 54%, 69024 KB, 3669 KB/s, 18 seconds passed
-... 54%, 69056 KB, 3669 KB/s, 18 seconds passed
-... 54%, 69088 KB, 3670 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 54%, 69120 KB, 3668 KB/s, 18 seconds passed
-... 54%, 69152 KB, 3669 KB/s, 18 seconds passed
-... 54%, 69184 KB, 3669 KB/s, 18 seconds passed
-... 54%, 69216 KB, 3670 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 54%, 69248 KB, 3668 KB/s, 18 seconds passed
-... 55%, 69280 KB, 3669 KB/s, 18 seconds passed
-... 55%, 69312 KB, 3669 KB/s, 18 seconds passed
-... 55%, 69344 KB, 3670 KB/s, 18 seconds passed
-... 55%, 69376 KB, 3668 KB/s, 18 seconds passed
-... 55%, 69408 KB, 3669 KB/s, 18 seconds passed
-... 55%, 69440 KB, 3669 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 55%, 69472 KB, 3670 KB/s, 18 seconds passed
-... 55%, 69504 KB, 3668 KB/s, 18 seconds passed
-... 55%, 69536 KB, 3669 KB/s, 18 seconds passed
-... 55%, 69568 KB, 3669 KB/s, 18 seconds passed
-... 55%, 69600 KB, 3670 KB/s, 18 seconds passed
-
-.. parsed-literal::
-
-    ... 55%, 69632 KB, 3668 KB/s, 18 seconds passed
-... 55%, 69664 KB, 3669 KB/s, 18 seconds passed
-... 55%, 69696 KB, 3669 KB/s, 18 seconds passed
-... 55%, 69728 KB, 3670 KB/s, 18 seconds passed
-... 55%, 69760 KB, 3668 KB/s, 19 seconds passed
-... 55%, 69792 KB, 3669 KB/s, 19 seconds passed
-... 55%, 69824 KB, 3669 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 55%, 69856 KB, 3671 KB/s, 19 seconds passed
-... 55%, 69888 KB, 3668 KB/s, 19 seconds passed
-... 55%, 69920 KB, 3669 KB/s, 19 seconds passed
-... 55%, 69952 KB, 3669 KB/s, 19 seconds passed
-... 55%, 69984 KB, 3671 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 55%, 70016 KB, 3668 KB/s, 19 seconds passed
-... 55%, 70048 KB, 3669 KB/s, 19 seconds passed
-... 55%, 70080 KB, 3670 KB/s, 19 seconds passed
-... 55%, 70112 KB, 3671 KB/s, 19 seconds passed
-... 55%, 70144 KB, 3668 KB/s, 19 seconds passed
-... 55%, 70176 KB, 3669 KB/s, 19 seconds passed
-... 55%, 70208 KB, 3670 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 55%, 70240 KB, 3671 KB/s, 19 seconds passed
-... 55%, 70272 KB, 3668 KB/s, 19 seconds passed
-... 55%, 70304 KB, 3669 KB/s, 19 seconds passed
-... 55%, 70336 KB, 3670 KB/s, 19 seconds passed
-... 55%, 70368 KB, 3671 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 55%, 70400 KB, 3669 KB/s, 19 seconds passed
-... 55%, 70432 KB, 3669 KB/s, 19 seconds passed
-... 55%, 70464 KB, 3670 KB/s, 19 seconds passed
-... 55%, 70496 KB, 3671 KB/s, 19 seconds passed
-... 55%, 70528 KB, 3669 KB/s, 19 seconds passed
-... 56%, 70560 KB, 3669 KB/s, 19 seconds passed
-... 56%, 70592 KB, 3670 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 56%, 70624 KB, 3671 KB/s, 19 seconds passed
-... 56%, 70656 KB, 3669 KB/s, 19 seconds passed
-... 56%, 70688 KB, 3670 KB/s, 19 seconds passed
-... 56%, 70720 KB, 3670 KB/s, 19 seconds passed
-... 56%, 70752 KB, 3671 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 56%, 70784 KB, 3669 KB/s, 19 seconds passed
-... 56%, 70816 KB, 3669 KB/s, 19 seconds passed
-... 56%, 70848 KB, 3670 KB/s, 19 seconds passed
-... 56%, 70880 KB, 3671 KB/s, 19 seconds passed
-... 56%, 70912 KB, 3669 KB/s, 19 seconds passed
-... 56%, 70944 KB, 3670 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 56%, 70976 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71008 KB, 3671 KB/s, 19 seconds passed
-... 56%, 71040 KB, 3669 KB/s, 19 seconds passed
-... 56%, 71072 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71104 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71136 KB, 3671 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 56%, 71168 KB, 3669 KB/s, 19 seconds passed
-... 56%, 71200 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71232 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71264 KB, 3671 KB/s, 19 seconds passed
-... 56%, 71296 KB, 3669 KB/s, 19 seconds passed
-... 56%, 71328 KB, 3670 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 56%, 71360 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71392 KB, 3671 KB/s, 19 seconds passed
-... 56%, 71424 KB, 3669 KB/s, 19 seconds passed
-... 56%, 71456 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71488 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71520 KB, 3671 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 56%, 71552 KB, 3669 KB/s, 19 seconds passed
-... 56%, 71584 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71616 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71648 KB, 3671 KB/s, 19 seconds passed
-... 56%, 71680 KB, 3669 KB/s, 19 seconds passed
-... 56%, 71712 KB, 3670 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 56%, 71744 KB, 3670 KB/s, 19 seconds passed
-... 56%, 71776 KB, 3671 KB/s, 19 seconds passed
-... 57%, 71808 KB, 3669 KB/s, 19 seconds passed
-... 57%, 71840 KB, 3670 KB/s, 19 seconds passed
-... 57%, 71872 KB, 3670 KB/s, 19 seconds passed
-... 57%, 71904 KB, 3671 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 57%, 71936 KB, 3669 KB/s, 19 seconds passed
-... 57%, 71968 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72000 KB, 3670 KB/s, 19 seconds passed
-... 57%, 72032 KB, 3668 KB/s, 19 seconds passed
-... 57%, 72064 KB, 3669 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 57%, 72096 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72128 KB, 3670 KB/s, 19 seconds passed
-... 57%, 72160 KB, 3668 KB/s, 19 seconds passed
-... 57%, 72192 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72224 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72256 KB, 3670 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 57%, 72288 KB, 3668 KB/s, 19 seconds passed
-... 57%, 72320 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72352 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72384 KB, 3670 KB/s, 19 seconds passed
-... 57%, 72416 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72448 KB, 3669 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 57%, 72480 KB, 3670 KB/s, 19 seconds passed
-... 57%, 72512 KB, 3670 KB/s, 19 seconds passed
-... 57%, 72544 KB, 3672 KB/s, 19 seconds passed
-... 57%, 72576 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72608 KB, 3670 KB/s, 19 seconds passed
-... 57%, 72640 KB, 3670 KB/s, 19 seconds passed
-... 57%, 72672 KB, 3672 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 57%, 72704 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72736 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72768 KB, 3670 KB/s, 19 seconds passed
-... 57%, 72800 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72832 KB, 3669 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 57%, 72864 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72896 KB, 3671 KB/s, 19 seconds passed
-... 57%, 72928 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72960 KB, 3669 KB/s, 19 seconds passed
-... 57%, 72992 KB, 3670 KB/s, 19 seconds passed
-... 57%, 73024 KB, 3671 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 58%, 73056 KB, 3669 KB/s, 19 seconds passed
-... 58%, 73088 KB, 3669 KB/s, 19 seconds passed
-... 58%, 73120 KB, 3670 KB/s, 19 seconds passed
-... 58%, 73152 KB, 3671 KB/s, 19 seconds passed
-... 58%, 73184 KB, 3669 KB/s, 19 seconds passed
-... 58%, 73216 KB, 3670 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 58%, 73248 KB, 3670 KB/s, 19 seconds passed
-... 58%, 73280 KB, 3671 KB/s, 19 seconds passed
-... 58%, 73312 KB, 3669 KB/s, 19 seconds passed
-... 58%, 73344 KB, 3670 KB/s, 19 seconds passed
-... 58%, 73376 KB, 3670 KB/s, 19 seconds passed
-... 58%, 73408 KB, 3671 KB/s, 19 seconds passed
-
-.. parsed-literal::
-
-    ... 58%, 73440 KB, 3669 KB/s, 20 seconds passed
-... 58%, 73472 KB, 3669 KB/s, 20 seconds passed
-... 58%, 73504 KB, 3670 KB/s, 20 seconds passed
-... 58%, 73536 KB, 3671 KB/s, 20 seconds passed
-... 58%, 73568 KB, 3669 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 58%, 73600 KB, 3670 KB/s, 20 seconds passed
-... 58%, 73632 KB, 3670 KB/s, 20 seconds passed
-... 58%, 73664 KB, 3671 KB/s, 20 seconds passed
-... 58%, 73696 KB, 3669 KB/s, 20 seconds passed
-... 58%, 73728 KB, 3670 KB/s, 20 seconds passed
-... 58%, 73760 KB, 3670 KB/s, 20 seconds passed
-... 58%, 73792 KB, 3671 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 58%, 73824 KB, 3669 KB/s, 20 seconds passed
-... 58%, 73856 KB, 3670 KB/s, 20 seconds passed
-... 58%, 73888 KB, 3670 KB/s, 20 seconds passed
-... 58%, 73920 KB, 3671 KB/s, 20 seconds passed
-... 58%, 73952 KB, 3669 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 58%, 73984 KB, 3670 KB/s, 20 seconds passed
-... 58%, 74016 KB, 3670 KB/s, 20 seconds passed
-... 58%, 74048 KB, 3671 KB/s, 20 seconds passed
-... 58%, 74080 KB, 3669 KB/s, 20 seconds passed
-... 58%, 74112 KB, 3670 KB/s, 20 seconds passed
-... 58%, 74144 KB, 3670 KB/s, 20 seconds passed
-... 58%, 74176 KB, 3671 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 58%, 74208 KB, 3669 KB/s, 20 seconds passed
-... 58%, 74240 KB, 3670 KB/s, 20 seconds passed
-... 58%, 74272 KB, 3670 KB/s, 20 seconds passed
-... 58%, 74304 KB, 3671 KB/s, 20 seconds passed
-... 59%, 74336 KB, 3669 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 59%, 74368 KB, 3670 KB/s, 20 seconds passed
-... 59%, 74400 KB, 3670 KB/s, 20 seconds passed
-... 59%, 74432 KB, 3671 KB/s, 20 seconds passed
-... 59%, 74464 KB, 3669 KB/s, 20 seconds passed
-... 59%, 74496 KB, 3670 KB/s, 20 seconds passed
-... 59%, 74528 KB, 3670 KB/s, 20 seconds passed
-... 59%, 74560 KB, 3671 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 59%, 74592 KB, 3669 KB/s, 20 seconds passed
-... 59%, 74624 KB, 3670 KB/s, 20 seconds passed
-... 59%, 74656 KB, 3670 KB/s, 20 seconds passed
-... 59%, 74688 KB, 3671 KB/s, 20 seconds passed
-... 59%, 74720 KB, 3669 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 59%, 74752 KB, 3670 KB/s, 20 seconds passed
-... 59%, 74784 KB, 3670 KB/s, 20 seconds passed
-... 59%, 74816 KB, 3671 KB/s, 20 seconds passed
-... 59%, 74848 KB, 3669 KB/s, 20 seconds passed
-... 59%, 74880 KB, 3670 KB/s, 20 seconds passed
-... 59%, 74912 KB, 3670 KB/s, 20 seconds passed
-... 59%, 74944 KB, 3672 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 59%, 74976 KB, 3669 KB/s, 20 seconds passed
-... 59%, 75008 KB, 3670 KB/s, 20 seconds passed
-... 59%, 75040 KB, 3670 KB/s, 20 seconds passed
-... 59%, 75072 KB, 3672 KB/s, 20 seconds passed
-... 59%, 75104 KB, 3669 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 59%, 75136 KB, 3670 KB/s, 20 seconds passed
-... 59%, 75168 KB, 3670 KB/s, 20 seconds passed
-... 59%, 75200 KB, 3672 KB/s, 20 seconds passed
-... 59%, 75232 KB, 3669 KB/s, 20 seconds passed
-... 59%, 75264 KB, 3670 KB/s, 20 seconds passed
-... 59%, 75296 KB, 3670 KB/s, 20 seconds passed
-... 59%, 75328 KB, 3672 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 59%, 75360 KB, 3670 KB/s, 20 seconds passed
-... 59%, 75392 KB, 3670 KB/s, 20 seconds passed
-... 59%, 75424 KB, 3671 KB/s, 20 seconds passed
-... 59%, 75456 KB, 3672 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 59%, 75488 KB, 3670 KB/s, 20 seconds passed
-... 59%, 75520 KB, 3670 KB/s, 20 seconds passed
-... 59%, 75552 KB, 3671 KB/s, 20 seconds passed
-... 60%, 75584 KB, 3672 KB/s, 20 seconds passed
-... 60%, 75616 KB, 3670 KB/s, 20 seconds passed
-... 60%, 75648 KB, 3671 KB/s, 20 seconds passed
-... 60%, 75680 KB, 3671 KB/s, 20 seconds passed
-... 60%, 75712 KB, 3672 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 60%, 75744 KB, 3670 KB/s, 20 seconds passed
-... 60%, 75776 KB, 3671 KB/s, 20 seconds passed
-... 60%, 75808 KB, 3671 KB/s, 20 seconds passed
-... 60%, 75840 KB, 3672 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 60%, 75872 KB, 3670 KB/s, 20 seconds passed
-... 60%, 75904 KB, 3671 KB/s, 20 seconds passed
-... 60%, 75936 KB, 3671 KB/s, 20 seconds passed
-... 60%, 75968 KB, 3669 KB/s, 20 seconds passed
-... 60%, 76000 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76032 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76064 KB, 3671 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 60%, 76096 KB, 3669 KB/s, 20 seconds passed
-... 60%, 76128 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76160 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76192 KB, 3671 KB/s, 20 seconds passed
-... 60%, 76224 KB, 3669 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 60%, 76256 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76288 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76320 KB, 3671 KB/s, 20 seconds passed
-... 60%, 76352 KB, 3669 KB/s, 20 seconds passed
-... 60%, 76384 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76416 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76448 KB, 3671 KB/s, 20 seconds passed
-... 60%, 76480 KB, 3672 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 60%, 76512 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76544 KB, 3671 KB/s, 20 seconds passed
-... 60%, 76576 KB, 3671 KB/s, 20 seconds passed
-... 60%, 76608 KB, 3672 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 60%, 76640 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76672 KB, 3671 KB/s, 20 seconds passed
-... 60%, 76704 KB, 3671 KB/s, 20 seconds passed
-... 60%, 76736 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76768 KB, 3670 KB/s, 20 seconds passed
-... 60%, 76800 KB, 3671 KB/s, 20 seconds passed
-... 61%, 76832 KB, 3671 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 61%, 76864 KB, 3670 KB/s, 20 seconds passed
-... 61%, 76896 KB, 3670 KB/s, 20 seconds passed
-... 61%, 76928 KB, 3670 KB/s, 20 seconds passed
-... 61%, 76960 KB, 3671 KB/s, 20 seconds passed
-
-.. parsed-literal::
-
-    ... 61%, 76992 KB, 3670 KB/s, 20 seconds passed
-... 61%, 77024 KB, 3670 KB/s, 20 seconds passed
-... 61%, 77056 KB, 3670 KB/s, 20 seconds passed
-... 61%, 77088 KB, 3671 KB/s, 20 seconds passed
-... 61%, 77120 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77152 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77184 KB, 3670 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 61%, 77216 KB, 3671 KB/s, 21 seconds passed
-... 61%, 77248 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77280 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77312 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77344 KB, 3671 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 61%, 77376 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77408 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77440 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77472 KB, 3671 KB/s, 21 seconds passed
-... 61%, 77504 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77536 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77568 KB, 3670 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 61%, 77600 KB, 3671 KB/s, 21 seconds passed
-... 61%, 77632 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77664 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77696 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77728 KB, 3671 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 61%, 77760 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77792 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77824 KB, 3671 KB/s, 21 seconds passed
-... 61%, 77856 KB, 3671 KB/s, 21 seconds passed
-... 61%, 77888 KB, 3670 KB/s, 21 seconds passed
-... 61%, 77920 KB, 3671 KB/s, 21 seconds passed
-... 61%, 77952 KB, 3671 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 61%, 77984 KB, 3672 KB/s, 21 seconds passed
-... 61%, 78016 KB, 3670 KB/s, 21 seconds passed
-... 61%, 78048 KB, 3671 KB/s, 21 seconds passed
-... 61%, 78080 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78112 KB, 3672 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 62%, 78144 KB, 3670 KB/s, 21 seconds passed
-... 62%, 78176 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78208 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78240 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78272 KB, 3670 KB/s, 21 seconds passed
-... 62%, 78304 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78336 KB, 3671 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 62%, 78368 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78400 KB, 3670 KB/s, 21 seconds passed
-... 62%, 78432 KB, 3670 KB/s, 21 seconds passed
-... 62%, 78464 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78496 KB, 3671 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 62%, 78528 KB, 3670 KB/s, 21 seconds passed
-... 62%, 78560 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78592 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78624 KB, 3672 KB/s, 21 seconds passed
-... 62%, 78656 KB, 3670 KB/s, 21 seconds passed
-... 62%, 78688 KB, 3671 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 62%, 78720 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78752 KB, 3672 KB/s, 21 seconds passed
-... 62%, 78784 KB, 3670 KB/s, 21 seconds passed
-... 62%, 78816 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78848 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78880 KB, 3672 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 62%, 78912 KB, 3670 KB/s, 21 seconds passed
-... 62%, 78944 KB, 3671 KB/s, 21 seconds passed
-... 62%, 78976 KB, 3671 KB/s, 21 seconds passed
-... 62%, 79008 KB, 3672 KB/s, 21 seconds passed
-... 62%, 79040 KB, 3670 KB/s, 21 seconds passed
-... 62%, 79072 KB, 3671 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 62%, 79104 KB, 3671 KB/s, 21 seconds passed
-... 62%, 79136 KB, 3672 KB/s, 21 seconds passed
-... 62%, 79168 KB, 3670 KB/s, 21 seconds passed
-... 62%, 79200 KB, 3671 KB/s, 21 seconds passed
-... 62%, 79232 KB, 3671 KB/s, 21 seconds passed
-... 62%, 79264 KB, 3672 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 62%, 79296 KB, 3670 KB/s, 21 seconds passed
-... 62%, 79328 KB, 3671 KB/s, 21 seconds passed
-... 63%, 79360 KB, 3671 KB/s, 21 seconds passed
-... 63%, 79392 KB, 3672 KB/s, 21 seconds passed
-... 63%, 79424 KB, 3670 KB/s, 21 seconds passed
-... 63%, 79456 KB, 3671 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 63%, 79488 KB, 3671 KB/s, 21 seconds passed
-... 63%, 79520 KB, 3672 KB/s, 21 seconds passed
-... 63%, 79552 KB, 3670 KB/s, 21 seconds passed
-... 63%, 79584 KB, 3671 KB/s, 21 seconds passed
-... 63%, 79616 KB, 3671 KB/s, 21 seconds passed
-... 63%, 79648 KB, 3672 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 63%, 79680 KB, 3670 KB/s, 21 seconds passed
-... 63%, 79712 KB, 3671 KB/s, 21 seconds passed
-... 63%, 79744 KB, 3671 KB/s, 21 seconds passed
-... 63%, 79776 KB, 3672 KB/s, 21 seconds passed
-... 63%, 79808 KB, 3670 KB/s, 21 seconds passed
-... 63%, 79840 KB, 3671 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 63%, 79872 KB, 3671 KB/s, 21 seconds passed
-... 63%, 79904 KB, 3672 KB/s, 21 seconds passed
-... 63%, 79936 KB, 3670 KB/s, 21 seconds passed
-... 63%, 79968 KB, 3671 KB/s, 21 seconds passed
-... 63%, 80000 KB, 3672 KB/s, 21 seconds passed
-... 63%, 80032 KB, 3672 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 63%, 80064 KB, 3670 KB/s, 21 seconds passed
-... 63%, 80096 KB, 3671 KB/s, 21 seconds passed
-... 63%, 80128 KB, 3671 KB/s, 21 seconds passed
-... 63%, 80160 KB, 3672 KB/s, 21 seconds passed
-... 63%, 80192 KB, 3670 KB/s, 21 seconds passed
-... 63%, 80224 KB, 3671 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 63%, 80256 KB, 3671 KB/s, 21 seconds passed
-... 63%, 80288 KB, 3672 KB/s, 21 seconds passed
-... 63%, 80320 KB, 3670 KB/s, 21 seconds passed
-... 63%, 80352 KB, 3671 KB/s, 21 seconds passed
-... 63%, 80384 KB, 3671 KB/s, 21 seconds passed
-... 63%, 80416 KB, 3672 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 63%, 80448 KB, 3670 KB/s, 21 seconds passed
-... 63%, 80480 KB, 3671 KB/s, 21 seconds passed
-... 63%, 80512 KB, 3671 KB/s, 21 seconds passed
-... 63%, 80544 KB, 3670 KB/s, 21 seconds passed
-... 63%, 80576 KB, 3670 KB/s, 21 seconds passed
-... 63%, 80608 KB, 3672 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 64%, 80640 KB, 3672 KB/s, 21 seconds passed
-... 64%, 80672 KB, 3672 KB/s, 21 seconds passed
-... 64%, 80704 KB, 3671 KB/s, 21 seconds passed
-... 64%, 80736 KB, 3672 KB/s, 21 seconds passed
-... 64%, 80768 KB, 3672 KB/s, 21 seconds passed
-... 64%, 80800 KB, 3673 KB/s, 21 seconds passed
-
-.. parsed-literal::
-
-    ... 64%, 80832 KB, 3670 KB/s, 22 seconds passed
-... 64%, 80864 KB, 3671 KB/s, 22 seconds passed
-... 64%, 80896 KB, 3672 KB/s, 22 seconds passed
-... 64%, 80928 KB, 3670 KB/s, 22 seconds passed
-... 64%, 80960 KB, 3670 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 64%, 80992 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81024 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81056 KB, 3670 KB/s, 22 seconds passed
-... 64%, 81088 KB, 3670 KB/s, 22 seconds passed
-... 64%, 81120 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81152 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 64%, 81184 KB, 3670 KB/s, 22 seconds passed
-... 64%, 81216 KB, 3671 KB/s, 22 seconds passed
-... 64%, 81248 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81280 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81312 KB, 3673 KB/s, 22 seconds passed
-... 64%, 81344 KB, 3671 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 64%, 81376 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81408 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81440 KB, 3671 KB/s, 22 seconds passed
-... 64%, 81472 KB, 3671 KB/s, 22 seconds passed
-... 64%, 81504 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81536 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 64%, 81568 KB, 3671 KB/s, 22 seconds passed
-... 64%, 81600 KB, 3671 KB/s, 22 seconds passed
-... 64%, 81632 KB, 3671 KB/s, 22 seconds passed
-... 64%, 81664 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81696 KB, 3670 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 64%, 81728 KB, 3671 KB/s, 22 seconds passed
-... 64%, 81760 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81792 KB, 3672 KB/s, 22 seconds passed
-... 64%, 81824 KB, 3671 KB/s, 22 seconds passed
-... 64%, 81856 KB, 3671 KB/s, 22 seconds passed
-... 65%, 81888 KB, 3672 KB/s, 22 seconds passed
-... 65%, 81920 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 65%, 81952 KB, 3670 KB/s, 22 seconds passed
-... 65%, 81984 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82016 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82048 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82080 KB, 3671 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 65%, 82112 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82144 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82176 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82208 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82240 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82272 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82304 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 65%, 82336 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82368 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82400 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82432 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82464 KB, 3671 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 65%, 82496 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82528 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82560 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82592 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82624 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82656 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82688 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 65%, 82720 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82752 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82784 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82816 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82848 KB, 3671 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 65%, 82880 KB, 3671 KB/s, 22 seconds passed
-... 65%, 82912 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82944 KB, 3672 KB/s, 22 seconds passed
-... 65%, 82976 KB, 3671 KB/s, 22 seconds passed
-... 65%, 83008 KB, 3671 KB/s, 22 seconds passed
-... 65%, 83040 KB, 3672 KB/s, 22 seconds passed
-... 65%, 83072 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 65%, 83104 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83136 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83168 KB, 3672 KB/s, 22 seconds passed
-... 66%, 83200 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 66%, 83232 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83264 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83296 KB, 3672 KB/s, 22 seconds passed
-... 66%, 83328 KB, 3672 KB/s, 22 seconds passed
-... 66%, 83360 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83392 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83424 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 66%, 83456 KB, 3672 KB/s, 22 seconds passed
-... 66%, 83488 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83520 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83552 KB, 3672 KB/s, 22 seconds passed
-... 66%, 83584 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 66%, 83616 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83648 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83680 KB, 3672 KB/s, 22 seconds passed
-... 66%, 83712 KB, 3672 KB/s, 22 seconds passed
-... 66%, 83744 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83776 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83808 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 66%, 83840 KB, 3672 KB/s, 22 seconds passed
-... 66%, 83872 KB, 3671 KB/s, 22 seconds passed
-... 66%, 83904 KB, 3672 KB/s, 22 seconds passed
-... 66%, 83936 KB, 3673 KB/s, 22 seconds passed
-... 66%, 83968 KB, 3673 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 66%, 84000 KB, 3671 KB/s, 22 seconds passed
-... 66%, 84032 KB, 3671 KB/s, 22 seconds passed
-... 66%, 84064 KB, 3672 KB/s, 22 seconds passed
-... 66%, 84096 KB, 3672 KB/s, 22 seconds passed
-... 66%, 84128 KB, 3671 KB/s, 22 seconds passed
-... 66%, 84160 KB, 3671 KB/s, 22 seconds passed
-... 66%, 84192 KB, 3672 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 66%, 84224 KB, 3672 KB/s, 22 seconds passed
-... 66%, 84256 KB, 3671 KB/s, 22 seconds passed
-... 66%, 84288 KB, 3671 KB/s, 22 seconds passed
-... 66%, 84320 KB, 3672 KB/s, 22 seconds passed
-... 66%, 84352 KB, 3673 KB/s, 22 seconds passed
-
-.. parsed-literal::
-
-    ... 66%, 84384 KB, 3671 KB/s, 22 seconds passed
-... 67%, 84416 KB, 3672 KB/s, 22 seconds passed
-... 67%, 84448 KB, 3673 KB/s, 22 seconds passed
-... 67%, 84480 KB, 3673 KB/s, 22 seconds passed
-... 67%, 84512 KB, 3671 KB/s, 23 seconds passed
-... 67%, 84544 KB, 3672 KB/s, 23 seconds passed
-... 67%, 84576 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 67%, 84608 KB, 3673 KB/s, 23 seconds passed
-... 67%, 84640 KB, 3672 KB/s, 23 seconds passed
-... 67%, 84672 KB, 3672 KB/s, 23 seconds passed
-... 67%, 84704 KB, 3673 KB/s, 23 seconds passed
-... 67%, 84736 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 67%, 84768 KB, 3672 KB/s, 23 seconds passed
-... 67%, 84800 KB, 3672 KB/s, 23 seconds passed
-... 67%, 84832 KB, 3672 KB/s, 23 seconds passed
-... 67%, 84864 KB, 3671 KB/s, 23 seconds passed
-... 67%, 84896 KB, 3671 KB/s, 23 seconds passed
-... 67%, 84928 KB, 3672 KB/s, 23 seconds passed
-... 67%, 84960 KB, 3672 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 67%, 84992 KB, 3671 KB/s, 23 seconds passed
-... 67%, 85024 KB, 3671 KB/s, 23 seconds passed
-... 67%, 85056 KB, 3672 KB/s, 23 seconds passed
-... 67%, 85088 KB, 3672 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 67%, 85120 KB, 3671 KB/s, 23 seconds passed
-... 67%, 85152 KB, 3671 KB/s, 23 seconds passed
-... 67%, 85184 KB, 3672 KB/s, 23 seconds passed
-... 67%, 85216 KB, 3672 KB/s, 23 seconds passed
-... 67%, 85248 KB, 3673 KB/s, 23 seconds passed
-... 67%, 85280 KB, 3671 KB/s, 23 seconds passed
-... 67%, 85312 KB, 3672 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 67%, 85344 KB, 3673 KB/s, 23 seconds passed
-... 67%, 85376 KB, 3671 KB/s, 23 seconds passed
-... 67%, 85408 KB, 3671 KB/s, 23 seconds passed
-... 67%, 85440 KB, 3672 KB/s, 23 seconds passed
-... 67%, 85472 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 67%, 85504 KB, 3671 KB/s, 23 seconds passed
-... 67%, 85536 KB, 3671 KB/s, 23 seconds passed
-... 67%, 85568 KB, 3672 KB/s, 23 seconds passed
-... 67%, 85600 KB, 3673 KB/s, 23 seconds passed
-... 67%, 85632 KB, 3671 KB/s, 23 seconds passed
-... 68%, 85664 KB, 3671 KB/s, 23 seconds passed
-... 68%, 85696 KB, 3672 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 68%, 85728 KB, 3673 KB/s, 23 seconds passed
-... 68%, 85760 KB, 3671 KB/s, 23 seconds passed
-... 68%, 85792 KB, 3671 KB/s, 23 seconds passed
-... 68%, 85824 KB, 3672 KB/s, 23 seconds passed
-... 68%, 85856 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 68%, 85888 KB, 3671 KB/s, 23 seconds passed
-... 68%, 85920 KB, 3671 KB/s, 23 seconds passed
-... 68%, 85952 KB, 3672 KB/s, 23 seconds passed
-... 68%, 85984 KB, 3673 KB/s, 23 seconds passed
-... 68%, 86016 KB, 3671 KB/s, 23 seconds passed
-... 68%, 86048 KB, 3671 KB/s, 23 seconds passed
-... 68%, 86080 KB, 3672 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 68%, 86112 KB, 3673 KB/s, 23 seconds passed
-... 68%, 86144 KB, 3671 KB/s, 23 seconds passed
-... 68%, 86176 KB, 3672 KB/s, 23 seconds passed
-... 68%, 86208 KB, 3672 KB/s, 23 seconds passed
-... 68%, 86240 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 68%, 86272 KB, 3671 KB/s, 23 seconds passed
-... 68%, 86304 KB, 3671 KB/s, 23 seconds passed
-... 68%, 86336 KB, 3672 KB/s, 23 seconds passed
-... 68%, 86368 KB, 3673 KB/s, 23 seconds passed
-... 68%, 86400 KB, 3671 KB/s, 23 seconds passed
-... 68%, 86432 KB, 3672 KB/s, 23 seconds passed
-... 68%, 86464 KB, 3672 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 68%, 86496 KB, 3673 KB/s, 23 seconds passed
-... 68%, 86528 KB, 3672 KB/s, 23 seconds passed
-... 68%, 86560 KB, 3672 KB/s, 23 seconds passed
-... 68%, 86592 KB, 3673 KB/s, 23 seconds passed
-... 68%, 86624 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 68%, 86656 KB, 3672 KB/s, 23 seconds passed
-... 68%, 86688 KB, 3672 KB/s, 23 seconds passed
-... 68%, 86720 KB, 3673 KB/s, 23 seconds passed
-... 68%, 86752 KB, 3673 KB/s, 23 seconds passed
-... 68%, 86784 KB, 3672 KB/s, 23 seconds passed
-... 68%, 86816 KB, 3672 KB/s, 23 seconds passed
-... 68%, 86848 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 68%, 86880 KB, 3673 KB/s, 23 seconds passed
-... 69%, 86912 KB, 3672 KB/s, 23 seconds passed
-... 69%, 86944 KB, 3672 KB/s, 23 seconds passed
-... 69%, 86976 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87008 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 69%, 87040 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87072 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87104 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87136 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87168 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87200 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87232 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 69%, 87264 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87296 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87328 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87360 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87392 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 69%, 87424 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87456 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87488 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87520 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87552 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87584 KB, 3672 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 69%, 87616 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87648 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87680 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87712 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87744 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87776 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 69%, 87808 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87840 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87872 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87904 KB, 3673 KB/s, 23 seconds passed
-... 69%, 87936 KB, 3672 KB/s, 23 seconds passed
-... 69%, 87968 KB, 3672 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 69%, 88000 KB, 3673 KB/s, 23 seconds passed
-... 69%, 88032 KB, 3673 KB/s, 23 seconds passed
-... 69%, 88064 KB, 3672 KB/s, 23 seconds passed
-... 69%, 88096 KB, 3672 KB/s, 23 seconds passed
-... 69%, 88128 KB, 3673 KB/s, 23 seconds passed
-... 69%, 88160 KB, 3673 KB/s, 23 seconds passed
-
-.. parsed-literal::
-
-    ... 70%, 88192 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88224 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88256 KB, 3673 KB/s, 24 seconds passed
-... 70%, 88288 KB, 3673 KB/s, 24 seconds passed
-... 70%, 88320 KB, 3672 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 70%, 88352 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88384 KB, 3673 KB/s, 24 seconds passed
-... 70%, 88416 KB, 3673 KB/s, 24 seconds passed
-... 70%, 88448 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88480 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88512 KB, 3673 KB/s, 24 seconds passed
-... 70%, 88544 KB, 3673 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 70%, 88576 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88608 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88640 KB, 3673 KB/s, 24 seconds passed
-... 70%, 88672 KB, 3673 KB/s, 24 seconds passed
-... 70%, 88704 KB, 3672 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 70%, 88736 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88768 KB, 3673 KB/s, 24 seconds passed
-... 70%, 88800 KB, 3673 KB/s, 24 seconds passed
-... 70%, 88832 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88864 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88896 KB, 3673 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 70%, 88928 KB, 3671 KB/s, 24 seconds passed
-... 70%, 88960 KB, 3672 KB/s, 24 seconds passed
-... 70%, 88992 KB, 3672 KB/s, 24 seconds passed
-... 70%, 89024 KB, 3673 KB/s, 24 seconds passed
-... 70%, 89056 KB, 3671 KB/s, 24 seconds passed
-... 70%, 89088 KB, 3672 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 70%, 89120 KB, 3672 KB/s, 24 seconds passed
-... 70%, 89152 KB, 3673 KB/s, 24 seconds passed
-... 70%, 89184 KB, 3672 KB/s, 24 seconds passed
-... 70%, 89216 KB, 3672 KB/s, 24 seconds passed
-... 70%, 89248 KB, 3672 KB/s, 24 seconds passed
-... 70%, 89280 KB, 3673 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 70%, 89312 KB, 3672 KB/s, 24 seconds passed
-... 70%, 89344 KB, 3672 KB/s, 24 seconds passed
-... 70%, 89376 KB, 3672 KB/s, 24 seconds passed
-... 70%, 89408 KB, 3673 KB/s, 24 seconds passed
-... 71%, 89440 KB, 3672 KB/s, 24 seconds passed
-... 71%, 89472 KB, 3672 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 71%, 89504 KB, 3672 KB/s, 24 seconds passed
-... 71%, 89536 KB, 3673 KB/s, 24 seconds passed
-... 71%, 89568 KB, 3672 KB/s, 24 seconds passed
-... 71%, 89600 KB, 3672 KB/s, 24 seconds passed
-... 71%, 89632 KB, 3672 KB/s, 24 seconds passed
-... 71%, 89664 KB, 3673 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 71%, 89696 KB, 3671 KB/s, 24 seconds passed
-... 71%, 89728 KB, 3672 KB/s, 24 seconds passed
-... 71%, 89760 KB, 3672 KB/s, 24 seconds passed
-... 71%, 89792 KB, 3673 KB/s, 24 seconds passed
-... 71%, 89824 KB, 3672 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 71%, 89856 KB, 3672 KB/s, 24 seconds passed
-... 71%, 89888 KB, 3673 KB/s, 24 seconds passed
-... 71%, 89920 KB, 3673 KB/s, 24 seconds passed
-... 71%, 89952 KB, 3672 KB/s, 24 seconds passed
-... 71%, 89984 KB, 3672 KB/s, 24 seconds passed
-... 71%, 90016 KB, 3673 KB/s, 24 seconds passed
-... 71%, 90048 KB, 3673 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 71%, 90080 KB, 3672 KB/s, 24 seconds passed
-... 71%, 90112 KB, 3672 KB/s, 24 seconds passed
-... 71%, 90144 KB, 3673 KB/s, 24 seconds passed
-... 71%, 90176 KB, 3673 KB/s, 24 seconds passed
-... 71%, 90208 KB, 3672 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 71%, 90240 KB, 3672 KB/s, 24 seconds passed
-... 71%, 90272 KB, 3673 KB/s, 24 seconds passed
-... 71%, 90304 KB, 3673 KB/s, 24 seconds passed
-... 71%, 90336 KB, 3672 KB/s, 24 seconds passed
-... 71%, 90368 KB, 3672 KB/s, 24 seconds passed
-... 71%, 90400 KB, 3673 KB/s, 24 seconds passed
-... 71%, 90432 KB, 3673 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 71%, 90464 KB, 3672 KB/s, 24 seconds passed
-... 71%, 90496 KB, 3672 KB/s, 24 seconds passed
-... 71%, 90528 KB, 3673 KB/s, 24 seconds passed
-... 71%, 90560 KB, 3674 KB/s, 24 seconds passed
-... 71%, 90592 KB, 3672 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 71%, 90624 KB, 3672 KB/s, 24 seconds passed
-... 71%, 90656 KB, 3673 KB/s, 24 seconds passed
-... 72%, 90688 KB, 3673 KB/s, 24 seconds passed
-... 72%, 90720 KB, 3672 KB/s, 24 seconds passed
-... 72%, 90752 KB, 3672 KB/s, 24 seconds passed
-... 72%, 90784 KB, 3673 KB/s, 24 seconds passed
-... 72%, 90816 KB, 3673 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 72%, 90848 KB, 3672 KB/s, 24 seconds passed
-... 72%, 90880 KB, 3672 KB/s, 24 seconds passed
-... 72%, 90912 KB, 3673 KB/s, 24 seconds passed
-... 72%, 90944 KB, 3674 KB/s, 24 seconds passed
-... 72%, 90976 KB, 3672 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 72%, 91008 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91040 KB, 3673 KB/s, 24 seconds passed
-... 72%, 91072 KB, 3674 KB/s, 24 seconds passed
-... 72%, 91104 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91136 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91168 KB, 3673 KB/s, 24 seconds passed
-... 72%, 91200 KB, 3674 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 72%, 91232 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91264 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91296 KB, 3673 KB/s, 24 seconds passed
-... 72%, 91328 KB, 3673 KB/s, 24 seconds passed
-... 72%, 91360 KB, 3672 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 72%, 91392 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91424 KB, 3673 KB/s, 24 seconds passed
-... 72%, 91456 KB, 3673 KB/s, 24 seconds passed
-... 72%, 91488 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91520 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91552 KB, 3673 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 72%, 91584 KB, 3673 KB/s, 24 seconds passed
-... 72%, 91616 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91648 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91680 KB, 3673 KB/s, 24 seconds passed
-... 72%, 91712 KB, 3673 KB/s, 24 seconds passed
-
-.. parsed-literal::
-
-    ... 72%, 91744 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91776 KB, 3672 KB/s, 24 seconds passed
-... 72%, 91808 KB, 3673 KB/s, 24 seconds passed
-... 72%, 91840 KB, 3673 KB/s, 25 seconds passed
-... 72%, 91872 KB, 3672 KB/s, 25 seconds passed
-... 72%, 91904 KB, 3672 KB/s, 25 seconds passed
-... 72%, 91936 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 73%, 91968 KB, 3673 KB/s, 25 seconds passed
-... 73%, 92000 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92032 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92064 KB, 3673 KB/s, 25 seconds passed
-... 73%, 92096 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 73%, 92128 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92160 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92192 KB, 3673 KB/s, 25 seconds passed
-... 73%, 92224 KB, 3673 KB/s, 25 seconds passed
-... 73%, 92256 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92288 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92320 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 73%, 92352 KB, 3673 KB/s, 25 seconds passed
-... 73%, 92384 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92416 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92448 KB, 3673 KB/s, 25 seconds passed
-... 73%, 92480 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 73%, 92512 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92544 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92576 KB, 3673 KB/s, 25 seconds passed
-... 73%, 92608 KB, 3673 KB/s, 25 seconds passed
-... 73%, 92640 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92672 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92704 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 73%, 92736 KB, 3673 KB/s, 25 seconds passed
-... 73%, 92768 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92800 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92832 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 73%, 92864 KB, 3671 KB/s, 25 seconds passed
-... 73%, 92896 KB, 3671 KB/s, 25 seconds passed
-... 73%, 92928 KB, 3672 KB/s, 25 seconds passed
-... 73%, 92960 KB, 3673 KB/s, 25 seconds passed
-... 73%, 92992 KB, 3671 KB/s, 25 seconds passed
-... 73%, 93024 KB, 3672 KB/s, 25 seconds passed
-... 73%, 93056 KB, 3672 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 73%, 93088 KB, 3673 KB/s, 25 seconds passed
-... 73%, 93120 KB, 3672 KB/s, 25 seconds passed
-... 73%, 93152 KB, 3672 KB/s, 25 seconds passed
-... 73%, 93184 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93216 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 74%, 93248 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93280 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93312 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93344 KB, 3673 KB/s, 25 seconds passed
-... 74%, 93376 KB, 3673 KB/s, 25 seconds passed
-... 74%, 93408 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93440 KB, 3672 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 74%, 93472 KB, 3673 KB/s, 25 seconds passed
-... 74%, 93504 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93536 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93568 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93600 KB, 3673 KB/s, 25 seconds passed
-... 74%, 93632 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 74%, 93664 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93696 KB, 3673 KB/s, 25 seconds passed
-... 74%, 93728 KB, 3673 KB/s, 25 seconds passed
-... 74%, 93760 KB, 3674 KB/s, 25 seconds passed
-... 74%, 93792 KB, 3672 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 74%, 93824 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93856 KB, 3673 KB/s, 25 seconds passed
-... 74%, 93888 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93920 KB, 3672 KB/s, 25 seconds passed
-... 74%, 93952 KB, 3673 KB/s, 25 seconds passed
-... 74%, 93984 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 74%, 94016 KB, 3672 KB/s, 25 seconds passed
-... 74%, 94048 KB, 3672 KB/s, 25 seconds passed
-... 74%, 94080 KB, 3673 KB/s, 25 seconds passed
-... 74%, 94112 KB, 3673 KB/s, 25 seconds passed
-... 74%, 94144 KB, 3672 KB/s, 25 seconds passed
-... 74%, 94176 KB, 3672 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 74%, 94208 KB, 3673 KB/s, 25 seconds passed
-... 74%, 94240 KB, 3673 KB/s, 25 seconds passed
-... 74%, 94272 KB, 3672 KB/s, 25 seconds passed
-... 74%, 94304 KB, 3672 KB/s, 25 seconds passed
-... 74%, 94336 KB, 3673 KB/s, 25 seconds passed
-... 74%, 94368 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 74%, 94400 KB, 3672 KB/s, 25 seconds passed
-... 74%, 94432 KB, 3673 KB/s, 25 seconds passed
-... 74%, 94464 KB, 3673 KB/s, 25 seconds passed
-... 75%, 94496 KB, 3674 KB/s, 25 seconds passed
-... 75%, 94528 KB, 3672 KB/s, 25 seconds passed
-... 75%, 94560 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 75%, 94592 KB, 3673 KB/s, 25 seconds passed
-... 75%, 94624 KB, 3673 KB/s, 25 seconds passed
-... 75%, 94656 KB, 3672 KB/s, 25 seconds passed
-... 75%, 94688 KB, 3672 KB/s, 25 seconds passed
-... 75%, 94720 KB, 3673 KB/s, 25 seconds passed
-... 75%, 94752 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 75%, 94784 KB, 3672 KB/s, 25 seconds passed
-... 75%, 94816 KB, 3672 KB/s, 25 seconds passed
-... 75%, 94848 KB, 3673 KB/s, 25 seconds passed
-... 75%, 94880 KB, 3673 KB/s, 25 seconds passed
-... 75%, 94912 KB, 3672 KB/s, 25 seconds passed
-... 75%, 94944 KB, 3672 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 75%, 94976 KB, 3673 KB/s, 25 seconds passed
-... 75%, 95008 KB, 3673 KB/s, 25 seconds passed
-... 75%, 95040 KB, 3672 KB/s, 25 seconds passed
-... 75%, 95072 KB, 3672 KB/s, 25 seconds passed
-... 75%, 95104 KB, 3673 KB/s, 25 seconds passed
-... 75%, 95136 KB, 3673 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 75%, 95168 KB, 3672 KB/s, 25 seconds passed
-... 75%, 95200 KB, 3672 KB/s, 25 seconds passed
-... 75%, 95232 KB, 3673 KB/s, 25 seconds passed
-... 75%, 95264 KB, 3673 KB/s, 25 seconds passed
-... 75%, 95296 KB, 3672 KB/s, 25 seconds passed
-
-.. parsed-literal::
-
-    ... 75%, 95328 KB, 3672 KB/s, 25 seconds passed
-... 75%, 95360 KB, 3673 KB/s, 25 seconds passed
-... 75%, 95392 KB, 3673 KB/s, 25 seconds passed
-... 75%, 95424 KB, 3672 KB/s, 25 seconds passed
-... 75%, 95456 KB, 3672 KB/s, 25 seconds passed
-... 75%, 95488 KB, 3673 KB/s, 25 seconds passed
-... 75%, 95520 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 75%, 95552 KB, 3672 KB/s, 26 seconds passed
-... 75%, 95584 KB, 3672 KB/s, 26 seconds passed
-... 75%, 95616 KB, 3673 KB/s, 26 seconds passed
-... 75%, 95648 KB, 3673 KB/s, 26 seconds passed
-... 75%, 95680 KB, 3672 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 75%, 95712 KB, 3672 KB/s, 26 seconds passed
-... 76%, 95744 KB, 3673 KB/s, 26 seconds passed
-... 76%, 95776 KB, 3673 KB/s, 26 seconds passed
-... 76%, 95808 KB, 3672 KB/s, 26 seconds passed
-... 76%, 95840 KB, 3672 KB/s, 26 seconds passed
-... 76%, 95872 KB, 3673 KB/s, 26 seconds passed
-... 76%, 95904 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 76%, 95936 KB, 3672 KB/s, 26 seconds passed
-... 76%, 95968 KB, 3672 KB/s, 26 seconds passed
-... 76%, 96000 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96032 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96064 KB, 3672 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 76%, 96096 KB, 3672 KB/s, 26 seconds passed
-... 76%, 96128 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96160 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96192 KB, 3672 KB/s, 26 seconds passed
-... 76%, 96224 KB, 3672 KB/s, 26 seconds passed
-... 76%, 96256 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 76%, 96288 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96320 KB, 3672 KB/s, 26 seconds passed
-... 76%, 96352 KB, 3672 KB/s, 26 seconds passed
-... 76%, 96384 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96416 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96448 KB, 3672 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 76%, 96480 KB, 3672 KB/s, 26 seconds passed
-... 76%, 96512 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96544 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96576 KB, 3672 KB/s, 26 seconds passed
-... 76%, 96608 KB, 3672 KB/s, 26 seconds passed
-... 76%, 96640 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96672 KB, 3674 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 76%, 96704 KB, 3672 KB/s, 26 seconds passed
-... 76%, 96736 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96768 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96800 KB, 3674 KB/s, 26 seconds passed
-... 76%, 96832 KB, 3672 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 76%, 96864 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96896 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96928 KB, 3673 KB/s, 26 seconds passed
-... 76%, 96960 KB, 3672 KB/s, 26 seconds passed
-... 77%, 96992 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97024 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 77%, 97056 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97088 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97120 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97152 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97184 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 77%, 97216 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97248 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97280 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97312 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97344 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97376 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97408 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 77%, 97440 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97472 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97504 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97536 KB, 3674 KB/s, 26 seconds passed
-... 77%, 97568 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 77%, 97600 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97632 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97664 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97696 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97728 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97760 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97792 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 77%, 97824 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97856 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97888 KB, 3673 KB/s, 26 seconds passed
-... 77%, 97920 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 77%, 97952 KB, 3672 KB/s, 26 seconds passed
-... 77%, 97984 KB, 3672 KB/s, 26 seconds passed
-... 77%, 98016 KB, 3673 KB/s, 26 seconds passed
-... 77%, 98048 KB, 3673 KB/s, 26 seconds passed
-... 77%, 98080 KB, 3672 KB/s, 26 seconds passed
-... 77%, 98112 KB, 3672 KB/s, 26 seconds passed
-... 77%, 98144 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 77%, 98176 KB, 3673 KB/s, 26 seconds passed
-... 77%, 98208 KB, 3671 KB/s, 26 seconds passed
-... 77%, 98240 KB, 3672 KB/s, 26 seconds passed
-... 78%, 98272 KB, 3673 KB/s, 26 seconds passed
-... 78%, 98304 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 78%, 98336 KB, 3671 KB/s, 26 seconds passed
-... 78%, 98368 KB, 3672 KB/s, 26 seconds passed
-... 78%, 98400 KB, 3672 KB/s, 26 seconds passed
-... 78%, 98432 KB, 3673 KB/s, 26 seconds passed
-... 78%, 98464 KB, 3671 KB/s, 26 seconds passed
-... 78%, 98496 KB, 3672 KB/s, 26 seconds passed
-... 78%, 98528 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 78%, 98560 KB, 3673 KB/s, 26 seconds passed
-... 78%, 98592 KB, 3671 KB/s, 26 seconds passed
-... 78%, 98624 KB, 3672 KB/s, 26 seconds passed
-... 78%, 98656 KB, 3673 KB/s, 26 seconds passed
-... 78%, 98688 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 78%, 98720 KB, 3671 KB/s, 26 seconds passed
-... 78%, 98752 KB, 3672 KB/s, 26 seconds passed
-... 78%, 98784 KB, 3673 KB/s, 26 seconds passed
-... 78%, 98816 KB, 3673 KB/s, 26 seconds passed
-... 78%, 98848 KB, 3671 KB/s, 26 seconds passed
-... 78%, 98880 KB, 3672 KB/s, 26 seconds passed
-... 78%, 98912 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 78%, 98944 KB, 3673 KB/s, 26 seconds passed
-... 78%, 98976 KB, 3671 KB/s, 26 seconds passed
-... 78%, 99008 KB, 3672 KB/s, 26 seconds passed
-... 78%, 99040 KB, 3673 KB/s, 26 seconds passed
-... 78%, 99072 KB, 3673 KB/s, 26 seconds passed
-
-.. parsed-literal::
-
-    ... 78%, 99104 KB, 3672 KB/s, 26 seconds passed
-... 78%, 99136 KB, 3672 KB/s, 26 seconds passed
-... 78%, 99168 KB, 3673 KB/s, 26 seconds passed
-... 78%, 99200 KB, 3673 KB/s, 27 seconds passed
-... 78%, 99232 KB, 3672 KB/s, 27 seconds passed
-... 78%, 99264 KB, 3672 KB/s, 27 seconds passed
-... 78%, 99296 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 78%, 99328 KB, 3673 KB/s, 27 seconds passed
-... 78%, 99360 KB, 3671 KB/s, 27 seconds passed
-... 78%, 99392 KB, 3672 KB/s, 27 seconds passed
-... 78%, 99424 KB, 3673 KB/s, 27 seconds passed
-... 78%, 99456 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 78%, 99488 KB, 3671 KB/s, 27 seconds passed
-... 79%, 99520 KB, 3672 KB/s, 27 seconds passed
-... 79%, 99552 KB, 3673 KB/s, 27 seconds passed
-... 79%, 99584 KB, 3673 KB/s, 27 seconds passed
-... 79%, 99616 KB, 3671 KB/s, 27 seconds passed
-... 79%, 99648 KB, 3672 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 79%, 99680 KB, 3673 KB/s, 27 seconds passed
-... 79%, 99712 KB, 3674 KB/s, 27 seconds passed
-... 79%, 99744 KB, 3672 KB/s, 27 seconds passed
-... 79%, 99776 KB, 3672 KB/s, 27 seconds passed
-... 79%, 99808 KB, 3673 KB/s, 27 seconds passed
-... 79%, 99840 KB, 3674 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 79%, 99872 KB, 3672 KB/s, 27 seconds passed
-... 79%, 99904 KB, 3673 KB/s, 27 seconds passed
-... 79%, 99936 KB, 3673 KB/s, 27 seconds passed
-... 79%, 99968 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100000 KB, 3672 KB/s, 27 seconds passed
-... 79%, 100032 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 79%, 100064 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100096 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100128 KB, 3672 KB/s, 27 seconds passed
-... 79%, 100160 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100192 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100224 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 79%, 100256 KB, 3672 KB/s, 27 seconds passed
-... 79%, 100288 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100320 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100352 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100384 KB, 3672 KB/s, 27 seconds passed
-... 79%, 100416 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 79%, 100448 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100480 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100512 KB, 3672 KB/s, 27 seconds passed
-... 79%, 100544 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100576 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100608 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 79%, 100640 KB, 3672 KB/s, 27 seconds passed
-... 79%, 100672 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100704 KB, 3673 KB/s, 27 seconds passed
-... 79%, 100736 KB, 3673 KB/s, 27 seconds passed
-... 80%, 100768 KB, 3672 KB/s, 27 seconds passed
-... 80%, 100800 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 80%, 100832 KB, 3673 KB/s, 27 seconds passed
-... 80%, 100864 KB, 3673 KB/s, 27 seconds passed
-... 80%, 100896 KB, 3672 KB/s, 27 seconds passed
-... 80%, 100928 KB, 3673 KB/s, 27 seconds passed
-... 80%, 100960 KB, 3673 KB/s, 27 seconds passed
-... 80%, 100992 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 80%, 101024 KB, 3672 KB/s, 27 seconds passed
-... 80%, 101056 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101088 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101120 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101152 KB, 3672 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 80%, 101184 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101216 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101248 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101280 KB, 3672 KB/s, 27 seconds passed
-... 80%, 101312 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101344 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101376 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 80%, 101408 KB, 3672 KB/s, 27 seconds passed
-... 80%, 101440 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101472 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101504 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 80%, 101536 KB, 3672 KB/s, 27 seconds passed
-... 80%, 101568 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101600 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101632 KB, 3672 KB/s, 27 seconds passed
-... 80%, 101664 KB, 3672 KB/s, 27 seconds passed
-... 80%, 101696 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101728 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 80%, 101760 KB, 3672 KB/s, 27 seconds passed
-... 80%, 101792 KB, 3672 KB/s, 27 seconds passed
-... 80%, 101824 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101856 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101888 KB, 3672 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 80%, 101920 KB, 3672 KB/s, 27 seconds passed
-... 80%, 101952 KB, 3673 KB/s, 27 seconds passed
-... 80%, 101984 KB, 3673 KB/s, 27 seconds passed
-... 80%, 102016 KB, 3672 KB/s, 27 seconds passed
-... 81%, 102048 KB, 3672 KB/s, 27 seconds passed
-... 81%, 102080 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102112 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 81%, 102144 KB, 3672 KB/s, 27 seconds passed
-... 81%, 102176 KB, 3672 KB/s, 27 seconds passed
-... 81%, 102208 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102240 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102272 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 81%, 102304 KB, 3672 KB/s, 27 seconds passed
-... 81%, 102336 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102368 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102400 KB, 3672 KB/s, 27 seconds passed
-... 81%, 102432 KB, 3672 KB/s, 27 seconds passed
-... 81%, 102464 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102496 KB, 3673 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 81%, 102528 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102560 KB, 3672 KB/s, 27 seconds passed
-... 81%, 102592 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102624 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102656 KB, 3672 KB/s, 27 seconds passed
-
-.. parsed-literal::
-
-    ... 81%, 102688 KB, 3672 KB/s, 27 seconds passed
-... 81%, 102720 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102752 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102784 KB, 3674 KB/s, 27 seconds passed
-... 81%, 102816 KB, 3672 KB/s, 27 seconds passed
-... 81%, 102848 KB, 3673 KB/s, 27 seconds passed
-... 81%, 102880 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 81%, 102912 KB, 3673 KB/s, 28 seconds passed
-... 81%, 102944 KB, 3672 KB/s, 28 seconds passed
-... 81%, 102976 KB, 3673 KB/s, 28 seconds passed
-... 81%, 103008 KB, 3673 KB/s, 28 seconds passed
-... 81%, 103040 KB, 3673 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 81%, 103072 KB, 3672 KB/s, 28 seconds passed
-... 81%, 103104 KB, 3673 KB/s, 28 seconds passed
-... 81%, 103136 KB, 3674 KB/s, 28 seconds passed
-... 81%, 103168 KB, 3673 KB/s, 28 seconds passed
-... 81%, 103200 KB, 3672 KB/s, 28 seconds passed
-... 81%, 103232 KB, 3673 KB/s, 28 seconds passed
-... 81%, 103264 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 82%, 103296 KB, 3673 KB/s, 28 seconds passed
-... 82%, 103328 KB, 3672 KB/s, 28 seconds passed
-... 82%, 103360 KB, 3673 KB/s, 28 seconds passed
-... 82%, 103392 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 82%, 103424 KB, 3672 KB/s, 28 seconds passed
-... 82%, 103456 KB, 3672 KB/s, 28 seconds passed
-... 82%, 103488 KB, 3673 KB/s, 28 seconds passed
-... 82%, 103520 KB, 3673 KB/s, 28 seconds passed
-... 82%, 103552 KB, 3673 KB/s, 28 seconds passed
-... 82%, 103584 KB, 3672 KB/s, 28 seconds passed
-... 82%, 103616 KB, 3673 KB/s, 28 seconds passed
-... 82%, 103648 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 82%, 103680 KB, 3672 KB/s, 28 seconds passed
-... 82%, 103712 KB, 3672 KB/s, 28 seconds passed
-... 82%, 103744 KB, 3673 KB/s, 28 seconds passed
-... 82%, 103776 KB, 3673 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 82%, 103808 KB, 3672 KB/s, 28 seconds passed
-... 82%, 103840 KB, 3672 KB/s, 28 seconds passed
-... 82%, 103872 KB, 3673 KB/s, 28 seconds passed
-... 82%, 103904 KB, 3673 KB/s, 28 seconds passed
-... 82%, 103936 KB, 3672 KB/s, 28 seconds passed
-... 82%, 103968 KB, 3672 KB/s, 28 seconds passed
-... 82%, 104000 KB, 3673 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 82%, 104032 KB, 3673 KB/s, 28 seconds passed
-... 82%, 104064 KB, 3672 KB/s, 28 seconds passed
-... 82%, 104096 KB, 3672 KB/s, 28 seconds passed
-... 82%, 104128 KB, 3673 KB/s, 28 seconds passed
-... 82%, 104160 KB, 3673 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 82%, 104192 KB, 3672 KB/s, 28 seconds passed
-... 82%, 104224 KB, 3672 KB/s, 28 seconds passed
-... 82%, 104256 KB, 3673 KB/s, 28 seconds passed
-... 82%, 104288 KB, 3673 KB/s, 28 seconds passed
-... 82%, 104320 KB, 3672 KB/s, 28 seconds passed
-... 82%, 104352 KB, 3673 KB/s, 28 seconds passed
-... 82%, 104384 KB, 3673 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 82%, 104416 KB, 3673 KB/s, 28 seconds passed
-... 82%, 104448 KB, 3672 KB/s, 28 seconds passed
-... 82%, 104480 KB, 3673 KB/s, 28 seconds passed
-... 82%, 104512 KB, 3673 KB/s, 28 seconds passed
-... 83%, 104544 KB, 3673 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 83%, 104576 KB, 3672 KB/s, 28 seconds passed
-... 83%, 104608 KB, 3673 KB/s, 28 seconds passed
-... 83%, 104640 KB, 3674 KB/s, 28 seconds passed
-... 83%, 104672 KB, 3674 KB/s, 28 seconds passed
-... 83%, 104704 KB, 3672 KB/s, 28 seconds passed
-... 83%, 104736 KB, 3673 KB/s, 28 seconds passed
-... 83%, 104768 KB, 3674 KB/s, 28 seconds passed
-... 83%, 104800 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 83%, 104832 KB, 3672 KB/s, 28 seconds passed
-... 83%, 104864 KB, 3673 KB/s, 28 seconds passed
-... 83%, 104896 KB, 3674 KB/s, 28 seconds passed
-... 83%, 104928 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 83%, 104960 KB, 3672 KB/s, 28 seconds passed
-... 83%, 104992 KB, 3673 KB/s, 28 seconds passed
-... 83%, 105024 KB, 3674 KB/s, 28 seconds passed
-... 83%, 105056 KB, 3674 KB/s, 28 seconds passed
-... 83%, 105088 KB, 3672 KB/s, 28 seconds passed
-... 83%, 105120 KB, 3673 KB/s, 28 seconds passed
-... 83%, 105152 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 83%, 105184 KB, 3674 KB/s, 28 seconds passed
-... 83%, 105216 KB, 3672 KB/s, 28 seconds passed
-... 83%, 105248 KB, 3673 KB/s, 28 seconds passed
-... 83%, 105280 KB, 3674 KB/s, 28 seconds passed
-... 83%, 105312 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 83%, 105344 KB, 3672 KB/s, 28 seconds passed
-... 83%, 105376 KB, 3673 KB/s, 28 seconds passed
-... 83%, 105408 KB, 3674 KB/s, 28 seconds passed
-... 83%, 105440 KB, 3672 KB/s, 28 seconds passed
-... 83%, 105472 KB, 3672 KB/s, 28 seconds passed
-... 83%, 105504 KB, 3673 KB/s, 28 seconds passed
-... 83%, 105536 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 83%, 105568 KB, 3673 KB/s, 28 seconds passed
-... 83%, 105600 KB, 3672 KB/s, 28 seconds passed
-... 83%, 105632 KB, 3673 KB/s, 28 seconds passed
-... 83%, 105664 KB, 3674 KB/s, 28 seconds passed
-... 83%, 105696 KB, 3673 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 83%, 105728 KB, 3672 KB/s, 28 seconds passed
-... 83%, 105760 KB, 3673 KB/s, 28 seconds passed
-... 83%, 105792 KB, 3674 KB/s, 28 seconds passed
-... 84%, 105824 KB, 3673 KB/s, 28 seconds passed
-... 84%, 105856 KB, 3672 KB/s, 28 seconds passed
-... 84%, 105888 KB, 3673 KB/s, 28 seconds passed
-... 84%, 105920 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 84%, 105952 KB, 3673 KB/s, 28 seconds passed
-... 84%, 105984 KB, 3672 KB/s, 28 seconds passed
-... 84%, 106016 KB, 3673 KB/s, 28 seconds passed
-... 84%, 106048 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 84%, 106080 KB, 3673 KB/s, 28 seconds passed
-... 84%, 106112 KB, 3672 KB/s, 28 seconds passed
-... 84%, 106144 KB, 3673 KB/s, 28 seconds passed
-... 84%, 106176 KB, 3674 KB/s, 28 seconds passed
-... 84%, 106208 KB, 3673 KB/s, 28 seconds passed
-... 84%, 106240 KB, 3672 KB/s, 28 seconds passed
-... 84%, 106272 KB, 3673 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 84%, 106304 KB, 3674 KB/s, 28 seconds passed
-... 84%, 106336 KB, 3674 KB/s, 28 seconds passed
-... 84%, 106368 KB, 3672 KB/s, 28 seconds passed
-... 84%, 106400 KB, 3673 KB/s, 28 seconds passed
-... 84%, 106432 KB, 3674 KB/s, 28 seconds passed
-... 84%, 106464 KB, 3674 KB/s, 28 seconds passed
-
-.. parsed-literal::
-
-    ... 84%, 106496 KB, 3672 KB/s, 28 seconds passed
-... 84%, 106528 KB, 3673 KB/s, 28 seconds passed
-... 84%, 106560 KB, 3674 KB/s, 29 seconds passed
-... 84%, 106592 KB, 3674 KB/s, 29 seconds passed
-... 84%, 106624 KB, 3672 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 84%, 106656 KB, 3673 KB/s, 29 seconds passed
-... 84%, 106688 KB, 3674 KB/s, 29 seconds passed
-... 84%, 106720 KB, 3674 KB/s, 29 seconds passed
-... 84%, 106752 KB, 3672 KB/s, 29 seconds passed
-... 84%, 106784 KB, 3673 KB/s, 29 seconds passed
-... 84%, 106816 KB, 3674 KB/s, 29 seconds passed
-... 84%, 106848 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 84%, 106880 KB, 3672 KB/s, 29 seconds passed
-... 84%, 106912 KB, 3673 KB/s, 29 seconds passed
-... 84%, 106944 KB, 3674 KB/s, 29 seconds passed
-... 84%, 106976 KB, 3674 KB/s, 29 seconds passed
-... 84%, 107008 KB, 3672 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 84%, 107040 KB, 3673 KB/s, 29 seconds passed
-... 85%, 107072 KB, 3674 KB/s, 29 seconds passed
-... 85%, 107104 KB, 3674 KB/s, 29 seconds passed
-... 85%, 107136 KB, 3672 KB/s, 29 seconds passed
-... 85%, 107168 KB, 3673 KB/s, 29 seconds passed
-... 85%, 107200 KB, 3674 KB/s, 29 seconds passed
-... 85%, 107232 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 85%, 107264 KB, 3672 KB/s, 29 seconds passed
-... 85%, 107296 KB, 3673 KB/s, 29 seconds passed
-... 85%, 107328 KB, 3674 KB/s, 29 seconds passed
-... 85%, 107360 KB, 3672 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 85%, 107392 KB, 3672 KB/s, 29 seconds passed
-... 85%, 107424 KB, 3673 KB/s, 29 seconds passed
-... 85%, 107456 KB, 3674 KB/s, 29 seconds passed
-... 85%, 107488 KB, 3672 KB/s, 29 seconds passed
-... 85%, 107520 KB, 3672 KB/s, 29 seconds passed
-... 85%, 107552 KB, 3673 KB/s, 29 seconds passed
-... 85%, 107584 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 85%, 107616 KB, 3672 KB/s, 29 seconds passed
-... 85%, 107648 KB, 3672 KB/s, 29 seconds passed
-... 85%, 107680 KB, 3673 KB/s, 29 seconds passed
-... 85%, 107712 KB, 3674 KB/s, 29 seconds passed
-... 85%, 107744 KB, 3672 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 85%, 107776 KB, 3672 KB/s, 29 seconds passed
-... 85%, 107808 KB, 3673 KB/s, 29 seconds passed
-... 85%, 107840 KB, 3674 KB/s, 29 seconds passed
-... 85%, 107872 KB, 3672 KB/s, 29 seconds passed
-... 85%, 107904 KB, 3672 KB/s, 29 seconds passed
-... 85%, 107936 KB, 3673 KB/s, 29 seconds passed
-... 85%, 107968 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 85%, 108000 KB, 3672 KB/s, 29 seconds passed
-... 85%, 108032 KB, 3672 KB/s, 29 seconds passed
-... 85%, 108064 KB, 3673 KB/s, 29 seconds passed
-... 85%, 108096 KB, 3674 KB/s, 29 seconds passed
-... 85%, 108128 KB, 3672 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 85%, 108160 KB, 3672 KB/s, 29 seconds passed
-... 85%, 108192 KB, 3673 KB/s, 29 seconds passed
-... 85%, 108224 KB, 3674 KB/s, 29 seconds passed
-... 85%, 108256 KB, 3672 KB/s, 29 seconds passed
-... 85%, 108288 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108320 KB, 3673 KB/s, 29 seconds passed
-... 86%, 108352 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 86%, 108384 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108416 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108448 KB, 3673 KB/s, 29 seconds passed
-... 86%, 108480 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 86%, 108512 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108544 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108576 KB, 3673 KB/s, 29 seconds passed
-... 86%, 108608 KB, 3674 KB/s, 29 seconds passed
-... 86%, 108640 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108672 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108704 KB, 3673 KB/s, 29 seconds passed
-... 86%, 108736 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 86%, 108768 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108800 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108832 KB, 3673 KB/s, 29 seconds passed
-... 86%, 108864 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 86%, 108896 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108928 KB, 3672 KB/s, 29 seconds passed
-... 86%, 108960 KB, 3673 KB/s, 29 seconds passed
-... 86%, 108992 KB, 3674 KB/s, 29 seconds passed
-... 86%, 109024 KB, 3672 KB/s, 29 seconds passed
-... 86%, 109056 KB, 3673 KB/s, 29 seconds passed
-... 86%, 109088 KB, 3673 KB/s, 29 seconds passed
-... 86%, 109120 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 86%, 109152 KB, 3672 KB/s, 29 seconds passed
-... 86%, 109184 KB, 3672 KB/s, 29 seconds passed
-... 86%, 109216 KB, 3673 KB/s, 29 seconds passed
-... 86%, 109248 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 86%, 109280 KB, 3672 KB/s, 29 seconds passed
-... 86%, 109312 KB, 3672 KB/s, 29 seconds passed
-... 86%, 109344 KB, 3673 KB/s, 29 seconds passed
-... 86%, 109376 KB, 3674 KB/s, 29 seconds passed
-... 86%, 109408 KB, 3672 KB/s, 29 seconds passed
-... 86%, 109440 KB, 3672 KB/s, 29 seconds passed
-... 86%, 109472 KB, 3673 KB/s, 29 seconds passed
-... 86%, 109504 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 86%, 109536 KB, 3672 KB/s, 29 seconds passed
-... 86%, 109568 KB, 3672 KB/s, 29 seconds passed
-... 87%, 109600 KB, 3673 KB/s, 29 seconds passed
-... 87%, 109632 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 87%, 109664 KB, 3672 KB/s, 29 seconds passed
-... 87%, 109696 KB, 3672 KB/s, 29 seconds passed
-... 87%, 109728 KB, 3673 KB/s, 29 seconds passed
-... 87%, 109760 KB, 3674 KB/s, 29 seconds passed
-... 87%, 109792 KB, 3672 KB/s, 29 seconds passed
-... 87%, 109824 KB, 3672 KB/s, 29 seconds passed
-... 87%, 109856 KB, 3673 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 87%, 109888 KB, 3674 KB/s, 29 seconds passed
-... 87%, 109920 KB, 3672 KB/s, 29 seconds passed
-... 87%, 109952 KB, 3672 KB/s, 29 seconds passed
-... 87%, 109984 KB, 3673 KB/s, 29 seconds passed
-... 87%, 110016 KB, 3674 KB/s, 29 seconds passed
-
-.. parsed-literal::
-
-    ... 87%, 110048 KB, 3672 KB/s, 29 seconds passed
-... 87%, 110080 KB, 3672 KB/s, 29 seconds passed
-... 87%, 110112 KB, 3673 KB/s, 29 seconds passed
-... 87%, 110144 KB, 3674 KB/s, 29 seconds passed
-... 87%, 110176 KB, 3672 KB/s, 30 seconds passed
-... 87%, 110208 KB, 3673 KB/s, 30 seconds passed
-... 87%, 110240 KB, 3673 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 87%, 110272 KB, 3674 KB/s, 30 seconds passed
-... 87%, 110304 KB, 3672 KB/s, 30 seconds passed
-... 87%, 110336 KB, 3673 KB/s, 30 seconds passed
-... 87%, 110368 KB, 3673 KB/s, 30 seconds passed
-... 87%, 110400 KB, 3674 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 87%, 110432 KB, 3672 KB/s, 30 seconds passed
-... 87%, 110464 KB, 3673 KB/s, 30 seconds passed
-... 87%, 110496 KB, 3673 KB/s, 30 seconds passed
-... 87%, 110528 KB, 3673 KB/s, 30 seconds passed
-... 87%, 110560 KB, 3672 KB/s, 30 seconds passed
-... 87%, 110592 KB, 3673 KB/s, 30 seconds passed
-... 87%, 110624 KB, 3674 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 87%, 110656 KB, 3673 KB/s, 30 seconds passed
-... 87%, 110688 KB, 3672 KB/s, 30 seconds passed
-... 87%, 110720 KB, 3673 KB/s, 30 seconds passed
-... 87%, 110752 KB, 3674 KB/s, 30 seconds passed
-... 87%, 110784 KB, 3673 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 87%, 110816 KB, 3672 KB/s, 30 seconds passed
-... 88%, 110848 KB, 3673 KB/s, 30 seconds passed
-... 88%, 110880 KB, 3674 KB/s, 30 seconds passed
-... 88%, 110912 KB, 3674 KB/s, 30 seconds passed
-... 88%, 110944 KB, 3672 KB/s, 30 seconds passed
-... 88%, 110976 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111008 KB, 3674 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 88%, 111040 KB, 3674 KB/s, 30 seconds passed
-... 88%, 111072 KB, 3672 KB/s, 30 seconds passed
-... 88%, 111104 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111136 KB, 3674 KB/s, 30 seconds passed
-... 88%, 111168 KB, 3673 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 88%, 111200 KB, 3672 KB/s, 30 seconds passed
-... 88%, 111232 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111264 KB, 3674 KB/s, 30 seconds passed
-... 88%, 111296 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111328 KB, 3672 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 88%, 111360 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111392 KB, 3674 KB/s, 30 seconds passed
-... 88%, 111424 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111456 KB, 3672 KB/s, 30 seconds passed
-... 88%, 111488 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111520 KB, 3674 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 88%, 111552 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111584 KB, 3672 KB/s, 30 seconds passed
-... 88%, 111616 KB, 3672 KB/s, 30 seconds passed
-... 88%, 111648 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111680 KB, 3673 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 88%, 111712 KB, 3672 KB/s, 30 seconds passed
-... 88%, 111744 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111776 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111808 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111840 KB, 3672 KB/s, 30 seconds passed
-... 88%, 111872 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111904 KB, 3673 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 88%, 111936 KB, 3673 KB/s, 30 seconds passed
-... 88%, 111968 KB, 3672 KB/s, 30 seconds passed
-... 88%, 112000 KB, 3673 KB/s, 30 seconds passed
-... 88%, 112032 KB, 3673 KB/s, 30 seconds passed
-... 88%, 112064 KB, 3673 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 88%, 112096 KB, 3672 KB/s, 30 seconds passed
-... 89%, 112128 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112160 KB, 3674 KB/s, 30 seconds passed
-... 89%, 112192 KB, 3674 KB/s, 30 seconds passed
-... 89%, 112224 KB, 3672 KB/s, 30 seconds passed
-... 89%, 112256 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112288 KB, 3674 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 89%, 112320 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112352 KB, 3672 KB/s, 30 seconds passed
-... 89%, 112384 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112416 KB, 3674 KB/s, 30 seconds passed
-... 89%, 112448 KB, 3673 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 89%, 112480 KB, 3672 KB/s, 30 seconds passed
-... 89%, 112512 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112544 KB, 3674 KB/s, 30 seconds passed
-... 89%, 112576 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112608 KB, 3672 KB/s, 30 seconds passed
-... 89%, 112640 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112672 KB, 3674 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 89%, 112704 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112736 KB, 3672 KB/s, 30 seconds passed
-... 89%, 112768 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112800 KB, 3674 KB/s, 30 seconds passed
-... 89%, 112832 KB, 3673 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 89%, 112864 KB, 3672 KB/s, 30 seconds passed
-... 89%, 112896 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112928 KB, 3674 KB/s, 30 seconds passed
-... 89%, 112960 KB, 3673 KB/s, 30 seconds passed
-... 89%, 112992 KB, 3672 KB/s, 30 seconds passed
-... 89%, 113024 KB, 3673 KB/s, 30 seconds passed
-... 89%, 113056 KB, 3674 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 89%, 113088 KB, 3673 KB/s, 30 seconds passed
-... 89%, 113120 KB, 3672 KB/s, 30 seconds passed
-... 89%, 113152 KB, 3673 KB/s, 30 seconds passed
-... 89%, 113184 KB, 3674 KB/s, 30 seconds passed
-... 89%, 113216 KB, 3673 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 89%, 113248 KB, 3672 KB/s, 30 seconds passed
-... 89%, 113280 KB, 3673 KB/s, 30 seconds passed
-... 89%, 113312 KB, 3674 KB/s, 30 seconds passed
-... 89%, 113344 KB, 3673 KB/s, 30 seconds passed
-... 90%, 113376 KB, 3672 KB/s, 30 seconds passed
-... 90%, 113408 KB, 3673 KB/s, 30 seconds passed
-... 90%, 113440 KB, 3674 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 90%, 113472 KB, 3672 KB/s, 30 seconds passed
-... 90%, 113504 KB, 3672 KB/s, 30 seconds passed
-... 90%, 113536 KB, 3673 KB/s, 30 seconds passed
-... 90%, 113568 KB, 3674 KB/s, 30 seconds passed
-... 90%, 113600 KB, 3673 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 90%, 113632 KB, 3672 KB/s, 30 seconds passed
-... 90%, 113664 KB, 3673 KB/s, 30 seconds passed
-... 90%, 113696 KB, 3674 KB/s, 30 seconds passed
-... 90%, 113728 KB, 3673 KB/s, 30 seconds passed
-... 90%, 113760 KB, 3672 KB/s, 30 seconds passed
-... 90%, 113792 KB, 3673 KB/s, 30 seconds passed
-... 90%, 113824 KB, 3674 KB/s, 30 seconds passed
-
-.. parsed-literal::
-
-    ... 90%, 113856 KB, 3673 KB/s, 30 seconds passed
-... 90%, 113888 KB, 3672 KB/s, 31 seconds passed
-... 90%, 113920 KB, 3673 KB/s, 31 seconds passed
-... 90%, 113952 KB, 3674 KB/s, 31 seconds passed
-... 90%, 113984 KB, 3673 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 90%, 114016 KB, 3672 KB/s, 31 seconds passed
-... 90%, 114048 KB, 3673 KB/s, 31 seconds passed
-... 90%, 114080 KB, 3674 KB/s, 31 seconds passed
-... 90%, 114112 KB, 3672 KB/s, 31 seconds passed
-... 90%, 114144 KB, 3672 KB/s, 31 seconds passed
-... 90%, 114176 KB, 3673 KB/s, 31 seconds passed
-... 90%, 114208 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 90%, 114240 KB, 3672 KB/s, 31 seconds passed
-... 90%, 114272 KB, 3672 KB/s, 31 seconds passed
-... 90%, 114304 KB, 3673 KB/s, 31 seconds passed
-... 90%, 114336 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 90%, 114368 KB, 3672 KB/s, 31 seconds passed
-... 90%, 114400 KB, 3672 KB/s, 31 seconds passed
-... 90%, 114432 KB, 3673 KB/s, 31 seconds passed
-... 90%, 114464 KB, 3674 KB/s, 31 seconds passed
-... 90%, 114496 KB, 3672 KB/s, 31 seconds passed
-... 90%, 114528 KB, 3672 KB/s, 31 seconds passed
-... 90%, 114560 KB, 3673 KB/s, 31 seconds passed
-... 90%, 114592 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 91%, 114624 KB, 3673 KB/s, 31 seconds passed
-... 91%, 114656 KB, 3672 KB/s, 31 seconds passed
-... 91%, 114688 KB, 3673 KB/s, 31 seconds passed
-... 91%, 114720 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 91%, 114752 KB, 3672 KB/s, 31 seconds passed
-... 91%, 114784 KB, 3672 KB/s, 31 seconds passed
-... 91%, 114816 KB, 3673 KB/s, 31 seconds passed
-... 91%, 114848 KB, 3674 KB/s, 31 seconds passed
-... 91%, 114880 KB, 3672 KB/s, 31 seconds passed
-... 91%, 114912 KB, 3672 KB/s, 31 seconds passed
-... 91%, 114944 KB, 3673 KB/s, 31 seconds passed
-... 91%, 114976 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 91%, 115008 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115040 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115072 KB, 3673 KB/s, 31 seconds passed
-... 91%, 115104 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 91%, 115136 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115168 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115200 KB, 3673 KB/s, 31 seconds passed
-... 91%, 115232 KB, 3674 KB/s, 31 seconds passed
-... 91%, 115264 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115296 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115328 KB, 3673 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 91%, 115360 KB, 3674 KB/s, 31 seconds passed
-... 91%, 115392 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115424 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115456 KB, 3673 KB/s, 31 seconds passed
-... 91%, 115488 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 91%, 115520 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115552 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115584 KB, 3673 KB/s, 31 seconds passed
-... 91%, 115616 KB, 3674 KB/s, 31 seconds passed
-... 91%, 115648 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115680 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115712 KB, 3673 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 91%, 115744 KB, 3674 KB/s, 31 seconds passed
-... 91%, 115776 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115808 KB, 3672 KB/s, 31 seconds passed
-... 91%, 115840 KB, 3673 KB/s, 31 seconds passed
-... 91%, 115872 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 92%, 115904 KB, 3672 KB/s, 31 seconds passed
-... 92%, 115936 KB, 3673 KB/s, 31 seconds passed
-... 92%, 115968 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116000 KB, 3674 KB/s, 31 seconds passed
-... 92%, 116032 KB, 3672 KB/s, 31 seconds passed
-... 92%, 116064 KB, 3673 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 92%, 116096 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116128 KB, 3674 KB/s, 31 seconds passed
-... 92%, 116160 KB, 3672 KB/s, 31 seconds passed
-... 92%, 116192 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116224 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116256 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 92%, 116288 KB, 3672 KB/s, 31 seconds passed
-... 92%, 116320 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116352 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116384 KB, 3674 KB/s, 31 seconds passed
-... 92%, 116416 KB, 3672 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 92%, 116448 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116480 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116512 KB, 3674 KB/s, 31 seconds passed
-... 92%, 116544 KB, 3672 KB/s, 31 seconds passed
-... 92%, 116576 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116608 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116640 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 92%, 116672 KB, 3672 KB/s, 31 seconds passed
-... 92%, 116704 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116736 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116768 KB, 3674 KB/s, 31 seconds passed
-... 92%, 116800 KB, 3672 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 92%, 116832 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116864 KB, 3674 KB/s, 31 seconds passed
-... 92%, 116896 KB, 3674 KB/s, 31 seconds passed
-... 92%, 116928 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116960 KB, 3673 KB/s, 31 seconds passed
-... 92%, 116992 KB, 3674 KB/s, 31 seconds passed
-... 92%, 117024 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 92%, 117056 KB, 3672 KB/s, 31 seconds passed
-... 92%, 117088 KB, 3673 KB/s, 31 seconds passed
-... 92%, 117120 KB, 3673 KB/s, 31 seconds passed
-... 93%, 117152 KB, 3674 KB/s, 31 seconds passed
-... 93%, 117184 KB, 3672 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 93%, 117216 KB, 3673 KB/s, 31 seconds passed
-... 93%, 117248 KB, 3673 KB/s, 31 seconds passed
-... 93%, 117280 KB, 3674 KB/s, 31 seconds passed
-... 93%, 117312 KB, 3672 KB/s, 31 seconds passed
-... 93%, 117344 KB, 3673 KB/s, 31 seconds passed
-... 93%, 117376 KB, 3674 KB/s, 31 seconds passed
-... 93%, 117408 KB, 3674 KB/s, 31 seconds passed
-
-.. parsed-literal::
-
-    ... 93%, 117440 KB, 3672 KB/s, 31 seconds passed
-... 93%, 117472 KB, 3673 KB/s, 31 seconds passed
-... 93%, 117504 KB, 3674 KB/s, 31 seconds passed
-... 93%, 117536 KB, 3674 KB/s, 31 seconds passed
-... 93%, 117568 KB, 3673 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 93%, 117600 KB, 3673 KB/s, 32 seconds passed
-... 93%, 117632 KB, 3674 KB/s, 32 seconds passed
-... 93%, 117664 KB, 3674 KB/s, 32 seconds passed
-... 93%, 117696 KB, 3673 KB/s, 32 seconds passed
-... 93%, 117728 KB, 3673 KB/s, 32 seconds passed
-... 93%, 117760 KB, 3674 KB/s, 32 seconds passed
-... 93%, 117792 KB, 3674 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 93%, 117824 KB, 3673 KB/s, 32 seconds passed
-... 93%, 117856 KB, 3673 KB/s, 32 seconds passed
-... 93%, 117888 KB, 3674 KB/s, 32 seconds passed
-... 93%, 117920 KB, 3674 KB/s, 32 seconds passed
-... 93%, 117952 KB, 3673 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 93%, 117984 KB, 3673 KB/s, 32 seconds passed
-... 93%, 118016 KB, 3674 KB/s, 32 seconds passed
-... 93%, 118048 KB, 3674 KB/s, 32 seconds passed
-... 93%, 118080 KB, 3673 KB/s, 32 seconds passed
-... 93%, 118112 KB, 3673 KB/s, 32 seconds passed
-... 93%, 118144 KB, 3674 KB/s, 32 seconds passed
-... 93%, 118176 KB, 3674 KB/s, 32 seconds passed
 
 .. parsed-literal::
-
-    ... 93%, 118208 KB, 3672 KB/s, 32 seconds passed
-... 93%, 118240 KB, 3673 KB/s, 32 seconds passed
-... 93%, 118272 KB, 3674 KB/s, 32 seconds passed
-... 93%, 118304 KB, 3672 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 93%, 118336 KB, 3672 KB/s, 32 seconds passed
-... 93%, 118368 KB, 3673 KB/s, 32 seconds passed
-... 94%, 118400 KB, 3674 KB/s, 32 seconds passed
-... 94%, 118432 KB, 3674 KB/s, 32 seconds passed
-... 94%, 118464 KB, 3672 KB/s, 32 seconds passed
-... 94%, 118496 KB, 3673 KB/s, 32 seconds passed
-... 94%, 118528 KB, 3674 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 94%, 118560 KB, 3674 KB/s, 32 seconds passed
-... 94%, 118592 KB, 3672 KB/s, 32 seconds passed
-... 94%, 118624 KB, 3673 KB/s, 32 seconds passed
-... 94%, 118656 KB, 3674 KB/s, 32 seconds passed
-... 94%, 118688 KB, 3674 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 94%, 118720 KB, 3672 KB/s, 32 seconds passed
-... 94%, 118752 KB, 3673 KB/s, 32 seconds passed
-... 94%, 118784 KB, 3674 KB/s, 32 seconds passed
-... 94%, 118816 KB, 3673 KB/s, 32 seconds passed
-... 94%, 118848 KB, 3672 KB/s, 32 seconds passed
-... 94%, 118880 KB, 3673 KB/s, 32 seconds passed
-... 94%, 118912 KB, 3674 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 94%, 118944 KB, 3673 KB/s, 32 seconds passed
-... 94%, 118976 KB, 3672 KB/s, 32 seconds passed
-... 94%, 119008 KB, 3673 KB/s, 32 seconds passed
-... 94%, 119040 KB, 3674 KB/s, 32 seconds passed
-... 94%, 119072 KB, 3673 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 94%, 119104 KB, 3672 KB/s, 32 seconds passed
-... 94%, 119136 KB, 3673 KB/s, 32 seconds passed
-... 94%, 119168 KB, 3674 KB/s, 32 seconds passed
-... 94%, 119200 KB, 3673 KB/s, 32 seconds passed
-... 94%, 119232 KB, 3672 KB/s, 32 seconds passed
-... 94%, 119264 KB, 3673 KB/s, 32 seconds passed
-... 94%, 119296 KB, 3674 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 94%, 119328 KB, 3672 KB/s, 32 seconds passed
-... 94%, 119360 KB, 3672 KB/s, 32 seconds passed
-... 94%, 119392 KB, 3673 KB/s, 32 seconds passed
-... 94%, 119424 KB, 3674 KB/s, 32 seconds passed
-... 94%, 119456 KB, 3673 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 94%, 119488 KB, 3672 KB/s, 32 seconds passed
-... 94%, 119520 KB, 3673 KB/s, 32 seconds passed
-... 94%, 119552 KB, 3674 KB/s, 32 seconds passed
-... 94%, 119584 KB, 3673 KB/s, 32 seconds passed
-... 94%, 119616 KB, 3672 KB/s, 32 seconds passed
-... 94%, 119648 KB, 3673 KB/s, 32 seconds passed
-... 95%, 119680 KB, 3674 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 95%, 119712 KB, 3672 KB/s, 32 seconds passed
-... 95%, 119744 KB, 3672 KB/s, 32 seconds passed
-... 95%, 119776 KB, 3673 KB/s, 32 seconds passed
-... 95%, 119808 KB, 3674 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 95%, 119840 KB, 3672 KB/s, 32 seconds passed
-... 95%, 119872 KB, 3672 KB/s, 32 seconds passed
-... 95%, 119904 KB, 3673 KB/s, 32 seconds passed
-... 95%, 119936 KB, 3674 KB/s, 32 seconds passed
-... 95%, 119968 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120000 KB, 3672 KB/s, 32 seconds passed
-... 95%, 120032 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120064 KB, 3674 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 95%, 120096 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120128 KB, 3672 KB/s, 32 seconds passed
-... 95%, 120160 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120192 KB, 3674 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 95%, 120224 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120256 KB, 3672 KB/s, 32 seconds passed
-... 95%, 120288 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120320 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120352 KB, 3672 KB/s, 32 seconds passed
-... 95%, 120384 KB, 3672 KB/s, 32 seconds passed
-... 95%, 120416 KB, 3673 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 95%, 120448 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120480 KB, 3672 KB/s, 32 seconds passed
-... 95%, 120512 KB, 3672 KB/s, 32 seconds passed
-... 95%, 120544 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120576 KB, 3673 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 95%, 120608 KB, 3672 KB/s, 32 seconds passed
-... 95%, 120640 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120672 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120704 KB, 3674 KB/s, 32 seconds passed
-... 95%, 120736 KB, 3672 KB/s, 32 seconds passed
-... 95%, 120768 KB, 3673 KB/s, 32 seconds passed
-... 95%, 120800 KB, 3673 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 95%, 120832 KB, 3674 KB/s, 32 seconds passed
-... 95%, 120864 KB, 3672 KB/s, 32 seconds passed
-... 95%, 120896 KB, 3673 KB/s, 32 seconds passed
-... 96%, 120928 KB, 3673 KB/s, 32 seconds passed
-... 96%, 120960 KB, 3674 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 96%, 120992 KB, 3673 KB/s, 32 seconds passed
-... 96%, 121024 KB, 3673 KB/s, 32 seconds passed
-... 96%, 121056 KB, 3673 KB/s, 32 seconds passed
-... 96%, 121088 KB, 3673 KB/s, 32 seconds passed
-... 96%, 121120 KB, 3672 KB/s, 32 seconds passed
-... 96%, 121152 KB, 3673 KB/s, 32 seconds passed
-... 96%, 121184 KB, 3673 KB/s, 32 seconds passed
-
-.. parsed-literal::
-
-    ... 96%, 121216 KB, 3673 KB/s, 32 seconds passed
-... 96%, 121248 KB, 3672 KB/s, 33 seconds passed
-... 96%, 121280 KB, 3673 KB/s, 33 seconds passed
-... 96%, 121312 KB, 3673 KB/s, 33 seconds passed
-... 96%, 121344 KB, 3674 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 96%, 121376 KB, 3672 KB/s, 33 seconds passed
-... 96%, 121408 KB, 3673 KB/s, 33 seconds passed
-... 96%, 121440 KB, 3674 KB/s, 33 seconds passed
-... 96%, 121472 KB, 3673 KB/s, 33 seconds passed
-... 96%, 121504 KB, 3672 KB/s, 33 seconds passed
-... 96%, 121536 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 96%, 121568 KB, 3674 KB/s, 33 seconds passed
-... 96%, 121600 KB, 3673 KB/s, 33 seconds passed
-... 96%, 121632 KB, 3672 KB/s, 33 seconds passed
-... 96%, 121664 KB, 3673 KB/s, 33 seconds passed
-... 96%, 121696 KB, 3674 KB/s, 33 seconds passed
-... 96%, 121728 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 96%, 121760 KB, 3672 KB/s, 33 seconds passed
-... 96%, 121792 KB, 3673 KB/s, 33 seconds passed
-... 96%, 121824 KB, 3674 KB/s, 33 seconds passed
-... 96%, 121856 KB, 3674 KB/s, 33 seconds passed
-... 96%, 121888 KB, 3672 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 96%, 121920 KB, 3673 KB/s, 33 seconds passed
-... 96%, 121952 KB, 3674 KB/s, 33 seconds passed
-... 96%, 121984 KB, 3673 KB/s, 33 seconds passed
-... 96%, 122016 KB, 3672 KB/s, 33 seconds passed
-... 96%, 122048 KB, 3673 KB/s, 33 seconds passed
-... 96%, 122080 KB, 3674 KB/s, 33 seconds passed
-... 96%, 122112 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 96%, 122144 KB, 3672 KB/s, 33 seconds passed
-... 97%, 122176 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122208 KB, 3674 KB/s, 33 seconds passed
-... 97%, 122240 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122272 KB, 3672 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 97%, 122304 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122336 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122368 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122400 KB, 3672 KB/s, 33 seconds passed
-... 97%, 122432 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122464 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 97%, 122496 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122528 KB, 3672 KB/s, 33 seconds passed
-... 97%, 122560 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122592 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122624 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 97%, 122656 KB, 3672 KB/s, 33 seconds passed
-... 97%, 122688 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122720 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122752 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122784 KB, 3672 KB/s, 33 seconds passed
-... 97%, 122816 KB, 3672 KB/s, 33 seconds passed
-... 97%, 122848 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 97%, 122880 KB, 3673 KB/s, 33 seconds passed
-... 97%, 122912 KB, 3672 KB/s, 33 seconds passed
-... 97%, 122944 KB, 3672 KB/s, 33 seconds passed
-... 97%, 122976 KB, 3673 KB/s, 33 seconds passed
-... 97%, 123008 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 97%, 123040 KB, 3672 KB/s, 33 seconds passed
-... 97%, 123072 KB, 3672 KB/s, 33 seconds passed
-... 97%, 123104 KB, 3673 KB/s, 33 seconds passed
-... 97%, 123136 KB, 3673 KB/s, 33 seconds passed
-... 97%, 123168 KB, 3672 KB/s, 33 seconds passed
-... 97%, 123200 KB, 3672 KB/s, 33 seconds passed
-... 97%, 123232 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 97%, 123264 KB, 3673 KB/s, 33 seconds passed
-... 97%, 123296 KB, 3672 KB/s, 33 seconds passed
-... 97%, 123328 KB, 3672 KB/s, 33 seconds passed
-... 97%, 123360 KB, 3673 KB/s, 33 seconds passed
-... 97%, 123392 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 97%, 123424 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123456 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123488 KB, 3673 KB/s, 33 seconds passed
-... 98%, 123520 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123552 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123584 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123616 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 98%, 123648 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123680 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123712 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123744 KB, 3673 KB/s, 33 seconds passed
-... 98%, 123776 KB, 3672 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 98%, 123808 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123840 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123872 KB, 3673 KB/s, 33 seconds passed
-... 98%, 123904 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123936 KB, 3672 KB/s, 33 seconds passed
-... 98%, 123968 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124000 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 98%, 124032 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124064 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124096 KB, 3673 KB/s, 33 seconds passed
-... 98%, 124128 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 98%, 124160 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124192 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124224 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124256 KB, 3673 KB/s, 33 seconds passed
-... 98%, 124288 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124320 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124352 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 98%, 124384 KB, 3673 KB/s, 33 seconds passed
-... 98%, 124416 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124448 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124480 KB, 3673 KB/s, 33 seconds passed
-... 98%, 124512 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 98%, 124544 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124576 KB, 3672 KB/s, 33 seconds passed
-... 98%, 124608 KB, 3673 KB/s, 33 seconds passed
-... 98%, 124640 KB, 3673 KB/s, 33 seconds passed
-... 98%, 124672 KB, 3672 KB/s, 33 seconds passed
-... 99%, 124704 KB, 3672 KB/s, 33 seconds passed
-... 99%, 124736 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 99%, 124768 KB, 3673 KB/s, 33 seconds passed
-... 99%, 124800 KB, 3672 KB/s, 33 seconds passed
-... 99%, 124832 KB, 3672 KB/s, 33 seconds passed
-... 99%, 124864 KB, 3673 KB/s, 33 seconds passed
-... 99%, 124896 KB, 3673 KB/s, 33 seconds passed
-
-.. parsed-literal::
-
-    ... 99%, 124928 KB, 3673 KB/s, 34 seconds passed
-... 99%, 124960 KB, 3672 KB/s, 34 seconds passed
-... 99%, 124992 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125024 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125056 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125088 KB, 3672 KB/s, 34 seconds passed
-... 99%, 125120 KB, 3673 KB/s, 34 seconds passed
-
-.. parsed-literal::
-
-    ... 99%, 125152 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125184 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125216 KB, 3672 KB/s, 34 seconds passed
-... 99%, 125248 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125280 KB, 3674 KB/s, 34 seconds passed
-
-.. parsed-literal::
-
-    ... 99%, 125312 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125344 KB, 3672 KB/s, 34 seconds passed
-... 99%, 125376 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125408 KB, 3674 KB/s, 34 seconds passed
-... 99%, 125440 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125472 KB, 3672 KB/s, 34 seconds passed
-
-.. parsed-literal::
-
-    ... 99%, 125504 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125536 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125568 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125600 KB, 3672 KB/s, 34 seconds passed
-... 99%, 125632 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125664 KB, 3673 KB/s, 34 seconds passed
-
-.. parsed-literal::
-
-    ... 99%, 125696 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125728 KB, 3672 KB/s, 34 seconds passed
-... 99%, 125760 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125792 KB, 3674 KB/s, 34 seconds passed
-... 99%, 125824 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125856 KB, 3673 KB/s, 34 seconds passed
-
-.. parsed-literal::
-
-    ... 99%, 125888 KB, 3673 KB/s, 34 seconds passed
-... 99%, 125920 KB, 3674 KB/s, 34 seconds passed
-... 99%, 125952 KB, 3673 KB/s, 34 seconds passed
-... 100%, 125953 KB, 3673 KB/s, 34 seconds passed
-
-
-
-.. parsed-literal::
-
 
+    
     ========== Downloading models/public/colorization-v2/model/__init__.py
 
 
 .. parsed-literal::
 
-    ... 100%, 0 KB, 283 KB/s, 0 seconds passed
-
-
+    ... 100%, 0 KB, 301 KB/s, 0 seconds passed
+    
     ========== Downloading models/public/colorization-v2/model/base_color.py
 
 
 .. parsed-literal::
 
-    ... 100%, 0 KB, 1753 KB/s, 0 seconds passed
-
-
+    ... 100%, 0 KB, 1660 KB/s, 0 seconds passed
+    
     ========== Downloading models/public/colorization-v2/model/eccv16.py
 
 
 .. parsed-literal::
 
-    ... 100%, 4 KB, 17370 KB/s, 0 seconds passed
-
-
+    ... 100%, 4 KB, 17206 KB/s, 0 seconds passed
+    
     ========== Replacing text in models/public/colorization-v2/model/__init__.py
     ========== Replacing text in models/public/colorization-v2/model/__init__.py
     ========== Replacing text in models/public/colorization-v2/model/eccv16.py
-
+    
 
 
 Convert the model to OpenVINO IR
 --------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ``omz_converter`` converts the models that are not in the OpenVINO™ IR
 format into that format using model conversion API.
@@ -6214,8 +468,8 @@ respectively
 .. parsed-literal::
 
     ========== Converting colorization-v2 to ONNX
-    Conversion to ONNX command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/model_zoo/internal_scripts/pytorch_to_onnx.py --model-path=models/public/colorization-v2 --model-name=ECCVGenerator --weights=models/public/colorization-v2/ckpt/colorization-v2-eccv16.pth --import-module=model --input-shape=1,1,256,256 --output-file=models/public/colorization-v2/colorization-v2-eccv16.onnx --input-names=data_l --output-names=color_ab
-
+    Conversion to ONNX command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/omz_tools/internal_scripts/pytorch_to_onnx.py --model-path=models/public/colorization-v2 --model-name=ECCVGenerator --weights=models/public/colorization-v2/ckpt/colorization-v2-eccv16.pth --import-module=model --input-shape=1,1,256,256 --output-file=models/public/colorization-v2/colorization-v2-eccv16.onnx --input-names=data_l --output-names=color_ab
+    
 
 
 .. parsed-literal::
@@ -6225,35 +479,36 @@ respectively
 
 .. parsed-literal::
 
-
+    
     ========== Converting colorization-v2 to IR (FP16)
-    Conversion command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/bin/mo --framework=onnx --output_dir=models/public/colorization-v2/FP16 --model_name=colorization-v2 --input=data_l --output=color_ab --input_model=models/public/colorization-v2/colorization-v2-eccv16.onnx '--layout=data_l(NCHW)' '--input_shape=[1, 1, 256, 256]' --compress_to_fp16=True
-
+    Conversion command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/bin/mo --framework=onnx --output_dir=models/public/colorization-v2/FP16 --model_name=colorization-v2 --input=data_l --output=color_ab --input_model=models/public/colorization-v2/colorization-v2-eccv16.onnx '--layout=data_l(NCHW)' '--input_shape=[1, 1, 256, 256]' --compress_to_fp16=True
+    
 
 
 .. parsed-literal::
 
     [ INFO ] Generated IR will be compressed to FP16. If you get lower accuracy, please consider disabling compression explicitly by adding argument --compress_to_fp16=False.
     Find more information about compression to FP16 at https://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
-    [ INFO ] The model was converted to IR v11, the latest model format that corresponds to the source DL framework input/output format. While IR v11 is backwards compatible with OpenVINO Inference Engine API v1.0, please use API v2.0 (as of 2022.1) to take advantage of the latest improvements in IR v11.
-    Find more information about API v2.0 and IR v11 at https://docs.openvino.ai/2023.0/openvino_2_0_transition_guide.html
-    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release. Please use OpenVINO Model Converter (OVC). OVC represents a lightweight alternative of MO and provides simplified model conversion API.
+    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release. Please use OpenVINO Model Converter (OVC). OVC represents a lightweight alternative of MO and provides simplified model conversion API. 
     Find more information about transition from MO to OVC at https://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
 
 
 .. parsed-literal::
 
     [ SUCCESS ] Generated IR version 11 model.
-    [ SUCCESS ] XML file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/notebooks/222-vision-image-colorization/models/public/colorization-v2/FP16/colorization-v2.xml
-    [ SUCCESS ] BIN file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/notebooks/222-vision-image-colorization/models/public/colorization-v2/FP16/colorization-v2.bin
+    [ SUCCESS ] XML file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/notebooks/222-vision-image-colorization/models/public/colorization-v2/FP16/colorization-v2.xml
+    [ SUCCESS ] BIN file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/notebooks/222-vision-image-colorization/models/public/colorization-v2/FP16/colorization-v2.bin
 
 
+.. parsed-literal::
+
+    
 
 
 Loading the Model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load the model in OpenVINO Runtime with ``ie.read_model`` and compile it
 for the specified device with ``ie.compile_model``.
@@ -6270,7 +525,7 @@ for the specified device with ``ie.compile_model``.
 Utility Functions
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -6278,14 +533,14 @@ Utility Functions
         """
         Returns an image as ndarra, given path to an image reads the
         (BGR) image using opencv's imread() API.
-
+    
             Parameter:
                 impath (string): Path of the image to be read and returned.
-
+    
             Returns:
                 image (ndarray): Numpy array representing the read image.
         """
-
+    
         raw_image = cv2.imread(impath)
         if raw_image.shape[2] > 1:
             image = cv2.cvtColor(
@@ -6293,112 +548,112 @@ Utility Functions
             )
         else:
             image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-
+    
         return image
-
-
+    
+    
     def plot_image(image: np.ndarray, title: str = "") -> None:
         """
         Given a image as ndarray and title as string, display it using
         matplotlib.
-
+    
             Parameters:
                 image (ndarray): Numpy array representing the image to be
                                  displayed.
                 title (string): String representing the title of the plot.
-
+    
             Returns:
                 None
-
+    
         """
-
+    
         plt.imshow(image)
         plt.title(title)
         plt.axis("off")
         plt.show()
-
-
+    
+    
     def plot_output(gray_img: np.ndarray, color_img: np.ndarray) -> None:
         """
         Plots the original (bw or grayscale) image and colorized image
         on different column axes for comparing side by side.
-
+    
             Parameters:
                 gray_image (ndarray): Numpy array representing the original image.
                 color_image (ndarray): Numpy array representing the model output.
-
+    
             Returns:
                 None
         """
-
+    
         fig = plt.figure(figsize=(12, 12))
-
+    
         ax1 = fig.add_subplot(1, 2, 1)
         plt.title("Input", fontsize=20)
         ax1.axis("off")
-
+    
         ax2 = fig.add_subplot(1, 2, 2)
         plt.title("Colorized", fontsize=20)
         ax2.axis("off")
-
+    
         ax1.imshow(gray_img)
         ax2.imshow(color_img)
-
+    
         plt.show()
 
 Load the Image
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     img_url_0 = "https://user-images.githubusercontent.com/18904157/180923287-20339d01-b1bf-493f-9a0d-55eff997aff1.jpg"
     img_url_1 = "https://user-images.githubusercontent.com/18904157/180923289-0bb71e09-25e1-46a6-aaf1-e8f666b62d26.jpg"
-
+    
     image_file_0 = utils.download_file(
         img_url_0, filename="test_0.jpg", directory="data", show_progress=False, silent=True, timeout=30
     )
     assert Path(image_file_0).exists()
-
+    
     image_file_1 = utils.download_file(
         img_url_1, filename="test_1.jpg", directory="data", show_progress=False, silent=True, timeout=30
     )
     assert Path(image_file_1).exists()
-
+    
     test_img_0 = read_image("data/test_0.jpg")
     test_img_1 = read_image("data/test_1.jpg")
 
 .. code:: ipython3
 
     def colorize(gray_img: np.ndarray) -> np.ndarray:
-
+    
         """
-        Given an image as ndarray for inference convert the image into LAB image,
-        the model consumes as input L-Channel of LAB image and provides output
+        Given an image as ndarray for inference convert the image into LAB image, 
+        the model consumes as input L-Channel of LAB image and provides output 
         A & B - Channels of LAB image. i.e returns a colorized image
-
+    
             Parameters:
                 gray_img (ndarray): Numpy array representing the original
                                     image.
-
+    
             Returns:
                 colorize_image (ndarray): Numpy arrray depicting the
                                           colorized version of the original
                                           image.
         """
-
+        
         # Preprocess
         h_in, w_in, _ = gray_img.shape
         img_rgb = gray_img.astype(np.float32) / 255
         img_lab = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2Lab)
         img_l_rs = cv2.resize(img_lab.copy(), (W, H))[:, :, 0]
-
+    
         # Inference
         inputs = np.expand_dims(img_l_rs, axis=[0, 1])
         res = compiled_model([inputs])[output_layer]
         update_res = np.squeeze(res)
-
+    
         # Post-process
         out = update_res.transpose((1, 2, 0))
         out = cv2.resize(out, (w_in, h_in))
@@ -6417,7 +672,7 @@ Load the Image
 Display Colorized Image
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 

@@ -25,26 +25,26 @@ and `paper <https://arxiv.org/abs/2312.16886>`__.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Install requirements <#install-requirements>`__
--  `Clone MobileVLM repository <#clone-mobilevlm-repository>`__
--  `Import required packages <#import-required-packages>`__
--  `Load the model <#load-the-model>`__
+-  `Install requirements <#Install-requirements>`__
+-  `Clone MobileVLM repository <#Clone-MobileVLM-repository>`__
+-  `Import required packages <#Import-required-packages>`__
+-  `Load the model <#Load-the-model>`__
 -  `Convert model to OpenVINO Intermediate Representation
-   (IR) <#convert-model-to-openvino-intermediate-representation-ir>`__
--  `Inference <#inference>`__
+   (IR) <#Convert-model-to-OpenVINO-Intermediate-Representation-(IR)>`__
+-  `Inference <#Inference>`__
 
-   -  `Load OpenVINO model <#load-openvino-model>`__
-   -  `Prepare input data <#prepare-input-data>`__
-   -  `Run generation process <#run-generation-process>`__
+   -  `Load OpenVINO model <#Load-OpenVINO-model>`__
+   -  `Prepare input data <#Prepare-input-data>`__
+   -  `Run generation process <#Run-generation-process>`__
 
--  `Interactive inference <#interactive-inference>`__
+-  `Interactive inference <#Interactive-inference>`__
 
 .. |image0| image:: https://github.com/Meituan-AutoML/MobileVLM/raw/main/assets/mobilevlm_arch.png
 
 Install requirements
 --------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -55,7 +55,7 @@ Install requirements
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-
+    
 
 .. parsed-literal::
 
@@ -65,15 +65,16 @@ Install requirements
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-
+    
 
 .. parsed-literal::
 
     ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    datasets 2.17.0 requires huggingface-hub>=0.19.4, but you have huggingface-hub 0.17.3 which is incompatible.
-    diffusers 0.26.2 requires huggingface-hub>=0.20.2, but you have huggingface-hub 0.17.3 which is incompatible.
-    pyannote-audio 2.0.1 requires torchaudio<1.0,>=0.10, but you have torchaudio 2.2.0+cpu which is incompatible.
-
+    datasets 2.18.0 requires huggingface-hub>=0.19.4, but you have huggingface-hub 0.17.3 which is incompatible.
+    diffusers 0.26.3 requires huggingface-hub>=0.20.2, but you have huggingface-hub 0.17.3 which is incompatible.
+    optimum-intel 1.16.0.dev0+2588077 requires transformers<4.39.0,>=4.36.0, but you have transformers 4.34.1 which is incompatible.
+    pyannote-audio 2.0.1 requires torchaudio<1.0,>=0.10, but you have torchaudio 2.2.1+cpu which is incompatible.
+    
 
 .. parsed-literal::
 
@@ -83,7 +84,7 @@ Install requirements
 Clone MobileVLM repository
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -97,7 +98,7 @@ Clone MobileVLM repository
 Import required packages
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -105,7 +106,7 @@ Import required packages
     import itertools
     import gc
     from typing import Optional, List, Tuple
-
+    
     from mobilevlm.model.mobilevlm import load_pretrained_model
     from mobilevlm.conversation import conv_templates, SeparatorStyle
     from mobilevlm.utils import (
@@ -127,26 +128,26 @@ Import required packages
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
       torch.utils._pytree._register_pytree_node(
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
       torch.utils._pytree._register_pytree_node(
+    2024-03-14 00:22:37.129723: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
 
 
 .. parsed-literal::
 
-    2024-02-10 00:45:20.724190: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-02-10 00:45:20.759074: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-03-14 00:22:37.163461: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-02-10 00:45:21.267446: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-03-14 00:22:37.683620: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 .. parsed-literal::
@@ -158,19 +159,19 @@ Import required packages
 
     MODELS_DIR = Path("./models")
     MODEL_PATH = 'mtgv/MobileVLM-1.7B'
-
+    
     TEMPERATURE = 0.2
     TOP_P = None
     NUM_BEAMS = 1
     MAX_NEW_TOKENS = 512
-
+    
     IMAGE_PATH = MOBILEVLM_REPO_DIR / "assets" / "samples" / "demo.jpg"
     PROMPT_STR = "Who is the author of this book?\nAnswer the question using a single word or phrase."
 
 Load the model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To load the model, we use pre-defined ``load_pretrained_model`` function
 in ``mobilevlm`` module. It returns the model itself, tokenizer, and
@@ -188,7 +189,7 @@ image processor to convert images to appropriate tensors.
 Convert model to OpenVINO Intermediate Representation (IR)
 ----------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -247,7 +248,7 @@ compression instead of INT8 weight compression.
         description='Compression mode:',
         disabled=False,
     )
-
+    
     compression_mode
 
 
@@ -277,7 +278,7 @@ compression instead of INT8 weight compression.
         def __init__(self, model):
             super().__init__()
             self.model = model
-
+    
         def forward(
             self,
             input_ids: torch.LongTensor = None,
@@ -293,7 +294,7 @@ compression instead of INT8 weight compression.
             )
             hidden_states = outputs[0]
             logits = self.model.lm_head(hidden_states)
-
+    
             return (logits,) + outputs[1:]
 
 .. code:: ipython3
@@ -331,10 +332,10 @@ compression instead of INT8 weight compression.
         "inputs_embeds": torch.zeros((1, 205, 2048)),
         "attention_mask": torch.ones((1, 205), dtype=torch.long),
     }
-
+    
     wrapped = ModelWrapper(model)
     past_key_values = wrapped(**example_input)[1]
-
+    
     if not stage1_xml_path.exists():
         ov_model = ov.convert_model(wrapped, example_input=example_input)
         set_output_names(ov_model, past_key_values)
@@ -357,20 +358,20 @@ compression instead of INT8 weight compression.
 
 .. parsed-literal::
 
-    WARNING:nncf:NNCF provides best results with torch==2.1.2, while current torch version is 2.2.0+cpu. If you encounter issues, consider switching to torch==2.1.2
+    WARNING:nncf:NNCF provides best results with torch==2.1.2, while current torch version is 2.2.1+cpu. If you encounter issues, consider switching to torch==2.1.2
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:808: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:808: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if input_shape[-1] > 1:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:146: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:146: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if seq_len > self.max_seq_len_cached:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:375: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:375: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attn_weights.size() != (bsz, self.num_heads, q_len, kv_seq_len):
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:382: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:382: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attention_mask.size() != (bsz, 1, q_len, kv_seq_len):
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:392: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:392: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attn_output.size() != (bsz, self.num_heads, q_len, self.head_dim):
 
 
@@ -381,7 +382,9 @@ compression instead of INT8 weight compression.
 
 
 
+.. raw:: html
 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 
 
 
@@ -413,7 +416,9 @@ compression instead of INT8 weight compression.
 
 
 
+.. raw:: html
 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 
 
 
@@ -432,7 +437,7 @@ compression instead of INT8 weight compression.
         "past_key_values": past_key_values,
         "attention_mask": torch.ones((1, past_key_values[-1][-1].shape[-2] + 1), dtype=torch.long),
     }
-
+    
     if not stage2_xml_path.exists():
         ov_model = ov.convert_model(
             wrapped,
@@ -449,7 +454,7 @@ compression instead of INT8 weight compression.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-609/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:165: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at aten/src/ATen/core/TensorBody.h:489.)
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-633/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:165: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at aten/src/ATen/core/TensorBody.h:489.)
       if a.grad is not None:
 
 
@@ -460,7 +465,9 @@ compression instead of INT8 weight compression.
 
 
 
+.. raw:: html
 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 
 
 
@@ -492,7 +499,9 @@ compression instead of INT8 weight compression.
 
 
 
+.. raw:: html
 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 
 
 
@@ -520,7 +529,7 @@ compression instead of INT8 weight compression.
 Inference
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ``OVMobileLlamaForCausalLM`` class provides ease-to-use interface for
 using model in generation scenario. It is based on
@@ -536,7 +545,7 @@ documentation <https://huggingface.co/docs/transformers/main_classes/text_genera
         def __init__(self, stage1_path, stage2_path, device):
             self.stage1 = core.compile_model(stage1_path, device)
             self.stage2 = core.read_model(stage2_path)
-
+    
             self.generation_config = transformers.GenerationConfig.from_model_config(config)
             self.config = transformers.AutoConfig.from_pretrained(MODELS_DIR)
             self.main_input_name = "input_ids"
@@ -549,11 +558,11 @@ documentation <https://huggingface.co/docs/transformers/main_classes/text_genera
             self.key_value_output_names = [key for key in self.output_names if "present" in key]
             stage2 = core.compile_model(self.stage2, device)
             self.request = stage2.create_infer_request()
-
+    
         def can_generate(self):
             """Returns True to validate the check that the model using `GenerationMixin.generate()` can indeed generate."""
             return True
-
+    
         def __call__(
             self,
             input_ids: torch.LongTensor,
@@ -564,7 +573,7 @@ documentation <https://huggingface.co/docs/transformers/main_classes/text_genera
             **kwargs,
         ) -> transformers.modeling_outputs.CausalLMOutputWithPast:
             return self.forward(input_ids, images, attention_mask, prefix_mask, past_key_values)
-
+    
         def forward(
             self,
             input_ids: torch.LongTensor,
@@ -589,35 +598,35 @@ documentation <https://huggingface.co/docs/transformers/main_classes/text_genera
                 )
                 # Add the past_key_values to the decoder inputs
                 inputs = dict(zip(self.key_value_input_names, past_key_values))
-
+    
             else:
                 return self.forward_with_image(input_ids, images, attention_mask)
             inputs["input_ids"] = np.array(input_ids)
-
+    
             if "attention_mask" in self.input_names:
                 inputs["attention_mask"] = np.array(attention_mask)
-
+    
             # Run inference
             self.request.start_async(inputs, share_inputs=True)
             self.request.wait()
-
+    
             logits = torch.from_numpy(self.request.get_tensor("logits").data)
-
+    
             # Tuple of length equal to : number of layer * number of past_key_value per decoder layer (2 corresponds to the self-attention layer)
             past_key_values = tuple(
                 self.request.get_tensor(key).data for key in self.key_value_output_names
             )
             # Tuple of tuple of length `n_layers`, with each tuple of length equal to 2 (k/v of self-attention)
-
+    
             past_key_values = tuple(
                 past_key_values[i : i + self.num_pkv]
                 for i in range(0, len(past_key_values), self.num_pkv)
             )
-
+    
             return transformers.modeling_outputs.CausalLMOutputWithPast(
                 logits=logits, past_key_values=past_key_values
             )
-
+    
         def forward_with_image(self, input_ids, images, attention_mask):
             """First step inference method, that resolves multimodal data"""
             _, attention_mask, _, input_embed, _ = prepare_inputs_labels_for_multimodal(
@@ -639,14 +648,14 @@ Select device from dropdown list for running inference using OpenVINO.
 .. code:: ipython3
 
     core = ov.Core()
-
+    
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
         value="AUTO",
         description="Device:",
         disabled=False,
     )
-
+    
     device
 
 
@@ -661,7 +670,7 @@ Select device from dropdown list for running inference using OpenVINO.
 Load OpenVINO model
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -670,7 +679,7 @@ Load OpenVINO model
 Prepare input data
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -712,7 +721,7 @@ Prepare input data
 Run generation process
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -741,13 +750,13 @@ Run generation process
 .. parsed-literal::
 
     🚀 MobileVLM-1.7B with OpenVINO: Susan Wise Bauer
-
+    
 
 
 Interactive inference
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -765,7 +774,7 @@ Interactive inference
             prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt"
         ).unsqueeze(0)
         stopping_criteria = KeywordsStoppingCriteria([stop_str], tokenizer, input_ids)
-
+    
         output_ids = ov_model.generate(
             input_ids,
             images=images_tensor,
@@ -782,10 +791,10 @@ Interactive inference
         outputs = outputs.strip()
         if outputs.endswith(stop_str):
             outputs = outputs[: -len(stop_str)]
-
+    
         return outputs.strip()
-
-
+    
+    
     demo = gr.Interface(
         generate,
         [gr.Image(label="Image", type="pil"), gr.Textbox(label="Prompt")],
@@ -798,7 +807,7 @@ Interactive inference
         ],
         allow_flagging="never"
     )
-
+    
     try:
         demo.launch(debug=False)
     except Exception:
@@ -811,12 +820,12 @@ Interactive inference
 .. parsed-literal::
 
     Running on local URL:  http://127.0.0.1:7860
-
+    
     To create a public link, set `share=True` in `launch()`.
 
 
 
-.. .. raw:: html
+.. raw:: html
 
-..    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 
