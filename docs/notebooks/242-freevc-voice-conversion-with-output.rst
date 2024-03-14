@@ -522,22 +522,22 @@ Inference
 .. parsed-literal::
 
 
-0it [00:00, ?it/s]
+   0it [00:00, ?it/s]
 
 .. parsed-literal::
 
 
-1it [00:00,  1.08it/s]
+   1it [00:00,  1.08it/s]
 
 .. parsed-literal::
 
 
-2it [00:01,  1.26it/s]
+   2it [00:01,  1.26it/s]
 
 .. parsed-literal::
 
 
-2it [00:01,  1.23it/s]
+   2it [00:01,  1.23it/s]
 
 .. parsed-literal::
 
@@ -900,22 +900,22 @@ And now we can check inference using only IR models.
 .. parsed-literal::
 
 
-0it [00:00, ?it/s]
+   0it [00:00, ?it/s]
 
 .. parsed-literal::
 
 
-1it [00:00,  1.68it/s]
+   1it [00:00,  1.68it/s]
 
 .. parsed-literal::
 
 
-2it [00:01,  1.19it/s]
+   2it [00:01,  1.19it/s]
 
 .. parsed-literal::
 
 
-2it [00:01,  1.25it/s]
+   2it [00:01,  1.25it/s]
 
 
 Result audio files should be available in ‘outputs/freevc’ and you can

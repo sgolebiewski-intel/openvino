@@ -908,92 +908,92 @@ Create dataloader
 .. parsed-literal::
 
 
-Scanning images:   0%|          | 0/5000 [00:00<?, ?it/s]
+   Scanning images:   0%|          | 0/5000 [00:00<?, ?it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 296 found, 1 missing, 0 empty, 0 corrupted:   6%|▌         | 297/5000 [00:00<00:01, 2967.89it/s]
+   val: Scanning 'coco/val2017' images and labels... 296 found, 1 missing, 0 empty, 0 corrupted:   6%|▌         | 297/5000 [00:00<00:01, 2967.89it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 590 found, 6 missing, 0 empty, 0 corrupted:  12%|█▏        | 596/5000 [00:00<00:01, 2970.55it/s]
+   val: Scanning 'coco/val2017' images and labels... 590 found, 6 missing, 0 empty, 0 corrupted:  12%|█▏        | 596/5000 [00:00<00:01, 2970.55it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 889 found, 8 missing, 0 empty, 0 corrupted:  18%|█▊        | 897/5000 [00:00<00:01, 2983.57it/s]
+   val: Scanning 'coco/val2017' images and labels... 889 found, 8 missing, 0 empty, 0 corrupted:  18%|█▊        | 897/5000 [00:00<00:01, 2983.57it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 1191 found, 10 missing, 0 empty, 0 corrupted:  24%|██▍       | 1201/5000 [00:00<00:01, 3005.52it/s]
+   val: Scanning 'coco/val2017' images and labels... 1191 found, 10 missing, 0 empty, 0 corrupted:  24%|██▍       | 1201/5000 [00:00<00:01, 3005.52it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 1491 found, 11 missing, 0 empty, 0 corrupted:  30%|███       | 1502/5000 [00:00<00:01, 2997.73it/s]
+   val: Scanning 'coco/val2017' images and labels... 1491 found, 11 missing, 0 empty, 0 corrupted:  30%|███       | 1502/5000 [00:00<00:01, 2997.73it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 1788 found, 14 missing, 0 empty, 0 corrupted:  36%|███▌      | 1802/5000 [00:00<00:01, 2990.72it/s]
+   val: Scanning 'coco/val2017' images and labels... 1788 found, 14 missing, 0 empty, 0 corrupted:  36%|███▌      | 1802/5000 [00:00<00:01, 2990.72it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 2089 found, 17 missing, 0 empty, 0 corrupted:  42%|████▏     | 2106/5000 [00:00<00:00, 3004.72it/s]
+   val: Scanning 'coco/val2017' images and labels... 2089 found, 17 missing, 0 empty, 0 corrupted:  42%|████▏     | 2106/5000 [00:00<00:00, 3004.72it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 2390 found, 23 missing, 0 empty, 0 corrupted:  48%|████▊     | 2413/5000 [00:00<00:00, 3021.25it/s]
+   val: Scanning 'coco/val2017' images and labels... 2390 found, 23 missing, 0 empty, 0 corrupted:  48%|████▊     | 2413/5000 [00:00<00:00, 3021.25it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 2690 found, 26 missing, 0 empty, 0 corrupted:  54%|█████▍    | 2716/5000 [00:00<00:00, 3011.86it/s]
+   val: Scanning 'coco/val2017' images and labels... 2690 found, 26 missing, 0 empty, 0 corrupted:  54%|█████▍    | 2716/5000 [00:00<00:00, 3011.86it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 2990 found, 29 missing, 0 empty, 0 corrupted:  60%|██████    | 3019/5000 [00:01<00:00, 3015.84it/s]
+   val: Scanning 'coco/val2017' images and labels... 2990 found, 29 missing, 0 empty, 0 corrupted:  60%|██████    | 3019/5000 [00:01<00:00, 3015.84it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 3289 found, 32 missing, 0 empty, 0 corrupted:  66%|██████▋   | 3321/5000 [00:01<00:00, 3002.22it/s]
+   val: Scanning 'coco/val2017' images and labels... 3289 found, 32 missing, 0 empty, 0 corrupted:  66%|██████▋   | 3321/5000 [00:01<00:00, 3002.22it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 3589 found, 34 missing, 0 empty, 0 corrupted:  72%|███████▏  | 3623/5000 [00:01<00:00, 3006.34it/s]
+   val: Scanning 'coco/val2017' images and labels... 3589 found, 34 missing, 0 empty, 0 corrupted:  72%|███████▏  | 3623/5000 [00:01<00:00, 3006.34it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 3891 found, 35 missing, 0 empty, 0 corrupted:  79%|███████▊  | 3926/5000 [00:01<00:00, 3012.71it/s]
+   val: Scanning 'coco/val2017' images and labels... 3891 found, 35 missing, 0 empty, 0 corrupted:  79%|███████▊  | 3926/5000 [00:01<00:00, 3012.71it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 4188 found, 40 missing, 0 empty, 0 corrupted:  85%|████████▍ | 4228/5000 [00:01<00:00, 2984.65it/s]
+   val: Scanning 'coco/val2017' images and labels... 4188 found, 40 missing, 0 empty, 0 corrupted:  85%|████████▍ | 4228/5000 [00:01<00:00, 2984.65it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 4488 found, 42 missing, 0 empty, 0 corrupted:  91%|█████████ | 4530/5000 [00:01<00:00, 2995.12it/s]
+   val: Scanning 'coco/val2017' images and labels... 4488 found, 42 missing, 0 empty, 0 corrupted:  91%|█████████ | 4530/5000 [00:01<00:00, 2995.12it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 4790 found, 48 missing, 0 empty, 0 corrupted:  97%|█████████▋| 4838/5000 [00:01<00:00, 3019.73it/s]
+   val: Scanning 'coco/val2017' images and labels... 4790 found, 48 missing, 0 empty, 0 corrupted:  97%|█████████▋| 4838/5000 [00:01<00:00, 3019.73it/s]
 
 .. parsed-literal::
 
 
-val: Scanning 'coco/val2017' images and labels... 4952 found, 48 missing, 0 empty, 0 corrupted: 100%|██████████| 5000/5000 [00:01<00:00, 3000.67it/s]
+   val: Scanning 'coco/val2017' images and labels... 4952 found, 48 missing, 0 empty, 0 corrupted: 100%|██████████| 5000/5000 [00:01<00:00, 3000.67it/s]
 
 
 

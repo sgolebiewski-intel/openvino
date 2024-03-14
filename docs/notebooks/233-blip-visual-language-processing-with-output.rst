@@ -251,7 +251,7 @@ text and vision modalities and postprocessing of generation results.
 .. code:: ipython3
 
     import platform
-    
+
     %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu torch torchvision "transformers>=4.26.0" gradio "openvino>=2023.3.0" "datasets>==2.14.6" "nncf>=2.8.1"
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -270,27 +270,27 @@ text and vision modalities and postprocessing of generation results.
     import time
     from PIL import Image
     from transformers import BlipProcessor, BlipForQuestionAnswering
-    
+
     sys.path.append("../utils")
     from notebook_utils import download_file
-    
+
     # get model and processor
     processor = BlipProcessor.from_pretrained("Salesforce/blip-vqa-base")
     model = BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
-    
+
     # setup test input: download and read image, prepare question
-    img_url = 'https://storage.googleapis.com/sfr-vision-language-research/BLIP/demo.jpg' 
+    img_url = 'https://storage.googleapis.com/sfr-vision-language-research/BLIP/demo.jpg'
     download_file(img_url, "demo.jpg")
     raw_image = Image.open("demo.jpg").convert('RGB')
     question = "how many dogs are in the picture?"
     # preprocess input data
     inputs = processor(raw_image, question, return_tensors="pt")
-    
+
     start = time.perf_counter()
     # perform generation
     out = model.generate(**inputs)
     end = time.perf_counter() - start
-    
+
     # postprocess result
     answer = processor.decode(out[0], skip_special_tokens=True)
 
@@ -328,7 +328,7 @@ text and vision modalities and postprocessing of generation results.
 .. code:: ipython3
 
     from utils import visualize_results
-    
+
     fig = visualize_results(raw_image, answer, question)
 
 
@@ -373,18 +373,18 @@ shape, containing RGB image pixel values normalized in the [0,1] range.
     import torch
     from pathlib import Path
     import openvino as ov
-    
+
     VISION_MODEL_OV = Path("blip_vision_model.xml")
     vision_model = model.vision_model
     vision_model.eval()
-    
+
     # check that model works and save it outputs for reusage as text encoder input
     with torch.no_grad():
         vision_outputs = vision_model(inputs["pixel_values"])
-    
+
     # if openvino model does not exist, convert it to IR
     if not VISION_MODEL_OV.exists():
-        
+
         # export pytorch model to ov.Model
         with torch.no_grad():
             ov_vision_model = ov.convert_model(vision_model, example_input=inputs["pixel_values"])
@@ -413,11 +413,11 @@ model and attention masks for them.
 .. code:: ipython3
 
     TEXT_ENCODER_OV = Path("blip_text_encoder.xml")
-    
-    
+
+
     text_encoder = model.text_encoder
     text_encoder.eval()
-    
+
     # if openvino model does not exist, convert it to IR
     if not TEXT_ENCODER_OV.exists():
         # prepare example inputs
@@ -491,20 +491,20 @@ shapes.
 
     text_decoder = model.text_decoder
     text_decoder.eval()
-    
+
     TEXT_DECODER_OV = Path("blip_text_decoder_with_past.xml")
-    
+
     # prepare example inputs
     input_ids = torch.tensor([[30522]])  # begin of sequence token id
     attention_mask = torch.tensor([[1]])  # attention mask for input_ids
     encoder_hidden_states = torch.rand((1, 10, 768))  # encoder last hidden state from text_encoder
     encoder_attention_mask = torch.ones((1, 10), dtype=torch.long)  # attention mask for encoder hidden states
-    
+
     input_dict = {"input_ids": input_ids, "attention_mask": attention_mask, "encoder_hidden_states": encoder_hidden_states, "encoder_attention_mask": encoder_attention_mask}
     text_decoder_outs = text_decoder(**input_dict)
     # extend input dictionary with hidden states from previous step
     input_dict["past_key_values"] = text_decoder_outs["past_key_values"]
-    
+
     text_decoder.config.torchscript = True
     if not TEXT_DECODER_OV.exists():
         # export PyTorch model
@@ -536,7 +536,7 @@ As discussed before, the model consists of several blocks which can be
 reused for building pipelines for different tasks. In the diagram below,
 you can see how image captioning works:
 
-|image0|
+|image01|
 
 The visual model accepts the image preprocessed by ``BlipProcessor`` as
 input and produces image embeddings, which are directly passed to the
@@ -554,8 +554,8 @@ performing generation of answers.
 
 The next step is implementing both pipelines using OpenVINO models.
 
-.. |image0| image:: https://user-images.githubusercontent.com/29454499/221865836-a56da06e-196d-449c-a5dc-4136da6ab5d5.png
-.. |image1| image:: https://user-images.githubusercontent.com/29454499/221868167-d0081add-d9f3-4591-80e7-4753c88c1d0a.png
+.. |image01| image:: https://user-images.githubusercontent.com/29454499/221865836-a56da06e-196d-449c-a5dc-4136da6ab5d5.png
+.. |image11| image:: https://user-images.githubusercontent.com/29454499/221868167-d0081add-d9f3-4591-80e7-4753c88c1d0a.png
 
 .. code:: ipython3
 
@@ -572,14 +572,14 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     import ipywidgets as widgets
-    
+
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
         value='AUTO',
         description='Device:',
         disabled=False,
     )
-    
+
     device
 
 
@@ -602,7 +602,7 @@ select device from dropdown list for running inference using OpenVINO
 
     from functools import partial
     from blip_model import text_decoder_forward
-    
+
     text_decoder.forward = partial(text_decoder_forward, ov_text_decoder_with_past=ov_text_decoder_with_past)
 
 The model helper class has two methods for generation:
@@ -615,7 +615,7 @@ initial token for decoder work.
 .. code:: ipython3
 
     from blip_model import OVBlipModel
-    
+
     ov_model = OVBlipModel(model.config, model.decoder_start_token_id, ov_vision_model, ov_text_encoder, text_decoder)
     out = ov_model.generate_answer(**inputs, max_length=20)
 
@@ -700,24 +700,24 @@ The optimization process contains the following steps:
         description='Quantization',
         disabled=False,
     )
-    
+
     to_quantize
 
 .. code:: ipython3
 
     from urllib.request import urlretrieve
-    
+
     VISION_MODEL_OV_INT8 = Path(str(VISION_MODEL_OV).replace(".xml", "_int8.xml"))
     TEXT_ENCODER_OV_INT8 = Path(str(TEXT_ENCODER_OV).replace(".xml", "_int8.xml"))
     TEXT_DECODER_OV_INT8 = Path(str(TEXT_DECODER_OV).replace(".xml", "_int8.xml"))
     int8_model = None
-    
+
     # Fetch skip_kernel_extension module
     urlretrieve(
         url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/main/notebooks/utils/skip_kernel_extension.py',
         filename='skip_kernel_extension.py'
     )
-    
+
     %load_ext skip_kernel_extension
 
 Prepare dataset
@@ -732,11 +732,11 @@ understanding of vision, language and commonsense knowledge to answer.
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     import numpy as np
     from datasets import load_dataset
     from tqdm.notebook import tqdm
-    
+
     def preprocess_batch(batch, vision_model, inputs_info):
         """
         Preprocesses a dataset batch by loading and transforming image and text data.
@@ -757,14 +757,14 @@ understanding of vision, language and commonsense knowledge to answer.
                 "encoder_hidden_states": encoder_hidden_states,
                 "text_encoder_inputs": []
             }
-    
+
         text_encoder_inputs = {
             "input_ids": inputs["input_ids"],
             "attention_mask": inputs["attention_mask"]
         }
         inputs_info[image_id]["text_encoder_inputs"].append(text_encoder_inputs)
-    
-    
+
+
     def prepare_input_data(dataloader, vision_model, opt_init_steps):
         """
         Store calibration subset in List to reduce quantization time.
@@ -774,7 +774,7 @@ understanding of vision, language and commonsense knowledge to answer.
             preprocess_batch(batch, vision_model, inputs_info)
             if idx >= opt_init_steps:
                 break
-    
+
         calibration_subset = []
         for image_id in inputs_info:
             pixel_values = inputs_info[image_id]["pixel_values"]
@@ -789,8 +789,8 @@ understanding of vision, language and commonsense knowledge to answer.
                 }
                 calibration_subset.append(blip_inputs)
         return calibration_subset
-    
-    
+
+
     def prepare_dataset(vision_model, opt_init_steps=300, streaming=False):
         """
         Prepares a vision-text dataset for quantization.
@@ -806,9 +806,9 @@ time and depends on your internet connection.
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     import nncf
-    
+
     comp_vision_model = core.compile_model(VISION_MODEL_OV, device.value)
     calibration_data = prepare_dataset(comp_vision_model)
 
@@ -838,16 +838,16 @@ Vision model
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     core = ov.Core()
     vision_dataset = nncf.Dataset(calibration_data, lambda x: x["vision_model_inputs"])
-    
+
     quantized_model = nncf.quantize(
         model=ov_vision_model,
         calibration_dataset=vision_dataset,
         model_type=nncf.ModelType.TRANSFORMER
     )
-    
+
     ov.save_model(quantized_model, VISION_MODEL_OV_INT8)
 
 
@@ -949,7 +949,7 @@ Text encoder
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     text_encoder_dataset = nncf.Dataset(calibration_data, lambda x: x["text_encoder_inputs"])
     quantized_model = nncf.quantize(
         model=ov_text_encoder,
@@ -1067,7 +1067,7 @@ The optimization process contains the following steps:
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     compressed_text_decoder = nncf.compress_weights(ov_text_decoder_with_past)
     ov.save_model(compressed_text_decoder, str(TEXT_DECODER_OV_INT8))
 
@@ -1116,7 +1116,7 @@ the same input data like for model before quantization
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     q_ov_vision_model = core.compile_model(VISION_MODEL_OV_INT8, device.value)
     q_ov_text_encoder = core.compile_model(TEXT_ENCODER_OV_INT8, device.value)
     q_ov_text_decoder_with_past = core.compile_model(TEXT_DECODER_OV_INT8, device.value)
@@ -1124,22 +1124,22 @@ the same input data like for model before quantization
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     from functools import partial
     from transformers import BlipForQuestionAnswering
     from blip_model import OVBlipModel, text_decoder_forward
-    
+
     model = BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
     text_decoder = model.text_decoder
     text_decoder.eval()
-    
+
     text_decoder.forward = partial(text_decoder_forward, ov_text_decoder_with_past=q_ov_text_decoder_with_past)
     int8_model = OVBlipModel(model.config, model.decoder_start_token_id, q_ov_vision_model, q_ov_text_encoder, text_decoder)
 
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     raw_image = Image.open("demo.jpg").convert('RGB')
     question = "how many dogs are in the picture?"
     # preprocess input data
@@ -1151,7 +1151,7 @@ Image captioning
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     out = int8_model.generate_caption(inputs["pixel_values"], max_length=20)
     caption = processor.decode(out[0], skip_special_tokens=True)
     fig = visualize_results(raw_image, caption)
@@ -1167,7 +1167,7 @@ Question answering
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     out = int8_model.generate_answer(**inputs, max_length=20)
     answer = processor.decode(out[0], skip_special_tokens=True)
     fig = visualize_results(raw_image, answer, question)
@@ -1208,17 +1208,17 @@ quantized models.
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     import time
     import torch
-    
+
     def calculate_inference_time(blip_model, calibration_data, generate_caption):
         inference_time = []
         for inputs in calibration_data:
             pixel_values = torch.from_numpy(inputs["vision_model_inputs"]["pixel_values"])
             input_ids = torch.from_numpy(inputs["text_encoder_inputs"]["input_ids"])
             attention_mask = torch.from_numpy(inputs["text_encoder_inputs"]["attention_mask"])
-    
+
             start = time.perf_counter()
             if generate_caption:
                 _ = blip_model.generate_caption(pixel_values, max_length=20)
@@ -1232,11 +1232,11 @@ quantized models.
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     fp_original_model = BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
     fp_text_decoder = fp_original_model.text_decoder
     fp_text_decoder.eval()
-    
+
     comp_text_encoder = core.compile_model(TEXT_ENCODER_OV, device.value)
     comp_text_decoder_with_past = core.compile_model(TEXT_DECODER_OV, device.value)
     fp_text_decoder.forward = partial(text_decoder_forward, ov_text_decoder_with_past=comp_text_decoder_with_past)
@@ -1245,12 +1245,12 @@ quantized models.
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     validation_data = calibration_data[:100]
-    
+
     int8_caption_latency = calculate_inference_time(int8_model, validation_data, generate_caption=True)
     fp16_caption_latency = calculate_inference_time(fp16_model, validation_data, generate_caption=True)
-    
+
     print(f"Image Captioning speed up: {fp16_caption_latency / int8_caption_latency:.3f}")
 
 
@@ -1262,7 +1262,7 @@ quantized models.
 .. code:: ipython3
 
     %%skip not $to_quantize.value
-    
+
     int8_generate_answer_latency = calculate_inference_time(int8_model, validation_data, generate_caption=False)
     fp16_generate_answer_latency = calculate_inference_time(fp16_model, validation_data, generate_caption=False)
     print(f"Question Answering speed up: {fp16_generate_answer_latency / int8_generate_answer_latency:.3f}")
@@ -1281,9 +1281,9 @@ Interactive demo
 .. code:: ipython3
 
     import gradio as gr
-    
+
     ov_model = int8_model if int8_model is not None else ov_model
-    
+
     def generate_answer(img, question):
         if img is None:
             raise gr.Error("Please upload an image or choose one from the examples list")
@@ -1298,8 +1298,8 @@ Interactive demo
         elapsed = time.perf_counter() - start
         html = f"<p>Processing time: {elapsed:.4f}</p>"
         return answer, html
-    
-    
+
+
     demo = gr.Interface(
         generate_answer,
         [
