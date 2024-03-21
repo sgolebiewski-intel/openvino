@@ -1,18 +1,15 @@
 /* overrides */
-.switcher-set, .prev-next-bottom, .bd-toc {display: none!important;}
+.switcher-set, .prev-next-bottom, .bd-toc {display: none;}
 #openvino-documentation > h1 {
     display: none;
 }
 
 h1 {
-    /*font-size: var(--pst-font-size-h2);*/
-    /*margin-bottom: 3rem;*/
-    display: none!important;
+    display: none;
 }
 
-
 #ov-homepage-banner, .openvino-diagram, .ov-homepage-higlight-grid {
-    margin-bottom: 90px!important;
+    margin-bottom: 90px;
 }
 
 #ov-homepage-banner {
@@ -96,18 +93,18 @@ h1 {
 }
 
 .ov-homepage-higlight-grid .sd-card {
-    box-shadow: 0 0 20px 5px #f3f3f3!important;
+    box-shadow: 0 0 20px 5px #f3f3f3;
     transition: 0.5s;
     overflow: hidden;
 }
 
 .ov-homepage-higlight-grid .sd-card-hover:hover {
-    border-color: var(--sd-color-card-border)!important;
-    transform: scale(1.00)!important;
+    border-color: var(--sd-color-card-border);
+    transform: scale(1.00);
 }
 
 .ov-homepage-higlight-grid .sd-shadow-sm:hover {
-    box-shadow: 0 0 10px 2px rgba(108,36,240,0.3) !important;
+    box-shadow: 0 0 10px 2px rgba(108,36,240,0.3)!important;
 }
 
 .ov-homepage-higlight-grid .sd-card-title {
@@ -140,34 +137,10 @@ h1 {
 
 .ov-homepage-feature-grid .sd-card {
     border: none;
-    box-shadow: 0 0 20px 2px #f3f3f3!important;
-    /* box-shadow: none!important; */
+    box-shadow: 0 0 20px 2px #f3f3f3;
 }
 
 .ov-homepage-feature-grid .sd-row {
     gap: 1rem;
     justify-content: center;
-}
-
-
-/* =================================================================== */
-/* @media screen and (min-width: 720px) {
-    main.col-xl-7.bd-content {
-        flex: 0 0 75%!important;
-        max-width: 75%!important;
-    }
-}*/
-
-@media screen and (max-width: 535px) {
-    .ov-homepage-feature-grid .sd-row {
-        flex-direction: column;
-        align-items: center;
-    }
-    .ov-homepage-feature-grid .sd-col {
-        max-width: 100%;
-    }
-}
-
-.sd-row {
-    --sd-gutter-x: 0rem!important;
 }
