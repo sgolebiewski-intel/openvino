@@ -51,7 +51,7 @@ Table of contents:
     # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     # See the License for the specific language governing permissions and
     # limitations under the License.
-    
+
     # Copyright 2018 The TensorFlow Authors
     #
     # Modified for OpenVINO Notebooks
@@ -77,7 +77,7 @@ obtained by executing the code with ‘Runtime->Run All’ or the
 .. code:: ipython3
 
     import platform
-    
+
     %pip install -q "openvino>=2023.1.0" "pillow"
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -95,7 +95,7 @@ obtained by executing the code with ‘Runtime->Run All’ or the
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -105,7 +105,7 @@ obtained by executing the code with ‘Runtime->Run All’ or the
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -115,7 +115,7 @@ obtained by executing the code with ‘Runtime->Run All’ or the
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -125,7 +125,7 @@ obtained by executing the code with ‘Runtime->Run All’ or the
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -135,7 +135,7 @@ obtained by executing the code with ‘Runtime->Run All’ or the
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -145,7 +145,7 @@ obtained by executing the code with ‘Runtime->Run All’ or the
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -155,7 +155,7 @@ obtained by executing the code with ‘Runtime->Run All’ or the
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -165,7 +165,7 @@ obtained by executing the code with ‘Runtime->Run All’ or the
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -175,7 +175,7 @@ obtained by executing the code with ‘Runtime->Run All’ or the
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -215,16 +215,16 @@ Import TensorFlow and Other Libraries
     import os
     import sys
     from pathlib import Path
-    
+
     os.environ["TF_USE_LEGACY_KERAS"] = "1"
-    
+
     import PIL
     import matplotlib.pyplot as plt
     import numpy as np
     import tensorflow as tf
     from PIL import Image
     import openvino as ov
-    
+
     sys.path.append("../utils")
     from notebook_utils import download_file
 
@@ -542,7 +542,7 @@ calling map:
     image_batch, labels_batch = next(iter(normalized_ds))
     first_image = image_batch[0]
     # Notice the pixels values are now in `[0,1]`.
-    print(np.min(first_image), np.max(first_image)) 
+    print(np.min(first_image), np.max(first_image))
 
 
 .. parsed-literal::
@@ -581,7 +581,7 @@ standard approach.
 .. code:: ipython3
 
     num_classes = 5
-    
+
     model = tf.keras.Sequential([
       tf.keras.layers.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
       tf.keras.layers.Conv2D(16, 3, padding='same', activation='relu'),
@@ -650,19 +650,19 @@ Create plots of loss and accuracy on the training and validation sets.
 
     # acc = history.history['accuracy']
     # val_acc = history.history['val_accuracy']
-    
+
     # loss = history.history['loss']
     # val_loss = history.history['val_loss']
-    
+
     # epochs_range = range(epochs)
-    
+
     # plt.figure(figsize=(8, 8))
     # plt.subplot(1, 2, 1)
     # plt.plot(epochs_range, acc, label='Training Accuracy')
     # plt.plot(epochs_range, val_acc, label='Validation Accuracy')
     # plt.legend(loc='lower right')
     # plt.title('Training and Validation Accuracy')
-    
+
     # plt.subplot(1, 2, 2)
     # plt.plot(epochs_range, loss, label='Training Loss')
     # plt.plot(epochs_range, val_loss, label='Validation Loss')
@@ -819,7 +819,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-     Layer (type)                Output Shape              Param #   
+     Layer (type)                Output Shape              Param #
 
 
 .. parsed-literal::
@@ -829,137 +829,137 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-     sequential_1 (Sequential)   (None, 180, 180, 3)       0         
+     sequential_1 (Sequential)   (None, 180, 180, 3)       0
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     rescaling_2 (Rescaling)     (None, 180, 180, 3)       0         
+     rescaling_2 (Rescaling)     (None, 180, 180, 3)       0
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     conv2d_3 (Conv2D)           (None, 180, 180, 16)      448       
+     conv2d_3 (Conv2D)           (None, 180, 180, 16)      448
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     max_pooling2d_3 (MaxPooling  (None, 90, 90, 16)       0         
+     max_pooling2d_3 (MaxPooling  (None, 90, 90, 16)       0
 
 
 .. parsed-literal::
 
-     2D)                                                             
+     2D)
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     conv2d_4 (Conv2D)           (None, 90, 90, 32)        4640      
+     conv2d_4 (Conv2D)           (None, 90, 90, 32)        4640
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     max_pooling2d_4 (MaxPooling  (None, 45, 45, 32)       0         
+     max_pooling2d_4 (MaxPooling  (None, 45, 45, 32)       0
 
 
 .. parsed-literal::
 
-     2D)                                                             
+     2D)
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     conv2d_5 (Conv2D)           (None, 45, 45, 64)        18496     
+     conv2d_5 (Conv2D)           (None, 45, 45, 64)        18496
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     max_pooling2d_5 (MaxPooling  (None, 22, 22, 64)       0         
+     max_pooling2d_5 (MaxPooling  (None, 22, 22, 64)       0
 
 
 .. parsed-literal::
 
-     2D)                                                             
+     2D)
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     dropout (Dropout)           (None, 22, 22, 64)        0         
+     dropout (Dropout)           (None, 22, 22, 64)        0
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     flatten_1 (Flatten)         (None, 30976)             0         
+     flatten_1 (Flatten)         (None, 30976)             0
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     dense_2 (Dense)             (None, 128)               3965056   
+     dense_2 (Dense)             (None, 128)               3965056
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     outputs (Dense)             (None, 5)                 645       
+     outputs (Dense)             (None, 5)                 645
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
@@ -1012,13 +1012,13 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 1:28 - loss: 1.6484 - accuracy: 0.1562
 
 .. parsed-literal::
 
     
- 2/92 [..............................] - ETA: 6s - loss: 2.1134 - accuracy: 0.1719  
+ 2/92 [..............................] - ETA: 6s - loss: 2.1134 - accuracy: 0.1719
 
 .. parsed-literal::
 
@@ -1491,7 +1491,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.9461 - accuracy: 0.6875
 
 .. parsed-literal::
@@ -1957,7 +1957,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 1.3307 - accuracy: 0.4688
 
 .. parsed-literal::
@@ -2423,7 +2423,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 1.2800 - accuracy: 0.4688
 
 .. parsed-literal::
@@ -2889,7 +2889,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.6932 - accuracy: 0.6875
 
 .. parsed-literal::
@@ -3355,7 +3355,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.7882 - accuracy: 0.7500
 
 .. parsed-literal::
@@ -3821,7 +3821,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 1.1985 - accuracy: 0.4688
 
 .. parsed-literal::
@@ -4287,7 +4287,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.5652 - accuracy: 0.7500
 
 .. parsed-literal::
@@ -4753,7 +4753,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.4719 - accuracy: 0.8125
 
 .. parsed-literal::
@@ -5219,7 +5219,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.7487 - accuracy: 0.8125
 
 .. parsed-literal::
@@ -5685,7 +5685,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.6383 - accuracy: 0.7812
 
 .. parsed-literal::
@@ -6151,7 +6151,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.6038 - accuracy: 0.7188
 
 .. parsed-literal::
@@ -6617,7 +6617,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.2521 - accuracy: 0.9062
 
 .. parsed-literal::
@@ -7083,7 +7083,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.4724 - accuracy: 0.7812
 
 .. parsed-literal::
@@ -7549,7 +7549,7 @@ Compile and Train the Model
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.6753 - accuracy: 0.8125
 
 .. parsed-literal::
@@ -8020,19 +8020,19 @@ than before, and training and validation accuracy are closer aligned.
 
     acc = history.history['accuracy']
     val_acc = history.history['val_accuracy']
-    
+
     loss = history.history['loss']
     val_loss = history.history['val_loss']
-    
+
     epochs_range = range(epochs)
-    
+
     plt.figure(figsize=(8, 8))
     plt.subplot(1, 2, 1)
     plt.plot(epochs_range, acc, label='Training Accuracy')
     plt.plot(epochs_range, val_acc, label='Validation Accuracy')
     plt.legend(loc='lower right')
     plt.title('Training and Validation Accuracy')
-    
+
     plt.subplot(1, 2, 2)
     plt.plot(epochs_range, loss, label='Training Loss')
     plt.plot(epochs_range, val_loss, label='Validation Loss')
@@ -8060,16 +8060,16 @@ in the training or validation sets.
 
     sunflower_url = "https://storage.googleapis.com/download.tensorflow.org/example_images/592px-Red_sunflower.jpg"
     sunflower_path = tf.keras.utils.get_file('Red_sunflower', origin=sunflower_url)
-    
+
     img = tf.keras.preprocessing.image.load_img(
         sunflower_path, target_size=(img_height, img_width)
     )
     img_array = tf.keras.preprocessing.image.img_to_array(img)
     img_array = tf.expand_dims(img_array, 0)  # Create a batch
-    
+
     predictions = model.predict(img_array)
     score = tf.nn.softmax(predictions[0])
-    
+
     print(
         "This image most likely belongs to {} with a {:.2f} percent confidence."
         .format(class_names[np.argmax(score)], 100 * np.max(score))
@@ -8078,13 +8078,13 @@ in the training or validation sets.
 
 .. parsed-literal::
 
-    
-1/1 [==============================] - ETA: 0s
+
+   1/1 [==============================] - ETA: 0s
 
 .. parsed-literal::
 
     
-1/1 [==============================] - 0s 75ms/step
+    1/1 [==============================] - 0s 75ms/step
 
 
 .. parsed-literal::
@@ -8195,11 +8195,11 @@ Preprocessing Image Function
         n, h, w, c = [1, img_height, img_height, 3]
         image = Image.open(imagePath)
         image = image.resize((h, w), resample=Image.BILINEAR)
-    
+
         # Convert to array and change data layout from HWC to CHW
         image = np.array(image)
         input_image = image.reshape((n, h, w, c))
-    
+
         return input_image
 
 OpenVINO Runtime Setup
@@ -8217,7 +8217,7 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     import ipywidgets as widgets
-    
+
     # Initialize OpenVINO runtime
     core = ov.Core()
     device = widgets.Dropdown(
@@ -8226,7 +8226,7 @@ select device from dropdown list for running inference using OpenVINO
         description='Device:',
         disabled=False,
     )
-    
+
     device
 
 
@@ -8241,11 +8241,11 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     class_names=["daisy", "dandelion", "roses", "sunflowers", "tulips"]
-    
+
     compiled_model = core.compile_model(model=ir_model, device_name=device.value)
-    
+
     del ir_model
-    
+
     input_layer = compiled_model.input(0)
     output_layer = compiled_model.output(0)
 
@@ -8261,21 +8261,21 @@ Run the Inference Step
     OUTPUT_DIR = "output"
     inp_file_name = f"A_Close_Up_Photo_of_a_Dandelion.jpg"
     file_path = Path(OUTPUT_DIR)/Path(inp_file_name)
-    
+
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    
+
     # Download the image
     download_file(inp_img_url, inp_file_name, directory=OUTPUT_DIR)
-    
+
     # Pre-process the image and get it ready for inference.
     input_image = pre_process_image(file_path)
-    
+
     print(input_image.shape)
     print(input_layer.shape)
     res = compiled_model([input_image])[output_layer]
-    
+
     score = tf.nn.softmax(res[0])
-    
+
     # Show the results
     image = Image.open(file_path)
     plt.imshow(image)

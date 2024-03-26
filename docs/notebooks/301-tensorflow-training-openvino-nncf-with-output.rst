@@ -41,14 +41,14 @@ notebook. This will take a while.
 .. code:: ipython3
 
     import platform
-    
+
     %pip install -q Pillow numpy tqdm nncf "openvino>=2023.1"
-    
+
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
     else:
         %pip install -q "matplotlib>=3.4,<3.7"
-    
+
     %pip install -q "tensorflow-macos>=2.5; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version > '3.8'" # macOS M1 and M2
     %pip install -q "tensorflow-macos>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version <= '3.8'" # macOS M1 and M2
     %pip install -q "tensorflow>=2.5; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version > '3.8'" # macOS x86
@@ -61,7 +61,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -71,7 +71,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -81,7 +81,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -91,7 +91,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -101,7 +101,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -111,7 +111,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -121,7 +121,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -131,7 +131,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -148,7 +148,7 @@ notebook. This will take a while.
     pytorch-lightning 1.6.5 requires protobuf<=3.20.1, but you have protobuf 4.25.3 which is incompatible.
     tensorflow-metadata 1.14.0 requires protobuf<4.21,>=3.20.3, but you have protobuf 4.25.3 which is incompatible.
     tf2onnx 1.16.1 requires protobuf~=3.20, but you have protobuf 4.25.3 which is incompatible.
-    
+
 
 .. parsed-literal::
 
@@ -158,7 +158,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -169,18 +169,18 @@ notebook. This will take a while.
 
     from pathlib import Path
     import os
-    
+
     os.environ["TF_USE_LEGACY_KERAS"] = "1"
-    
-    
+
+
     import tensorflow as tf
-    
+
     model_xml = Path("model/flower/flower_ir.xml")
     dataset_url = (
         "https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz"
     )
     data_dir = Path(tf.keras.utils.get_file("flower_photos", origin=dataset_url, untar=True))
-    
+
     if not model_xml.exists():
         print("Executing training notebook. This will take a while...")
         %run 301-tensorflow-training-openvino.ipynb
@@ -206,7 +206,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -216,7 +216,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -226,7 +226,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -236,7 +236,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -246,7 +246,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -256,7 +256,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -266,7 +266,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -276,7 +276,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -286,7 +286,7 @@ notebook. This will take a while.
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -388,7 +388,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-     Layer (type)                Output Shape              Param #   
+     Layer (type)                Output Shape              Param #
 
 
 .. parsed-literal::
@@ -398,137 +398,137 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-     sequential_1 (Sequential)   (None, 180, 180, 3)       0         
+     sequential_1 (Sequential)   (None, 180, 180, 3)       0
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     rescaling_2 (Rescaling)     (None, 180, 180, 3)       0         
+     rescaling_2 (Rescaling)     (None, 180, 180, 3)       0
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     conv2d_3 (Conv2D)           (None, 180, 180, 16)      448       
+     conv2d_3 (Conv2D)           (None, 180, 180, 16)      448
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     max_pooling2d_3 (MaxPooling  (None, 90, 90, 16)       0         
+     max_pooling2d_3 (MaxPooling  (None, 90, 90, 16)       0
 
 
 .. parsed-literal::
 
-     2D)                                                             
+     2D)
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     conv2d_4 (Conv2D)           (None, 90, 90, 32)        4640      
+     conv2d_4 (Conv2D)           (None, 90, 90, 32)        4640
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     max_pooling2d_4 (MaxPooling  (None, 45, 45, 32)       0         
+     max_pooling2d_4 (MaxPooling  (None, 45, 45, 32)       0
 
 
 .. parsed-literal::
 
-     2D)                                                             
+     2D)
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     conv2d_5 (Conv2D)           (None, 45, 45, 64)        18496     
+     conv2d_5 (Conv2D)           (None, 45, 45, 64)        18496
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     max_pooling2d_5 (MaxPooling  (None, 22, 22, 64)       0         
+     max_pooling2d_5 (MaxPooling  (None, 22, 22, 64)       0
 
 
 .. parsed-literal::
 
-     2D)                                                             
+     2D)
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     dropout (Dropout)           (None, 22, 22, 64)        0         
+     dropout (Dropout)           (None, 22, 22, 64)        0
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     flatten_1 (Flatten)         (None, 30976)             0         
+     flatten_1 (Flatten)         (None, 30976)             0
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     dense_2 (Dense)             (None, 128)               3965056   
+     dense_2 (Dense)             (None, 128)               3965056
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
 
-     outputs (Dense)             (None, 5)                 645       
+     outputs (Dense)             (None, 5)                 645
 
 
 
 
-                                                                     
+
 
 
 .. parsed-literal::
@@ -571,13 +571,13 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 1:24 - loss: 1.5954 - accuracy: 0.2812
 
 .. parsed-literal::
 
     
- 2/92 [..............................] - ETA: 6s - loss: 2.7563 - accuracy: 0.2188  
+ 2/92 [..............................] - ETA: 6s - loss: 2.7563 - accuracy: 0.2188
 
 .. parsed-literal::
 
@@ -1050,7 +1050,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 1.2158 - accuracy: 0.5000
 
 .. parsed-literal::
@@ -1516,7 +1516,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.8932 - accuracy: 0.6250
 
 .. parsed-literal::
@@ -1982,7 +1982,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.8340 - accuracy: 0.6562
 
 .. parsed-literal::
@@ -2448,7 +2448,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.5466 - accuracy: 0.8125
 
 .. parsed-literal::
@@ -2914,7 +2914,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.6900 - accuracy: 0.7500
 
 .. parsed-literal::
@@ -3380,7 +3380,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.6328 - accuracy: 0.7812
 
 .. parsed-literal::
@@ -3846,7 +3846,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.6520 - accuracy: 0.7812
 
 .. parsed-literal::
@@ -4312,7 +4312,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.7932 - accuracy: 0.6562
 
 .. parsed-literal::
@@ -4778,7 +4778,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.7562 - accuracy: 0.7188
 
 .. parsed-literal::
@@ -5244,7 +5244,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 6s - loss: 0.6069 - accuracy: 0.7500
 
 .. parsed-literal::
@@ -5710,7 +5710,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.4500 - accuracy: 0.8125
 
 .. parsed-literal::
@@ -6176,7 +6176,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 6s - loss: 0.4247 - accuracy: 0.8438
 
 .. parsed-literal::
@@ -6642,7 +6642,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 7s - loss: 0.4192 - accuracy: 0.8750
 
 .. parsed-literal::
@@ -7108,7 +7108,7 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
+
  1/92 [..............................] - ETA: 8s - loss: 0.5391 - accuracy: 0.7812
 
 .. parsed-literal::
@@ -7573,8 +7573,8 @@ notebook. This will take a while.
 
 .. parsed-literal::
 
-    
-1/1 [==============================] - ETA: 0s
+
+    1/1 [==============================] - ETA: 0s
 
 .. parsed-literal::
 
@@ -7682,7 +7682,7 @@ library.
 .. code:: ipython3
 
     import sys
-    
+
     import matplotlib.pyplot as plt
     import numpy as np
     import nncf
@@ -7690,7 +7690,7 @@ library.
     from openvino.runtime import serialize
     from PIL import Image
     from sklearn.metrics import accuracy_score
-    
+
     sys.path.append("../utils")
     from notebook_utils import download_file
 
@@ -7730,7 +7730,7 @@ The validation dataset already defined in the training notebook.
       image_size=(img_height, img_width),
       batch_size=1
     )
-    
+
     for a, b in val_dataset:
         print(type(a), type(b))
         break
@@ -7769,8 +7769,8 @@ user validation dataset to the calibration dataset.
         """
         images, _ = data_item
         return images.numpy()
-    
-    
+
+
     calibration_dataset = nncf.Dataset(val_dataset, transform_fn)
 
 Download Intermediate Representation (IR) model.
@@ -7837,7 +7837,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/live.py", line 32, in run
     </pre>
@@ -7855,7 +7855,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/live.py", line 223, in refresh
     </pre>
@@ -7873,7 +7873,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/live.py", line 203, in renderable
     </pre>
@@ -7891,7 +7891,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/live.py", line 98, in get_renderable
     </pre>
@@ -7909,7 +7909,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/progress.py", line 1537, in get_renderable
     </pre>
@@ -7927,7 +7927,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/progress.py", line 1542, in get_renderables
     </pre>
@@ -7945,7 +7945,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/progress.py", line 1566, in make_tasks_table
     </pre>
@@ -7963,7 +7963,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/progress.py", line 1571, in &lt;genexpr&gt;
     </pre>
@@ -7981,7 +7981,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/progress.py", line 528, in __call__
     </pre>
@@ -7999,7 +7999,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/nncf/common/logging/track_progress.py", line 58, in render
     </pre>
@@ -8017,7 +8017,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/progress.py", line 787, in render
     </pre>
@@ -8035,7 +8035,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/rich/progress.py", line 1039, in time_remaining
     </pre>
@@ -8053,7 +8053,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/tensorflow/python/util/traceback_utils.py", line 153, in error_handler
     </pre>
@@ -8071,7 +8071,7 @@ control <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guid
 
 .. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File 
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  File
     "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/si
     te-packages/tensorflow/python/ops/math_ops.py", line 1569, in _truediv_python3
     </pre>
@@ -8149,14 +8149,14 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     import ipywidgets as widgets
-    
+
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"] if not "GPU" in core.available_devices else ["AUTO", "MULTY:CPU,GPU"],
         value='AUTO',
         description='Device:',
         disabled=False,
     )
-    
+
     device
 
 
@@ -8182,27 +8182,27 @@ For this demo we define validate function to compute accuracy metrics.
     def validate(model, validation_loader):
         """
         Evaluate model and compute accuracy metrics.
-    
+
         :param model: Model to validate
         :param validation_loader: Validation dataset
         :returns: Accuracy scores
         """
         predictions = []
         references = []
-    
+
         output = model.outputs[0]
-    
+
         for images, target in validation_loader:
             pred = model(images.numpy())[output]
-    
+
             predictions.append(np.argmax(pred, axis=1))
             references.append(target)
-    
+
         predictions = np.concatenate(predictions, axis=0)
         references = np.concatenate(references, axis=0)
-    
+
         scores = accuracy_score(references, predictions)
-    
+
         return scores
 
 Calculate accuracy for the original model and the quantized model.
@@ -8211,10 +8211,10 @@ Calculate accuracy for the original model and the quantized model.
 
     original_compiled_model = core.compile_model(model=ir_model, device_name=device.value)
     quantized_compiled_model = core.compile_model(model=quantized_model, device_name=device.value)
-    
+
     original_accuracy = validate(original_compiled_model, val_dataset)
     quantized_accuracy = validate(quantized_compiled_model, val_dataset)
-    
+
     print(f"Accuracy of the original model: {original_accuracy:.3f}")
     print(f"Accuracy of the quantized model: {quantized_accuracy:.3f}")
 
@@ -8231,7 +8231,7 @@ Compare file size of the models.
 
     original_model_size = model_xml.with_suffix(".bin").stat().st_size / 1024
     quantized_model_size = compressed_model_xml.with_suffix(".bin").stat().st_size / 1024
-    
+
     print(f"Original model size: {original_model_size:.2f} KB")
     print(f"Quantized model size: {quantized_model_size:.2f} KB")
 
@@ -8263,12 +8263,12 @@ Python API.
         n, c, h, w = [1, 3, img_height, img_height]
         image = Image.open(imagePath)
         image = image.resize((h, w), resample=Image.BILINEAR)
-    
+
         # Convert to array and change data layout from HWC to CHW
         image = np.array(image)
-    
+
         input_image = image.reshape((n, h, w, c))
-    
+
         return input_image
 
 .. code:: ipython3
@@ -8276,10 +8276,10 @@ Python API.
     # Get the names of the input and output layer
     input_layer = quantized_compiled_model.input(0)
     output_layer = quantized_compiled_model.output(0)
-    
+
     # Get the class names: a list of directory names in alphabetical order
     class_names = sorted([item.name for item in Path(data_dir).iterdir() if item.is_dir()])
-    
+
     # Run inference on an input image...
     inp_img_url = (
         "https://upload.wikimedia.org/wikipedia/commons/4/48/A_Close_Up_Photo_of_a_Dandelion.jpg"
@@ -8290,16 +8290,16 @@ Python API.
     # Download the image if it does not exist yet
     if not Path(inp_file_name).exists():
         download_file(inp_img_url, inp_file_name, directory=directory)
-    
+
     # Pre-process the image and get it ready for inference.
     input_image = pre_process_image(imagePath=file_path)
     print(f'input image shape: {input_image.shape}')
     print(f'input layer shape: {input_layer.shape}')
-    
+
     res = quantized_compiled_model([input_image])[output_layer]
-    
+
     score = tf.nn.softmax(res[0])
-    
+
     # Show the results
     image = Image.open(file_path)
     plt.imshow(image)
@@ -8357,7 +8357,7 @@ measured for CPU+GPU as well. The number of seconds is set to 15.
 
     # print the available devices on this system
     print("Device information:")
-    
+
     for ov_device in core.available_devices:
         print(f'{ov_device} - {core.get_property(ov_device, "FULL_DEVICE_NAME")}')
 
@@ -8381,12 +8381,12 @@ measured for CPU+GPU as well. The number of seconds is set to 15.
     [Step 2/11] Loading OpenVINO Runtime
     [ INFO ] OpenVINO:
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
+    [ INFO ]
     [ INFO ] Device info:
     [ INFO ] AUTO
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
-    [ INFO ] 
+    [ INFO ]
+    [ INFO ]
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
@@ -8441,7 +8441,7 @@ measured for CPU+GPU as well. The number of seconds is set to 15.
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'sequential_1_input'!. This input will be filled with random values!
-    [ INFO ] Fill input 'sequential_1_input' with random values 
+    [ INFO ] Fill input 'sequential_1_input' with random values
     [Step 10/11] Measuring performance (Start inference asynchronously, 12 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
     [ INFO ] First inference took 4.14 ms
@@ -8474,12 +8474,12 @@ measured for CPU+GPU as well. The number of seconds is set to 15.
     [Step 2/11] Loading OpenVINO Runtime
     [ INFO ] OpenVINO:
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
+    [ INFO ]
     [ INFO ] Device info:
     [ INFO ] AUTO
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
-    [ INFO ] 
+    [ INFO ]
+    [ INFO ]
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
@@ -8534,7 +8534,7 @@ measured for CPU+GPU as well. The number of seconds is set to 15.
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'sequential_1_input'!. This input will be filled with random values!
-    [ INFO ] Fill input 'sequential_1_input' with random values 
+    [ INFO ] Fill input 'sequential_1_input' with random values
     [Step 10/11] Measuring performance (Start inference asynchronously, 12 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
     [ INFO ] First inference took 2.08 ms
