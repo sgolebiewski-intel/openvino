@@ -65,7 +65,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -114,7 +114,7 @@ Imports
 Settings
 --------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -131,7 +131,7 @@ Settings
 Prepare the Model
 -----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Perform the following:
 
@@ -224,7 +224,7 @@ PyTorch model formats are supported:
 Prepare the Dataset
 -------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We download the `General Language Understanding Evaluation
 (GLUE) <https://gluebenchmark.com/>`__ dataset for the MRPC task from
@@ -251,7 +251,7 @@ tokenizer from HuggingFace.
 Optimize model using NNCF Post-training Quantization API
 --------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -387,7 +387,7 @@ The optimization process contains the following steps:
 Load and Test OpenVINO Model
 ----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To load and test converted model, perform the following:
 
@@ -399,7 +399,7 @@ To load and test converted model, perform the following:
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -460,7 +460,7 @@ changing ``sample_idx`` to another value (from 0 to 407).
 Compare F1-score of FP32 and INT8 models
 ----------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -514,7 +514,7 @@ Compare F1-score of FP32 and INT8 models
 Compare Performance of the Original, Converted and Quantized Models
 -------------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Compare the original PyTorch model with OpenVINO converted and quantized
 models (``FP32``, ``INT8``) to see the difference in performance. It is

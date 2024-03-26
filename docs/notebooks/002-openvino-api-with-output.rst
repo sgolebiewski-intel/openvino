@@ -67,7 +67,7 @@ Table of contents:
 Loading OpenVINO Runtime and Showing Info
 -----------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Initialize OpenVINO Runtime with ``ov.Core()``
 
@@ -128,7 +128,7 @@ inference using this widget
 Loading a Model
 ---------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 After initializing OpenVINO Runtime, first read the model file with
 ``read_model()``, then compile it to the specified device with the
@@ -142,7 +142,7 @@ using a tool dedicated to this task.
 OpenVINO IR Model
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 An OpenVINO IR (Intermediate Representation) model consists of an
 ``.xml`` file, containing information about network topology, and a
@@ -213,7 +213,7 @@ notebooks.
 ONNX Model
 ~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `ONNX <https://onnx.ai/>`__ is an open format built to represent machine
 learning models. ONNX defines a common set of operators - the building
@@ -268,7 +268,7 @@ The ONNX model can be exported to OpenVINO IR with ``save_model()``:
 PaddlePaddle Model
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `PaddlePaddle <https://www.paddlepaddle.org.cn/documentation/docs/en/guides/index_en.html>`__
 models saved for inference can also be passed to OpenVINO Runtime
@@ -322,7 +322,7 @@ without any conversion step. Pass the filename with extension to
 TensorFlow Model
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 TensorFlow models saved in frozen graph format can also be passed to
 ``read_model``.
@@ -366,7 +366,7 @@ TensorFlow models saved in frozen graph format can also be passed to
 TensorFlow Lite Model
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `TFLite <https://www.tensorflow.org/lite>`__ models saved for inference
 can also be passed to OpenVINO Runtime. Pass the filename with extension
@@ -417,7 +417,7 @@ It is pre-trained model optimized to work with TensorFlow Lite.
 PyTorch Model
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `PyTorch <https://pytorch.org/>`__ models can not be directly passed to
 ``core.read_model``. ``ov.Model`` for model objects from this framework
@@ -449,7 +449,7 @@ model form torchvision library. After conversion model using
 Getting Information about a Model
 ---------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The OpenVINO Model instance stores information about the model.
 Information about the inputs and outputs of the model are in
@@ -489,7 +489,7 @@ Information about the inputs and outputs of the model are in
 Model Inputs
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Information about all input layers is stored in the ``inputs``
 dictionary.
@@ -564,7 +564,7 @@ point) precision.
 Model Outputs
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -630,7 +630,7 @@ classes (``C``). The output is returned as 32-bit floating point.
 Doing Inference on a Model
 --------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
    **NOTE** this notebook demonstrates only the basic synchronous
    inference API. For an async inference example, please refer to `Async
@@ -840,12 +840,12 @@ notebook <001-hello-world-with-output.html>`__.
 Reshaping and Resizing
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Change Image Size
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Instead of reshaping the image to fit the model, it is also possible to
 reshape the model to fit the image. Be aware that not all models support
@@ -939,7 +939,7 @@ dimensions. After reshaping, compile the network once again.
 Change Batch Size
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Use the ``.reshape()`` method to set the batch size, by increasing the
 first element of ``new_shape``. For example, to set a batch size of two,
@@ -1001,7 +1001,7 @@ input image through the network to see the result:
 Caching a Model
 ---------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 For some devices, like GPU, loading a model can take some time. Model
 Caching solves this issue by caching the model in a cache directory. If

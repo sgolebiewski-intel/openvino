@@ -56,7 +56,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 First, we should install the `Hugging Face
 Optimum <https://huggingface.co/docs/optimum/installation>`__ library
@@ -78,7 +78,7 @@ useful modules.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Select the device from dropdown list for running inference using
 OpenVINO.
@@ -102,7 +102,7 @@ OpenVINO.
 Create autoregressive and speculative forms of sampling with KV Cache support
 -----------------------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Text generation is often done in an autoregressive fashion. We will all
 support a KV cache (aka Past Value Cache) in the code. Note that we are
@@ -113,7 +113,7 @@ simple and understandable as possible.
 Setup imports
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -125,7 +125,7 @@ Setup imports
 Prepare autoregressive sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -153,7 +153,7 @@ Prepare autoregressive sampling
 Prepare speculative sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 -  Step 1: With speculative sampling, we first generate K samples from
    the draft model (in an autoregressive manner).
@@ -236,12 +236,12 @@ high enough, it’s likely to be accepted (using a random number).
 Main generation function
 ------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Download and Convert Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Optimum Intel can be used to load optimized models from the `Hugging
 Face Hub <https://huggingface.co/docs/optimum/intel/hf.co/models>`__ and

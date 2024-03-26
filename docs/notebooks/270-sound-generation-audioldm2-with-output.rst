@@ -47,7 +47,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -64,7 +64,7 @@ Prerequisites
 Instantiating Generation Pipeline
 ---------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To work with `AudioLDM 2 <https://huggingface.co/cvssp/audioldm2>`__ by
 `Centre for Vision, Speech and Signal Processing - University of Surrey <https://www.surrey.ac.uk/centre-vision-speech-signal-processing>`__,
@@ -132,7 +132,7 @@ sample.
 Convert models to OpenVINO Intermediate representation (IR) format
 ------------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `Model conversion
 API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
@@ -169,7 +169,7 @@ The pipeline consists of seven important parts:
 CLAP Text Encoder Conversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 First frozen text-encoder. AudioLDM2 uses the joint audio-text embedding
 model
@@ -219,7 +219,7 @@ against the text prompt by computing similarity scores.
 T5 Text Encoder Conversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 As second frozen text-encoder, AudioLDM2 uses the
 `T5 <https://huggingface.co/docs/transformers/model_doc/t5#transformers.T5EncoderModel>`__,
@@ -268,7 +268,7 @@ hidden states.
 Projection model conversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 A trained model used to linearly project the hidden-states from the
 first and second text encoder models and insert learned Start Of
@@ -311,7 +311,7 @@ input to the language model.
 GPT-2 conversion
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `GPT-2 <https://huggingface.co/gpt2>`__ is an auto-regressive language
 model used to generate a sequence of hidden-states conditioned on the
@@ -363,7 +363,7 @@ projected outputs from the two text encoders.
 Vocoder conversion
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `SpeechT5 HiFi-GAN Vocoder <https://huggingface.co/microsoft/speecht5_hifigan>`__
 is used to convert the mel-spectrogram latents to the final audio
@@ -397,7 +397,7 @@ waveform.
 UNet conversion
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The UNet model is used to denoise the encoded audio latents. The process
 of UNet model conversion remains the same, like for original Stable
@@ -444,7 +444,7 @@ Diffusion model.
 VAE Decoder conversion
 ~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The VAE model has two parts, an encoder, and a decoder. The encoder is
 used to convert the image into a low-dimensional latent representation,
@@ -498,7 +498,7 @@ diffusion
 Select inference device for AudioLDM2 pipeline
 ----------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -529,7 +529,7 @@ select device from dropdown list for running inference using OpenVINO
 Adapt OpenVINO models to the original pipeline
 ----------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Here we create wrapper classes for all three OpenVINO models that we
 want to embed in the original inference pipeline. Here are some of the
@@ -716,7 +716,7 @@ Now we initialize the wrapper objects and load them to the HF pipeline
 Try out the converted pipeline
 ------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now, we are ready to start generation. For improving the generation
 process, we also introduce an opportunity to provide a

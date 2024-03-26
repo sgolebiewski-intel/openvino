@@ -43,7 +43,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -93,12 +93,12 @@ Imports
 Prepare model and data processing
 ---------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Download test model
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We use a pre-trained model from OpenVINO’s `Open Model
 Zoo <https://docs.openvino.ai/2024/documentation/legacy-features/model-zoo.html>`__
@@ -285,7 +285,7 @@ the person in each frame of the video.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -313,7 +313,7 @@ Select inference device
 Load the model
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -335,7 +335,7 @@ Load the model
 Create functions for data processing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -379,7 +379,7 @@ Create functions for data processing
 Get the test video
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -388,7 +388,7 @@ Get the test video
 How to improve the throughput of video processing
 -------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Below, we compare the performance of the synchronous and async-based
 approaches:
@@ -396,7 +396,7 @@ approaches:
 Sync Mode (default)
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Let us see how video processing works with the default approach. Using
 the synchronous approach, the frame is captured with OpenCV and then
@@ -488,7 +488,7 @@ immediately processed:
 Test performance in Sync Mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -509,7 +509,7 @@ Test performance in Sync Mode
 Async Mode
 ~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Let us see how the OpenVINO Async API can improve the overall frame rate
 of an application. The key advantage of the Async approach is as
@@ -627,7 +627,7 @@ pipeline (decoding vs inference) and not by the sum of the stages.
 Test the performance in Async Mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -648,7 +648,7 @@ Test the performance in Async Mode
 Compare the performance
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -678,7 +678,7 @@ Compare the performance
 ``AsyncInferQueue``
 -------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Asynchronous mode pipelines can be supported with the
 `AsyncInferQueue <https://docs.openvino.ai/2024/openvino-workflow/running-inference/integrate-openvino-with-your-application/python-api-exclusives.html#asyncinferqueue>`__
@@ -690,7 +690,7 @@ simpler way to manage the infer request queue in Asynchronous mode.
 Setting Callback
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 When ``callback`` is set, any job that ends inference calls upon the
 Python function. The ``callback`` function must have two arguments: one
@@ -769,7 +769,7 @@ the possibility of passing runtime values.
 Test the performance with ``AsyncInferQueue``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

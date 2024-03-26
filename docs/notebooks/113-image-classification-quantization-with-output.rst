@@ -67,7 +67,7 @@ Table of contents:
 Prepare the Model
 -----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Model preparation stage has the following steps:
 
@@ -483,7 +483,7 @@ can be found on this
 Prepare Dataset
 ---------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We will use `CIFAR10 <https://www.cs.toronto.edu/~kriz/cifar.html>`__
 dataset from
@@ -1406,7 +1406,7 @@ Preprocessing for model obtained from training
 Perform Quantization
 --------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -1422,7 +1422,7 @@ MobileNetV2. The optimization process contains the following steps:
 Create Dataset for Validation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 NNCF is compatible with ``torch.utils.data.DataLoader`` interface. For
 performing quantization it should be passed into ``nncf.Dataset`` object
@@ -1449,7 +1449,7 @@ model during quantization, in our case, to pick input tensor from pair
 Run nncf.quantize for Getting an Optimized Model
 ------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 ``nncf.quantize`` function accepts model and prepared quantization
 dataset for performing basic quantization. Optionally, additional
@@ -1520,7 +1520,7 @@ about supported parameters can be found on this
 Serialize an OpenVINO IR model
 ------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Similar to ``ov.convert_model``, quantized model is ``ov.Model`` object
 which ready to be loaded into device and can be serialized on disk using
@@ -1533,7 +1533,7 @@ which ready to be loaded into device and can be serialized on disk using
 Compare Accuracy of the Original and Quantized Models
 -----------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1553,7 +1553,7 @@ Compare Accuracy of the Original and Quantized Models
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -1617,7 +1617,7 @@ select device from dropdown list for running inference using OpenVINO
 Compare Performance of the Original and Quantized Models
 --------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Finally, measure the inference performance of the ``FP32`` and ``INT8``
 models, using `Benchmark
@@ -1828,7 +1828,7 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
 Compare results on four pictures
 --------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

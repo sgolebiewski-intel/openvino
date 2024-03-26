@@ -26,7 +26,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -91,7 +91,7 @@ Imports
 Initializing the Model
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We will use the transformer-based `DistilBERT base uncased finetuned
 SST-2 <https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english>`__
@@ -107,7 +107,7 @@ model from Hugging Face.
 Initializing the Tokenizer
 --------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Text Preprocessing cleans the text-based input data so it can be fed
 into the model.
@@ -129,7 +129,7 @@ understand the context of a sentence. Here, we will use
 Convert Model to OpenVINO Intermediate Representation format
 ------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `Model conversion
 API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
@@ -182,7 +182,7 @@ documentation. <https://docs.openvino.ai/2024/openvino-workflow/running-inferenc
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -230,7 +230,7 @@ select device from dropdown list for running inference using OpenVINO
 Inference
 ---------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -258,7 +258,7 @@ Inference
 For a single input sentence
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -280,7 +280,7 @@ For a single input sentence
 Read from a text file
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

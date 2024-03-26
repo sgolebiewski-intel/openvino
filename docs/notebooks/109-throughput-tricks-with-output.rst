@@ -76,7 +76,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -105,7 +105,7 @@ Prerequisites
 Data
 ----
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We will use the same image of the dog sitting on a bicycle copied 1000
 times to simulate the video with 1000 frames (about 33s). The image is
@@ -153,7 +153,7 @@ object detection model.
 Model
 -----
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We decided to go with
 `YOLOv5n <https://github.com/ultralytics/yolov5>`__, one of the
@@ -212,7 +212,7 @@ PyTorch Hub and small enough to see the difference in performance.
 Hardware
 --------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The code below lists the available hardware we will use in the
 benchmarking process.
@@ -241,7 +241,7 @@ benchmarking process.
 Helper functions
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We’re defining a benchmark model function to use for all optimizations
 below. It runs inference for 1000 frames and prints average frames per
@@ -383,7 +383,7 @@ the image.
 Optimizations
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Below, we present the performance tricks for faster inference in the
 throughput mode. We release resources after every benchmarking to be
@@ -392,7 +392,7 @@ sure the same amount of resource is available for every experiment.
 PyTorch model
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 First, we’re benchmarking the original PyTorch model without any
 optimizations applied. We will treat it as our baseline.
@@ -424,7 +424,7 @@ optimizations applied. We will treat it as our baseline.
 OpenVINO IR model
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The first optimization is exporting the PyTorch model to OpenVINO
 Intermediate Representation (IR) FP16 and running it. Reducing the
@@ -475,7 +475,7 @@ step in this notebook.
 OpenVINO IR model + bigger batch
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Batch processing often gives higher throughput as more inputs are
 processed at once. To use bigger batches (than 1), we must convert the
@@ -537,7 +537,7 @@ hardware and model.
 Asynchronous processing
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Asynchronous mode means that OpenVINO immediately returns from an
 inference call and doesn’t wait for the result. It requires more
@@ -578,7 +578,7 @@ the pipeline.
 OpenVINO IR model in throughput mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 OpenVINO allows specifying a performance hint changing the internal
 configuration of the device. There are three different hints:
@@ -615,7 +615,7 @@ feature, which sets the batch size to the optimal level.
 OpenVINO IR model in throughput mode on GPU
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Usually, a GPU device provides more frames per second than a CPU, so
 let’s run the above model on the GPU. Please note you need to have an
@@ -641,7 +641,7 @@ execution.
 OpenVINO IR model in throughput mode on AUTO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 OpenVINO offers a virtual device called
 `AUTO <https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes/auto-device-selection.html>`__,
@@ -674,7 +674,7 @@ performance hint.
 OpenVINO IR model in cumulative throughput mode on AUTO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The AUTO device in throughput mode will select the best, but one
 physical device to bring the highest throughput. However, if we have
@@ -706,7 +706,7 @@ activate all devices.
 Other tricks
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 There are other tricks for performance improvement, such as advanced
 options, quantization and pre-post-processing or dedicated to latency
@@ -720,7 +720,7 @@ options <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optim
 Performance comparison
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The following graphical comparison is valid for the selected model and
 hardware simultaneously. If you cannot see any improvement between some
@@ -758,7 +758,7 @@ steps, just skip them.
 Conclusions
 -----------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We already showed the steps needed to improve the throughput of an
 object detection model. Even if you experience much better performance

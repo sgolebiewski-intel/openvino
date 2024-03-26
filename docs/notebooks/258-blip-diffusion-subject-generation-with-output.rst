@@ -49,7 +49,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -126,7 +126,7 @@ Prerequisites
 Load the model
 --------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We use Hugging Face ``diffusers`` library to load the model using
 ``from_pretrained`` method.
@@ -172,12 +172,12 @@ We use Hugging Face ``diffusers`` library to load the model using
 Infer the original model
 ------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Zero-Shot subject-driven generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The pipeline takes a subject image and prompt text as input. The output
 is an image containing the subject with conditions from the prompt
@@ -232,7 +232,7 @@ is an image containing the subject with conditions from the prompt
 Controlled subject-driven generation (Canny-edge)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The `Canny edge
 detector <https://en.wikipedia.org/wiki/Canny_edge_detector>`__ is a
@@ -308,7 +308,7 @@ description.
 Controlled subject-driven generation (Scribble)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 `Holistically-Nested Edge
 Detection <https://arxiv.org/pdf/1504.06375.pdf>`__ (HED) is a deep
@@ -380,7 +380,7 @@ edge map is the final output of HED and input of our diffusion model.
 Convert the model to OpenVINO Intermediate Representation (IR)
 --------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 BLIP-Diffusion pipeline has the following structure:
 
@@ -472,7 +472,7 @@ we clean after every conversion.
 Q-Former
 ~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Q-Former was introduced in
 `BLIP-2 <https://arxiv.org/pdf/2301.12597.pdf>`__ paper and is a
@@ -599,7 +599,7 @@ Original QFormer model takes raw text as input, so we redefine the
 Text encoder
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 BLIP-Diffusion pipeline uses CLIP text encoder, the default encoder for
 Stable Diffusion-based models. The only difference is it allows for an
@@ -651,7 +651,7 @@ embeddings, and interact with them using self-attention.
 ControlNet
 ~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The ControlNet model was introduced in `Adding Conditional Control to
 Text-to-Image Diffusion
@@ -697,7 +697,7 @@ segmentation maps, and keypoints for pose detection.
 UNet
 ~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The `UNet <https://huggingface.co/papers/1505.04597>`__ model is one of
 the most important components of a diffusion system because it
@@ -814,7 +814,7 @@ facilitates the actual diffusion process.
 Variational Autoencoder (VAE)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The variational autoencoder (VAE) model with KL loss was introduced in
 `Auto-Encoding Variational
@@ -855,7 +855,7 @@ decoder in separate ``torch.nn.Module``.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -913,7 +913,7 @@ select device from dropdown list for running inference using OpenVINO
 Inference
 ---------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1161,7 +1161,7 @@ Inference
 Zero-Shot subject-driven generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1200,7 +1200,7 @@ Zero-Shot subject-driven generation
 Controlled subject-driven generation (Canny-edge)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1261,7 +1261,7 @@ Controlled subject-driven generation (Canny-edge)
 Controlled subject-driven generation (Scribble)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1318,7 +1318,7 @@ Controlled subject-driven generation (Scribble)
 Interactive inference
 ---------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

@@ -66,7 +66,7 @@ Table of contents:
 Settings
 --------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -130,7 +130,7 @@ Settings
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -158,7 +158,7 @@ Imports
 Setup image and device
 ~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -202,7 +202,7 @@ Setup image and device
 Downloading the model
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 This tutorial uses the
 `InceptionResNetV2 <https://www.tensorflow.org/api_docs/python/tf/keras/applications/inception_resnet_v2>`__.
@@ -260,7 +260,7 @@ and save it to the disk.
 Create core
 ~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -269,7 +269,7 @@ Create core
 Check the original parameters of image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -292,7 +292,7 @@ Check the original parameters of image
 Setup preprocessing steps with Preprocessing API and perform inference
 ----------------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Intuitively, preprocessing API consists of the following parts:
 
@@ -320,7 +320,7 @@ Pre-processing support following operations (please, see more details
 Convert model to OpenVINO IR with model conversion API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The options for preprocessing are not required.
 
@@ -341,7 +341,7 @@ The options for preprocessing are not required.
 Create ``PrePostProcessor`` Object
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The
 `PrePostProcessor() <https://docs.openvino.ai/2024/api/c_cpp_api/classov_1_1preprocess_1_1_pre_post_processor.html>`__
@@ -357,7 +357,7 @@ a model.
 Declare User’s Data Format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To address particular input of a model/preprocessor, use the
 ``PrePostProcessor.input(input_name)`` method. If the model has only one
@@ -402,7 +402,7 @@ for mean/scale normalization.
 Declaring Model Layout
 ~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Model input already has information about precision and shape.
 Preprocessing API is not intended to modify this. The only thing that
@@ -433,7 +433,7 @@ may be specified is input data
 Preprocessing Steps
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now, the sequence of preprocessing steps can be defined. For more
 information about preprocessing steps, see
@@ -474,7 +474,7 @@ then such conversion will be added explicitly.
 Integrating Steps into a Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Once the preprocessing steps have been finished, the model can be
 finally built. It is possible to display ``PrePostProcessor``
@@ -502,7 +502,7 @@ configuration for debugging purposes.
 Load model and perform inference
 --------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -522,12 +522,12 @@ Load model and perform inference
 Fit image manually and perform inference
 ----------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Load the model
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -537,7 +537,7 @@ Load the model
 Load image and fit it to model input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -573,7 +573,7 @@ Load image and fit it to model input
 Perform inference
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -584,12 +584,12 @@ Perform inference
 Compare results
 ---------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Compare results on one image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -653,7 +653,7 @@ Compare results on one image
 Compare performance
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

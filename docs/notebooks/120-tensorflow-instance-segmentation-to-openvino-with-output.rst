@@ -54,7 +54,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Install required packages:
 
@@ -133,7 +133,7 @@ The notebook uses utility functions. The cell below will download the
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -154,7 +154,7 @@ Imports
 Settings
 --------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Define model related variables and create corresponding directories:
 
@@ -183,7 +183,7 @@ Define model related variables and create corresponding directories:
 Download Model from TensorFlow Hub
 ----------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Download archive with TensorFlow Instance Segmentation model
 (`mask_rcnn_inception_resnet_v2_1024x1024 <https://tfhub.dev/tensorflow/mask_rcnn/inception_resnet_v2_1024x1024/1>`__)
@@ -217,7 +217,7 @@ archive:
 Convert Model to OpenVINO IR
 ----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 OpenVINO Model Optimizer Python API can be used to convert the
 TensorFlow model to OpenVINO IR.
@@ -245,12 +245,12 @@ when the model is run in the future.
 Test Inference on the Converted Model
 -------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -280,7 +280,7 @@ select device from dropdown list for running inference using OpenVINO
 Load the Model
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -290,7 +290,7 @@ Load the Model
 Get Model Information
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Mask R-CNN with Inception ResNet V2 instance segmentation model has one
 input - a three-channel image of variable size. The input tensor shape
@@ -368,7 +368,7 @@ the first (and highest) detection score.
 Get an Image for Test Inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Load and save an image:
 
@@ -424,7 +424,7 @@ Read the image, resize and convert it to the input shape of the network:
 Perform Inference
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -473,7 +473,7 @@ be extracted from the result. For further model result visualization
 Inference Result Visualization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Define utility functions to visualize the inference results
 
@@ -715,7 +715,7 @@ original test image:
 Next Steps
 ----------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 This section contains suggestions on how to additionally improve the
 performance of your application using OpenVINO.
@@ -723,7 +723,7 @@ performance of your application using OpenVINO.
 Async inference pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__ The key advantage of the Async
+The key advantage of the Async
 API is that when a device is busy with inference, the application can
 perform other tasks in parallel (for example, populating inputs or
 scheduling other requests) rather than wait for the current inference to
@@ -734,7 +734,7 @@ tutorial <115-async-api-with-output.html>`__.
 Integration preprocessing to model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Preprocessing API enables making preprocessing a part of the model
 reducing application code and dependency on additional image processing

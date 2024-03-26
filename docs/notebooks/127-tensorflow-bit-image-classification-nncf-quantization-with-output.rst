@@ -142,7 +142,7 @@ Table of contents:
 Prepare Dataset
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -198,7 +198,7 @@ Prepare Dataset
 Plotting data samples
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -251,7 +251,7 @@ Plotting data samples
 Model Fine-tuning
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -796,7 +796,7 @@ Model Fine-tuning
 Perform model optimization (IR) step
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -817,7 +817,7 @@ Perform model optimization (IR) step
 Compute accuracy of the TF model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -849,7 +849,7 @@ Compute accuracy of the TF model
 Compute accuracy of the OpenVINO model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Select device for inference:
 
@@ -901,7 +901,7 @@ Select device for inference:
 Quantize OpenVINO model using NNCF
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Model Quantization using NNCF
 
@@ -975,7 +975,7 @@ Model Quantization using NNCF
 Compute accuracy of the quantized model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1004,7 +1004,7 @@ Compute accuracy of the quantized model
 Compare FP32 and INT8 accuracy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -1026,7 +1026,7 @@ Compare FP32 and INT8 accuracy
 Compare inference results on one picture
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

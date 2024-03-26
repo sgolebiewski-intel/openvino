@@ -49,7 +49,7 @@ Table of contents:
 Converting a Model from the HF Transformers Package
 ---------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Hugging Face transformers package provides API for initializing a model
 and loading a set of pre-trained weights using the model text handle.
@@ -61,7 +61,7 @@ by popularity and novelty.
 Installing Requirements
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -88,7 +88,7 @@ Installing Requirements
 Imports
 ~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -103,7 +103,7 @@ Imports
 Initializing a Model Using the HF Transformers Package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 We will use `roberta text sentiment
 classification <https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest>`__
@@ -143,7 +143,7 @@ tutorials <https://huggingface.co/learn/nlp-course/chapter2/2?fw=pt#behind-the-p
 Original Model inference
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Let’s do a classification of a simple prompt below.
 
@@ -175,7 +175,7 @@ Let’s do a classification of a simple prompt below.
 Converting the Model to OpenVINO IR format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__ We use the OpenVINO `Model
+We use the OpenVINO `Model
 conversion
 API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html#convert-a-model-with-python-convert-model>`__
 to convert the model (this one is implemented in PyTorch) to OpenVINO
@@ -204,7 +204,7 @@ Note how we reuse our real ``encoded_input``, passing it to the
 Converted Model Inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 First, we pick a device to do the model inference
 
@@ -273,7 +273,7 @@ first example in the list above relies on the ``diffusers``.
 Converting a Model Using the Optimum Intel Package
 --------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Optimum Intel is the interface between the Transformers and
 Diffusers libraries and the different tools and libraries provided by
@@ -287,7 +287,7 @@ OpenVINO Runtime.
 Install Requirements for Optimum
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -310,7 +310,7 @@ Install Requirements for Optimum
 Import Optimum
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Documentation for Optimum Intel states: >You can now easily perform
 inference with OpenVINO Runtime on a variety of Intel processors (see
@@ -369,7 +369,7 @@ documentation <https://huggingface.co/docs/optimum/intel/inference>`__.
 Initialize and Convert the Model Automatically using OVModel class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To load a Transformers model and convert it to the OpenVINO format on
 the fly, you can set ``export=True`` when loading your model. The model
@@ -449,7 +449,7 @@ inference run.
 Convert model using Optimum CLI interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Alternatively, you can use the Optimum CLI interface for converting
 models (supported starting optimum-intel 1.12 version). General command
@@ -679,7 +679,7 @@ link <https://huggingface.co/models?library=openvino&sort=trending>`__.
 The Optimum Model Inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Model inference is exactly the same as for the original model!
 

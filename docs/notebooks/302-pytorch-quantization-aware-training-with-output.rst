@@ -82,7 +82,7 @@ Table of contents:
 Imports and Settings
 --------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 On Windows, add the required C++ directories to the system PATH.
 
@@ -223,7 +223,7 @@ Download Tiny ImageNet dataset
 Pre-train Floating-Point Model
 ------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Using NNCF for model compression assumes that a pre-trained model and a
 training pipeline are already in use.
@@ -238,7 +238,7 @@ for quantization-aware training.
 Train Function
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -285,7 +285,7 @@ Train Function
 Validate Function
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -329,7 +329,7 @@ Validate Function
 Helpers
 ~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -394,7 +394,7 @@ Helpers
 Get a Pre-trained FP32 Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 А pre-trained floating-point model is a prerequisite for quantization.
 It can be obtained by tuning from scratch with the code below. However,
@@ -523,7 +523,7 @@ benchmark it in comparison with the ``INT8`` model.
 Create and Initialize Quantization
 ----------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 NNCF enables compression-aware training by integrating into regular
 training pipelines. The framework is designed so that modifications to
@@ -699,7 +699,7 @@ demonstrated here.
 Fine-tune the Compressed Model
 ------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 At this step, a regular fine-tuning process is applied to further
 improve quantized model accuracy. Normally, several epochs of tuning are
@@ -852,7 +852,7 @@ training pipeline are required. Here is a simple example.
 Export INT8 Model to OpenVINO IR
 --------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -878,7 +878,7 @@ Export INT8 Model to OpenVINO IR
 Benchmark Model Performance by Computing Inference Time
 -------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Finally, measure the inference performance of the ``FP32`` and ``INT8``
 models, using `Benchmark

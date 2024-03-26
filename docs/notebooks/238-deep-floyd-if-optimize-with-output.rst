@@ -41,7 +41,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -109,7 +109,7 @@ Prerequisites
 Compress weights
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Text encoder model consumes ~22 GB of disk space. To avoid running out
 of memory, we suggest using 8-bit weights compression instead of
@@ -144,12 +144,12 @@ quantized model, but this will significantly reduce the model footprint.
 Quantize
 --------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Prepare dataset
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 DeepFloyd IF consists of a U-Net model for first and second stages.
 First stage U-Net generates 64x64 px image based on text prompt, second
@@ -315,7 +315,7 @@ To collect intermediate model inputs for calibration we should customize
 Quantize first stage U-Net
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -439,7 +439,7 @@ Quantize first stage U-Net
 Quantize second stage U-Net
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -475,7 +475,7 @@ Quantize second stage U-Net
 Run optimized OpenVINO model
 ----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Let us check predictions with the optimized OpenVINO DeepFloyd IF model
 result using the same input data from the `1st
@@ -703,7 +703,7 @@ notebook <238-deep-floyd-if-with-output.html>`__.
 Compare file sizes
 ^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Let’s calculate the compression rate of the optimized IRs file size
 relative to the FP16 OpenVINO models file size
@@ -744,7 +744,7 @@ relative to the FP16 OpenVINO models file size
 Compare performance time of the converted and optimized models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To measure the inference performance of OpenVINO FP16 and INT8 models,
 use `Benchmark

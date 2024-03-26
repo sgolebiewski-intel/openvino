@@ -59,7 +59,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -113,7 +113,7 @@ Prerequisites
 Stable Diffusion with Diffusers library
 ---------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To work with Stable Diffusion v2.1, we will use Hugging Face Diffusers
 library. To experiment with Stable Diffusion models, Diffusers exposes
@@ -143,7 +143,7 @@ The code below demonstrates how to create the
 OpenVINO TorchDynamo backend
 ----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The `OpenVINO TorchDynamo
 backend <https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html>`__
@@ -235,7 +235,7 @@ backend:
 Run Image generation
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -259,7 +259,7 @@ Run Image generation
 Interactive demo
 ================
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now you can start the demo, choose the inference mode, define prompts
 (and input image for Image-to-Image generation) and run inference
@@ -413,7 +413,7 @@ pipeline. Optionally, you can also change some input parameters.
 Support for Automatic1111 Stable Diffusion WebUI
 ------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Automatic1111 Stable Diffusion WebUI is an open-source repository that
 hosts a browser-based interface for the Stable Diffusion based image

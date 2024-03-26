@@ -38,7 +38,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -61,7 +61,7 @@ Imports
 Download the Model and data samples
 -----------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -97,7 +97,7 @@ Download the Model and data samples
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -127,7 +127,7 @@ select device from dropdown list for running inference using OpenVINO
 Load the Model
 --------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -140,7 +140,7 @@ Load the Model
 Load an Image
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -174,7 +174,7 @@ Load an Image
 Do Inference
 ------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

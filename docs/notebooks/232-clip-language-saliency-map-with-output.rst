@@ -105,7 +105,7 @@ Table of contents:
 Initial Implementation with Transformers and Pytorch
 ----------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -326,7 +326,7 @@ Let us overlay the saliency map on the image:
 Separate Text and Visual Processing
 -----------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The code above is functional, but there are some repeated computations
 that can be avoided. The text embedding can be computed once because it
@@ -376,7 +376,7 @@ build a saliency map.
 Convert to OpenVINO™ Intermediate Representation (IR) Format
 ------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The process of building a saliency map can be quite time-consuming. To
 speed it up, you will use OpenVINO. OpenVINO is an inference framework
@@ -475,7 +475,7 @@ and ready to be loaded and inferred with OpenVINO™.
 Inference with OpenVINO™
 ------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 1. Create an instance of the ``Core`` object that will handle any
    interaction with OpenVINO runtime for you.
@@ -494,7 +494,7 @@ Inference with OpenVINO™
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -574,7 +574,7 @@ the inference process is mostly similar.
 Accelerate Inference with ``AsyncInferQueue``
 ---------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Up until now, the pipeline was synchronous, which means that the data
 preparation, model input population, model inference, and output
@@ -706,7 +706,7 @@ should pass a progress bar object and call ``update`` method after
 Pack the Pipeline into a Function
 ---------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Let us wrap all code in the function and add a user interface to it.
 
@@ -816,7 +816,7 @@ The second version will enable loading the image from your computer.
 Interactive demo with Gradio
 ----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -865,7 +865,7 @@ Interactive demo with Gradio
 What To Do Next
 ---------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now that you have a convenient interface and accelerated inference, you
 can explore the CLIP capabilities further. For example:

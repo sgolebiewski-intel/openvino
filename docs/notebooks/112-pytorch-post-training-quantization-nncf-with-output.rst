@@ -53,7 +53,7 @@ Table of contents:
 Preparations
 ------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -75,7 +75,7 @@ Preparations
 Imports
 ~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -106,7 +106,7 @@ Imports
 Settings
 ~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -153,7 +153,7 @@ Settings
 Download and Prepare Tiny ImageNet dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 -  100k images of shape 3x64x64,
 -  200 different classes: snake, spider, cat, truck, grasshopper, gull,
@@ -215,7 +215,7 @@ Download and Prepare Tiny ImageNet dataset
 Helpers classes and functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The code below will help to count accuracy and visualize validation
 process.
@@ -283,7 +283,7 @@ process.
 Validation function
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -338,7 +338,7 @@ Validation function
 Create and load original uncompressed model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 ResNet-50 from the `torchivision
 repository <https://github.com/pytorch/vision>`__ is pre-trained on
@@ -368,7 +368,7 @@ values.
 Create train and validation DataLoaders
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -420,7 +420,7 @@ Create train and validation DataLoaders
 Model quantization and benchmarking
 -----------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 With the validation pipeline, model files, and data-loading procedures
 for model calibration now prepared, it’s time to proceed with the actual
@@ -429,7 +429,7 @@ post-training quantization using NNCF.
 I. Evaluate the loaded model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -486,7 +486,7 @@ I. Evaluate the loaded model
 II. Create and initialize quantization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 NNCF enables post-training quantization by adding the quantization
 layers into the model graph and then using a subset of the training
@@ -660,7 +660,7 @@ Representation (IR) format.
 III. Convert the models to OpenVINO Intermediate Representation (OpenVINO IR)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 To convert the Pytorch models to OpenVINO IR, use Model Conversion
 Python API. The models will be saved to the ‘OUTPUT’ directory for later
@@ -851,7 +851,7 @@ Evaluate the FP32 and INT8 models.
 IV. Compare performance of INT8 model and FP32 model in OpenVINO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Finally, measure the inference performance of the ``FP32`` and ``INT8``
 models, using `Benchmark

@@ -53,12 +53,12 @@ Table of contents:
 Prepare PyTorch Model
 ---------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Install necessary packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -73,7 +73,7 @@ Install necessary packages
 Imports and Settings
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -720,7 +720,7 @@ inference using the same. The top 5 predictions can be seen below.
 Convert model to OpenVINO Intermediate Representation
 -----------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Now that we have obtained our trained model and checked inference with
 it, we export the PyTorch model to OpenVINO IR format. In this format,
@@ -768,7 +768,7 @@ using the ``weights`` parameter.
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -802,7 +802,7 @@ select device from dropdown list for running inference using OpenVINO
 Verify Model Inference
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Using the compiled model, we run inference on the same sample video and
 print the top 5 predictions again.

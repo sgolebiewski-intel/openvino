@@ -40,7 +40,7 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -61,7 +61,7 @@ Prerequisites
 Get a test image
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__ First of all lets get a test
+First of all lets get a test
 image from an open dataset.
 
 .. code:: ipython3
@@ -88,7 +88,7 @@ image from an open dataset.
 Get a pretrained model
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__ Torchvision provides a
+Torchvision provides a
 mechanism of `listing and retrieving available
 models <https://pytorch.org/vision/stable/models.html#listing-and-retrieving-available-models>`__.
 
@@ -128,7 +128,7 @@ initialize pre-trained models
 Define a preprocessing and prepare an input data
 ------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__ You can use
+You can use
 ``torchvision.transforms`` to make a preprocessing or
 use\ `preprocessing transforms from the model
 wight <https://pytorch.org/vision/stable/models.html#using-the-pre-trained-models>`__.
@@ -153,7 +153,7 @@ wight <https://pytorch.org/vision/stable/models.html#using-the-pre-trained-model
 Use the original model to run an inference
 ------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 
@@ -198,7 +198,7 @@ And print results
 Convert the model to OpenVINO Intermediate representation format
 ----------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 OpenVINO supports PyTorch through conversion to OpenVINO Intermediate
 Representation (IR) format. To take the advantage of OpenVINO
@@ -267,7 +267,7 @@ Select device from dropdown list for running inference using OpenVINO
 Use the OpenVINO IR model to run an inference
 ---------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 .. code:: ipython3
 

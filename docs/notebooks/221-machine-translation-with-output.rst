@@ -71,7 +71,7 @@ Table of contents:
 Downloading model
 -----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The following command will download the model to the current directory.
 Make sure you have run ``pip install openvino-dev`` beforehand.
@@ -136,7 +136,7 @@ Make sure you have run ``pip install openvino-dev`` beforehand.
 Load and configure the model
 ----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The model is now available in the ``model/`` folder. Below, we load and
 configure its inputs and outputs.
@@ -153,7 +153,7 @@ configure its inputs and outputs.
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -188,7 +188,7 @@ select device from dropdown list for running inference using OpenVINO
 Load tokenizers
 ---------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 NLP models usually take a list of tokens as standard input. A token is a
 single word converted to some integer. To provide the proper input, we
@@ -217,7 +217,7 @@ Initialize the tokenizer for the input ``src_tokenizer`` and the output
 Perform translation
 -------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The following function translates a sentence in English to German.
 
@@ -268,7 +268,7 @@ The following function translates a sentence in English to German.
 Translate the sentence
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 The following function is a basic loop that translates sentences.
 
@@ -300,7 +300,7 @@ The following function is a basic loop that translates sentences.
 Test your translation
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+
 
 Run the following cell with an English sentence to have it translated to
 German
