@@ -55,19 +55,19 @@ Table of contents:
 .. code:: ipython3
 
     from pathlib import Path
-
+    
     # Set the data and model directories
     DATA_DIR = Path("data")
     MODEL_DIR = Path('model')
     model_repo = 'pytorch-cifar-models'
-
+    
     DATA_DIR.mkdir(exist_ok=True)
     MODEL_DIR.mkdir(exist_ok=True)
 
 Prepare the Model
 -----------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Model preparation stage has the following steps:
 
@@ -79,10 +79,10 @@ Model preparation stage has the following steps:
 .. code:: ipython3
 
     import sys
-
+    
     if not Path(model_repo).exists():
         !git clone https://github.com/chenyaofo/pytorch-cifar-models.git
-
+    
     sys.path.append(model_repo)
 
 
@@ -364,10 +364,7 @@ Receiving objects:  63% (178/282)
 Receiving objects:  64% (181/282)
 Receiving objects:  65% (184/282)
 Receiving objects:  66% (187/282)
-
-.. parsed-literal::
-
-    Receiving objects:  67% (189/282)
+Receiving objects:  67% (189/282)
 Receiving objects:  68% (192/282)
 Receiving objects:  69% (195/282)
 Receiving objects:  70% (198/282)
@@ -380,84 +377,74 @@ Receiving objects:  75% (212/282)
 .. parsed-literal::
 
     Receiving objects:  76% (215/282)
-
-.. parsed-literal::
-
-    Receiving objects:  77% (218/282)
+Receiving objects:  77% (218/282)
 
 .. parsed-literal::
 
     Receiving objects:  78% (220/282)
+Receiving objects:  79% (223/282)
+Receiving objects:  80% (226/282)
+Receiving objects:  81% (229/282)
 
 .. parsed-literal::
 
-    Receiving objects:  79% (223/282), 2.34 MiB | 4.38 MiB/s
+    Receiving objects:  82% (232/282)
+Receiving objects:  83% (235/282)
+Receiving objects:  84% (237/282)
 
 .. parsed-literal::
 
-    Receiving objects:  80% (226/282), 2.34 MiB | 4.38 MiB/s
+    Receiving objects:  85% (240/282)
+Receiving objects:  86% (243/282)
 
 .. parsed-literal::
 
-    Receiving objects:  81% (229/282), 2.34 MiB | 4.38 MiB/s
+    Receiving objects:  87% (246/282)
 
 .. parsed-literal::
 
-    Receiving objects:  82% (232/282), 2.34 MiB | 4.38 MiB/s
-Receiving objects:  83% (235/282), 2.34 MiB | 4.38 MiB/s
-
-.. parsed-literal::
-
-    Receiving objects:  84% (237/282), 2.34 MiB | 4.38 MiB/s
-Receiving objects:  85% (240/282), 2.34 MiB | 4.38 MiB/s
-
-.. parsed-literal::
-
-    Receiving objects:  86% (243/282), 2.34 MiB | 4.38 MiB/s
-
-.. parsed-literal::
-
-    Receiving objects:  87% (246/282), 2.34 MiB | 4.38 MiB/s
-Receiving objects:  88% (249/282), 2.34 MiB | 4.38 MiB/s
-
-.. parsed-literal::
-
-    Receiving objects:  89% (251/282), 8.63 MiB | 8.35 MiB/s
+    Receiving objects:  88% (249/282)
+Receiving objects:  89% (251/282)
 remote: Total 282 (delta 135), reused 269 (delta 128), pack-reused 1[K
-    Receiving objects:  90% (254/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects:  91% (257/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects:  92% (260/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects:  93% (263/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects:  94% (266/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects:  95% (268/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects:  96% (271/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects:  97% (274/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects:  98% (277/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects:  99% (280/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects: 100% (282/282), 8.63 MiB | 8.35 MiB/s
-Receiving objects: 100% (282/282), 9.22 MiB | 8.26 MiB/s, done.
+    Receiving objects:  90% (254/282)
+Receiving objects:  91% (257/282)
+Receiving objects:  92% (260/282)
+Receiving objects:  93% (263/282)
+Receiving objects:  94% (266/282)
+Receiving objects:  95% (268/282)
+Receiving objects:  96% (271/282)
+Receiving objects:  97% (274/282)
+Receiving objects:  98% (277/282)
+Receiving objects:  99% (280/282)
+Receiving objects: 100% (282/282)
+Receiving objects: 100% (282/282), 9.22 MiB | 19.46 MiB/s, done.
     Resolving deltas:   0% (0/135)
+Resolving deltas:   1% (2/135)
 Resolving deltas:   3% (5/135)
-Resolving deltas:   5% (7/135)
-Resolving deltas:   6% (9/135)
-Resolving deltas:  13% (18/135)
-Resolving deltas:  21% (29/135)
-Resolving deltas:  25% (34/135)
+Resolving deltas:   8% (11/135)
+Resolving deltas:  10% (14/135)
+Resolving deltas:  16% (22/135)
+Resolving deltas:  20% (28/135)
+Resolving deltas:  23% (32/135)
+Resolving deltas:  25% (35/135)
+Resolving deltas:  26% (36/135)
+Resolving deltas:  27% (37/135)
+Resolving deltas:  28% (38/135)
 Resolving deltas:  29% (40/135)
 Resolving deltas:  30% (41/135)
 Resolving deltas:  31% (42/135)
-Resolving deltas:  32% (44/135)
-Resolving deltas:  33% (45/135)
-Resolving deltas:  34% (46/135)
+Resolving deltas:  34% (47/135)
 Resolving deltas:  40% (54/135)
 Resolving deltas:  45% (62/135)
-Resolving deltas:  46% (63/135)
+Resolving deltas:  47% (64/135)
 Resolving deltas:  50% (68/135)
-Resolving deltas:  57% (78/135)
+Resolving deltas:  57% (77/135)
 Resolving deltas:  58% (79/135)
+Resolving deltas:  59% (80/135)
 Resolving deltas:  60% (81/135)
-Resolving deltas:  62% (84/135)
-Resolving deltas:  71% (96/135)
+Resolving deltas:  61% (83/135)
+Resolving deltas:  69% (94/135)
+Resolving deltas:  71% (97/135)
 
 .. parsed-literal::
 
@@ -468,7 +455,7 @@ Resolving deltas: 100% (135/135), done.
 .. code:: ipython3
 
     from pytorch_cifar_models import cifar10_mobilenetv2_x1_0
-
+    
     model = cifar10_mobilenetv2_x1_0(pretrained=True)
 
 OpenVINO supports PyTorch models via conversion to OpenVINO Intermediate
@@ -486,17 +473,17 @@ can be found on this
 .. code:: ipython3
 
     import openvino as ov
-
+    
     model.eval()
-
+    
     ov_model = ov.convert_model(model, input=[1,3,32,32])
-
-    ov.save_model(ov_model, MODEL_DIR / "mobilenet_v2.xml")
+    
+    ov.save_model(ov_model, MODEL_DIR / "mobilenet_v2.xml") 
 
 Prepare Dataset
 ---------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 We will use `CIFAR10 <https://www.cs.toronto.edu/~kriz/cifar.html>`__
 dataset from
@@ -509,7 +496,7 @@ Preprocessing for model obtained from training
     import torch
     from torchvision import transforms
     from torchvision.datasets import CIFAR10
-
+    
     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261))])
     dataset = CIFAR10(root=DATA_DIR, train=False, transform=transform, download=True)
     val_loader = torch.utils.data.DataLoader(
@@ -528,322 +515,887 @@ Preprocessing for model obtained from training
 
 .. parsed-literal::
 
-
+    
   0%|          | 0/170498071 [00:00<?, ?it/s]
 
 .. parsed-literal::
 
-
-  0%|          | 32768/170498071 [00:00<10:17, 275946.37it/s]
-
-.. parsed-literal::
-
-
-  0%|          | 65536/170498071 [00:00<10:28, 271284.88it/s]
+    
+  0%|          | 32768/170498071 [00:00<10:00, 283927.24it/s]
 
 .. parsed-literal::
 
-
-  0%|          | 98304/170498071 [00:00<10:31, 269970.74it/s]
-
-.. parsed-literal::
-
-
-  0%|          | 229376/170498071 [00:00<04:50, 586473.34it/s]
+    
+  0%|          | 65536/170498071 [00:00<10:40, 265903.57it/s]
 
 .. parsed-literal::
 
-
-  0%|          | 393216/170498071 [00:00<03:17, 859242.88it/s]
-
-.. parsed-literal::
-
-
-  0%|          | 786432/170498071 [00:00<01:42, 1661012.29it/s]
+    
+  0%|          | 98304/170498071 [00:00<10:18, 275319.56it/s]
 
 .. parsed-literal::
 
-
-  1%|          | 1507328/170498071 [00:00<00:55, 3048520.02it/s]
-
-.. parsed-literal::
-
-
-  2%|▏         | 3014656/170498071 [00:00<00:28, 5961632.12it/s]
+    
+  0%|          | 229376/170498071 [00:00<04:47, 591792.24it/s]
 
 .. parsed-literal::
 
-
-  3%|▎         | 5963776/170498071 [00:01<00:14, 11664878.14it/s]
-
-.. parsed-literal::
-
-
-  6%|▌         | 9502720/170498071 [00:01<00:09, 16415065.07it/s]
+    
+  0%|          | 458752/170498071 [00:00<02:39, 1064782.70it/s]
 
 .. parsed-literal::
 
-
-  7%|▋         | 12484608/170498071 [00:01<00:08, 18713452.56it/s]
-
-.. parsed-literal::
-
-
-  9%|▉         | 15532032/170498071 [00:01<00:07, 20509245.76it/s]
+    
+  1%|          | 884736/170498071 [00:00<01:27, 1932402.03it/s]
 
 .. parsed-literal::
 
-
- 11%|█         | 18513920/170498071 [00:01<00:07, 21529733.73it/s]
-
-.. parsed-literal::
-
-
- 13%|█▎        | 21692416/170498071 [00:01<00:06, 22662379.12it/s]
+    
+  1%|          | 1376256/170498071 [00:00<01:05, 2582519.82it/s]
 
 .. parsed-literal::
 
-
- 15%|█▍        | 24805376/170498071 [00:01<00:06, 23237932.55it/s]
-
-.. parsed-literal::
-
-
- 16%|█▋        | 28016640/170498071 [00:01<00:05, 23916419.04it/s]
+    
+  1%|          | 1835008/170498071 [00:00<00:55, 3022915.63it/s]
 
 .. parsed-literal::
 
-
- 18%|█▊        | 31195136/170498071 [00:02<00:05, 24165013.75it/s]
-
-.. parsed-literal::
-
-
- 20%|██        | 34373632/170498071 [00:02<00:05, 24570741.60it/s]
+    
+  1%|▏         | 2326528/170498071 [00:01<00:47, 3518057.23it/s]
 
 .. parsed-literal::
 
-
- 22%|██▏       | 37617664/170498071 [00:02<00:05, 24839298.54it/s]
-
-.. parsed-literal::
-
-
- 24%|██▍       | 40763392/170498071 [00:02<00:05, 24899513.26it/s]
+    
+  2%|▏         | 2752512/170498071 [00:01<00:45, 3677634.47it/s]
 
 .. parsed-literal::
 
-
- 26%|██▌       | 43909120/170498071 [00:02<00:05, 24859956.00it/s]
-
-.. parsed-literal::
-
-
- 28%|██▊       | 47054848/170498071 [00:02<00:04, 24910085.77it/s]
+    
+  2%|▏         | 3211264/170498071 [00:01<00:43, 3882041.66it/s]
 
 .. parsed-literal::
 
-
- 30%|██▉       | 50462720/170498071 [00:02<00:04, 25342462.67it/s]
-
-.. parsed-literal::
-
-
- 32%|███▏      | 53772288/170498071 [00:03<00:04, 25549574.14it/s]
+    
+  2%|▏         | 3702784/170498071 [00:01<00:40, 4126993.42it/s]
 
 .. parsed-literal::
 
-
- 33%|███▎      | 56983552/170498071 [00:03<00:04, 25497496.83it/s]
-
-.. parsed-literal::
-
-
- 35%|███▌      | 60129280/170498071 [00:03<00:04, 25318471.74it/s]
+    
+  2%|▏         | 4194304/170498071 [00:01<00:38, 4348789.83it/s]
 
 .. parsed-literal::
 
-
- 37%|███▋      | 63864832/170498071 [00:03<00:04, 26188505.17it/s]
-
-.. parsed-literal::
-
-
- 39%|███▉      | 67076096/170498071 [00:03<00:04, 25607940.52it/s]
+    
+  3%|▎         | 4718592/170498071 [00:01<00:36, 4584385.74it/s]
 
 .. parsed-literal::
 
-
- 41%|████      | 70221824/170498071 [00:03<00:03, 25164439.49it/s]
-
-.. parsed-literal::
-
-
- 43%|████▎     | 73269248/170498071 [00:03<00:03, 24814859.91it/s]
+    
+  3%|▎         | 5275648/170498071 [00:01<00:34, 4834650.62it/s]
 
 .. parsed-literal::
 
-
- 45%|████▍     | 76316672/170498071 [00:03<00:03, 24363754.63it/s]
-
-.. parsed-literal::
-
-
- 46%|████▋     | 79233024/170498071 [00:04<00:03, 23924798.97it/s]
+    
+  3%|▎         | 5865472/170498071 [00:01<00:32, 5080896.08it/s]
 
 .. parsed-literal::
 
-
- 48%|████▊     | 82247680/170498071 [00:04<00:03, 23837747.76it/s]
-
-.. parsed-literal::
-
-
- 50%|█████     | 85426176/170498071 [00:04<00:03, 24006567.90it/s]
+    
+  4%|▍         | 6455296/170498071 [00:01<00:30, 5311689.91it/s]
 
 .. parsed-literal::
 
-
- 52%|█████▏    | 88539136/170498071 [00:04<00:03, 24061028.14it/s]
-
-.. parsed-literal::
-
-
- 54%|█████▍    | 91783168/170498071 [00:04<00:03, 24193022.36it/s]
+    
+  4%|▍         | 7077888/170498071 [00:01<00:29, 5541755.44it/s]
 
 .. parsed-literal::
 
-
- 56%|█████▌    | 94863360/170498071 [00:04<00:03, 24172569.31it/s]
-
-.. parsed-literal::
-
-
- 57%|█████▋    | 97943552/170498071 [00:04<00:02, 24211561.34it/s]
+    
+  5%|▍         | 7733248/170498071 [00:02<00:28, 5788975.59it/s]
 
 .. parsed-literal::
 
-
- 59%|█████▉    | 101023744/170498071 [00:04<00:02, 24311644.55it/s]
-
-.. parsed-literal::
-
-
- 61%|██████    | 104071168/170498071 [00:05<00:02, 24218216.60it/s]
+    
+  5%|▍         | 8421376/170498071 [00:02<00:26, 6024015.03it/s]
 
 .. parsed-literal::
 
-
- 63%|██████▎   | 107151360/170498071 [00:05<00:02, 24154999.17it/s]
-
-.. parsed-literal::
-
-
- 65%|██████▍   | 110133248/170498071 [00:05<00:02, 24021903.66it/s]
+    
+  5%|▌         | 9142272/170498071 [00:02<00:25, 6312114.84it/s]
 
 .. parsed-literal::
 
-
- 66%|██████▋   | 113016832/170498071 [00:05<00:02, 23700128.22it/s]
-
-.. parsed-literal::
-
-
- 68%|██████▊   | 116162560/170498071 [00:05<00:02, 23748863.27it/s]
+    
+  6%|▌         | 9895936/170498071 [00:02<00:24, 6554603.63it/s]
 
 .. parsed-literal::
 
-
- 70%|██████▉   | 119242752/170498071 [00:05<00:02, 23908673.56it/s]
-
-.. parsed-literal::
-
-
- 72%|███████▏  | 122355712/170498071 [00:05<00:02, 23981194.75it/s]
+    
+  6%|▋         | 10682368/170498071 [00:02<00:23, 6904833.33it/s]
 
 .. parsed-literal::
 
-
- 74%|███████▎  | 125403136/170498071 [00:05<00:01, 23999264.79it/s]
-
-.. parsed-literal::
-
-
- 75%|███████▌  | 128581632/170498071 [00:06<00:01, 24304776.88it/s]
+    
+  7%|▋         | 11468800/170498071 [00:02<00:22, 7128388.61it/s]
 
 .. parsed-literal::
 
-
- 77%|███████▋  | 131596288/170498071 [00:06<00:01, 24188415.22it/s]
-
-.. parsed-literal::
-
-
- 79%|███████▉  | 134709248/170498071 [00:06<00:01, 24194648.52it/s]
+    
+  7%|▋         | 12288000/170498071 [00:02<00:21, 7340568.59it/s]
 
 .. parsed-literal::
 
-
- 81%|████████  | 137756672/170498071 [00:06<00:01, 24193549.64it/s]
-
-.. parsed-literal::
-
-
- 83%|████████▎ | 141066240/170498071 [00:06<00:01, 24630062.43it/s]
+    
+  8%|▊         | 13139968/170498071 [00:02<00:20, 7645657.54it/s]
 
 .. parsed-literal::
 
-
- 85%|████████▍ | 144113664/170498071 [00:06<00:01, 24505080.69it/s]
-
-.. parsed-literal::
-
-
- 86%|████████▋ | 147062784/170498071 [00:06<00:00, 24261709.76it/s]
+    
+  8%|▊         | 14024704/170498071 [00:02<00:19, 7907828.21it/s]
 
 .. parsed-literal::
 
-
- 88%|████████▊ | 150044672/170498071 [00:06<00:00, 24102172.86it/s]
-
-.. parsed-literal::
-
-
- 90%|████████▉ | 153059328/170498071 [00:07<00:00, 23913295.27it/s]
+    
+  9%|▉         | 14942208/170498071 [00:03<00:18, 8235418.29it/s]
 
 .. parsed-literal::
 
-
- 92%|█████████▏| 156041216/170498071 [00:07<00:00, 23659468.91it/s]
-
-.. parsed-literal::
-
-
- 93%|█████████▎| 158892032/170498071 [00:07<00:00, 23391139.06it/s]
+    
+  9%|▉         | 15925248/170498071 [00:03<00:17, 8627022.82it/s]
 
 .. parsed-literal::
 
-
- 95%|█████████▍| 161972224/170498071 [00:07<00:00, 23475130.31it/s]
-
-.. parsed-literal::
-
-
- 97%|█████████▋| 164954112/170498071 [00:07<00:00, 23499014.41it/s]
+    
+ 10%|▉         | 16941056/170498071 [00:03<00:16, 9050435.87it/s]
 
 .. parsed-literal::
 
-
- 99%|█████████▊| 168001536/170498071 [00:07<00:00, 23679867.24it/s]
+    
+ 11%|█         | 17956864/170498071 [00:03<00:16, 9324887.66it/s]
 
 .. parsed-literal::
 
+    
+ 11%|█         | 19070976/170498071 [00:03<00:15, 9822086.35it/s]
 
-   100%|██████████| 170498071/170498071 [00:07<00:00, 21918964.93it/s]
+.. parsed-literal::
+
+    
+ 12%|█▏        | 20250624/170498071 [00:03<00:14, 10306090.35it/s]
+
+.. parsed-literal::
+
+    
+ 13%|█▎        | 21495808/170498071 [00:03<00:13, 10885735.05it/s]
+
+.. parsed-literal::
+
+    
+ 13%|█▎        | 22773760/170498071 [00:03<00:12, 11392919.31it/s]
+
+.. parsed-literal::
+
+    
+ 14%|█▍        | 23920640/170498071 [00:03<00:16, 8936643.54it/s] 
+
+.. parsed-literal::
+
+    
+ 15%|█▌        | 26214400/170498071 [00:04<00:11, 12036210.58it/s]
+
+.. parsed-literal::
+
+    
+ 16%|█▌        | 27525120/170498071 [00:04<00:12, 11566207.13it/s]
+
+.. parsed-literal::
+
+    
+ 17%|█▋        | 28770304/170498071 [00:04<00:12, 11084810.42it/s]
+
+.. parsed-literal::
+
+    
+ 18%|█▊        | 29949952/170498071 [00:04<00:13, 10749248.08it/s]
+
+.. parsed-literal::
+
+    
+ 18%|█▊        | 31064064/170498071 [00:04<00:13, 10493386.55it/s]
+
+.. parsed-literal::
+
+    
+ 19%|█▉        | 32145408/170498071 [00:04<00:13, 10182993.35it/s]
+
+.. parsed-literal::
+
+    
+ 19%|█▉        | 33193984/170498071 [00:04<00:13, 10254170.13it/s]
+
+.. parsed-literal::
+
+    
+ 20%|██        | 34242560/170498071 [00:04<00:13, 9977525.48it/s] 
+
+.. parsed-literal::
+
+    
+ 21%|██        | 35422208/170498071 [00:04<00:12, 10468485.47it/s]
+
+.. parsed-literal::
+
+    
+ 21%|██▏       | 36503552/170498071 [00:05<00:13, 10238693.08it/s]
+
+.. parsed-literal::
+
+    
+ 22%|██▏       | 37683200/170498071 [00:05<00:12, 10643199.05it/s]
+
+.. parsed-literal::
+
+    
+ 23%|██▎       | 38764544/170498071 [00:05<00:12, 10678388.43it/s]
+
+.. parsed-literal::
+
+    
+ 23%|██▎       | 39878656/170498071 [00:05<00:12, 10808401.03it/s]
+
+.. parsed-literal::
+
+    
+ 24%|██▍       | 40992768/170498071 [00:05<00:12, 10533455.09it/s]
+
+.. parsed-literal::
+
+    
+ 25%|██▍       | 42106880/170498071 [00:05<00:12, 10511427.91it/s]
+
+.. parsed-literal::
+
+    
+ 25%|██▌       | 43253760/170498071 [00:05<00:11, 10739555.52it/s]
+
+.. parsed-literal::
+
+    
+ 26%|██▌       | 44498944/170498071 [00:05<00:11, 11144715.38it/s]
+
+.. parsed-literal::
+
+    
+ 27%|██▋       | 45645824/170498071 [00:05<00:11, 11020810.39it/s]
+
+.. parsed-literal::
+
+    
+ 28%|██▊       | 46891008/170498071 [00:05<00:10, 11407936.56it/s]
+
+.. parsed-literal::
+
+    
+ 28%|██▊       | 48070656/170498071 [00:06<00:10, 11407753.92it/s]
+
+.. parsed-literal::
+
+    
+ 29%|██▉       | 49283072/170498071 [00:06<00:10, 11431487.36it/s]
+
+.. parsed-literal::
+
+    
+ 30%|██▉       | 50429952/170498071 [00:06<00:10, 11324573.74it/s]
+
+.. parsed-literal::
+
+    
+ 30%|███       | 51576832/170498071 [00:06<00:10, 11168808.69it/s]
+
+.. parsed-literal::
+
+    
+ 31%|███       | 52822016/170498071 [00:06<00:10, 11489158.99it/s]
+
+.. parsed-literal::
+
+    
+ 32%|███▏      | 54067200/170498071 [00:06<00:09, 11747461.18it/s]
+
+.. parsed-literal::
+
+    
+ 32%|███▏      | 55312384/170498071 [00:06<00:09, 11681092.91it/s]
+
+.. parsed-literal::
+
+    
+ 33%|███▎      | 56590336/170498071 [00:06<00:09, 11912678.55it/s]
+
+.. parsed-literal::
+
+    
+ 34%|███▍      | 57802752/170498071 [00:06<00:09, 11692508.37it/s]
+
+.. parsed-literal::
+
+    
+ 35%|███▍      | 58982400/170498071 [00:07<00:09, 11688532.47it/s]
+
+.. parsed-literal::
+
+    
+ 35%|███▌      | 60162048/170498071 [00:07<00:09, 11623913.91it/s]
+
+.. parsed-literal::
+
+    
+ 36%|███▌      | 61440000/170498071 [00:07<00:09, 11928362.14it/s]
+
+.. parsed-literal::
+
+    
+ 37%|███▋      | 62685184/170498071 [00:07<00:08, 12058183.44it/s]
+
+.. parsed-literal::
+
+    
+ 37%|███▋      | 63897600/170498071 [00:07<00:08, 12062590.12it/s]
+
+.. parsed-literal::
+
+    
+ 38%|███▊      | 65110016/170498071 [00:07<00:08, 12015735.75it/s]
+
+.. parsed-literal::
+
+    
+ 39%|███▉      | 66322432/170498071 [00:07<00:08, 11894203.12it/s]
+
+.. parsed-literal::
+
+    
+ 40%|███▉      | 67600384/170498071 [00:07<00:08, 12107867.13it/s]
+
+.. parsed-literal::
+
+    
+ 40%|████      | 68911104/170498071 [00:07<00:08, 12391125.43it/s]
+
+.. parsed-literal::
+
+    
+ 41%|████      | 70156288/170498071 [00:07<00:08, 12380968.80it/s]
+
+.. parsed-literal::
+
+    
+ 42%|████▏     | 71401472/170498071 [00:08<00:08, 12341060.16it/s]
+
+.. parsed-literal::
+
+    
+ 43%|████▎     | 72646656/170498071 [00:08<00:07, 12316266.05it/s]
+
+.. parsed-literal::
+
+    
+ 43%|████▎     | 73891840/170498071 [00:08<00:07, 12235410.16it/s]
+
+.. parsed-literal::
+
+    
+ 44%|████▍     | 75169792/170498071 [00:08<00:07, 12324119.94it/s]
+
+.. parsed-literal::
+
+    
+ 45%|████▍     | 76546048/170498071 [00:08<00:07, 12526567.17it/s]
+
+.. parsed-literal::
+
+    
+ 46%|████▌     | 77856768/170498071 [00:08<00:07, 12629945.67it/s]
+
+.. parsed-literal::
+
+    
+ 46%|████▋     | 79200256/170498071 [00:08<00:07, 12794574.31it/s]
+
+.. parsed-literal::
+
+    
+ 47%|████▋     | 80510976/170498071 [00:08<00:07, 12714478.97it/s]
+
+.. parsed-literal::
+
+    
+ 48%|████▊     | 81821696/170498071 [00:08<00:06, 12825187.00it/s]
+
+.. parsed-literal::
+
+    
+ 49%|████▉     | 83132416/170498071 [00:08<00:06, 12720119.35it/s]
+
+.. parsed-literal::
+
+    
+ 50%|████▉     | 84410368/170498071 [00:09<00:06, 12735552.42it/s]
+
+.. parsed-literal::
+
+    
+ 50%|█████     | 85786624/170498071 [00:09<00:06, 12954615.41it/s]
+
+.. parsed-literal::
+
+    
+ 51%|█████     | 87130112/170498071 [00:09<00:06, 13066468.64it/s]
+
+.. parsed-literal::
+
+    
+ 52%|█████▏    | 88473600/170498071 [00:09<00:06, 13134946.81it/s]
+
+.. parsed-literal::
+
+    
+ 53%|█████▎    | 89817088/170498071 [00:09<00:06, 13033540.08it/s]
+
+.. parsed-literal::
+
+    
+ 53%|█████▎    | 91160576/170498071 [00:09<00:06, 13087445.00it/s]
+
+.. parsed-literal::
+
+    
+ 54%|█████▍    | 92471296/170498071 [00:09<00:06, 12975513.21it/s]
+
+.. parsed-literal::
+
+    
+ 55%|█████▌    | 93782016/170498071 [00:09<00:05, 12886873.79it/s]
+
+.. parsed-literal::
+
+    
+ 56%|█████▌    | 95158272/170498071 [00:09<00:05, 13139018.79it/s]
+
+.. parsed-literal::
+
+    
+ 57%|█████▋    | 96534528/170498071 [00:09<00:05, 13308395.86it/s]
+
+.. parsed-literal::
+
+    
+ 57%|█████▋    | 97878016/170498071 [00:10<00:05, 13322827.20it/s]
+
+.. parsed-literal::
+
+    
+ 58%|█████▊    | 99221504/170498071 [00:10<00:05, 13181673.04it/s]
+
+.. parsed-literal::
+
+    
+ 59%|█████▉    | 100597760/170498071 [00:10<00:05, 13134178.23it/s]
+
+.. parsed-literal::
+
+    
+ 60%|█████▉    | 101941248/170498071 [00:10<00:05, 13210607.23it/s]
+
+.. parsed-literal::
+
+    
+ 61%|██████    | 103284736/170498071 [00:10<00:05, 13036002.08it/s]
+
+.. parsed-literal::
+
+    
+ 61%|██████▏   | 104628224/170498071 [00:10<00:05, 13113089.69it/s]
+
+.. parsed-literal::
+
+    
+ 62%|██████▏   | 106070016/170498071 [00:10<00:04, 13400061.37it/s]
+
+.. parsed-literal::
+
+    
+ 63%|██████▎   | 107446272/170498071 [00:10<00:04, 13475287.69it/s]
+
+.. parsed-literal::
+
+    
+ 64%|██████▍   | 108822528/170498071 [00:10<00:04, 13313750.98it/s]
+
+.. parsed-literal::
+
+    
+ 65%|██████▍   | 110166016/170498071 [00:11<00:04, 13080989.48it/s]
+
+.. parsed-literal::
+
+    
+ 65%|██████▌   | 111542272/170498071 [00:11<00:04, 13234853.77it/s]
+
+.. parsed-literal::
+
+    
+ 66%|██████▌   | 112951296/170498071 [00:11<00:04, 13270267.01it/s]
+
+.. parsed-literal::
+
+    
+ 67%|██████▋   | 114294784/170498071 [00:11<00:04, 13302307.20it/s]
+
+.. parsed-literal::
+
+    
+ 68%|██████▊   | 115638272/170498071 [00:11<00:04, 13310513.20it/s]
+
+.. parsed-literal::
+
+    
+ 69%|██████▊   | 117047296/170498071 [00:11<00:03, 13521525.32it/s]
+
+.. parsed-literal::
+
+    
+ 69%|██████▉   | 118423552/170498071 [00:11<00:05, 9097286.49it/s] 
+
+.. parsed-literal::
+
+    
+ 71%|███████   | 121077760/170498071 [00:11<00:03, 12880987.33it/s]
+
+.. parsed-literal::
+
+    
+ 72%|███████▏  | 122650624/170498071 [00:12<00:04, 11623721.84it/s]
+
+.. parsed-literal::
+
+    
+ 73%|███████▎  | 124026880/170498071 [00:12<00:04, 10694869.90it/s]
+
+.. parsed-literal::
+
+    
+ 73%|███████▎  | 125272064/170498071 [00:12<00:04, 10461454.45it/s]
+
+.. parsed-literal::
+
+    
+ 74%|███████▍  | 126418944/170498071 [00:12<00:04, 10269059.77it/s]
+
+.. parsed-literal::
+
+    
+ 75%|███████▍  | 127533056/170498071 [00:12<00:04, 10092008.14it/s]
+
+.. parsed-literal::
+
+    
+ 75%|███████▌  | 128614400/170498071 [00:12<00:04, 9991116.75it/s] 
+
+.. parsed-literal::
+
+    
+ 76%|███████▌  | 129728512/170498071 [00:12<00:04, 10024635.70it/s]
+
+.. parsed-literal::
+
+    
+ 77%|███████▋  | 130842624/170498071 [00:12<00:03, 10264583.93it/s]
+
+.. parsed-literal::
+
+    
+ 77%|███████▋  | 131956736/170498071 [00:13<00:03, 10414479.41it/s]
+
+.. parsed-literal::
+
+    
+ 78%|███████▊  | 133038080/170498071 [00:13<00:03, 10207685.94it/s]
+
+.. parsed-literal::
+
+    
+ 79%|███████▊  | 134086656/170498071 [00:13<00:03, 10253117.62it/s]
+
+.. parsed-literal::
+
+    
+ 79%|███████▉  | 135200768/170498071 [00:13<00:03, 10267523.71it/s]
+
+.. parsed-literal::
+
+    
+ 80%|███████▉  | 136249344/170498071 [00:13<00:05, 6445389.32it/s] 
+
+.. parsed-literal::
+
+    
+ 81%|████████  | 138248192/170498071 [00:13<00:03, 8999143.92it/s]
+
+.. parsed-literal::
+
+    
+ 82%|████████▏ | 139395072/170498071 [00:13<00:04, 7502968.08it/s]
+
+.. parsed-literal::
+
+    
+ 82%|████████▏ | 140345344/170498071 [00:14<00:04, 6780837.26it/s]
+
+.. parsed-literal::
+
+    
+ 83%|████████▎ | 141164544/170498071 [00:14<00:04, 6406113.63it/s]
+
+.. parsed-literal::
+
+    
+ 83%|████████▎ | 141918208/170498071 [00:14<00:04, 6136849.80it/s]
+
+.. parsed-literal::
+
+    
+ 84%|████████▎ | 142606336/170498071 [00:14<00:04, 5897511.08it/s]
+
+.. parsed-literal::
+
+    
+ 84%|████████▍ | 143261696/170498071 [00:14<00:04, 5793550.59it/s]
+
+.. parsed-literal::
+
+    
+ 84%|████████▍ | 143884288/170498071 [00:14<00:04, 5821252.36it/s]
+
+.. parsed-literal::
+
+    
+ 85%|████████▍ | 144506880/170498071 [00:14<00:04, 5670929.28it/s]
+
+.. parsed-literal::
+
+    
+ 85%|████████▌ | 145096704/170498071 [00:15<00:04, 5721299.33it/s]
+
+.. parsed-literal::
+
+    
+ 85%|████████▌ | 145686528/170498071 [00:15<00:04, 5589242.07it/s]
+
+.. parsed-literal::
+
+    
+ 86%|████████▌ | 146276352/170498071 [00:15<00:04, 5573544.98it/s]
+
+.. parsed-literal::
+
+    
+ 86%|████████▌ | 146866176/170498071 [00:15<00:04, 5653812.72it/s]
+
+.. parsed-literal::
+
+    
+ 86%|████████▋ | 147456000/170498071 [00:15<00:04, 5615466.08it/s]
+
+.. parsed-literal::
+
+    
+ 87%|████████▋ | 148078592/170498071 [00:15<00:03, 5727414.03it/s]
+
+.. parsed-literal::
+
+    
+ 87%|████████▋ | 148668416/170498071 [00:15<00:03, 5734945.03it/s]
+
+.. parsed-literal::
+
+    
+ 88%|████████▊ | 149291008/170498071 [00:15<00:03, 5720384.70it/s]
+
+.. parsed-literal::
+
+    
+ 88%|████████▊ | 149913600/170498071 [00:15<00:03, 5773789.44it/s]
+
+.. parsed-literal::
+
+    
+ 88%|████████▊ | 150536192/170498071 [00:15<00:03, 5898587.34it/s]
+
+.. parsed-literal::
+
+    
+ 89%|████████▊ | 151158784/170498071 [00:16<00:03, 5783102.09it/s]
+
+.. parsed-literal::
+
+    
+ 89%|████████▉ | 151748608/170498071 [00:16<00:03, 5744869.22it/s]
+
+.. parsed-literal::
+
+    
+ 89%|████████▉ | 152403968/170498071 [00:16<00:03, 5892137.14it/s]
+
+.. parsed-literal::
+
+    
+ 90%|████████▉ | 153026560/170498071 [00:16<00:02, 5894363.21it/s]
+
+.. parsed-literal::
+
+    
+ 90%|█████████ | 153649152/170498071 [00:16<00:02, 5922842.41it/s]
+
+.. parsed-literal::
+
+    
+ 90%|█████████ | 154271744/170498071 [00:16<00:02, 5933696.54it/s]
+
+.. parsed-literal::
+
+    
+ 91%|█████████ | 154927104/170498071 [00:16<00:02, 5932279.96it/s]
+
+.. parsed-literal::
+
+    
+ 91%|█████████ | 155549696/170498071 [00:16<00:02, 5972512.87it/s]
+
+.. parsed-literal::
+
+    
+ 92%|█████████▏| 156205056/170498071 [00:16<00:02, 6136941.06it/s]
+
+.. parsed-literal::
+
+    
+ 92%|█████████▏| 156827648/170498071 [00:17<00:02, 5963890.02it/s]
+
+.. parsed-literal::
+
+    
+ 92%|█████████▏| 157450240/170498071 [00:17<00:02, 5896825.04it/s]
+
+.. parsed-literal::
+
+    
+ 93%|█████████▎| 158105600/170498071 [00:17<00:02, 6069686.73it/s]
+
+.. parsed-literal::
+
+    
+ 93%|█████████▎| 158728192/170498071 [00:17<00:01, 5993375.93it/s]
+
+.. parsed-literal::
+
+    
+ 93%|█████████▎| 159383552/170498071 [00:17<00:01, 6099810.77it/s]
+
+.. parsed-literal::
+
+    
+ 94%|█████████▍| 160006144/170498071 [00:17<00:01, 6072335.15it/s]
+
+.. parsed-literal::
+
+    
+ 94%|█████████▍| 160661504/170498071 [00:17<00:01, 5985901.27it/s]
+
+.. parsed-literal::
+
+    
+ 95%|█████████▍| 161284096/170498071 [00:17<00:01, 6030540.06it/s]
+
+.. parsed-literal::
+
+    
+ 95%|█████████▍| 161906688/170498071 [00:17<00:01, 5995654.97it/s]
+
+.. parsed-literal::
+
+    
+ 95%|█████████▌| 162529280/170498071 [00:17<00:01, 5981934.93it/s]
+
+.. parsed-literal::
+
+    
+ 96%|█████████▌| 163151872/170498071 [00:18<00:01, 6001547.69it/s]
+
+.. parsed-literal::
+
+    
+ 96%|█████████▌| 163774464/170498071 [00:18<00:01, 5990972.04it/s]
+
+.. parsed-literal::
+
+    
+ 96%|█████████▋| 164397056/170498071 [00:18<00:01, 6055698.66it/s]
+
+.. parsed-literal::
+
+    
+ 97%|█████████▋| 165019648/170498071 [00:18<00:00, 6049158.95it/s]
+
+.. parsed-literal::
+
+    
+ 97%|█████████▋| 165642240/170498071 [00:18<00:00, 6016041.86it/s]
+
+.. parsed-literal::
+
+    
+ 98%|█████████▊| 166264832/170498071 [00:18<00:00, 6011049.16it/s]
+
+.. parsed-literal::
+
+    
+ 98%|█████████▊| 166887424/170498071 [00:18<00:00, 6054762.80it/s]
+
+.. parsed-literal::
+
+    
+ 98%|█████████▊| 167510016/170498071 [00:18<00:00, 6048047.89it/s]
+
+.. parsed-literal::
+
+    
+ 99%|█████████▊| 168132608/170498071 [00:18<00:00, 6031345.39it/s]
+
+.. parsed-literal::
+
+    
+ 99%|█████████▉| 168755200/170498071 [00:19<00:00, 6039672.92it/s]
+
+.. parsed-literal::
+
+    
+ 99%|█████████▉| 169377792/170498071 [00:19<00:00, 6034107.61it/s]
+
+.. parsed-literal::
+
+    
+100%|█████████▉| 170000384/170498071 [00:19<00:00, 6008716.05it/s]
+
+.. parsed-literal::
+
+    
+100%|██████████| 170498071/170498071 [00:19<00:00, 8827169.25it/s]
 
 
 
-
+    
 
 
 .. parsed-literal::
@@ -854,7 +1406,7 @@ Preprocessing for model obtained from training
 Perform Quantization
 --------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -870,7 +1422,7 @@ MobileNetV2. The optimization process contains the following steps:
 Create Dataset for Validation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 NNCF is compatible with ``torch.utils.data.DataLoader`` interface. For
 performing quantization it should be passed into ``nncf.Dataset`` object
@@ -881,11 +1433,11 @@ model during quantization, in our case, to pick input tensor from pair
 .. code:: ipython3
 
     import nncf
-
+    
     def transform_fn(data_item):
         image_tensor = data_item[0]
         return image_tensor.numpy()
-
+    
     quantization_dataset = nncf.Dataset(val_loader, transform_fn)
 
 
@@ -897,7 +1449,7 @@ model during quantization, in our case, to pick input tensor from pair
 Run nncf.quantize for Getting an Optimized Model
 ------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 ``nncf.quantize`` function accepts model and prepared quantization
 dataset for performing basic quantization. Optionally, additional
@@ -913,14 +1465,14 @@ about supported parameters can be found on this
 
 .. parsed-literal::
 
-    2024-03-12 22:43:46.333703: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-12 22:43:46.368061: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-03-25 22:44:56.961421: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-03-25 22:44:56.993144: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-03-12 22:43:46.930366: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-03-25 22:44:57.515616: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 
@@ -968,7 +1520,7 @@ about supported parameters can be found on this
 Serialize an OpenVINO IR model
 ------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Similar to ``ov.convert_model``, quantized model is ``ov.Model`` object
 which ready to be loaded into device and can be serialized on disk using
@@ -981,13 +1533,13 @@ which ready to be loaded into device and can be serialized on disk using
 Compare Accuracy of the Original and Quantized Models
 -----------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
     from tqdm.notebook import tqdm
     import numpy as np
-
+    
     def test_accuracy(ov_model, data_loader):
         correct = 0
         total = 0
@@ -1001,14 +1553,14 @@ Compare Accuracy of the Original and Quantized Models
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
 .. code:: ipython3
 
     import ipywidgets as widgets
-
+    
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
@@ -1016,7 +1568,7 @@ select device from dropdown list for running inference using OpenVINO
         description='Device:',
         disabled=False,
     )
-
+    
     device
 
 
@@ -1033,7 +1585,7 @@ select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     compiled_model = core.compile_model(ov_model, device.value)
     optimized_compiled_model = core.compile_model(quant_ov_model, device.value)
-
+    
     orig_accuracy = test_accuracy(compiled_model, val_loader)
     optimized_accuracy = test_accuracy(optimized_compiled_model, val_loader)
 
@@ -1065,7 +1617,7 @@ select device from dropdown list for running inference using OpenVINO
 Compare Performance of the Original and Quantized Models
 --------------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Finally, measure the inference performance of the ``FP32`` and ``INT8``
 models, using `Benchmark
@@ -1092,21 +1644,17 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
     [Step 2/11] Loading OpenVINO Runtime
     [ INFO ] OpenVINO:
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ]
+    [ INFO ] 
     [ INFO ] Device info:
     [ INFO ] AUTO
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ]
-    [ INFO ]
+    [ INFO ] 
+    [ INFO ] 
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
     [ INFO ] Loading model files
-
-
-.. parsed-literal::
-
-    [ INFO ] Read model took 10.11 ms
+    [ INFO ] Read model took 9.79 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     x (node: x) : f32 / [...] / [1,3,32,32]
@@ -1124,13 +1672,9 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 197.10 ms
+    [ INFO ] Compile model took 202.92 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
-
-
-.. parsed-literal::
-
     [ INFO ]   NETWORK_NAME: Model2
     [ INFO ]   EXECUTION_DEVICES: ['CPU']
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
@@ -1160,24 +1704,24 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'x'!. This input will be filled with random values!
-    [ INFO ] Fill input 'x' with random values
+    [ INFO ] Fill input 'x' with random values 
     [Step 10/11] Measuring performance (Start inference asynchronously, 12 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-    [ INFO ] First inference took 3.17 ms
+    [ INFO ] First inference took 2.61 ms
 
 
 .. parsed-literal::
 
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            88452 iterations
-    [ INFO ] Duration:         15002.60 ms
+    [ INFO ] Count:            88824 iterations
+    [ INFO ] Duration:         15002.32 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        1.86 ms
-    [ INFO ]    Average:       1.86 ms
-    [ INFO ]    Min:           1.57 ms
-    [ INFO ]    Max:           8.68 ms
-    [ INFO ] Throughput:   5895.78 FPS
+    [ INFO ]    Median:        1.84 ms
+    [ INFO ]    Average:       1.85 ms
+    [ INFO ]    Min:           1.18 ms
+    [ INFO ]    Max:           8.74 ms
+    [ INFO ] Throughput:   5920.68 FPS
 
 
 .. code:: ipython3
@@ -1193,17 +1737,21 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
     [Step 2/11] Loading OpenVINO Runtime
     [ INFO ] OpenVINO:
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ]
+    [ INFO ] 
     [ INFO ] Device info:
     [ INFO ] AUTO
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ]
-    [ INFO ]
+    [ INFO ] 
+    [ INFO ] 
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
     [ INFO ] Loading model files
-    [ INFO ] Read model took 19.04 ms
+
+
+.. parsed-literal::
+
+    [ INFO ] Read model took 19.60 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     x (node: x) : f32 / [...] / [1,3,32,32]
@@ -1221,7 +1769,7 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 335.52 ms
+    [ INFO ] Compile model took 335.01 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
     [ INFO ]   NETWORK_NAME: Model2
@@ -1253,30 +1801,34 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'x'!. This input will be filled with random values!
-    [ INFO ] Fill input 'x' with random values
+
+
+.. parsed-literal::
+
+    [ INFO ] Fill input 'x' with random values 
     [Step 10/11] Measuring performance (Start inference asynchronously, 12 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-    [ INFO ] First inference took 2.10 ms
+    [ INFO ] First inference took 1.91 ms
 
 
 .. parsed-literal::
 
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            167856 iterations
-    [ INFO ] Duration:         15001.55 ms
+    [ INFO ] Count:            167496 iterations
+    [ INFO ] Duration:         15001.47 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        1.00 ms
+    [ INFO ]    Median:        1.01 ms
     [ INFO ]    Average:       1.03 ms
-    [ INFO ]    Min:           0.68 ms
-    [ INFO ]    Max:           6.97 ms
-    [ INFO ] Throughput:   11189.25 FPS
+    [ INFO ]    Min:           0.75 ms
+    [ INFO ]    Max:           7.00 ms
+    [ INFO ] Throughput:   11165.31 FPS
 
 
 Compare results on four pictures
 --------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -1284,7 +1836,7 @@ Compare results on four pictures
     labels_names = ["airplane", "automobile", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"]
     all_pictures = []
     all_labels = []
-
+    
     # Get all pictures and their labels.
     for i, batch in enumerate(val_loader):
         all_pictures.append(batch[0].numpy())
@@ -1293,7 +1845,7 @@ Compare results on four pictures
 .. code:: ipython3
 
     import matplotlib.pyplot as plt
-
+    
     def plot_pictures(indexes: list, all_pictures=all_pictures, all_labels=all_labels):
         """Plot 4 pictures.
         :param indexes: a list of indexes of pictures to be displayed.
@@ -1306,19 +1858,19 @@ Compare results on four pictures
             assert idx < 10000, 'Cannot get such index, there are only 10000'
             pic = np.rollaxis(all_pictures[idx].squeeze(), 0, 3)
             images.append(pic)
-
+    
             labels.append(labels_names[all_labels[idx]])
-
+    
         f, axarr = plt.subplots(1, 4)
         axarr[0].imshow(images[0])
         axarr[0].set_title(labels[0])
-
+    
         axarr[1].imshow(images[1])
         axarr[1].set_title(labels[1])
-
+    
         axarr[2].imshow(images[2])
         axarr[2].set_title(labels[2])
-
+    
         axarr[3].imshow(images[3])
         axarr[3].set_title(labels[3])
 
@@ -1327,7 +1879,7 @@ Compare results on four pictures
     def infer_on_pictures(model, indexes: list, all_pictures=all_pictures):
         """ Inference model on a few pictures.
         :param net: model on which do inference
-        :param indexes: list of indexes
+        :param indexes: list of indexes 
         """
         output_key = model.output(0)
         predicted_labels = []
@@ -1341,12 +1893,12 @@ Compare results on four pictures
 .. code:: ipython3
 
     indexes_to_infer = [7, 12, 15, 20]  # To plot, specify 4 indexes.
-
+    
     plot_pictures(indexes_to_infer)
-
+    
     results_float = infer_on_pictures(compiled_model, indexes_to_infer)
     results_quanized = infer_on_pictures(optimized_compiled_model, indexes_to_infer)
-
+    
     print(f"Labels for picture from float model : {results_float}.")
     print(f"Labels for picture from quantized model : {results_quanized}.")
 

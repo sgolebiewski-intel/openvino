@@ -67,7 +67,7 @@ Table of contents:
 Import
 ------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -87,7 +87,7 @@ Import
 Prepare the Model and Test Image
 --------------------------------
 
-Download PPYOLOv2 and
+`back to top ⬆️ <#table-of-contents>`__ Download PPYOLOv2 and
 DeepLabV3P pre-trained models from PaddlePaddle community.
 
 .. code:: ipython3
@@ -163,7 +163,7 @@ DeepLabV3P pre-trained models from PaddlePaddle community.
 Configuration
 -------------
 
-Add parameter configuration for
+`back to top ⬆️ <#table-of-contents>`__ Add parameter configuration for
 reading calculation.
 
 .. code:: ipython3
@@ -193,7 +193,7 @@ reading calculation.
 Load the Models
 ---------------
 
-Define a common class for model
+`back to top ⬆️ <#table-of-contents>`__ Define a common class for model
 loading and inference
 
 .. code:: ipython3
@@ -237,7 +237,7 @@ loading and inference
 Data Process
 ------------
 
-Including the preprocessing and
+`back to top ⬆️ <#table-of-contents>`__ Including the preprocessing and
 postprocessing tasks of each model.
 
 .. code:: ipython3
@@ -568,12 +568,12 @@ postprocessing tasks of each model.
 Main Function
 -------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Initialize the model and parameters.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -635,7 +635,7 @@ bounds of input batch size.
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7fcb0dada370>
+    <matplotlib.image.AxesImage at 0x7ff84b1b9be0>
 
 
 
@@ -646,7 +646,7 @@ bounds of input batch size.
 Run meter detection model
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Detect the location of the
+`back to top ⬆️ <#table-of-contents>`__ Detect the location of the
 meter and prepare the ROI images for segmentation.
 
 .. code:: ipython3
@@ -691,7 +691,7 @@ meter and prepare the ROI images for segmentation.
 Run meter segmentation model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Get the results of segmentation
+`back to top ⬆️ <#table-of-contents>`__ Get the results of segmentation
 task on detected ROI.
 
 .. code:: ipython3
@@ -732,7 +732,7 @@ task on detected ROI.
 Postprocess the models result and calculate the final readings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use OpenCV function to find the
+`back to top ⬆️ <#table-of-contents>`__ Use OpenCV function to find the
 location of the pointer in a scale map.
 
 .. code:: ipython3
@@ -770,7 +770,7 @@ location of the pointer in a scale map.
 Get the reading result on the meter picture
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -803,4 +803,4 @@ Get the reading result on the meter picture
 Try it with your meter photos!
 ------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__

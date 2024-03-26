@@ -47,7 +47,7 @@ Table of contents:
 Prerequisites
 -------------
 
-## Prerequisites
+`back to top ⬆️ <#table-of-contents>`__ ## Prerequisites
 
 .. code:: ipython3
 
@@ -155,10 +155,7 @@ Unpacking objects:   4% (2/45)
 Unpacking objects:   6% (3/45)
 Unpacking objects:   8% (4/45)
 Unpacking objects:  11% (5/45)
-
-.. parsed-literal::
-
-    Unpacking objects:  13% (6/45)
+Unpacking objects:  13% (6/45)
 Unpacking objects:  15% (7/45)
 Unpacking objects:  17% (8/45)
 Unpacking objects:  20% (9/45)
@@ -171,7 +168,10 @@ Unpacking objects:  26% (12/45)
     remote: Total 45 (delta 9), reused 44 (delta 8), pack-reused 0[K
     Unpacking objects:  28% (13/45)
 Unpacking objects:  31% (14/45)
-Unpacking objects:  33% (15/45)
+
+.. parsed-literal::
+
+    Unpacking objects:  33% (15/45)
 Unpacking objects:  35% (16/45)
 Unpacking objects:  37% (17/45)
 Unpacking objects:  40% (18/45)
@@ -202,13 +202,21 @@ Unpacking objects:  93% (42/45)
 Unpacking objects:  95% (43/45)
 Unpacking objects:  97% (44/45)
 Unpacking objects: 100% (45/45)
-Unpacking objects: 100% (45/45), 428.50 KiB | 2.86 MiB/s, done.
+Unpacking objects: 100% (45/45), 428.50 KiB | 2.88 MiB/s, done.
 
 
 .. code:: ipython3
 
-    %pip install -q "./ml-mobileclip" --extra-index-url "https://download.pytorch.org/whl/cpu"
+    %pip install -q "./ml-mobileclip" --no-deps
+    
+    %pip install -q "clip-benchmark>=1.4.0" "datasets>=2.8.0" "open-clip-torch>=2.20.0" "timm>=0.9.5" "torch>=1.13.1" "torchvision>=0.14.1" --extra-index-url https://download.pytorch.org/whl/cpu
+    
     %pip install -q "openvino>=2024.0.0" "gradio" "matplotlib" "Pillow"  "altair" "pandas" "opencv-python"
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
 
 
 .. parsed-literal::
@@ -219,9 +227,8 @@ Unpacking objects: 100% (45/45), 428.50 KiB | 2.86 MiB/s, done.
 .. parsed-literal::
 
     ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    pyannote-audio 2.0.1 requires torchaudio<1.0,>=0.10, but you have torchaudio 2.2.1+cpu which is incompatible.
-    pytorch-lightning 1.6.5 requires protobuf<=3.20.1, but you have protobuf 4.25.3 which is incompatible.
-    torchaudio 2.2.1+cpu requires torch==2.2.1, but you have torch 1.13.1+cpu which is incompatible.
+    mobileclip 0.1.0 requires torch==1.13.1, but you have torch 2.2.1+cpu which is incompatible.
+    mobileclip 0.1.0 requires torchvision==0.14.1, but you have torchvision 0.17.1+cpu which is incompatible.
     
 
 .. parsed-literal::
@@ -242,7 +249,7 @@ Unpacking objects: 100% (45/45), 428.50 KiB | 2.86 MiB/s, done.
 Select model
 ------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 For starting work, we should select model that will be used in our
 demonstration. By default, we will use the MobileCLIP model, but for
@@ -352,7 +359,7 @@ comparison purposes, you can select different models among:
 Run model inference
 -------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Now, let’s see model in action. We will try to find image, where some
 specific object is represented using embeddings. Embeddings are a
@@ -373,7 +380,7 @@ represent are.
 Prepare image gallery
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -466,7 +473,7 @@ Prepare image gallery
 Prepare model
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The code bellow download model weights, create model class instance and
 preprocessing utilities
@@ -502,7 +509,7 @@ preprocessing utilities
 Perform search
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -536,8 +543,8 @@ Perform search
 
 .. parsed-literal::
 
-    Image encoding took 0.101 ms
-    Text encoding took 0.0102 ms
+    Image encoding took 0.11 ms
+    Text encoding took 0.0109 ms
 
 
 
@@ -547,7 +554,7 @@ Perform search
 Convert Model to OpenVINO Intermediate Representation format
 ------------------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 For best results with OpenVINO, it is recommended to convert the model
 to OpenVINO IR format. OpenVINO supports PyTorch via Model conversion
@@ -611,19 +618,19 @@ be used separately. Let’s convert each part to OpenVINO.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/mobileclip/modules/common/transformer.py:125: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/mobileclip/modules/common/transformer.py:125: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if seq_len != self.num_embeddings:
 
 
 Run OpenVINO model inference
 ----------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Select device for image encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -657,7 +664,7 @@ Select device for image encoder
 Select device for text encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -680,7 +687,7 @@ Select device for text encoder
 Perform search
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -703,8 +710,8 @@ Perform search
 
 .. parsed-literal::
 
-    Image encoding took 0.0306 ms
-    Text encoding took 0.0058 ms
+    Image encoding took 0.0302 ms
+    Text encoding took 0.0056 ms
 
 
 
@@ -714,7 +721,7 @@ Perform search
 Interactive Demo
 ----------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 In this part, you can try different supported by tutorial models in
 searching frames in the video by text query or image. Upload v

@@ -66,12 +66,60 @@ Table of contents:
 Settings
 --------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
+    import platform
     # Install openvino package
-    %pip install -q "openvino>=2023.1.0" tensorflow opencv-python matplotlib
+    %pip install -q "openvino>=2023.1.0" opencv-python
+    if platform.system() != "Windows":
+        %pip install -q "matplotlib>=3.4"
+    else:
+        %pip install -q "matplotlib>=3.4,<3.7"
+    
+    %pip install -q "tensorflow-macos>=2.5; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version > '3.8'" # macOS M1 and M2
+    %pip install -q "tensorflow-macos>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version <= '3.8'" # macOS M1 and M2
+    %pip install -q "tensorflow>=2.5; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version > '3.8'" # macOS x86
+    %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version <= '3.8'" # macOS x86
+    %pip install -q "tensorflow>=2.5; sys_platform != 'darwin' and python_version > '3.8'"
+    %pip install -q "tensorflow>=2.5; sys_platform != 'darwin' and python_version <= '3.8'"
+
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
 
 
 .. parsed-literal::
@@ -82,12 +130,16 @@ Settings
 Imports
 -------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
     import time
+    import os
     from pathlib import Path
+    
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+    os.environ["TF_USE_LEGACY_KERAS"] = "1"
     
     import cv2
     import matplotlib.pyplot as plt
@@ -103,23 +155,10 @@ Imports
     )
     from notebook_utils import download_file
 
-
-.. parsed-literal::
-
-    2024-03-12 22:47:40.396566: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-12 22:47:40.431134: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-
-
-.. parsed-literal::
-
-    2024-03-12 22:47:40.948008: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-
-
 Setup image and device
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -163,7 +202,7 @@ Setup image and device
 Downloading the model
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 This tutorial uses the
 `InceptionResNetV2 <https://www.tensorflow.org/api_docs/python/tf/keras/applications/inception_resnet_v2>`__.
@@ -194,12 +233,8 @@ and save it to the disk.
 
 .. parsed-literal::
 
-    2024-03-12 22:47:44.291989: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
-    2024-03-12 22:47:44.292027: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:168] retrieving CUDA diagnostic information for host: iotg-dev-workstation-07
-    2024-03-12 22:47:44.292031: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:175] hostname: iotg-dev-workstation-07
-    2024-03-12 22:47:44.292168: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:199] libcuda reported version is: 470.223.2
-    2024-03-12 22:47:44.292184: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:203] kernel reported version is: 470.182.3
-    2024-03-12 22:47:44.292187: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
+    2024-03-25 22:49:11.169219: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
+    2024-03-25 22:49:11.169410: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
 
 
 .. parsed-literal::
@@ -225,7 +260,7 @@ and save it to the disk.
 Create core
 ~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -234,7 +269,7 @@ Create core
 Check the original parameters of image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -257,7 +292,7 @@ Check the original parameters of image
 Setup preprocessing steps with Preprocessing API and perform inference
 ----------------------------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Intuitively, preprocessing API consists of the following parts:
 
@@ -285,7 +320,7 @@ Pre-processing support following operations (please, see more details
 Convert model to OpenVINO IR with model conversion API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The options for preprocessing are not required.
 
@@ -306,7 +341,7 @@ The options for preprocessing are not required.
 Create ``PrePostProcessor`` Object
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The
 `PrePostProcessor() <https://docs.openvino.ai/2024/api/c_cpp_api/classov_1_1preprocess_1_1_pre_post_processor.html>`__
@@ -322,7 +357,7 @@ a model.
 Declare User’s Data Format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 To address particular input of a model/preprocessor, use the
 ``PrePostProcessor.input(input_name)`` method. If the model has only one
@@ -360,14 +395,14 @@ for mean/scale normalization.
 
 .. parsed-literal::
 
-    <openvino._pyopenvino.preprocess.InputTensorInfo at 0x7f12e449edf0>
+    <openvino._pyopenvino.preprocess.InputTensorInfo at 0x7f2fa0530430>
 
 
 
 Declaring Model Layout
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Model input already has information about precision and shape.
 Preprocessing API is not intended to modify this. The only thing that
@@ -391,14 +426,14 @@ may be specified is input data
 
 .. parsed-literal::
 
-    <openvino._pyopenvino.preprocess.InputModelInfo at 0x7f12e448f9f0>
+    <openvino._pyopenvino.preprocess.InputModelInfo at 0x7f2f4dc369b0>
 
 
 
 Preprocessing Steps
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Now, the sequence of preprocessing steps can be defined. For more
 information about preprocessing steps, see
@@ -432,14 +467,14 @@ then such conversion will be added explicitly.
 
 .. parsed-literal::
 
-    <openvino._pyopenvino.preprocess.PreProcessSteps at 0x7f12e448fdf0>
+    <openvino._pyopenvino.preprocess.PreProcessSteps at 0x7f2f4dc364b0>
 
 
 
 Integrating Steps into a Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Once the preprocessing steps have been finished, the model can be
 finally built. It is possible to display ``PrePostProcessor``
@@ -467,7 +502,7 @@ configuration for debugging purposes.
 Load model and perform inference
 --------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -487,12 +522,12 @@ Load model and perform inference
 Fit image manually and perform inference
 ----------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Load the model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -502,7 +537,7 @@ Load the model
 Load image and fit it to model input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -538,7 +573,7 @@ Load image and fit it to model input
 Perform inference
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -549,12 +584,12 @@ Perform inference
 Compare results
 ---------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Compare results on one image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -618,7 +653,7 @@ Compare results on one image
 Compare performance
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -651,10 +686,10 @@ Compare performance
 
 .. parsed-literal::
 
-    IR model in OpenVINO Runtime/CPU with manual image preprocessing: 0.0153 seconds per image, FPS: 65.44
+    IR model in OpenVINO Runtime/CPU with manual image preprocessing: 0.0153 seconds per image, FPS: 65.48
 
 
 .. parsed-literal::
 
-    IR model in OpenVINO Runtime/CPU with preprocessing API: 0.0183 seconds per image, FPS: 54.74
+    IR model in OpenVINO Runtime/CPU with preprocessing API: 0.0182 seconds per image, FPS: 54.90
 

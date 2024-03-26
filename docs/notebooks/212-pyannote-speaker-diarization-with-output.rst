@@ -55,7 +55,7 @@ Table of contents:
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -71,8 +71,8 @@ Prerequisites
 
     ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
     googleapis-common-protos 1.63.0 requires protobuf!=3.20.0,!=3.20.1,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0.dev0,>=3.19.5, but you have protobuf 3.20.1 which is incompatible.
-    onnx 1.15.0 requires protobuf>=3.20.2, but you have protobuf 3.20.1 which is incompatible.
-    paddlepaddle 2.6.0 requires protobuf>=3.20.2; platform_system != "Windows", but you have protobuf 3.20.1 which is incompatible.
+    onnx 1.16.0 requires protobuf>=3.20.2, but you have protobuf 3.20.1 which is incompatible.
+    paddlepaddle 2.6.1 requires protobuf>=3.20.2; platform_system != "Windows", but you have protobuf 3.20.1 which is incompatible.
     ppgan 2.1.0 requires imageio==2.9.0, but you have imageio 2.34.0 which is incompatible.
     ppgan 2.1.0 requires librosa==0.8.1, but you have librosa 0.9.2 which is incompatible.
     ppgan 2.1.0 requires opencv-python<=4.6.0.66, but you have opencv-python 4.9.0.80 which is incompatible.
@@ -88,7 +88,7 @@ Prerequisites
 Prepare pipeline
 ----------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Traditional Speaker Diarization systems can be generalized into a
 five-step process:
@@ -166,7 +166,7 @@ hub <https://huggingface.co/pyannote/speaker-diarization>`__.
 Load test audio file
 --------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -224,7 +224,7 @@ Load test audio file
 Run inference pipeline
 ----------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 For running inference, we should provide a path to input audio to the
 pipeline
@@ -245,7 +245,7 @@ pipeline
 
 .. parsed-literal::
 
-    Diarization pipeline took 15.71 s
+    Diarization pipeline took 15.75 s
 
 
 The result of running the pipeline can be represented as a diagram
@@ -287,7 +287,7 @@ We can also print each time frame and corresponding speaker:
 Convert model to OpenVINO Intermediate Representation format
 ------------------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 For best results with OpenVINO, it is recommended to convert the model
 to OpenVINO IR format. OpenVINO supports PyTorch via ONNX conversion. We
@@ -328,7 +328,7 @@ with ``ov.save_model``.
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -357,7 +357,7 @@ select device from dropdown list for running inference using OpenVINO
 Replace segmentation model with OpenVINO
 ----------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -389,7 +389,7 @@ Replace segmentation model with OpenVINO
 Run speaker diarization with OpenVINO
 -------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -404,7 +404,7 @@ Run speaker diarization with OpenVINO
 
 .. parsed-literal::
 
-    Diarization pipeline took 15.14 s
+    Diarization pipeline took 15.08 s
 
 
 .. code:: ipython3

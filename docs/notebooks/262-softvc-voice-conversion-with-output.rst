@@ -31,14 +31,14 @@ Table of contents:
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
     %pip install -q --upgrade pip setuptools
     %pip install -q "openvino>=2023.2.0"
     !git clone https://github.com/svc-develop-team/so-vits-svc -b 4.1-Stable
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu  tqdm librosa "torch>=2.1.0" "torchaudio>=2.1.0" faiss-cpu gradio "numpy==1.23.5" "fairseq==0.12.2" praat-parselmouth
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu  tqdm librosa "torch>=2.1.0" "torchaudio>=2.1.0" faiss-cpu gradio "numpy>=1.23.5" "fairseq==0.12.2" praat-parselmouth
 
 Download pretrained models and configs. We use a recommended encoder
 `ContentVec <https://arxiv.org/abs/2204.09224>`__ and models from `a
@@ -73,7 +73,7 @@ own <https://github.com/svc-develop-team/so-vits-svc#%EF%B8%8F-training>`__.
 Use the original model to run an inference
 ------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Change directory to ``so-vits-svc`` in purpose not to brake internal
 relative paths.
@@ -123,7 +123,7 @@ And let compare the original audio with the result.
 Convert to OpenVINO IR model
 ----------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Model components are PyTorch modules, that can be converted with
 ``ov.convert_model`` function directly. We also use ``ov.save_model``
@@ -174,7 +174,7 @@ without need to look inside.
 Run the OpenVINO model
 ----------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Select a device from dropdown list for running inference using OpenVINO.
 
@@ -229,7 +229,7 @@ Check result. Is it identical to that created by the original model.
 Interactive inference
 ---------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 

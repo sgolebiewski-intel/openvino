@@ -36,12 +36,12 @@ Table of contents:
 Preparation
 -----------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -69,7 +69,7 @@ Install requirements
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -83,7 +83,7 @@ Imports
 Download TFLite model
 ---------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -106,14 +106,14 @@ Download TFLite model
 
 .. parsed-literal::
 
-    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/119-tflite-to-openvino/model/efficientnet_lite0_fp32_2.tflite')
+    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/119-tflite-to-openvino/model/efficientnet_lite0_fp32_2.tflite')
 
 
 
 Convert a Model to OpenVINO IR Format
 -------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 To convert the TFLite model to OpenVINO IR, model conversion Python API
 can be used. ``ov.convert_model`` function accepts the path to the
@@ -143,7 +143,7 @@ For TensorFlow Lite models support, refer to this
 Load model using OpenVINO TensorFlow Lite Frontend
 --------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 TensorFlow Lite models are supported via ``FrontEnd`` API. You may skip
 conversion to IR and read models directly by OpenVINO runtime API. For
@@ -159,7 +159,7 @@ this `tutorial <002-openvino-api-with-output.html>`__.
 Run OpenVINO model inference
 ----------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 We can find information about model input preprocessing in its
 `description <https://tfhub.dev/tensorflow/lite-model/efficientnet/lite0/fp32/2>`__
@@ -176,7 +176,7 @@ on `TensorFlow Hub <https://tfhub.dev/>`__.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -238,7 +238,7 @@ select device from dropdown list for running inference using OpenVINO
 Estimate Model Performance
 --------------------------
 
-`Benchmark
+`back to top ⬆️ <#table-of-contents>`__ `Benchmark
 Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
 is used to measure the inference performance of the model on CPU and
 GPU.
@@ -278,11 +278,7 @@ GPU.
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
     [ INFO ] Loading model files
-
-
-.. parsed-literal::
-
-    [ INFO ] Read model took 9.52 ms
+    [ INFO ] Read model took 9.27 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     images (node: images) : f32 / [...] / [1,224,224,3]
@@ -300,7 +296,7 @@ GPU.
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 181.00 ms
+    [ INFO ] Compile model took 160.03 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
     [ INFO ]   NETWORK_NAME: TensorFlow_Lite_Frontend_IR
@@ -335,23 +331,19 @@ GPU.
     [ INFO ] Fill input 'images' with random values 
     [Step 10/11] Measuring performance (Start inference asynchronously, 6 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-
-
-.. parsed-literal::
-
-    [ INFO ] First inference took 7.56 ms
+    [ INFO ] First inference took 7.63 ms
 
 
 .. parsed-literal::
 
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            17412 iterations
-    [ INFO ] Duration:         15009.54 ms
+    [ INFO ] Count:            17274 iterations
+    [ INFO ] Duration:         15009.10 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        5.04 ms
-    [ INFO ]    Average:       5.04 ms
-    [ INFO ]    Min:           3.66 ms
-    [ INFO ]    Max:           13.39 ms
-    [ INFO ] Throughput:   1160.06 FPS
+    [ INFO ]    Median:        5.08 ms
+    [ INFO ]    Average:       5.08 ms
+    [ INFO ]    Min:           3.72 ms
+    [ INFO ]    Max:           16.56 ms
+    [ INFO ] Throughput:   1150.90 FPS
 

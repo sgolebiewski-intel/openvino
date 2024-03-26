@@ -54,7 +54,7 @@ Table of contents:
 Image classification
 --------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 We will use the `MobileNet_v2 <https://arxiv.org/abs/1704.04861>`__
 image classification model from `TensorFlow Hub <https://tfhub.dev/>`__.
@@ -77,19 +77,62 @@ Hub <https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5>`__
 Install required packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
     import platform
     
-    %pip install -q tensorflow_hub tensorflow pillow numpy
+    %pip install -q pillow numpy
     %pip install -q "openvino>=2023.2.0"
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
     else:
         %pip install -q "matplotlib>=3.4,<3.7"
+    
+    %pip install -q "tensorflow-macos>=2.5; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version > '3.8'" # macOS M1 and M2
+    %pip install -q "tensorflow-macos>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version <= '3.8'" # macOS M1 and M2
+    %pip install -q "tensorflow>=2.5; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version > '3.8'" # macOS x86
+    %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version <= '3.8'" # macOS x86
+    %pip install -q "tensorflow>=2.5; sys_platform != 'darwin' and python_version > '3.8'"
+    %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform != 'darwin' and python_version <= '3.8'"
+    %pip install -q tf_keras tensorflow_hub
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
 
 
 .. parsed-literal::
@@ -110,7 +153,7 @@ Install required packages
 Import libraries
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -118,6 +161,7 @@ Import libraries
     import os
     from urllib.request import urlretrieve
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+    os.environ["TF_USE_LEGACY_KERAS"] = "1"
     
     import tensorflow_hub as hub
     import tensorflow as tf
@@ -138,7 +182,7 @@ Import libraries
 Download the classifier
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Select a MobileNetV2
+`back to top ⬆️ <#table-of-contents>`__ Select a MobileNetV2
 pre-trained model `from TensorFlow
 Hub <https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5>`__
 and wrap it as a Keras layer with ``hub.KerasLayer``.
@@ -150,14 +194,14 @@ and wrap it as a Keras layer with ``hub.KerasLayer``.
 
 .. parsed-literal::
 
-    2024-03-12 22:55:04.217869: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
-    2024-03-12 22:55:04.218046: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
+    2024-03-25 22:57:08.760370: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
+    2024-03-25 22:57:08.760545: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
 
 
 Download a single image to try the model on
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The input ``images`` are
+`back to top ⬆️ <#table-of-contents>`__ The input ``images`` are
 expected to have color values in the range [0,1], following the `common
 image input
 conventions <https://www.tensorflow.org/hub/common_signatures/images#input>`__.
@@ -197,7 +241,7 @@ Normalize the image to [0,1] range.
 Convert model to OpenVINO IR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 We will convert the loaded model to OpenVINO IR using
 ``ov.convert_model`` function. We pass the model object to it, no
@@ -213,7 +257,7 @@ additional arguments required. Then, we save the model to disk using
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -248,7 +292,7 @@ select device from dropdown list for running inference using OpenVINO
 Inference
 ~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Add a batch dimension (with ``np.newaxis``) and pass the image to the
 model:
@@ -306,7 +350,7 @@ dataset labels to decode the predictions:
 Image style transfer
 --------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 We will use `arbitrary image stylization
 model <https://arxiv.org/abs/1705.06830>`__ from `TensorFlow
@@ -337,7 +381,7 @@ Hub <https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2>`__.
 Install required packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -384,7 +428,7 @@ Install required packages
 Load the model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 We load the model from TensorFlow Hub using ``hub.KerasLayer``. Since
 the model has multiple inputs (content image and style image), we need
@@ -404,7 +448,7 @@ function.
 Convert the model to OpenVINO IR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 We convert the loaded model to OpenVINO IR using ``ov.convert_model``
 function. We pass our model to the function, no additional arguments
@@ -421,7 +465,7 @@ needed. After converting, we save the model to disk using
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -456,7 +500,7 @@ select device from dropdown list for running inference using OpenVINO
 Inference
 ~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 

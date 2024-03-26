@@ -59,7 +59,7 @@ Table of contents:
 Prerequisites
 ^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Install necessary packages.
 
@@ -80,7 +80,7 @@ Install necessary packages.
 Get Pytorch model and OpenVINO IR model
 ---------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Generally, PyTorch models represent an instance of the
 `torch.nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
@@ -178,7 +178,7 @@ Load model.
 Define validator and data loader
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The original model repository uses a ``Validator`` wrapper, which
 represents the accuracy validation pipeline. It creates dataloader and
@@ -215,7 +215,7 @@ validator class instance.
 Prepare calibration and validation datasets
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 We can use one dataset as calibration and validation datasets. Name it
 ``quantization_dataset``.
@@ -243,7 +243,7 @@ We can use one dataset as calibration and validation datasets. Name it
 Prepare validation function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -299,7 +299,7 @@ Prepare validation function
 Run quantization with accuracy control
 --------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 You should provide the calibration dataset and the validation dataset.
 It can be the same dataset. - parameter ``max_drop`` defines the
@@ -450,7 +450,7 @@ value 25 to speed up the execution.
 Compare Accuracy and Performance of the Original and Quantized Models
 ---------------------------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Now we can compare metrics of the Original non-quantized OpenVINO IR
 model and Quantized OpenVINO IR model to make sure that the ``max_drop``
@@ -486,8 +486,8 @@ is not exceeded.
     ov_config = {}
     if "GPU" in device.value or ("AUTO" in device.value and "GPU" in core.available_devices):
         ov_config = {"GPU_DISABLE_WINOGRAD_CONVOLUTION": "YES"}
-    quantized_compiled_model = core.compile_model(model=quantized_model, device_name=device.value, ov_config)
-    compiled_ov_model = core.compile_model(model=ov_model, device_name=device.value, ov_config)
+    quantized_compiled_model = core.compile_model(quantized_model, device.value, ov_config)
+    compiled_ov_model = core.compile_model(ov_model, device.value, ov_config)
     
     pt_result = validation_ac(compiled_ov_model, data_loader, validator)
     quantized_result = validation_ac(quantized_compiled_model, data_loader, validator)

@@ -51,7 +51,7 @@ Table of contents:
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -68,7 +68,7 @@ Prerequisites
     %pip install -q "typing-extensions>=4.9.0" eval-type-backport
     %pip install -q -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
     
-    if platform.python_version_tuple()[1] == "8": 
+    if platform.python_version_tuple()[1] in ["8", "9"]: 
         %pip install -q "gradio-imageslider<=0.0.17" "typing-extensions>=4.9.0"
 
 
@@ -119,7 +119,10 @@ remote: Counting objects:  35% (48/135)[K
 remote: Counting objects:  36% (49/135)[K
 remote: Counting objects:  37% (50/135)[K
 remote: Counting objects:  38% (52/135)[K
-remote: Counting objects:  39% (53/135)[K
+
+.. parsed-literal::
+
+    remote: Counting objects:  39% (53/135)[K
 remote: Counting objects:  40% (54/135)[K
 remote: Counting objects:  41% (56/135)[K
 remote: Counting objects:  42% (57/135)[K
@@ -279,255 +282,260 @@ remote: Compressing objects:  97% (94/96)[K
 remote: Compressing objects:  98% (95/96)[K
 remote: Compressing objects: 100% (96/96)[K
 remote: Compressing objects: 100% (96/96), done.[K
-
-
-.. parsed-literal::
-
     Receiving objects:   0% (1/412)
 
 .. parsed-literal::
 
-    Receiving objects:   1% (5/412), 11.29 MiB | 22.58 MiB/s
+    Receiving objects:   1% (5/412), 10.01 MiB | 19.98 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   1% (8/412), 23.78 MiB | 23.77 MiB/s
+    Receiving objects:   1% (8/412), 20.68 MiB | 20.43 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   2% (9/412), 23.78 MiB | 23.77 MiB/s
+    Receiving objects:   2% (9/412), 20.68 MiB | 20.43 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   3% (13/412), 23.78 MiB | 23.77 MiB/s
+    Receiving objects:   3% (13/412), 20.68 MiB | 20.43 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   4% (17/412), 36.27 MiB | 24.15 MiB/s
+    Receiving objects:   4% (17/412), 32.71 MiB | 21.64 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   4% (19/412), 49.09 MiB | 24.48 MiB/s
+    Receiving objects:   4% (19/412), 43.64 MiB | 21.39 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   5% (21/412), 49.09 MiB | 24.48 MiB/s
+    Receiving objects:   5% (21/412), 55.68 MiB | 21.92 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   6% (25/412), 61.89 MiB | 24.70 MiB/s
+    Receiving objects:   5% (22/412), 66.68 MiB | 21.72 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   7% (29/412), 61.89 MiB | 24.70 MiB/s
+    Receiving objects:   6% (25/412), 66.68 MiB | 21.72 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   8% (33/412), 61.89 MiB | 24.70 MiB/s
+    Receiving objects:   7% (29/412), 66.68 MiB | 21.72 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   8% (33/412), 74.70 MiB | 24.81 MiB/s
+    Receiving objects:   8% (33/412), 66.68 MiB | 21.72 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   9% (38/412), 87.74 MiB | 24.97 MiB/s
+    Receiving objects:   8% (34/412), 90.80 MiB | 22.16 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   9% (40/412), 100.92 MiB | 25.09 MiB/s
+    Receiving objects:   9% (38/412), 90.80 MiB | 22.16 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  10% (42/412), 114.27 MiB | 25.27 MiB/s
-Receiving objects:  11% (46/412), 114.27 MiB | 25.27 MiB/s
+    Receiving objects:   9% (40/412), 115.64 MiB | 22.84 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  11% (49/412), 127.68 MiB | 25.72 MiB/s
-Receiving objects:  12% (50/412), 127.68 MiB | 25.72 MiB/s
+    Receiving objects:  10% (42/412), 115.64 MiB | 22.84 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  13% (54/412), 127.68 MiB | 25.72 MiB/s
+    Receiving objects:  11% (46/412), 115.64 MiB | 22.84 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  14% (58/412), 127.68 MiB | 25.72 MiB/s
+    Receiving objects:  12% (50/412), 115.64 MiB | 22.84 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  14% (61/412), 155.21 MiB | 26.27 MiB/s
+    Receiving objects:  12% (52/412), 129.17 MiB | 23.51 MiB/s
+Receiving objects:  13% (54/412), 129.17 MiB | 23.51 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  15% (62/412), 155.21 MiB | 26.27 MiB/s
+    Receiving objects:  14% (58/412), 129.17 MiB | 23.51 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  16% (66/412), 169.30 MiB | 26.55 MiB/s
+    Receiving objects:  15% (62/412), 155.12 MiB | 24.16 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  16% (67/412), 183.34 MiB | 26.82 MiB/s
+    Receiving objects:  15% (63/412), 155.12 MiB | 24.16 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  17% (71/412), 183.34 MiB | 26.82 MiB/s
-Receiving objects:  18% (75/412), 183.34 MiB | 26.82 MiB/s
+    Receiving objects:  16% (66/412), 167.65 MiB | 24.11 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  19% (79/412), 197.58 MiB | 27.15 MiB/s
+    Receiving objects:  16% (69/412), 181.46 MiB | 24.88 MiB/s
+Receiving objects:  17% (71/412), 181.46 MiB | 24.88 MiB/s
+Receiving objects:  18% (75/412), 181.46 MiB | 24.88 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  20% (83/412), 197.58 MiB | 27.15 MiB/s
-Receiving objects:  21% (87/412), 197.58 MiB | 27.15 MiB/s
+    Receiving objects:  19% (79/412), 194.36 MiB | 24.79 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  21% (88/412), 211.98 MiB | 27.45 MiB/s
+    Receiving objects:  20% (83/412), 208.18 MiB | 25.44 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  22% (91/412), 211.98 MiB | 27.45 MiB/s
-Receiving objects:  23% (95/412), 211.98 MiB | 27.45 MiB/s
-Receiving objects:  24% (99/412), 211.98 MiB | 27.45 MiB/s
-Receiving objects:  25% (103/412), 211.98 MiB | 27.45 MiB/s
+    Receiving objects:  21% (87/412), 208.18 MiB | 25.44 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  26% (108/412), 211.98 MiB | 27.45 MiB/s
-Receiving objects:  27% (112/412), 211.98 MiB | 27.45 MiB/s
-Receiving objects:  28% (116/412), 211.98 MiB | 27.45 MiB/s
+    Receiving objects:  21% (89/412), 208.18 MiB | 25.44 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  29% (120/412), 226.54 MiB | 27.82 MiB/s
+    Receiving objects:  22% (91/412), 208.18 MiB | 25.44 MiB/s
+Receiving objects:  23% (95/412), 208.18 MiB | 25.44 MiB/s
+Receiving objects:  24% (99/412), 208.18 MiB | 25.44 MiB/s
+Receiving objects:  25% (103/412), 208.18 MiB | 25.44 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  30% (124/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  31% (128/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  32% (132/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  33% (136/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  34% (141/412), 226.54 MiB | 27.82 MiB/s
+    Receiving objects:  26% (108/412), 221.77 MiB | 25.46 MiB/s
+Receiving objects:  27% (112/412), 221.77 MiB | 25.46 MiB/s
+Receiving objects:  28% (116/412), 221.77 MiB | 25.46 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  35% (145/412), 226.54 MiB | 27.82 MiB/s
+    Receiving objects:  29% (120/412), 221.77 MiB | 25.46 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  36% (149/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  37% (153/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  38% (157/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  39% (161/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  40% (165/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  41% (169/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  42% (174/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  43% (178/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  44% (182/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  45% (186/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  46% (190/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  47% (194/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  48% (198/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  49% (202/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  50% (206/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  51% (211/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  52% (215/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  53% (219/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  54% (223/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  55% (227/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  56% (231/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  57% (235/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  58% (239/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  59% (244/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  60% (248/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  61% (252/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  62% (256/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  63% (260/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  64% (264/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  65% (268/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  66% (272/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  67% (277/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  68% (281/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  69% (285/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  70% (289/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  71% (293/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  72% (297/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  73% (301/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  74% (305/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  75% (309/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  76% (314/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  77% (318/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  78% (322/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  79% (326/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  80% (330/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  81% (334/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  82% (338/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  83% (342/412), 226.54 MiB | 27.82 MiB/s
-remote: Total 412 (delta 95), reused 39 (delta 39), pack-reused 277[K
-    Receiving objects:  84% (347/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  85% (351/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  86% (355/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  87% (359/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  88% (363/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  89% (367/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  90% (371/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  91% (375/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  92% (380/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  93% (384/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  94% (388/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  95% (392/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  96% (396/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  97% (400/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  98% (404/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects:  99% (408/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects: 100% (412/412), 226.54 MiB | 27.82 MiB/s
-Receiving objects: 100% (412/412), 237.89 MiB | 26.66 MiB/s, done.
+    Receiving objects:  30% (124/412), 221.77 MiB | 25.46 MiB/s
+Receiving objects:  31% (128/412), 221.77 MiB | 25.46 MiB/s
+Receiving objects:  32% (132/412), 221.77 MiB | 25.46 MiB/s
+Receiving objects:  33% (136/412), 221.77 MiB | 25.46 MiB/s
+Receiving objects:  34% (141/412), 221.77 MiB | 25.46 MiB/s
+
+.. parsed-literal::
+
+    Receiving objects:  35% (145/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  36% (149/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  37% (153/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  38% (157/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  39% (161/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  40% (165/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  41% (169/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  42% (174/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  43% (178/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  44% (182/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  45% (186/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  46% (190/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  47% (194/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  48% (198/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  49% (202/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  50% (206/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  51% (211/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  52% (215/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  53% (219/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  54% (223/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  55% (227/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  56% (231/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  57% (235/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  58% (239/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  59% (244/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  60% (248/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  61% (252/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  62% (256/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  63% (260/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  64% (264/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  65% (268/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  66% (272/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  67% (277/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  68% (281/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  69% (285/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  70% (289/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  71% (293/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  72% (297/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  73% (301/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  74% (305/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  75% (309/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  76% (314/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  77% (318/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  78% (322/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  79% (326/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  80% (330/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  81% (334/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  82% (338/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  83% (342/412), 235.75 MiB | 26.04 MiB/s
+remote: Total 412 (delta 95), reused 40 (delta 39), pack-reused 277[K
+    Receiving objects:  84% (347/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  85% (351/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  86% (355/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  87% (359/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  88% (363/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  89% (367/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  90% (371/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  91% (375/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  92% (380/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  93% (384/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  94% (388/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  95% (392/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  96% (396/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  97% (400/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  98% (404/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects:  99% (408/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects: 100% (412/412), 235.75 MiB | 26.04 MiB/s
+Receiving objects: 100% (412/412), 237.89 MiB | 24.18 MiB/s, done.
     Resolving deltas:   0% (0/138)
 Resolving deltas:   1% (2/138)
 Resolving deltas:   2% (3/138)
-Resolving deltas:   3% (5/138)
 Resolving deltas:   4% (6/138)
-Resolving deltas:   5% (8/138)
+Resolving deltas:   5% (7/138)
 Resolving deltas:   7% (10/138)
 Resolving deltas:   8% (12/138)
 Resolving deltas:  10% (14/138)
 Resolving deltas:  13% (19/138)
 Resolving deltas:  17% (24/138)
 Resolving deltas:  22% (31/138)
-Resolving deltas:  26% (36/138)
+Resolving deltas:  25% (35/138)
+Resolving deltas:  27% (38/138)
 Resolving deltas:  28% (39/138)
 Resolving deltas:  29% (41/138)
 Resolving deltas:  30% (42/138)
 Resolving deltas:  31% (43/138)
-Resolving deltas:  40% (56/138)
+Resolving deltas:  42% (59/138)
 Resolving deltas:  43% (60/138)
-Resolving deltas:  45% (63/138)
-Resolving deltas:  47% (66/138)
-Resolving deltas:  48% (67/138)
-Resolving deltas:  52% (73/138)
-Resolving deltas:  62% (86/138)
-Resolving deltas:  67% (93/138)
+Resolving deltas:  47% (65/138)
+Resolving deltas:  50% (70/138)
+Resolving deltas:  51% (71/138)
+Resolving deltas:  53% (74/138)
+Resolving deltas:  54% (75/138)
+Resolving deltas:  63% (87/138)
+Resolving deltas:  65% (91/138)
+Resolving deltas:  70% (97/138)
 Resolving deltas:  71% (98/138)
-Resolving deltas:  72% (100/138)
-Resolving deltas:  73% (101/138)
+Resolving deltas:  74% (103/138)
 Resolving deltas:  75% (104/138)
-Resolving deltas:  78% (108/138)
-Resolving deltas:  79% (110/138)
-Resolving deltas:  84% (116/138)
-Resolving deltas:  85% (118/138)
+Resolving deltas:  78% (109/138)
+Resolving deltas:  80% (111/138)
+Resolving deltas:  84% (117/138)
 Resolving deltas:  86% (119/138)
+Resolving deltas:  87% (121/138)
 Resolving deltas: 100% (138/138)
 Resolving deltas: 100% (138/138), done.
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything
+
+
+
+    
 
 
 .. parsed-literal::
@@ -538,9 +546,9 @@ Resolving deltas: 100% (138/138), done.
 .. parsed-literal::
 
     ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    optimum-intel 1.16.0.dev0 requires transformers<4.39.0,>=4.36.0, but you have transformers 4.34.1 which is incompatible.
+    optimum-intel 1.17.0.dev0+c2d267a requires transformers<4.40.0,>=4.36.0, but you have transformers 4.34.1 which is incompatible.
     pyannote-audio 2.0.1 requires torchaudio<1.0,>=0.10, but you have torchaudio 2.2.1+cpu which is incompatible.
-    tokenizers 0.14.1 requires huggingface_hub<0.18,>=0.16.4, but you have huggingface-hub 0.21.4 which is incompatible.
+    tokenizers 0.14.1 requires huggingface_hub<0.18,>=0.16.4, but you have huggingface-hub 0.22.0 which is incompatible.
     
 
 .. parsed-literal::
@@ -581,7 +589,7 @@ Resolving deltas: 100% (138/138), done.
 Load and run PyTorch model
 --------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 To be able run PyTorch model on CPU, we should disable xformers
 attention optimizations first.
@@ -632,7 +640,7 @@ DepthAnything family.
 Prepare input data
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -698,7 +706,7 @@ range.
 Run model inference
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Preprocessed image passed to model forward and model returns depth map
 in format ``B`` x ``H`` x ``W``, where ``B`` is input batch size, ``H``
@@ -737,7 +745,7 @@ image size and prepare it for visualization.
 Convert Model to OpenVINO IR format
 -----------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 OpenVINO supports PyTorch models via conversion to OpenVINO Intermediate
 Representation (IR). OpenVINO model conversion API should be used for
@@ -760,31 +768,31 @@ loading on device using ``core.complie_model``.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/torchhub/facebookresearch_dinov2_main/dinov2/layers/patch_embed.py:73: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/torchhub/facebookresearch_dinov2_main/dinov2/layers/patch_embed.py:73: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       assert H % patch_H == 0, f"Input image height {H} is not a multiple of patch height {patch_H}"
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/torchhub/facebookresearch_dinov2_main/dinov2/layers/patch_embed.py:74: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/torchhub/facebookresearch_dinov2_main/dinov2/layers/patch_embed.py:74: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       assert W % patch_W == 0, f"Input image width {W} is not a multiple of patch width: {patch_W}"
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/torchhub/facebookresearch_dinov2_main/vision_transformer.py:183: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/torchhub/facebookresearch_dinov2_main/vision_transformer.py:183: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if npatch == N and w == h:
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/depth_anything/dpt.py:133: TracerWarning: Converting a tensor to a Python integer might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/depth_anything/dpt.py:133: TracerWarning: Converting a tensor to a Python integer might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       out = F.interpolate(out, (int(patch_h * 14), int(patch_w * 14)), mode="bilinear", align_corners=True)
 
 
 Run OpenVINO model inference
 ----------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Now, we are ready to run OpenVINO model
 
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 For starting work, please select inference device from dropdown list.
 
@@ -819,7 +827,7 @@ For starting work, please select inference device from dropdown list.
 Run inference on image
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -850,7 +858,7 @@ Run inference on image
 Run inference on video
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -1060,7 +1068,7 @@ Run inference on video
 
 .. parsed-literal::
 
-    Processed 60 frames in 13.18 seconds. Total FPS (including video processing): 4.55.Inference FPS: 10.71 
+    Processed 60 frames in 13.24 seconds. Total FPS (including video processing): 4.53.Inference FPS: 10.66 
     Video saved to 'output/Coco Walking in Berkeley_depth_anything.mp4'.
 
 
@@ -1090,7 +1098,7 @@ Run inference on video
 .. parsed-literal::
 
     Showing video saved at
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/output/Coco Walking in Berkeley_depth_anything.mp4
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/output/Coco Walking in Berkeley_depth_anything.mp4
     If you cannot see the video in your browser, please click on the following link to download the video 
 
 
@@ -1112,7 +1120,7 @@ Run inference on video
 Quantization
 ------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -1161,7 +1169,7 @@ improve model inference speed.
 Prepare calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 We use a portion of
 `Nahrawy/VIDIT-Depth-ControlNet <https://huggingface.co/datasets/Nahrawy/VIDIT-Depth-ControlNet>`__
@@ -1194,7 +1202,7 @@ dataset from Hugging Face as calibration data.
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Create a quantized model from the pre-trained converted OpenVINO model.
 > **NOTE**: Quantization is time and memory consuming operation. Running
@@ -1224,14 +1232,14 @@ quantization code below may take some time.
 
 .. parsed-literal::
 
-    2024-03-13 00:23:02.898107: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-13 00:23:02.930029: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-03-26 00:20:37.309303: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-03-26 00:20:37.342334: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-03-13 00:23:03.531201: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-03-26 00:20:37.962909: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 
@@ -1309,7 +1317,7 @@ quantization code below may take some time.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
       return Tensor(self.data * unwrap_tensor_data(other))
 
 
@@ -1405,10 +1413,10 @@ data.
 
 .. parsed-literal::
 
-    Processed 60 frames in 12.72 seconds. Total FPS (including video processing): 4.72.Inference FPS: 12.84 
+    Processed 60 frames in 12.64 seconds. Total FPS (including video processing): 4.75.Inference FPS: 12.90 
     Video saved to 'output/Coco Walking in Berkeley_depth_anything_int8.mp4'.
     Showing video saved at
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/output/Coco Walking in Berkeley_depth_anything.mp4
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/280-depth-anything/Depth-Anything/output/Coco Walking in Berkeley_depth_anything.mp4
     If you cannot see the video in your browser, please click on the following link to download the video 
 
 
@@ -1430,7 +1438,7 @@ data.
 Compare model file size
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -1454,7 +1462,7 @@ Compare model file size
 Compare inference time of the FP16 and INT8 models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 To measure the inference performance of OpenVINO FP16 and INT8 models,
 use `Benchmark
@@ -1486,19 +1494,19 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
 
 .. parsed-literal::
 
-    FP16 Throughput: 10.78 FPS
+    FP16 Throughput: 10.82 FPS
 
 
 .. parsed-literal::
 
-    INT8 Throughput: 14.19 FPS
-    Speed-up: 1.32
+    INT8 Throughput: 14.21 FPS
+    Speed-up: 1.31
 
 
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 You can apply model on own images. You can move the slider on the
 resulting image to switch between the original image and the depth map

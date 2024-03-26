@@ -67,7 +67,7 @@ notebook consists of the following steps:
 Get and prepare PyTorch model
 -----------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The first thing we’ll need to do is clone
 `repository <https://github.com/rstrudel/segmenter>`__ containing model
@@ -84,7 +84,7 @@ weights (checkpoint) file and add some additional helper functions.
 Prerequisites
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -139,120 +139,117 @@ Receiving objects:  22% (59/268)
 .. parsed-literal::
 
     Receiving objects:  23% (62/268)
-Receiving objects:  24% (65/268)
 
 .. parsed-literal::
 
-    Receiving objects:  25% (67/268), 4.67 MiB | 9.20 MiB/s
+    Receiving objects:  24% (65/268)
 
 .. parsed-literal::
 
-    Receiving objects:  26% (70/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  27% (73/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  28% (76/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  29% (78/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  30% (81/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  31% (84/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  32% (86/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  33% (89/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  34% (92/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  35% (94/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  36% (97/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  37% (100/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  38% (102/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  39% (105/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  40% (108/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  41% (110/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  42% (113/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  43% (116/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  44% (118/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  45% (121/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  46% (124/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  47% (126/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  48% (129/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  49% (132/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  50% (134/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  51% (137/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  52% (140/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  53% (143/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  54% (145/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  55% (148/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  56% (151/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  57% (153/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  58% (156/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  59% (159/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  60% (161/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  61% (164/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  62% (167/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  63% (169/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  64% (172/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  65% (175/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  66% (177/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  67% (180/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  68% (183/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  69% (185/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  70% (188/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  71% (191/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  72% (193/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  73% (196/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  74% (199/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  75% (201/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  76% (204/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  77% (207/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  78% (210/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  79% (212/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  80% (215/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  81% (218/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  82% (220/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  83% (223/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  84% (226/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  85% (228/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  86% (231/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  87% (234/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  88% (236/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  89% (239/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  90% (242/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  91% (244/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  92% (247/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  93% (250/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  94% (252/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  95% (255/268), 4.67 MiB | 9.20 MiB/s
-Receiving objects:  96% (258/268), 4.67 MiB | 9.20 MiB/s
+    Receiving objects:  25% (67/268), 6.47 MiB | 11.54 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  96% (259/268), 13.36 MiB | 13.12 MiB/s
-Receiving objects:  97% (260/268), 13.36 MiB | 13.12 MiB/s
-Receiving objects:  98% (263/268), 13.36 MiB | 13.12 MiB/s
-Receiving objects:  99% (266/268), 13.36 MiB | 13.12 MiB/s
+    Receiving objects:  26% (70/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  27% (73/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  28% (76/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  29% (78/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  30% (81/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  31% (84/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  32% (86/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  33% (89/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  34% (92/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  35% (94/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  36% (97/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  37% (100/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  38% (102/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  39% (105/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  40% (108/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  41% (110/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  42% (113/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  43% (116/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  44% (118/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  45% (121/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  46% (124/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  47% (126/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  48% (129/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  49% (132/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  50% (134/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  51% (137/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  52% (140/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  53% (143/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  54% (145/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  55% (148/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  56% (151/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  57% (153/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  58% (156/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  59% (159/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  60% (161/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  61% (164/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  62% (167/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  63% (169/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  64% (172/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  65% (175/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  66% (177/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  67% (180/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  68% (183/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  69% (185/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  70% (188/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  71% (191/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  72% (193/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  73% (196/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  74% (199/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  75% (201/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  76% (204/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  77% (207/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  78% (210/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  79% (212/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  80% (215/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  81% (218/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  82% (220/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  83% (223/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  84% (226/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  85% (228/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  86% (231/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  87% (234/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  88% (236/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  89% (239/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  90% (242/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  91% (244/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  92% (247/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  93% (250/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  94% (252/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  95% (255/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  96% (258/268), 6.47 MiB | 11.54 MiB/s
 
 .. parsed-literal::
 
-    remote: Total 268 (delta 0), reused 0 (delta 0), pack-reused 268[K
-    Receiving objects: 100% (268/268), 13.36 MiB | 13.12 MiB/s
-Receiving objects: 100% (268/268), 15.34 MiB | 13.80 MiB/s, done.
+    Receiving objects:  97% (260/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  98% (263/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects:  99% (266/268), 6.47 MiB | 11.54 MiB/s
+remote: Total 268 (delta 0), reused 0 (delta 0), pack-reused 268[K
+    Receiving objects: 100% (268/268), 6.47 MiB | 11.54 MiB/s
+Receiving objects: 100% (268/268), 15.34 MiB | 16.01 MiB/s, done.
     Resolving deltas:   0% (0/117)
 Resolving deltas:   1% (2/117)
 Resolving deltas:   2% (3/117)
-Resolving deltas:   3% (4/117)
-Resolving deltas:   4% (5/117)
-Resolving deltas:   6% (8/117)
+Resolving deltas:   5% (6/117)
 Resolving deltas:   7% (9/117)
 Resolving deltas:   8% (10/117)
 Resolving deltas:   9% (11/117)
 Resolving deltas:  10% (12/117)
 Resolving deltas:  11% (13/117)
 Resolving deltas:  13% (16/117)
-Resolving deltas:  19% (23/117)
-Resolving deltas:  26% (31/117)
-Resolving deltas:  40% (47/117)
-Resolving deltas:  43% (51/117)
-Resolving deltas:  45% (53/117)
-Resolving deltas:  66% (78/117)
-Resolving deltas:  69% (81/117)
-Resolving deltas:  70% (83/117)
+Resolving deltas:  14% (17/117)
+Resolving deltas:  27% (32/117)
+Resolving deltas:  30% (36/117)
+Resolving deltas:  58% (68/117)
+Resolving deltas:  61% (72/117)
 Resolving deltas:  71% (84/117)
-Resolving deltas:  80% (94/117)
+Resolving deltas:  75% (88/117)
+Resolving deltas:  76% (90/117)
+Resolving deltas:  77% (91/117)
+Resolving deltas:  82% (96/117)
 Resolving deltas: 100% (117/117)
 Resolving deltas: 100% (117/117), done.
 
@@ -271,9 +268,9 @@ Resolving deltas: 100% (117/117), done.
 
 .. parsed-literal::
 
-    Requirement already satisfied: torch in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 1)) (2.1.0+cpu)
-    Requirement already satisfied: click in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 2)) (8.1.7)
-    Requirement already satisfied: numpy in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 3)) (1.23.5)
+    Requirement already satisfied: torch in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 1)) (2.1.0+cpu)
+    Requirement already satisfied: click in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 2)) (8.1.7)
+    Requirement already satisfied: numpy in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 3)) (1.23.5)
 
 
 .. parsed-literal::
@@ -286,13 +283,9 @@ Resolving deltas: 100% (117/117), done.
 
     Collecting python-hostlist (from -r segmenter/requirements.txt (line 5))
       Using cached python_hostlist-1.23.0-py3-none-any.whl
-
-
-.. parsed-literal::
-
-    Requirement already satisfied: tqdm in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 6)) (4.66.2)
-    Requirement already satisfied: requests in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 7)) (2.31.0)
-    Requirement already satisfied: pyyaml in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 8)) (6.0.1)
+    Requirement already satisfied: tqdm in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 6)) (4.66.2)
+    Requirement already satisfied: requests in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 7)) (2.31.0)
+    Requirement already satisfied: pyyaml in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from -r segmenter/requirements.txt (line 8)) (6.0.1)
 
 
 .. parsed-literal::
@@ -311,99 +304,83 @@ Resolving deltas: 100% (117/117), done.
 
     Collecting mmsegmentation==0.14.1 (from -r segmenter/requirements.txt (line 11))
       Using cached mmsegmentation-0.14.1-py3-none-any.whl.metadata (8.3 kB)
-    Requirement already satisfied: torchvision in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from timm==0.4.12->-r segmenter/requirements.txt (line 9)) (0.16.0+cpu)
+    Requirement already satisfied: torchvision in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from timm==0.4.12->-r segmenter/requirements.txt (line 9)) (0.16.0+cpu)
 
 
 .. parsed-literal::
 
     Collecting addict (from mmcv==1.3.8->-r segmenter/requirements.txt (line 10))
       Using cached addict-2.4.0-py3-none-any.whl.metadata (1.0 kB)
-    Requirement already satisfied: Pillow in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from mmcv==1.3.8->-r segmenter/requirements.txt (line 10)) (10.2.0)
+    Requirement already satisfied: Pillow in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from mmcv==1.3.8->-r segmenter/requirements.txt (line 10)) (10.2.0)
 
 
 .. parsed-literal::
 
     Collecting yapf (from mmcv==1.3.8->-r segmenter/requirements.txt (line 10))
       Using cached yapf-0.40.2-py3-none-any.whl.metadata (45 kB)
+    Requirement already satisfied: matplotlib in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (3.7.5)
+    Requirement already satisfied: prettytable in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (3.10.0)
+    Requirement already satisfied: filelock in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (3.13.3)
+    Requirement already satisfied: typing-extensions in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (4.10.0)
+    Requirement already satisfied: sympy in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (1.12)
+    Requirement already satisfied: networkx in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (3.1)
+    Requirement already satisfied: jinja2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (3.1.3)
+    Requirement already satisfied: fsspec in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (2024.2.0)
+    Requirement already satisfied: charset-normalizer<4,>=2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->-r segmenter/requirements.txt (line 7)) (3.3.2)
+    Requirement already satisfied: idna<4,>=2.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->-r segmenter/requirements.txt (line 7)) (3.6)
+    Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->-r segmenter/requirements.txt (line 7)) (2.2.1)
+    Requirement already satisfied: certifi>=2017.4.17 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->-r segmenter/requirements.txt (line 7)) (2024.2.2)
 
 
 .. parsed-literal::
 
-    Requirement already satisfied: matplotlib in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (3.7.5)
-    Requirement already satisfied: prettytable in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (3.10.0)
-    Requirement already satisfied: filelock in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (3.13.1)
-    Requirement already satisfied: typing-extensions in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (4.10.0)
-    Requirement already satisfied: sympy in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (1.12)
-    Requirement already satisfied: networkx in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (3.1)
-    Requirement already satisfied: jinja2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (3.1.3)
-    Requirement already satisfied: fsspec in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch->-r segmenter/requirements.txt (line 1)) (2024.2.0)
-    Requirement already satisfied: charset-normalizer<4,>=2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->-r segmenter/requirements.txt (line 7)) (3.3.2)
-    Requirement already satisfied: idna<4,>=2.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->-r segmenter/requirements.txt (line 7)) (3.6)
-    Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->-r segmenter/requirements.txt (line 7)) (2.2.1)
-    Requirement already satisfied: certifi>=2017.4.17 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->-r segmenter/requirements.txt (line 7)) (2024.2.2)
+    Requirement already satisfied: MarkupSafe>=2.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from jinja2->torch->-r segmenter/requirements.txt (line 1)) (2.1.5)
+    Requirement already satisfied: contourpy>=1.0.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (1.1.1)
+    Requirement already satisfied: cycler>=0.10 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (0.12.1)
+    Requirement already satisfied: fonttools>=4.22.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (4.50.0)
+    Requirement already satisfied: kiwisolver>=1.0.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (1.4.5)
+    Requirement already satisfied: packaging>=20.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (24.0)
+    Requirement already satisfied: pyparsing>=2.3.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (3.1.2)
+    Requirement already satisfied: python-dateutil>=2.7 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (2.9.0.post0)
+    Requirement already satisfied: importlib-resources>=3.2.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (6.4.0)
 
 
 .. parsed-literal::
 
-    Requirement already satisfied: MarkupSafe>=2.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from jinja2->torch->-r segmenter/requirements.txt (line 1)) (2.1.5)
-    Requirement already satisfied: contourpy>=1.0.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (1.1.1)
-    Requirement already satisfied: cycler>=0.10 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (0.12.1)
-    Requirement already satisfied: fonttools>=4.22.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (4.49.0)
-    Requirement already satisfied: kiwisolver>=1.0.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (1.4.5)
-    Requirement already satisfied: packaging>=20.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (24.0)
-    Requirement already satisfied: pyparsing>=2.3.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (3.1.2)
-    Requirement already satisfied: python-dateutil>=2.7 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (2.9.0.post0)
-    Requirement already satisfied: importlib-resources>=3.2.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (6.3.0)
+    Requirement already satisfied: wcwidth in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from prettytable->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (0.2.13)
+    Requirement already satisfied: mpmath>=0.19 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from sympy->torch->-r segmenter/requirements.txt (line 1)) (1.3.0)
+    Requirement already satisfied: importlib-metadata>=6.6.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from yapf->mmcv==1.3.8->-r segmenter/requirements.txt (line 10)) (7.1.0)
+    Requirement already satisfied: platformdirs>=3.5.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from yapf->mmcv==1.3.8->-r segmenter/requirements.txt (line 10)) (4.2.0)
+    Requirement already satisfied: tomli>=2.0.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from yapf->mmcv==1.3.8->-r segmenter/requirements.txt (line 10)) (2.0.1)
 
 
 .. parsed-literal::
 
-    Requirement already satisfied: wcwidth in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from prettytable->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (0.2.13)
-    Requirement already satisfied: mpmath>=0.19 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from sympy->torch->-r segmenter/requirements.txt (line 1)) (1.3.0)
-    Requirement already satisfied: importlib-metadata>=6.6.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from yapf->mmcv==1.3.8->-r segmenter/requirements.txt (line 10)) (7.0.2)
-    Requirement already satisfied: platformdirs>=3.5.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from yapf->mmcv==1.3.8->-r segmenter/requirements.txt (line 10)) (4.2.0)
+    Requirement already satisfied: zipp>=0.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from importlib-metadata>=6.6.0->yapf->mmcv==1.3.8->-r segmenter/requirements.txt (line 10)) (3.18.1)
 
 
 .. parsed-literal::
 
-    Collecting tomli>=2.0.1 (from yapf->mmcv==1.3.8->-r segmenter/requirements.txt (line 10))
-      Using cached tomli-2.0.1-py3-none-any.whl.metadata (8.9 kB)
-
-
-.. parsed-literal::
-
-    Requirement already satisfied: zipp>=0.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from importlib-metadata>=6.6.0->yapf->mmcv==1.3.8->-r segmenter/requirements.txt (line 10)) (3.17.0)
-    Requirement already satisfied: six>=1.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from python-dateutil>=2.7->matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (1.16.0)
-
-
-.. parsed-literal::
-
+    Requirement already satisfied: six>=1.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from python-dateutil>=2.7->matplotlib->mmsegmentation==0.14.1->-r segmenter/requirements.txt (line 11)) (1.16.0)
     Using cached timm-0.4.12-py3-none-any.whl (376 kB)
     Using cached mmsegmentation-0.14.1-py3-none-any.whl (201 kB)
+
+
+.. parsed-literal::
+
     Using cached einops-0.7.0-py3-none-any.whl (44 kB)
     Using cached addict-2.4.0-py3-none-any.whl (3.8 kB)
     Using cached yapf-0.40.2-py3-none-any.whl (254 kB)
-    Using cached tomli-2.0.1-py3-none-any.whl (12 kB)
 
 
 .. parsed-literal::
 
-    Installing collected packages: python-hostlist, addict, tomli, einops, yapf, mmsegmentation, mmcv, timm
+    Installing collected packages: python-hostlist, addict, einops, yapf, mmsegmentation, mmcv, timm
 
 
 .. parsed-literal::
 
-      Attempting uninstall: tomli
-        Found existing installation: tomli 1.2.3
-        Uninstalling tomli-1.2.3:
-          Successfully uninstalled tomli-1.2.3
-
-
-.. parsed-literal::
-
-    ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    black 21.7b0 requires tomli<2.0.0,>=0.2.6, but you have tomli 2.0.1 which is incompatible.
-    Successfully installed addict-2.4.0 einops-0.7.0 mmcv-1.3.8 mmsegmentation-0.14.1 python-hostlist-1.23.0 timm-0.4.12 tomli-2.0.1 yapf-0.40.2
+    Successfully installed addict-2.4.0 einops-0.7.0 mmcv-1.3.8 mmsegmentation-0.14.1 python-hostlist-1.23.0 timm-0.4.12 yapf-0.40.2
 
 
 .. parsed-literal::
@@ -462,7 +439,7 @@ config for our model.
 Loading PyTorch model
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 PyTorch models are usually an instance of
 `torch.nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
@@ -511,7 +488,7 @@ Load normalization settings from config file.
 Preparing preprocessing and visualization functions
 ---------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Now we will define utility functions for preprocessing and visualizing
 the results.
@@ -519,7 +496,7 @@ the results.
 Preprocessing
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Inference input is tensor with shape ``[1, 3, H, W]`` in ``B, C, H, W``
 format, where:
@@ -566,7 +543,7 @@ normalized with given mean and standard deviation provided in
 Visualization
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Inference output contains labels assigned to each pixel, so the output
 in our case is ``[150, H, W]`` in ``CL, H, W`` format where:
@@ -612,7 +589,7 @@ corresponding to the inferred labels.
 Validation of inference of original model
 -----------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Now that we have everything ready, we can perform segmentation on
 example image ``coco_hollywood.jpg``.
@@ -666,7 +643,7 @@ larger models, but it already shows nice segmentation performance.
 Convert PyTorch model to OpenVINO Intermediate Representation (IR)
 ------------------------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Now that we’ve verified that the inference of PyTorch model works, we
 will convert it to OpenVINO IR format.
@@ -711,28 +688,28 @@ they are not a problem.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/utils.py:69: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/utils.py:69: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if H % patch_size > 0:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/utils.py:71: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/utils.py:71: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if W % patch_size > 0:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/vit.py:122: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/vit.py:122: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if x.shape[1] != pos_embed.shape[1]:
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/decoder.py:100: TracerWarning: Converting a tensor to a Python integer might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/decoder.py:100: TracerWarning: Converting a tensor to a Python integer might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       masks = rearrange(masks, "b (h w) n -> b n h w", h=int(GS))
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/utils.py:85: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/utils.py:85: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if extra_h > 0:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/utils.py:87: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/notebooks/204-segmenter-semantic-segmentation/./segmenter/segm/model/utils.py:87: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if extra_w > 0:
 
 
 Verify converted model inference
 --------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 To test that model was successfully converted, we can use same inference
 function from original repository, but we need to make custom class.
@@ -802,7 +779,7 @@ inference function.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -865,7 +842,7 @@ As we can see, we get the same results as with original model.
 Benchmarking performance of converted model
 -------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Finally, use the OpenVINO `Benchmark
 Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
@@ -925,7 +902,7 @@ to measure the inference performance of the model.
 
 .. parsed-literal::
 
-    [ INFO ] Read model took 24.36 ms
+    [ INFO ] Read model took 23.61 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     im (node: im) : f32 / [...] / [2,3,512,512]
@@ -943,13 +920,9 @@ to measure the inference performance of the model.
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 341.36 ms
+    [ INFO ] Compile model took 345.79 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
-
-
-.. parsed-literal::
-
     [ INFO ]   NETWORK_NAME: Model0
     [ INFO ]   EXECUTION_DEVICES: ['CPU']
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
@@ -986,19 +959,19 @@ to measure the inference performance of the model.
 
 .. parsed-literal::
 
-    [ INFO ] First inference took 203.29 ms
+    [ INFO ] First inference took 209.60 ms
 
 
 .. parsed-literal::
 
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            1728 iterations
-    [ INFO ] Duration:         120391.49 ms
+    [ INFO ] Count:            1722 iterations
+    [ INFO ] Duration:         120493.86 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        416.77 ms
-    [ INFO ]    Average:       417.75 ms
-    [ INFO ]    Min:           333.14 ms
-    [ INFO ]    Max:           505.65 ms
-    [ INFO ] Throughput:   28.71 FPS
+    [ INFO ]    Median:        417.78 ms
+    [ INFO ]    Average:       419.34 ms
+    [ INFO ]    Min:           183.62 ms
+    [ INFO ]    Max:           518.30 ms
+    [ INFO ] Throughput:   28.58 FPS
 

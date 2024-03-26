@@ -101,7 +101,7 @@ Table of contents:
 Model Selection
 ---------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Select the Model to be used for text generation, GPT-2 and GPT-Neo are
 used for text generation whereas PersonaGPT is used for Conversation.
@@ -169,7 +169,7 @@ used for text generation whereas PersonaGPT is used for Conversation.
 Load Model
 ----------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Download the Selected Model and Tokenizer from HuggingFace
 
@@ -190,7 +190,7 @@ Download the Selected Model and Tokenizer from HuggingFace
 Convert Pytorch Model to OpenVINO IR
 ------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 For starting work with GPT-Neo model using OpenVINO, a model should be
 converted to OpenVINO Intermediate Representation (IR) format.
@@ -231,20 +231,20 @@ consumption.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4193: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/gpt2/modeling_gpt2.py:801: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-642/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/gpt2/modeling_gpt2.py:801: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if batch_size <= 0:
 
 
 Load the model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 We start by building an OpenVINO Core object. Then we read the network
 architecture and model weights from the ``.xml`` and ``.bin`` files,
@@ -253,7 +253,7 @@ respectively. Finally, we compile the model for the desired device.
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -303,7 +303,7 @@ have ``batch size`` and ``sequence length`` as inputs and
 Pre-Processing
 --------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 NLP models often take a list of tokens as a standard input. A token is a
 word or a part of a word mapped to an integer. To provide the proper
@@ -313,7 +313,7 @@ load the vocabulary file.
 Define tokenization
 -------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -347,20 +347,20 @@ at later stage.
 
 .. parsed-literal::
 
-    2024-03-12 23:30:05.170186: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-12 23:30:05.202013: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-03-25 23:32:43.972078: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-03-25 23:32:44.004209: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-03-12 23:30:05.770717: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-03-25 23:32:44.565242: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 Define Softmax layer
 ~~~~~~~~~~~~~~~~~~~~
 
-A softmax function is used to
+`back to top ⬆️ <#table-of-contents>`__ A softmax function is used to
 convert top-k logits into a probability distribution.
 
 .. code:: ipython3
@@ -376,7 +376,7 @@ convert top-k logits into a probability distribution.
 Set the minimum sequence length
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 If the minimum sequence length is not reached, the following code will
 reduce the probability of the ``eos`` token occurring. This continues
@@ -404,7 +404,7 @@ the process of generating the next words.
 Top-K sampling
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 In Top-K sampling, we filter the K most likely next words and
 redistribute the probability mass among only those K next words.
@@ -435,7 +435,7 @@ redistribute the probability mass among only those K next words.
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Generating the predicted sequence.
 
@@ -487,7 +487,7 @@ Generating the predicted sequence.
 Inference with GPT-Neo/GPT-2
 ----------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The ``text`` variable below is the input used to generate a predicted
 sequence.
@@ -523,7 +523,7 @@ sequence.
 Conversation with PersonaGPT using OpenVINO
 ===========================================
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 User Input is tokenized with ``eos_token`` concatenated in the end.
 Model input is tokenized text, which serves as initial condition for
@@ -541,7 +541,7 @@ model.
 Converse Function
 -----------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Wrapper on generate sequence function to support conversation
 
@@ -588,7 +588,7 @@ Wrapper on generate sequence function to support conversation
 Conversation Class
 ------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -614,7 +614,7 @@ Conversation Class
 Conversation with PersonaGPT
 ----------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 This notebook provides two styles of inference, Plain and Interactive.
 The style of inference can be selected in the next cell.
@@ -701,59 +701,59 @@ The style of inference can be selected in the next cell.
 .. parsed-literal::
 
     Person: Hi,How are you?
-    PersonaGPT: good how are you?
+    PersonaGPT: good, how are you?
 
 
 .. parsed-literal::
 
     Person: What are you doing?
-    PersonaGPT: good just hanging out with my friends
+    PersonaGPT: just sitting here thinking about where i can go for lunch
 
 
 .. parsed-literal::
 
     Person: I like to dance,do you?
-    PersonaGPT: not really but i like to play
+    PersonaGPT: no, but i want to learn
 
 
 .. parsed-literal::
 
     Person: Can you recommend me some books?
-    PersonaGPT: any good suggestions i like romance movies
+    PersonaGPT: not usually i teach but i know a few
 
 
 .. parsed-literal::
 
     Person: Hi,How are you?
-    PersonaGPT: good thanks for asking. what do you do for fun?
+    PersonaGPT: i'm well, i'm in a band
 
 
 .. parsed-literal::
 
     Person: What are you doing?
-    PersonaGPT: i like to read. what about you?
+    PersonaGPT: playing some music for my band
 
 
 .. parsed-literal::
 
     Person: I like to dance,do you?
-    PersonaGPT: not really but i do play games.
+    PersonaGPT: not really, i like to read
 
 
 .. parsed-literal::
 
     Person: Can you recommend me some books?
-    PersonaGPT: sure what kind of games do you play
+    PersonaGPT: yeah, i can try to
 
 
 .. parsed-literal::
 
     Person: Hi,How are you?
-    PersonaGPT: i am good do you like movies?
+    PersonaGPT: good, i like tacos and rice
 
 
 .. parsed-literal::
 
     Person: What are you doing?
-    PersonaGPT: reading a romance movie. you seen any good ones lately?
+    PersonaGPT: i'm just reading about tacos
 

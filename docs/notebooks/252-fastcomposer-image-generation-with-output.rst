@@ -52,7 +52,7 @@ Table of contents:
 Install Prerequisites
 ---------------------
 
-Install required packages.
+`back to top ⬆️ <#table-of-contents>`__ Install required packages.
 
 .. code:: ipython3
 
@@ -101,7 +101,7 @@ Download pretrained model.
 Convert models to OpenVINO Intermediate representation (IR) format
 ------------------------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Define a configuration and make instance of ``FastComposerModel``.
 
@@ -173,7 +173,7 @@ So, convert the models into OpenVINO IR format.
 Convert text_encoder
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Model components are PyTorch modules, that can be converted with
 ``ov.convert_model`` function directly. We also use ``ov.save_model``
@@ -239,7 +239,7 @@ padded to the maximum length accepted by the model.
 The Object Transform
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 It pads an incoming user image to square and resize it. An input is a
 tensor of size [3, height, width].
@@ -289,7 +289,7 @@ tensor of size [3, height, width].
 The Image Encoder
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The image encoder is a CLIP (Contrastive Language-Image Pretraining)
 Image Encoder. It takes a transformed image from the previous step as
@@ -316,7 +316,7 @@ input and transforms it into a high-dimensional vector or embeddings.
 Postfuse module
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 On this step it is employed a multilayer perceptron (MLP) to augment the
 text embeddings with visual features extracted from the reference
@@ -344,7 +344,7 @@ MLP.
 Convert Unet
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 U-Net model gradually denoises latent image representation guided by
 text encoder hidden state.
@@ -397,7 +397,7 @@ text encoder hidden state.
 Rebuild pipeline
 ----------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Also, it needs to modify some internal FastComposer entities, to use
 OpenVINO models. First of all, how to get results. For example, to
@@ -1027,7 +1027,7 @@ And replace all model in the pipeline by converted models.
 Inference
 ---------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 And now it is possible to make inference. You can provide 1 or 2 images
 (``image1`` and ``image2``). If you want to provide only one image pass
@@ -1093,7 +1093,7 @@ to display them.
 Run Gradio
 ----------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Also, it is possible to run with Gradio
 

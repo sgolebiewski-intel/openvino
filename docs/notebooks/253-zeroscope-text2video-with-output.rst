@@ -64,7 +64,7 @@ We will use the first one.
 Install and import required packages
 ------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 To work with text-to-video synthesis model, we will use Hugging Face’s
 `Diffusers <https://github.com/huggingface/diffusers>`__ library. It
@@ -115,7 +115,7 @@ reducing values below to reduce the memory consumption.
 Load the model
 --------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The model is loaded from HuggingFace using ``.from_pretrained`` method
 of ``diffusers.DiffusionPipeline``.
@@ -156,7 +156,7 @@ of ``diffusers.DiffusionPipeline``.
 Convert the model
 -----------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The architecture for generating videos from text comprises three
 distinct sub-networks: one for extracting text features, another for
@@ -175,7 +175,7 @@ noise video.
 Define the conversion function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Model components are PyTorch modules, that can be converted with
 ``ov.convert_model`` function directly. We also use ``ov.save_model``
@@ -206,7 +206,7 @@ function to serialize the result of conversion.
 UNet
 ~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Text-to-video generation pipeline main component is a conditional 3D
 UNet model that takes a noisy sample, conditional state, and a timestep
@@ -234,7 +234,7 @@ and returns a sample shaped output.
 VAE
 ~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Variational autoencoder (VAE) uses UNet output to decode latents to
 visual representations. Our VAE model has KL loss for encoding images
@@ -265,7 +265,7 @@ inference, we need only decoder part.
 Text encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Text encoder is used to encode the input prompt to tensor. Default
 tensor length is 77.
@@ -284,7 +284,7 @@ tensor length is 77.
 Build a pipeline
 ----------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -752,7 +752,7 @@ Build a pipeline
 Inference with OpenVINO
 -----------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -761,7 +761,7 @@ Inference with OpenVINO
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -832,7 +832,7 @@ tokenizer and scheduler.
 Define a prompt
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -845,7 +845,7 @@ Let’s generate a video for our prompt. For full list of arguments, see
 Video generation
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -878,7 +878,7 @@ Video generation
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 

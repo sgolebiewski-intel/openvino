@@ -71,7 +71,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -92,7 +92,7 @@ Imports
 Prepare the Model
 -----------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 For instantiating PyTorch model class, we should use
 ``Wav2Vec2ForCTC.from_pretrained`` method with providing model ID for
@@ -148,7 +148,7 @@ Convert it to the OpenVINO Intermediate Representation (OpenVINO IR)
 Prepare LibriSpeech Dataset
 ---------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 For demonstration purposes, we will use short dummy version of
 LibriSpeech dataset - ``patrickvonplaten/librispeech_asr_dummy`` to
@@ -186,7 +186,7 @@ dataset.
 Prepare calibration dataset
 ---------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -213,7 +213,7 @@ Prepare calibration dataset
 Prepare validation function
 ---------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Define the validation function.
 
@@ -245,7 +245,7 @@ Define the validation function.
 Run quantization with accuracy control
 --------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 You should provide the calibration dataset and the validation dataset.
 It can be the same dataset. - parameter ``max_drop`` defines the
@@ -347,7 +347,7 @@ value 25 to speed up the execution.
 Model Usage Example
 -------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -414,7 +414,7 @@ Next, make a prediction.
 Compare Accuracy of the Original and Quantized Models
 -----------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 -  Define dataloader for test dataset.
 -  Define functions to get inference for PyTorch and OpenVINO models.

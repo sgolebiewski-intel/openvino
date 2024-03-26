@@ -42,12 +42,12 @@ Table of contents:
 Preparation
 -----------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -97,14 +97,14 @@ Install requirements
 
 .. parsed-literal::
 
-    ('notebook_utils.py', <http.client.HTTPMessage at 0x7f6f2809c5e0>)
+    ('notebook_utils.py', <http.client.HTTPMessage at 0x7f5244297940>)
 
 
 
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -125,12 +125,12 @@ Imports
 The Model
 ---------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Download the Model
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Use the ``download_file``, a function from the ``notebook_utils`` file.
 It automatically creates a directory structure and downloads the
@@ -175,7 +175,7 @@ Representation (OpenVINO IR).
 Convert the Model
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The pre-trained model is in TensorFlow format. To use it with OpenVINO,
 convert it to OpenVINO IR format, using `Model Conversion
@@ -211,7 +211,7 @@ converted, this step is skipped.
 Load the Model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Only a few lines of code are required to run the model. First,
 initialize OpenVINO Runtime. Then, read the network architecture and
@@ -281,12 +281,12 @@ output.
 Processing
 ----------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Process Results
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 First, list all available classes and create colors for them. Then, in
 the post-process stage, transform boxes with normalized coordinates
@@ -378,7 +378,7 @@ threshold (0.5). Finally, draw boxes and labels inside them.
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Run object detection on the specified source. Either a webcam or a video
 file.
@@ -491,12 +491,12 @@ file.
 Run
 ---
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Run Live Object Detection
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Use a webcam as the video input. By default, the primary webcam is set
 with ``source=0``. If you have multiple webcams, each one will be
@@ -542,7 +542,7 @@ Run the object detection:
 References
 ----------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 1. `SSDLite
    MobileNetV2 <https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/ssdlite_mobilenet_v2>`__

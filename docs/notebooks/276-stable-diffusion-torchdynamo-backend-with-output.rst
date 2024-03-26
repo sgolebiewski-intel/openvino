@@ -59,7 +59,7 @@ Table of contents:
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -100,26 +100,20 @@ Prerequisites
 
 .. parsed-literal::
 
-    2024-03-13 00:13:56.113209: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-13 00:13:56.146913: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-03-26 00:12:58.676696: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-03-26 00:12:58.710657: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-03-13 00:13:56.835981: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-
-
-.. parsed-literal::
-
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-632/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/diffusers/utils/outputs.py:63: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
-      torch.utils._pytree._register_pytree_node(
+    2024-03-26 00:12:59.243682: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 Stable Diffusion with Diffusers library
 ---------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 To work with Stable Diffusion v2.1, we will use Hugging Face Diffusers
 library. To experiment with Stable Diffusion models, Diffusers exposes
@@ -149,7 +143,7 @@ The code below demonstrates how to create the
 OpenVINO TorchDynamo backend
 ----------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The `OpenVINO TorchDynamo
 backend <https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html>`__
@@ -241,7 +235,7 @@ backend:
 Run Image generation
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -265,7 +259,7 @@ Run Image generation
 Interactive demo
 ================
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Now you can start the demo, choose the inference mode, define prompts
 (and input image for Image-to-Image generation) and run inference
@@ -419,7 +413,7 @@ pipeline. Optionally, you can also change some input parameters.
 Support for Automatic1111 Stable Diffusion WebUI
 ------------------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Automatic1111 Stable Diffusion WebUI is an open-source repository that
 hosts a browser-based interface for the Stable Diffusion based image

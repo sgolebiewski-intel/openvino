@@ -49,7 +49,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -101,12 +101,12 @@ Imports
 The model
 ---------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Download the model
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Download pretrained models from
 https://storage.openvinotoolkit.org/repositories/open_model_zoo. If the
@@ -163,7 +163,7 @@ converted to OpenVINO Intermediate Representation (OpenVINO IR).
 Load the model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Downloaded models are located in a fixed structure, which indicates a
 vendor, a model name and a precision. Only a few lines of code are
@@ -182,7 +182,7 @@ You can choose ``CPU`` or ``GPU`` for this model.
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -242,7 +242,7 @@ for BERT-large-like model.
 Processing
 ----------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 NLP models usually take a list of tokens as a standard input. A token is
 a single word converted to some integer. To provide the proper input,
@@ -292,7 +292,7 @@ content from provided URLs.
 Preprocessing
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The input size in this case is 384 tokens long. The main input
 (``input_ids``) to used BERT model consists of two parts: question
@@ -377,7 +377,7 @@ documentation <https://github.com/openvinotoolkit/open_model_zoo/tree/master/mod
 Postprocessing
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The results from the network are raw (logits). Use the softmax function
 to get the probability distribution. Then, find the best answer in the
@@ -472,7 +472,7 @@ answer should come with the highest score.
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Run question answering on a specific knowledge base (websites) and
 iterate through the questions.
@@ -516,12 +516,12 @@ iterate through the questions.
 Run
 ---
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Run on local paragraphs
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Change sources to your own to answer your questions. You can use as many
 sources as you want. Usually, you need to wait a few seconds for the
@@ -579,7 +579,7 @@ questions in the box.**
 Run on websites
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 You can also provide URLs. Note that the context (a knowledge base) is
 built from paragraphs on websites. If some information is outside the
@@ -619,5 +619,5 @@ questions in the box.**
     Question: What does OpenVINO mean?
     Answer: an open-source software toolkit for optimizing and deploying deep learning models
     Score: 0.09
-    Time: 0.04s
+    Time: 0.03s
 

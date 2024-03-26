@@ -56,12 +56,12 @@ Table of contents:
 Preparation
 -----------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -100,7 +100,7 @@ Install requirements
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -129,12 +129,12 @@ Imports
 Settings
 ~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -187,7 +187,7 @@ select device from dropdown list for running inference using OpenVINO
 Functions
 ~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -250,7 +250,7 @@ Functions
 Load the Superresolution Model
 ------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The Super Resolution model expects two inputs: the input image and a
 bicubic interpolation of the input image to the target size of
@@ -300,7 +300,7 @@ information about the network inputs and outputs.
 Load and Show the Input Image
 -----------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
    **NOTE**: For the best results, use raw images (like ``TIFF``,
    ``BMP`` or ``PNG``). Compressed images (like ``JPEG``) may appear
@@ -337,12 +337,12 @@ Load and Show the Input Image
 Superresolution on a Crop of the Image
 --------------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Crop the Input Image once.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Crop the network input size. Give the X (width) and Y (height)
 coordinates for the top left corner of the crop. Set the ``CROP_FACTOR``
@@ -393,7 +393,7 @@ as the crop size.
 Reshape/Resize Crop for Model Input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The input image is resized to a network input size, and reshaped to
 (N,C,H,W) (N=number of images, C=number of channels, H=height, W=width).
@@ -418,7 +418,7 @@ interpolation. This bicubic image is the second input to the network.
 Do Inference
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Do inference and convert the inference result to an ``RGB`` image.
 
@@ -437,7 +437,7 @@ Do inference and convert the inference result to an ``RGB`` image.
 Show and Save Results
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Show the bicubic image and the enhanced superresolution image.
 
@@ -465,7 +465,7 @@ Show the bicubic image and the enhanced superresolution image.
 Save Superresolution and Bicubic Image Crop
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -499,7 +499,7 @@ Save Superresolution and Bicubic Image Crop
 Write Animated GIF with Bicubic/Superresolution Comparison
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -539,7 +539,7 @@ Write Animated GIF with Bicubic/Superresolution Comparison
 Create a Video with Sliding Bicubic/Superresolution Comparison
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 This may take a while. For the video, the superresolution and bicubic
 image are resized by a factor of 2 to improve processing speed. This
@@ -609,7 +609,7 @@ the ``Files`` tool.
 Superresolution on full input image
 -----------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 Superresolution on the full image is done by dividing the image into
 patches of equal size, doing superresolution on each path, and then
@@ -622,7 +622,7 @@ effects.
 Compute patches
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -669,7 +669,7 @@ Compute patches
 Do Inference
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 The code below reads one patch of the image at a time. Each patch is
 reshaped to the network input shape and upsampled with bicubic
@@ -786,14 +786,14 @@ as total time to process each patch.
 
 .. parsed-literal::
 
-    Processed 42 patches in 4.63 seconds. Total patches per second (including processing): 9.08.
-    Inference patches per second: 17.95 
+    Processed 42 patches in 4.65 seconds. Total patches per second (including processing): 9.03.
+    Inference patches per second: 17.87 
 
 
 Save superresolution image and the bicubic image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 

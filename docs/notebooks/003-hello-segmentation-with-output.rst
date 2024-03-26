@@ -36,7 +36,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -57,7 +57,7 @@ Imports
 Download model weights
 ----------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -96,7 +96,7 @@ Download model weights
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -126,7 +126,7 @@ select device from dropdown list for running inference using OpenVINO
 Load the Model
 --------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -141,7 +141,7 @@ Load the Model
 Load an Image
 -------------
 
-A sample image from the
+`back to top ⬆️ <#table-of-contents>`__ A sample image from the
 `Mapillary Vistas <https://www.mapillary.com/dataset/vistas>`__ dataset
 is provided.
 
@@ -182,7 +182,7 @@ is provided.
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7fe68e54a130>
+    <matplotlib.image.AxesImage at 0x7f2108b23730>
 
 
 
@@ -193,7 +193,7 @@ is provided.
 Do Inference
 ------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -209,7 +209,7 @@ Do Inference
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7fe65848a160>
+    <matplotlib.image.AxesImage at 0x7f20c427f6d0>
 
 
 
@@ -220,7 +220,7 @@ Do Inference
 Prepare Data for Visualization
 ------------------------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
@@ -240,7 +240,7 @@ Prepare Data for Visualization
 Visualize data
 --------------
 
-
+`back to top ⬆️ <#table-of-contents>`__
 
 .. code:: ipython3
 
