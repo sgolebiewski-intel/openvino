@@ -14,8 +14,10 @@ Interactive Tutorials (Python)
    :maxdepth: 2
    :caption: Notebooks
    :hidden:
+   :glob:
 
    interactive-tutorials-python/notebooks-installation
+   ../../notebooks/*
 
 
 Jupyter notebooks show how to use various OpenVINO features to run optimized deep learning

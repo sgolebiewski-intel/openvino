@@ -51,11 +51,11 @@ Install requirements
 .. code:: ipython3
 
     import platform
-    
+
     %pip install -q "openvino>=2023.1.0"
     %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu torch opencv-python
     %pip install -q "gdown<4.6.4"
-    
+
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
     else:
@@ -94,7 +94,7 @@ Import the PyTorch Library and U\ :math:`^2`-Net
     import sys
     from collections import namedtuple
     from pathlib import Path
-    
+
     import cv2
     import matplotlib.pyplot as plt
     import numpy as np
@@ -105,18 +105,18 @@ Import the PyTorch Library and U\ :math:`^2`-Net
 .. code:: ipython3
 
     # Import local modules
-    
+
     utils_file_path = Path("../utils/notebook_utils.py")
     notebook_directory_path = Path(".")
-    
+
     if not utils_file_path.exists():
         !git clone --depth 1 https://github.com/openvinotoolkit/openvino_notebooks.git
         utils_file_path = Path("./openvino_notebooks/notebooks/utils/notebook_utils.py")
         notebook_directory_path = Path("./openvino_notebooks/notebooks/205-vision-background-removal/")
-    
+
     sys.path.append(str(utils_file_path.parent))
     sys.path.append(str(notebook_directory_path))
-    
+
     from notebook_utils import load_image
     from model.u2net import U2NET, U2NETP
 
@@ -133,7 +133,7 @@ detection and human segmentation.
 .. code:: ipython3
 
     model_config = namedtuple("ModelConfig", ["name", "url", "model", "model_args"])
-    
+
     u2net_lite = model_config(
         name="u2net_lite",
         url="https://drive.google.com/uc?id=1W8E4FHIlTVstfRkYmNOjbr0VDXTZm0jD",
@@ -152,7 +152,7 @@ detection and human segmentation.
         model=U2NET,
         model_args=(3, 1),
     )
-    
+
     # Set u2net_model to one of the three configurations listed above.
     u2net_model = u2net_lite
 
@@ -175,7 +175,7 @@ next cell loads the model and the pre-trained weights.
 
     if not model_path.exists():
         import gdown
-    
+
         os.makedirs(name=model_path.parent, exist_ok=True)
         print("Start downloading model weights file... ")
         with open(model_path, "wb") as model_file:
@@ -185,7 +185,7 @@ next cell loads the model and the pre-trained weights.
 
 .. parsed-literal::
 
-    Start downloading model weights file... 
+    Start downloading model weights file...
 
 
 .. parsed-literal::
@@ -197,27 +197,24 @@ next cell loads the model and the pre-trained weights.
 
 .. parsed-literal::
 
-    
-  0%|          | 0.00/4.68M [00:00<?, ?B/s]
+
+   0%|          | 0.00/4.68M [00:00<?, ?B/s]
 
 .. parsed-literal::
 
-    
- 34%|███▎      | 1.57M/4.68M [00:00<00:00, 14.7MB/s]
+
+   34%|███▎      | 1.57M/4.68M [00:00<00:00, 14.7MB/s]
 
 .. parsed-literal::
 
-    
-100%|██████████| 4.68M/4.68M [00:00<00:00, 28.3MB/s]
+
+   100%|██████████| 4.68M/4.68M [00:00<00:00, 28.3MB/s]
 
 .. parsed-literal::
 
-    Model weights have been downloaded to model/u2net_lite/u2net_lite.pth
+   Model weights have been downloaded to model/u2net_lite/u2net_lite.pth
 
 
-
-
-    
 
 
 .. code:: ipython3
@@ -225,7 +222,7 @@ next cell loads the model and the pre-trained weights.
     # Load the model.
     net = u2net_model.model(*u2net_model.model_args)
     net.eval()
-    
+
     # Load the weights.
     print(f"Loading model weights from: '{model_path}'")
     net.load_state_dict(state_dict=torch.load(model_path, map_location="cpu"))
@@ -285,20 +282,20 @@ repository <https://github.com/xuebinqin/U-2-Net/>`__ and multiplied by
 .. code:: ipython3
 
     IMAGE_URI = "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco_hollywood.jpg"
-    
+
     input_mean = np.array([123.675, 116.28 , 103.53]).reshape(1, 3, 1, 1)
     input_scale = np.array([58.395, 57.12 , 57.375]).reshape(1, 3, 1, 1)
-    
+
     image = cv2.cvtColor(
         src=load_image(IMAGE_URI),
         code=cv2.COLOR_BGR2RGB,
     )
-    
+
     resized_image = cv2.resize(src=image, dsize=(512, 512))
     # Convert the image shape to a shape and a data type expected by the network
     # for OpenVINO IR model: (1, 3, 512, 512).
     input_image = np.expand_dims(np.transpose(resized_image, (2, 0, 1)), 0)
-    
+
     input_image = (input_image - input_mean) / input_scale
 
 Select inference device
@@ -311,7 +308,7 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     import ipywidgets as widgets
-    
+
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
@@ -319,7 +316,7 @@ select device from dropdown list for running inference using OpenVINO
         description='Device:',
         disabled=False,
     )
-    
+
     device
 
 
@@ -346,7 +343,7 @@ Load the OpenVINO IR model to OpenVINO Runtime and do inference.
     # Get the names of input and output layers.
     input_layer_ir = compiled_model_ir.input(0)
     output_layer_ir = compiled_model_ir.output(0)
-    
+
     # Do inference on the input image.
     start_time = time.perf_counter()
     result = compiled_model_ir([input_image])[output_layer_ir]
@@ -378,11 +375,11 @@ with the background removed.
     resized_result = np.rint(
         cv2.resize(src=np.squeeze(result), dsize=(image.shape[1], image.shape[0]))
     ).astype(np.uint8)
-    
+
     # Create a copy of the image and set all background values to 255 (white).
     bg_removed_result = image.copy()
     bg_removed_result[resized_result == 0] = 255
-    
+
     fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(20, 7))
     ax[0].imshow(image)
     ax[1].imshow(resized_result, cmap="gray")
@@ -416,21 +413,21 @@ background pixels a value of 0. Replace the background image as follows:
 
     BACKGROUND_FILE = "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/wall.jpg"
     OUTPUT_DIR = "output"
-    
+
     os.makedirs(name=OUTPUT_DIR, exist_ok=True)
-    
+
     background_image = cv2.cvtColor(src=load_image(BACKGROUND_FILE), code=cv2.COLOR_BGR2RGB)
     background_image = cv2.resize(src=background_image, dsize=(image.shape[1], image.shape[0]))
-    
+
     # Set all the foreground pixels from the result to 0
     # in the background image and add the image with the background removed.
     background_image[resized_result == 1] = 0
     new_image = background_image + bg_removed_result
-    
+
     # Save the generated image.
     new_image_path = Path(f"{OUTPUT_DIR}/{Path(IMAGE_URI).stem}-{Path(BACKGROUND_FILE).stem}.jpg")
     cv2.imwrite(filename=str(new_image_path), img=cv2.cvtColor(new_image, cv2.COLOR_RGB2BGR))
-    
+
     # Display the original image and the image with the new background side by side
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(18, 7))
     ax[0].imshow(image)
@@ -438,7 +435,7 @@ background pixels a value of 0. Replace the background image as follows:
     for a in ax:
         a.axis("off")
     plt.show()
-    
+
     # Create a link to download the image.
     image_link = FileLink(new_image_path)
     image_link.html_link_str = "<a href='%s' download>%s</a>"
