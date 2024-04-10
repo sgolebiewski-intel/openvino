@@ -2,6 +2,7 @@ notebooks/3D-pose-estimation-webcam/3D-pose-estimation.ipynb
 notebooks/3D-segmentation-point-clouds/3D-segmentation-point-clouds.ipynb
 notebooks/action-recognition-webcam/action-recognition-webcam.ipynb
 notebooks/amused-lightweight-text-to-image/amused-lightweight-text-to-image.ipynb
+notebooks/animate-anyone/animate-anyone.ipynb
 notebooks/async-api/async-api.ipynb
 notebooks/attention-center/attention-center.ipynb
 notebooks/auto-device/auto-device.ipynb
@@ -56,6 +57,7 @@ notebooks/latent-consistency-models-image-generation/latent-consistency-models-o
 notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
 notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb
 notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
+notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
 notebooks/llm-chatbot/llm-chatbot.ipynb
 notebooks/llm-chatbot/rag-chatbot.ipynb
 notebooks/llm-question-answering/llm-question-answering.ipynb
@@ -95,6 +97,7 @@ notebooks/quantizing-model-with-accuracy-control/speech-recognition-quantization
 notebooks/quantizing-model-with-accuracy-control/yolov8-quantization-with-accuracy-control.ipynb
 notebooks/question-answering/question-answering.ipynb
 notebooks/riffusion-text-to-music/riffusion-text-to-music.ipynb
+notebooks/rmbg-background-removal/rmbg-background-removal.ipynb
 notebooks/sdxl-turbo/sdxl-turbo.ipynb
 notebooks/segment-anything/segment-anything.ipynb
 notebooks/segmenter-semantic-segmentation/segmenter-semantic-segmentation.ipynb
@@ -135,8 +138,8 @@ notebooks/tflite-to-openvino/tflite-to-openvino.ipynb
 notebooks/tiny-sd-image-generation/tiny-sd-image-generation.ipynb
 notebooks/torchvision-zoo-to-openvino/convnext-classification.ipynb
 notebooks/torchvision-zoo-to-openvino/lraspp-segmentation.ipynb
+notebooks/triposr-3d-reconstruction/triposr-3d-reconstruction.ipynb
 notebooks/typo-detector/typo-detector.ipynb
-notebooks/utils/notebook_utils.ipynb
 notebooks/vehicle-detection-and-recognition/vehicle-detection-and-recognition.ipynb
 notebooks/vision-background-removal/vision-background-removal.ipynb
 notebooks/vision-image-colorization/vision-image-colorization.ipynb

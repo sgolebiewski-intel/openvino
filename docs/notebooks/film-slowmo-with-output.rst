@@ -41,30 +41,30 @@ a model source.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Prepare images <#prepare-images>`__
--  `Load the model <#load-the-model>`__
--  `Infer the model <#infer-the-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Prepare images <#Prepare-images>`__
+-  `Load the model <#Load-the-model>`__
+-  `Infer the model <#Infer-the-model>`__
 
    -  `Single middle frame
-      interpolation <#single-middle-frame-interpolation>`__
-   -  `Recursive frame generation <#recursive-frame-generation>`__
+      interpolation <#Single-middle-frame-interpolation>`__
+   -  `Recursive frame generation <#Recursive-frame-generation>`__
 
 -  `Convert the model to OpenVINO
-   IR <#convert-the-model-to-openvino-ir>`__
--  `Inference <#inference>`__
+   IR <#Convert-the-model-to-OpenVINO-IR>`__
+-  `Inference <#Inference>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
    -  `Single middle frame
-      interpolation <#single-middle-frame-interpolation>`__
-   -  `Recursive frame generation <#recursive-frame-generation>`__
+      interpolation <#Single-middle-frame-interpolation>`__
+   -  `Recursive frame generation <#Recursive-frame-generation>`__
 
--  `Interactive inference <#interactive-inference>`__
+-  `Interactive inference <#Interactive-inference>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -109,6 +109,7 @@ Prerequisites
     
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     os.environ["TF_USE_LEGACY_KERAS"] = "1"
+    os.environ["TFHUB_CACHE_DIR"] = str(Path("./tfhub_modules").resolve())
     
     import tensorflow_hub as hub
     import tensorflow as tf
@@ -139,7 +140,7 @@ Prerequisites
 Prepare images
 --------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download images and cast them to NumPy arrays to provide as model
 inputs.
@@ -188,7 +189,7 @@ inputs.
 Load the model
 --------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model is loaded using ``tensorflow_hub.KerasLayer`` function. Then, we
 specify shapes of input tensors to cast loaded object to
@@ -215,12 +216,12 @@ Hub <https://tfhub.dev/google/film/1>`__.
 Infer the model
 ---------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Single middle frame interpolation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -251,7 +252,7 @@ Single middle frame interpolation
 Recursive frame generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The process will take as input 2 original frames (first and last) and
 generate a midpoint frame. Then, it will repeat itself for pairs “first
@@ -364,7 +365,7 @@ generating :math:`2^t-1` images.
 Convert the model to OpenVINO IR
 --------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To convert a TensorFlow Keras Model to OpenVINO Intermediate
 Representation (IR), call the ``openvino.convert_model()`` function and
@@ -392,12 +393,12 @@ object to disk using the ``openvino.save_model()`` function.
 Inference
 ---------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -430,7 +431,7 @@ select device from dropdown list for running inference using OpenVINO
 Single middle frame interpolation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model output has multiple tensors, including auxiliary inference data.
 The main output tensor - interpolated image - is stored at “image” key.
@@ -455,7 +456,7 @@ Model returned intermediate image. Let’s see what it is.
 Recursive frame generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now let’s create a smooth video by recursively generating frames between
 initial, middle and final images.
@@ -498,7 +499,7 @@ initial, middle and final images.
 Interactive inference
 ---------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 

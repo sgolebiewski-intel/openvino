@@ -40,19 +40,19 @@ Prerequisites
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Get Books <#get-books>`__
--  `Clean Text <#clean-text>`__
--  `Split Text <#split-text>`__
--  `Get Sentence Embeddings <#get-sentence-embeddings>`__
+-  `Get Books <#Get-Books>`__
+-  `Clean Text <#Clean-Text>`__
+-  `Split Text <#Split-Text>`__
+-  `Get Sentence Embeddings <#Get-Sentence-Embeddings>`__
 
    -  `Optimize the Model with
-      OpenVINO <#optimize-the-model-with-openvino>`__
+      OpenVINO <#Optimize-the-Model-with-OpenVINO>`__
 
--  `Calculate Sentence Alignment <#calculate-sentence-alignment>`__
--  `Postprocess Sentence Alignment <#postprocess-sentence-alignment>`__
--  `Visualize Sentence Alignment <#visualize-sentence-alignment>`__
+-  `Calculate Sentence Alignment <#Calculate-Sentence-Alignment>`__
+-  `Postprocess Sentence Alignment <#Postprocess-Sentence-Alignment>`__
+-  `Visualize Sentence Alignment <#Visualize-Sentence-Alignment>`__
 -  `Speed up Embeddings
-   Computation <#speed-up-embeddings-computation>`__
+   Computation <#Speed-up-Embeddings-Computation>`__
 
 .. |image0| image:: https://user-images.githubusercontent.com/51917466/254582697-18f3ab38-e264-4b2c-a088-8e54b855c1b2.png
 
@@ -65,27 +65,27 @@ Table of contents:
     else:
         %pip install -q "matplotlib>=3.4,<3.7"
     
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu requests pysbd transformers[torch] "openvino>=2023.1.0" seaborn ipywidgets
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu requests pysbd transformers "torch>=2.1" "openvino>=2023.1.0" seaborn ipywidgets
 
 Get Books
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The first step is to get the books that we will be working with. For
 this notebook, we will use English and German versions of Anna Karenina
 by Leo Tolstoy. The texts can be obtained from the `Project Gutenberg
-site <http/www.gutenberg.o>`__. Since copyright laws are complex
+site <https://www.gutenberg.org/>`__. Since copyright laws are complex
 and differ from country to country, check the book’s legal availability
 in your country. Refer to the Project Gutenberg Permissions, Licensing
 and other Common Requests
-`page <http/www.gutenberg.opolipermission.html>`__ for more
+`page <https://www.gutenberg.org/policy/permission.html>`__ for more
 information.
 
 Find the books on Project Gutenberg `search
-page <http/www.gutenberg.oeboo>`__ and get the ID of each book.
+page <https://www.gutenberg.org/ebooks/>`__ and get the ID of each book.
 To get the texts, we will pass the IDs to the
-`Gutendex <htt/gutendex.c>`__ API.
+`Gutendex <http://gutendex.com/>`__ API.
 
 .. code:: ipython3
 
@@ -217,7 +217,7 @@ which in a raw format looks like this:
 Clean Text
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The downloaded books may contain service information before and after
 the main text. The text might have different formatting styles and
@@ -239,7 +239,7 @@ the last occurrence of these asterisks.
    **Hint**: There are text-cleaning libraries that clean up common
    flaws. If the source of the text is known, you can look for a library
    designed for that source, for example
-   `gutenberg_cleaner <http/github.ckiasgutenberg_cleaner>`__.
+   ```gutenberg_cleaner`` <https://github.com/kiasar/gutenberg_cleaner>`__.
    These libraries can reduce manual work and even automate the
    process.process.
 
@@ -345,15 +345,15 @@ needed.
 Split Text
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Dividing text into sentences is a challenging task in text processing.
 The problem is called `sentence boundary
-disambiguation <http/en.wikipedia.owiSentence_boundary_disambiguation>`__,
+disambiguation <https://en.wikipedia.org/wiki/Sentence_boundary_disambiguation>`__,
 which can be solved using heuristics or machine learning models. This
 notebook uses a ``Segmenter`` from the ``pysbd`` library, which is
 initialized with an `ISO language
-code <http/en.wikipedia.owiList_of_ISO_639-1_codes>`__, as the
+code <https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes>`__, as the
 rules for splitting text into sentences may vary for different
 languages.
 
@@ -387,7 +387,7 @@ languages.
 Get Sentence Embeddings
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The next step is to transform sentences into vector representations.
 Transformer encoder models, like BERT, provide high-quality embeddings
@@ -396,13 +396,13 @@ languages. Training separate models for each language pair can be
 expensive, so there are many models pre-trained on multiple languages
 simultaneously, for example:
 
--  `multilingual-MiniLM <hthuggingface.sentence-transformeparaphrase-multilingual-MiniLM-L12-v2>`__
--  `distiluse-base-multilingual-cased <hthuggingface.sentence-transformedistiluse-base-multilingual-cased-v2>`__
--  `bert-base-multilingual-uncased <hthuggingface.bert-base-multilingual-uncased>`__
--  `LaBSE <hthuggingface.raLaBSE>`__
+-  `multilingual-MiniLM <https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2>`__
+-  `distiluse-base-multilingual-cased <https://huggingface.co/sentence-transformers/distiluse-base-multilingual-cased-v2>`__
+-  `bert-base-multilingual-uncased <https://huggingface.co/bert-base-multilingual-uncased>`__
+-  `LaBSE <https://huggingface.co/rasa/LaBSE>`__
 
 LaBSE stands for `Language-agnostic BERT Sentence
-Embedding <http/arxiv.op2007.01852.pdf>`__ and supports 109+
+Embedding <https://arxiv.org/pdf/2007.01852.pdf>`__ and supports 109+
 languages. It has the same architecture as the BERT model but has been
 trained on a different task: to produce identical embeddings for
 translation pairs.
@@ -479,11 +479,11 @@ best fit.
 Optimize the Model with OpenVINO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The LaBSE model is quite large and can be slow to infer on some
 hardware, so let’s optimize it with OpenVINO. `Model Conversion
-API <http/docs.openvino.20openvino-workflmodel-preparaticonversion-parameters.html>`__
+API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation/conversion-parameters.html>`__
 accepts the PyTorch/Transformers model object and additional information
 about model inputs. An ``example_input`` is needed to trace the model
 execution graph, as PyTorch constructs it dynamically during inference.
@@ -557,7 +557,7 @@ model predictions remain within an acceptable tolerance:
 Calculate Sentence Alignment
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 With the embedding matrices from the previous step, we can calculate the
 alignment: 1. Calculate sentence similarity between each pair of
@@ -684,7 +684,7 @@ will be lists of German sentence numbers.
 Postprocess Sentence Alignment
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 There are several gaps in the resulting alignment, such as English
 sentence #14 not mapping to any German sentence. Here are some possible
@@ -711,7 +711,7 @@ suitable alignment.
 Visualize Sentence Alignment
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To evaluate the final alignment and choose the best way to improve the
 results of the pipeline, we will create an interactive table with HTML
@@ -872,14 +872,14 @@ To read the model from disk, use the ``read_model`` method of the
 Speed up Embeddings Computation
 -------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let’s see how we can speed up the most computationally complex part of
 the pipeline - getting embeddings. You might wonder why, when using
 OpenVINO, you need to compile the model after reading it. There are two
 main reasons for this: 1. Compatibility with different devices. The
 model can be compiled to run on a `specific
-device <http/docs.openvino.20openvino-workflrunning-infereninference-devices-and-modes.html>`__,
+device <https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes.html>`__,
 like CPU, GPU or GNA. Each device may work with different data types,
 support different features, and gain performance by changing the neural
 network for a specific computing model. With OpenVINO, you do not need
@@ -888,13 +888,13 @@ hardware. A universal OpenVINO model representation is enough. 1.
 Optimization for different scenarios. For example, one scenario
 prioritizes minimizing the *time between starting and finishing model
 inference* (`latency-oriented
-optimization <http/docs.openvino.20openvino-workflrunning-inferenoptimize-inferenoptimizing-latency.html>`__).
+optimization <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/optimizing-latency.html>`__).
 In our case, it is more important *how many texts per second the model
 can process* (`throughput-oriented
-optimization <http/docs.openvino.20openvino-workflrunning-inferenoptimize-inferenoptimizing-throughput.html>`__).
+optimization <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/optimizing-throughput.html>`__).
 
 To get a throughput-optimized model, pass a `performance
-hint <http/docs.openvino.20openvino-workflrunning-inferenoptimize-inferenhigh-level-performance-hints.html#performance-hints-latency-and-throughput>`__
+hint <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/high-level-performance-hints.html#performance-hints-latency-and-throughput>`__
 as a configuration during compilation. Then OpenVINO selects the optimal
 parameters for execution on the available hardware.
 
@@ -912,7 +912,7 @@ parameters for execution on the available hardware.
 To further optimize hardware utilization, let’s change the inference
 mode from synchronous (Sync) to asynchronous (Async). While the
 synchronous API may be easier to start with, it is
-`recommended <http/docs.openvino.20openvino-workflrunning-inferenoptimize-inferengeneral-optimizations.html#prefer-openvino-async-api>`__
+`recommended <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/general-optimizations.html#prefer-openvino-async-api>`__
 to use the asynchronous (callbacks-based) API in production code. It is
 the most general and scalable way to implement flow control for any
 number of requests.
@@ -958,7 +958,7 @@ advance and fill it in as the inference requests are executed.
 Let’s compare the models and plot the results.
 
    **Note**: To get a more accurate benchmark, use the `Benchmark Python
-   Tool <http/docs.openvino.20learn-openviopenvino-samplbenchmark-tool.html>`__
+   Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
 
 .. code:: ipython3
 
@@ -1067,8 +1067,8 @@ boost.
 
 Here are useful links with information about the techniques used in this
 notebook: - `OpenVINO performance
-hints <http/docs.openvino.20openvino-workflrunning-inferenoptimize-inferenhigh-level-performance-hints.html>`__
+hints <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/high-level-performance-hints.html>`__
 - `OpenVINO Async
-API <http/docs.openvino.20openvino-workflrunning-inferenoptimize-inferengeneral-optimizations.html#prefer-openvino-async-api>`__
+API <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/general-optimizations.html#prefer-openvino-async-api>`__
 - `Throughput
-Optimizations <http/docs.openvino.20openvino-workflrunning-inferenoptimize-inferenoptimizing-throughput.html>`__
+Optimizations <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/optimizing-throughput.html>`__

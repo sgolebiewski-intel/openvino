@@ -33,6 +33,7 @@ person-tracking
 pose-estimation
 pytorch-onnx-to-openvino
 question-answering
+291-rmbg-background-removal
 speech-to-text
 style-transfer
 tensorflow-classification-to-openvino

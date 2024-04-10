@@ -16,31 +16,38 @@ don’t need to know exactly where the object is or its exact shape.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Get PyTorch model <#get-pytorch-model>`__
--  `Prepare dataset and dataloader <#prepare-dataset-and-dataloader>`__
--  `Run inference <#run-inference>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Get PyTorch model <#Get-PyTorch-model>`__
+-  `Prepare dataset and dataloader <#Prepare-dataset-and-dataloader>`__
+-  `Run inference <#Run-inference>`__
 -  `Convert PyTorch model to OpenVINO
-   IR <#convert-pytorch-model-to-openvino-ir>`__
+   IR <#Convert-PyTorch-model-to-OpenVINO-IR>`__
 
-   -  `Select inference device <#select-inference-device>`__
-   -  `Compile model <#compile-model>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Compile model <#Compile-model>`__
    -  `Prepare the model for
-      inference <#prepare-the-model-for-inference>`__
-   -  `Run inference <#run-inference>`__
+      inference <#Prepare-the-model-for-inference>`__
+   -  `Run inference <#Run-inference>`__
 
--  `Quantization <#quantization>`__
+-  `Quantization <#Quantization>`__
 -  `Compare inference time and model
-   sizes. <#compare-inference-time-and-model-sizes>`__
+   sizes. <#Compare-inference-time-and-model-sizes>`__
 
 Prerequisites
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     %pip install -q "ultralytics==8.1.24" "openvino>=2024.0.0" "nncf>=2.9.0"
+
+
+.. parsed-literal::
+
+    DEPRECATION: torchsde 0.2.5 has a non-standard dependency specifier numpy>=1.19.*; python_version >= "3.7". pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of torchsde or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+    Note: you may need to restart the kernel to use updated packages.
+
 
 Import required utility functions. The lower cell will download the
 notebook_utils Python module from GitHub.
@@ -49,10 +56,10 @@ notebook_utils Python module from GitHub.
 
     from pathlib import Path
     
-    # Fetch the notebook utils script from the openvino_notebooks repo
+    # Fetch `notebook_utils` module
     import urllib.request
     urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/notebook_utils.py',
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
         filename='notebook_utils.py'
     )
     
@@ -61,10 +68,10 @@ notebook_utils Python module from GitHub.
 Get PyTorch model
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Generally, PyTorch models represent an instance of the
-`torch.nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
+```torch.nn.Module`` <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
 class, initialized by a state dictionary with model weights. We will use
 the YOLOv8 pretrained OBB large model (also known as ``yolov8l-obbn``)
 pre-trained on a DOTAv1 dataset, which is available in this
@@ -80,7 +87,7 @@ also applicable to other YOLOv8 models.
 Prepare dataset and dataloader
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 YOLOv8-obb is pre-trained on the DOTA dataset. Also, Ultralytics
 provides DOTA8 dataset. It is a small, but versatile oriented object
@@ -126,10 +133,50 @@ instance.
     data_loader = validator.get_dataloader(DATASETS_DIR / 'dota8', 1)
     example_image_path = list(data_loader)[1]['im_file'][0]
 
+
+
+.. parsed-literal::
+
+    datasets/dota8.yaml:   0%|          | 0.00/608 [00:00<?, ?B/s]
+
+
+.. parsed-literal::
+
+    
+    Dataset 'datasets/dota8.yaml' images not found ⚠️, missing path '/home/ea/work/openvino_notebooks/notebooks/fast-segment-anything/datasets/dota8/images/val'
+    Downloading https://github.com/ultralytics/yolov5/releases/download/v1.0/dota8.zip to '/home/ea/work/openvino_notebooks/notebooks/fast-segment-anything/datasets/dota8.zip'...
+
+
+.. parsed-literal::
+
+    100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1.24M/1.24M [00:00<00:00, 1.63MB/s]
+    Unzipping /home/ea/work/openvino_notebooks/notebooks/fast-segment-anything/datasets/dota8.zip to /home/ea/work/openvino_notebooks/notebooks/fast-segment-anything/datasets/dota8...: 100%|██████████| 27/27 [00:00<00:00, 644.45file/s]
+
+.. parsed-literal::
+
+    Dataset download success ✅ (4.1s), saved to /home/ea/work/openvino_notebooks/notebooks/fast-segment-anything/datasets
+    
+
+
+.. parsed-literal::
+
+    
+    val: Scanning /home/ea/work/openvino_notebooks/notebooks/fast-segment-anything/datasets/dota8/labels/train... 8 images, 0 backgrounds, 0 corrupt: 100%|██████████| 8/8 [00:00<00:00, 266.41it/s]
+
+.. parsed-literal::
+
+    val: New cache created: /home/ea/work/openvino_notebooks/notebooks/fast-segment-anything/datasets/dota8/labels/train.cache
+
+
+.. parsed-literal::
+
+    
+
+
 Run inference
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -142,8 +189,8 @@ Run inference
 .. parsed-literal::
 
     
-    image 1/1 /home/maleksandr/test_notebooks/yolo8obb/openvino_notebooks/notebooks/288-yolov8-obb/datasets/dota8/images/train/P1053__1024__0___90.jpg: 1024x1024 367.6ms
-    Speed: 2.6ms preprocess, 367.6ms inference, 2.6ms postprocess per image at shape (1, 3, 1024, 1024)
+    image 1/1 /home/ea/work/openvino_notebooks/notebooks/fast-segment-anything/datasets/dota8/images/train/P1053__1024__0___90.jpg: 1024x1024 4915.2ms
+    Speed: 18.6ms preprocess, 4915.2ms inference, 50.9ms postprocess per image at shape (1, 3, 1024, 1024)
 
 
 
@@ -155,7 +202,7 @@ Run inference
 Convert PyTorch model to OpenVINO IR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 YOLOv8 provides API for convenient model exporting to different formats
 including OpenVINO IR. ``model.export`` is responsible for model
@@ -177,10 +224,27 @@ preserve dynamic shapes in the model.
     if not OV_MODEL_PATH.exists():
         model.export(format="openvino", dynamic=True, half=True)
 
+
+.. parsed-literal::
+
+    Ultralytics YOLOv8.1.24 🚀 Python-3.8.10 torch-2.1.2+cpu CPU (Intel Core(TM) i9-10980XE 3.00GHz)
+    
+    PyTorch: starting from 'yolov8l-obb.pt' with input shape (1, 3, 1024, 1024) BCHW and output shape(s) (1, 20, 21504) (85.4 MB)
+    
+    OpenVINO: starting export with openvino 2024.0.0-14509-34caeefd078-releases/2024/0...
+    OpenVINO: export success ✅ 5.6s, saved as 'yolov8l-obb_openvino_model/' (85.4 MB)
+    
+    Export complete (18.7s)
+    Results saved to /home/ea/work/openvino_notebooks_new_clone/openvino_notebooks/notebooks/yolov8-optimization
+    Predict:         yolo predict task=obb model=yolov8l-obb_openvino_model imgsz=1024 half 
+    Validate:        yolo val task=obb model=yolov8l-obb_openvino_model imgsz=1024 data=runs/DOTAv1.0-ms.yaml half 
+    Visualize:       https://netron.app
+
+
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select device from dropdown list for running inference using OpenVINO
 
@@ -212,7 +276,7 @@ Select device from dropdown list for running inference using OpenVINO
 Compile model
 ^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -226,7 +290,7 @@ Compile model
 Prepare the model for inference
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We can reuse the base model pipeline for pre- and postprocessing just
 replacing the inference method where we will use the IR model for
@@ -245,7 +309,7 @@ inference.
 Run inference
 ^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -256,8 +320,8 @@ Run inference
 .. parsed-literal::
 
     
-    image 1/1 /home/maleksandr/test_notebooks/yolo8obb/openvino_notebooks/notebooks/288-yolov8-obb/datasets/dota8/images/train/P1053__1024__0___90.jpg: 1024x1024 354.5ms
-    Speed: 10.3ms preprocess, 354.5ms inference, 2.5ms postprocess per image at shape (1, 3, 1024, 1024)
+    image 1/1 /home/ea/work/openvino_notebooks/notebooks/fast-segment-anything/datasets/dota8/images/train/P1053__1024__0___90.jpg: 1024x1024 338.0ms
+    Speed: 4.7ms preprocess, 338.0ms inference, 3.7ms postprocess per image at shape (1, 3, 1024, 1024)
 
 
 
@@ -269,7 +333,7 @@ Run inference
 Quantization
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -315,9 +379,13 @@ Let’s load ``skip magic`` extension to skip quantization if
 
 .. code:: ipython3
 
-    import sys
+    # Fetch `skip_kernel_extension` module
+    import urllib.request
     
-    sys.path.append("../utils")
+    urllib.request.urlretrieve(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
+        filename="skip_kernel_extension.py",
+    )
     
     %load_ext skip_kernel_extension
 
@@ -336,6 +404,12 @@ Let’s load ``skip magic`` extension to skip quantization if
     
     
     quantization_dataset = nncf.Dataset(data_loader, transform_fn)
+
+
+.. parsed-literal::
+
+    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, tensorflow, onnx, openvino
+
 
 Create a quantized model from the pre-trained converted OpenVINO model.
 
@@ -365,6 +439,49 @@ Create a quantized model from the pre-trained converted OpenVINO model.
     
     model_optimized = core.compile_model(INT8_OV_PATH, device.value)
 
+
+
+.. parsed-literal::
+
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
+
+
+
+.. parsed-literal::
+
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
+
+
 We can reuse the base model pipeline in the same way as for IR model.
 
 .. code:: ipython3
@@ -390,14 +507,8 @@ Run inference
 .. parsed-literal::
 
     
-    image 1/1 /home/maleksandr/test_notebooks/yolo8obb/openvino_notebooks/notebooks/288-yolov8-obb/datasets/dota8/images/train/P1053__1024__0___90.jpg: 1024x1024 262.4ms
-    Speed: 6.6ms preprocess, 262.4ms inference, 3.1ms postprocess per image at shape (1, 3, 1024, 1024)
-
-
-
-
-.. image:: yolov8-obb-with-output_files/yolov8-obb-with-output_31_1.png
-
+    image 1/1 /home/ea/work/openvino_notebooks/notebooks/fast-segment-anything/datasets/dota8/images/train/P1053__1024__0___90.jpg: 1024x1024 240.5ms
+    Speed: 3.2ms preprocess, 240.5ms inference, 4.2ms postprocess per image at shape (1, 3, 1024, 1024)
 
 
 You can see that the result is almost the same but it has a small
@@ -407,7 +518,7 @@ large car was also identified, unlike the original model.
 Compare inference time and model sizes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -423,9 +534,9 @@ Compare inference time and model sizes
 
 .. parsed-literal::
 
-    FP16 model size: 173697.94 KB
-    INT8 model size: 43494.75 KB
-    Model compression rate: 3.994
+    FP16 model size: 86849.05 KB
+    INT8 model size: 43494.78 KB
+    Model compression rate: 1.997
 
 
 .. code:: ipython3
@@ -452,7 +563,7 @@ Compare inference time and model sizes
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
     [ INFO ] Loading model files
-    [ INFO ] Read model took 16.98 ms
+    [ INFO ] Read model took 25.07 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     x (node: x) : f32 / [...] / [?,3,?,?]
@@ -461,14 +572,14 @@ Compare inference time and model sizes
     [Step 5/11] Resizing model to match image sizes and given batch
     [ INFO ] Model batch size: 1
     [ INFO ] Reshaping model: 'x': [1,3,640,640]
-    [ INFO ] Reshape model took 8.93 ms
+    [ INFO ] Reshape model took 10.42 ms
     [Step 6/11] Configuring input of the model
     [ INFO ] Model inputs:
     [ INFO ]     x (node: x) : u8 / [N,C,H,W] / [1,3,640,640]
     [ INFO ] Model outputs:
     [ INFO ]     ***NO_NAME*** (node: __module.model.22/aten::cat/Concat_9) : f32 / [...] / [1,20,8400]
     [Step 7/11] Loading the model to the device
-    [ INFO ] Compile model took 554.80 ms
+    [ INFO ] Compile model took 645.51 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
     [ INFO ]   NETWORK_NAME: Model0
@@ -503,17 +614,17 @@ Compare inference time and model sizes
     [ INFO ] Fill input 'x' with random values 
     [Step 10/11] Measuring performance (Start inference asynchronously, 12 inference requests, limits: 120000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-    [ INFO ] First inference took 324.82 ms
+    [ INFO ] First inference took 362.70 ms
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            1728 iterations
-    [ INFO ] Duration:         121146.03 ms
+    [ INFO ] Count:            1620 iterations
+    [ INFO ] Duration:         121527.01 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        838.25 ms
-    [ INFO ]    Average:       839.50 ms
-    [ INFO ]    Min:           603.03 ms
-    [ INFO ]    Max:           1051.74 ms
-    [ INFO ] Throughput:   14.26 FPS
+    [ INFO ]    Median:        884.92 ms
+    [ INFO ]    Average:       897.13 ms
+    [ INFO ]    Min:           599.38 ms
+    [ INFO ]    Max:           1131.46 ms
+    [ INFO ] Throughput:   13.33 FPS
 
 
 .. code:: ipython3
@@ -540,7 +651,7 @@ Compare inference time and model sizes
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
     [ INFO ] Loading model files
-    [ INFO ] Read model took 39.15 ms
+    [ INFO ] Read model took 46.47 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     x (node: x) : f32 / [...] / [?,3,?,?]
@@ -549,14 +660,14 @@ Compare inference time and model sizes
     [Step 5/11] Resizing model to match image sizes and given batch
     [ INFO ] Model batch size: 1
     [ INFO ] Reshaping model: 'x': [1,3,640,640]
-    [ INFO ] Reshape model took 18.90 ms
+    [ INFO ] Reshape model took 20.10 ms
     [Step 6/11] Configuring input of the model
     [ INFO ] Model inputs:
     [ INFO ]     x (node: x) : u8 / [N,C,H,W] / [1,3,640,640]
     [ INFO ] Model outputs:
     [ INFO ]     ***NO_NAME*** (node: __module.model.22/aten::cat/Concat_9) : f32 / [...] / [1,20,8400]
     [Step 7/11] Loading the model to the device
-    [ INFO ] Compile model took 1236.04 ms
+    [ INFO ] Compile model took 1201.42 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
     [ INFO ]   NETWORK_NAME: Model0
@@ -591,15 +702,15 @@ Compare inference time and model sizes
     [ INFO ] Fill input 'x' with random values 
     [Step 10/11] Measuring performance (Start inference asynchronously, 12 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-    [ INFO ] First inference took 118.47 ms
+    [ INFO ] First inference took 124.20 ms
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            768 iterations
-    [ INFO ] Duration:         15304.44 ms
+    [ INFO ] Count:            708 iterations
+    [ INFO ] Duration:         15216.46 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        237.48 ms
-    [ INFO ]    Average:       237.91 ms
-    [ INFO ]    Min:           138.26 ms
-    [ INFO ]    Max:           266.14 ms
-    [ INFO ] Throughput:   50.18 FPS
+    [ INFO ]    Median:        252.23 ms
+    [ INFO ]    Average:       255.76 ms
+    [ INFO ]    Min:           176.97 ms
+    [ INFO ]    Max:           344.41 ms
+    [ INFO ] Throughput:   46.53 FPS
 

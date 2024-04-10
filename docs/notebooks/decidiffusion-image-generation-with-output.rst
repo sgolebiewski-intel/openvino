@@ -25,7 +25,7 @@ reduction of nearly 66% in production costs.
 In this tutorial we consider how to convert and run DeciDiffusion using
 OpenVINO, making text-to-image generative applications more accessible
 and feasible. An additional part demonstrates how to run quantization
-with `NNCF <htgithub.copenvinotoolknn>`__ to speed up
+with `NNCF <https://github.com/openvinotoolkit/nncf/>`__ to speed up
 pipeline.
 
 The notebook contains the following steps:
@@ -35,71 +35,71 @@ The notebook contains the following steps:
 2. Prepare Inference Pipeline.
 3. Run Inference pipeline with OpenVINO.
 4. Optimize ``OVStableDiffusionPipeline`` with
-   `NNCF <htgithub.copenvinotoolknn>`__ quantization.
+   `NNCF <https://github.com/openvinotoolkit/nncf/>`__ quantization.
 5. Compare results of original and optimized pipelines.
 6. Run Interactive demo for DeciDiffusion model.
 
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Prepare DeciDiffusion models for OpenVINO format
-   conversion <#prepare-decidiffusion-models-for-openvino-format-conversion>`__
+   conversion <#Prepare-DeciDiffusion-models-for-OpenVINO-format-conversion>`__
 
-   -  `About model <#about-model>`__
+   -  `About model <#About-model>`__
    -  `DeciDiffusion integration with Diffusers
-      library <#decidiffusion-integration-with-diffusers-library>`__
+      library <#DeciDiffusion-integration-with-Diffusers-library>`__
 
 -  `Convert models to OpenVINO
-   format <#convert-models-to-openvino-format>`__
+   format <#Convert-models-to-OpenVINO-format>`__
 
-   -  `Text Encoder <#text-encoder>`__
-   -  `U-Net NAS <#u-net-nas>`__
-   -  `VAE <#vae>`__
+   -  `Text Encoder <#Text-Encoder>`__
+   -  `U-Net NAS <#U-Net-NAS>`__
+   -  `VAE <#VAE>`__
 
--  `Prepare inference pipeline <#prepare-inference-pipeline>`__
+-  `Prepare inference pipeline <#Prepare-inference-pipeline>`__
 
    -  `Guidance scale and negative prompt for controlling generation
-      result. <#guidance-scale-and-negative-prompt-for-controlling-generation-result->`__
+      result. <#Guidance-scale-and-negative-prompt-for-controlling-generation-result.>`__
    -  `Strength for controlling Image-to-Image
-      generation <#strength-for-controlling-image-to-image-generation>`__
-   -  `Configure Inference Pipeline <#configure-inference-pipeline>`__
+      generation <#Strength-for-controlling-Image-to-Image-generation>`__
+   -  `Configure Inference Pipeline <#Configure-Inference-Pipeline>`__
 
--  `Text-to-Image generation <#text-to-image-generation>`__
+-  `Text-to-Image generation <#Text-to-Image-generation>`__
 
-   -  `Image-to-Image generation <#image-to-image-generation>`__
+   -  `Image-to-Image generation <#Image-to-Image-generation>`__
 
--  `Quantization <#quantization>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Prepare calibration dataset <#prepare-calibration-dataset>`__
-   -  `Run quantization <#run-quantization>`__
+   -  `Prepare calibration dataset <#Prepare-calibration-dataset>`__
+   -  `Run quantization <#Run-quantization>`__
    -  `Compare inference time of the FP16 and INT8
-      pipelines <#compare-inference-time-of-the-fp16-and-int8-pipelines>`__
+      pipelines <#Compare-inference-time-of-the-FP16-and-INT8-pipelines>`__
 
-      -  `Compare UNet file size <#compare-unet-file-size>`__
+      -  `Compare UNet file size <#Compare-UNet-file-size>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 install required packages
 
 .. code:: ipython3
 
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu  "diffusers" "transformers" "torch" "pillow" "openvino>=2023.1.0" "gradio" "datasets>=2.14.6" "huggingface-hub>=0.19.4" "nncf>=2.7.0" "peft==0.6.2"
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu  "diffusers" "transformers" "torch>=2.1" "pillow" "openvino>=2023.1.0" "gradio" "datasets>=2.14.6" "huggingface-hub>=0.19.4" "nncf>=2.7.0" "peft==0.6.2"
 
 Prepare DeciDiffusion models for OpenVINO format conversion
 -----------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 About model
 ~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 DeciDiffusion 1.0 is an 820 million parameter text-to-image latent
 diffusion model trained on the LAION-v2 dataset and fine-tuned on the
@@ -152,12 +152,12 @@ computational demands are reduced.
 DeciDiffusion integration with Diffusers library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To work with DeciDiffusion, we will use Hugging Face
-`Diffusers <http/github.chuggingfadiffusers>`__ library.
+`Diffusers <https://github.com/huggingface/diffusers>`__ library.
 DeciDiffusion the
-`StableDiffusionPipeline <http/huggingface.dodiffuseusing-diffuseconditional_image_generation>`__
+```StableDiffusionPipeline`` <https://huggingface.co/docs/diffusers/using-diffusers/conditional_image_generation>`__
 with small customization: overriding default parameters and replacing
 U-Net model. The code, defined in
 ``load_orginal_pytorch_pipeline_componets`` function, demonstrates how
@@ -216,7 +216,7 @@ to create diffusers pipeline for DeciDiffusion.
 Convert models to OpenVINO format
 ---------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Starting from 2023.0 release, OpenVINO supports PyTorch models directly
 via Model Conversion API. ``ov.convert_model`` function accepts instance
@@ -237,7 +237,7 @@ Let us convert each part:
 Text Encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The text-encoder is responsible for transforming the input prompt, for
 example, “a photo of an astronaut riding a horse” into an embedding
@@ -296,7 +296,7 @@ hidden states.
 U-Net NAS
 ~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 U-Net NAS model, similar to Stable Diffusion UNet model, has three
 inputs:
@@ -368,7 +368,7 @@ Model predicts the ``sample`` state for the next step.
 VAE
 ~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The VAE model has two parts, an encoder and a decoder. The encoder is
 used to convert the image into a low dimensional latent representation,
@@ -475,7 +475,7 @@ of the pipeline, it will be better to convert them to separate models.
 Prepare inference pipeline
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Putting it all together, let us now take a closer look at how the model
 works in inference by illustrating the logical flow. |sd-pipeline|
@@ -497,14 +497,14 @@ denoised latent image representation via a scheduler algorithm. Many
 different scheduler algorithms can be used for this computation, each
 having its pros and cons. More information about supported schedulers
 algorithms can be found in `diffusers
-documentation <http/huggingface.dodiffusemausing-diffuseschedulers>`__.
+documentation <https://huggingface.co/docs/diffusers/main/en/using-diffusers/schedulers>`__.
 
 Theory on how the scheduler algorithm function works is out of scope for
 this notebook. Nonetheless, in short, you should remember that you
 compute the predicted denoised image representation from the previous
 noise representation and the predicted noise residual. For more
 information, refer to the recommended `Elucidating the Design Space of
-Diffusion-Based Generative Models <http/arxiv.oa2206.00364>`__
+Diffusion-Based Generative Models <https://arxiv.org/abs/2206.00364>`__
 
 The *denoising* process is repeated given number of times (by default 30
 for DeciDiffusion) to step-by-step retrieve better latent image
@@ -514,7 +514,7 @@ decoded by the decoder part of the variational auto encoder.
 Guidance scale and negative prompt for controlling generation result.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Guidance scale controls how similar the generated image will be to the
 prompt. A higher guidance scale means the model will try to generate an
@@ -523,7 +523,7 @@ means the model will have more creativity. guidance_scale is a way to
 increase the adherence to the conditional signal that guides the
 generation (text, in this case) as well as overall sample quality. It is
 also known as `classifier-free
-guidance <http/arxiv.oa2207.12598>`__. The default guidance
+guidance <https://arxiv.org/abs/2207.12598>`__. The default guidance
 scale in DeciDiffusion is 0.7.
 
 Additionally, to improve image generation quality, model supports
@@ -536,7 +536,7 @@ to avoid, in this case gray scale can be treated as negative prompt. The
 positive and negative prompt are in equal footing. You can always use
 one with or without the other. More explanation of how it works can be
 found in this
-`article <http/stable-diffusion-art.chow-negative-prompt-wo>`__.
+`article <https://stable-diffusion-art.com/how-negative-prompt-work/>`__.
 
 **Note**: negative prompting applicable only for high guidance scale (at
 least > 1).
@@ -544,7 +544,7 @@ least > 1).
 Strength for controlling Image-to-Image generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In the Image-to-Image mode, the strength parameter plays a crucial role.
 It determines the level of noise that is added to the initial image
@@ -923,7 +923,7 @@ between 0.4 and 0.6.
 Configure Inference Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -993,7 +993,7 @@ Let us define them and put all components together
 Text-to-Image generation
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, let’s see model in action
 
@@ -1051,7 +1051,7 @@ Now, let’s see model in action
 Image-to-Image generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 One of the most amazing features of Stable Diffusion model is the
 ability to condition image generation from an existing image or sketch.
@@ -1124,9 +1124,9 @@ diffusion models can be used to “enhance” an image.
 Quantization
 ------------
 
+`back to top ⬆️ <#Table-of-contents:>`__
 
-
-`NNCF <htgithub.copenvinotoolknn>`__ enables
+`NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
 graph and then using a subset of the training dataset to initialize the
 parameters of these additional quantization layers. Quantized operations
@@ -1173,8 +1173,12 @@ Let’s load ``skip magic`` extension to skip quantization if
 
 .. code:: ipython3
 
-    import sys
-    sys.path.append("../utils")
+    # Fetch `skip_kernel_extension` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
+        filename='skip_kernel_extension.py'
+    )
     
     int8_pipe = None
     
@@ -1183,10 +1187,10 @@ Let’s load ``skip magic`` extension to skip quantization if
 Prepare calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use a portion of
-`conceptual_captions <http/huggingface.dataseconceptual_captions>`__
+`conceptual_captions <https://huggingface.co/datasets/conceptual_captions>`__
 dataset from Hugging Face as calibration data. To collect intermediate
 model inputs for calibration we should customize ``CompiledModel``.
 
@@ -1253,7 +1257,7 @@ model inputs for calibration we should customize ``CompiledModel``.
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Create a quantized model from the pre-trained converted OpenVINO model.
 
@@ -1400,7 +1404,7 @@ Image-to-Image generation
 Compare inference time of the FP16 and INT8 pipelines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 pipelines, we use median inference time on calibration subset.
@@ -1454,7 +1458,7 @@ pipelines, we use median inference time on calibration subset.
 Compare UNet file size
 ^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1478,7 +1482,7 @@ Compare UNet file size
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Please select below whether you would like to use the quantized model to
 launch the interactive demo.

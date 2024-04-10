@@ -40,27 +40,32 @@ card <https://huggingface.co/pyannote/speaker-diarization>`__,
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Prepare pipeline <#prepare-pipeline>`__
--  `Load test audio file <#load-test-audio-file>`__
--  `Run inference pipeline <#run-inference-pipeline>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Prepare pipeline <#Prepare-pipeline>`__
+-  `Load test audio file <#Load-test-audio-file>`__
+-  `Run inference pipeline <#Run-inference-pipeline>`__
 -  `Convert model to OpenVINO Intermediate Representation
-   format <#convert-model-to-openvino-intermediate-representation-format>`__
--  `Select inference device <#select-inference-device>`__
+   format <#Convert-model-to-OpenVINO-Intermediate-Representation-format>`__
+-  `Select inference device <#Select-inference-device>`__
 -  `Replace segmentation model with
-   OpenVINO <#replace-segmentation-model-with-openvino>`__
+   OpenVINO <#Replace-segmentation-model-with-OpenVINO>`__
 -  `Run speaker diarization with
-   OpenVINO <#run-speaker-diarization-with-openvino>`__
+   OpenVINO <#Run-speaker-diarization-with-OpenVINO>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install  -q "librosa>=0.8.1" "matplotlib<3.8" "ruamel.yaml>=0.17.8,<0.17.29" --extra-index-url https://download.pytorch.org/whl/cpu torch torchvision torchaudio git+https://github.com/eaidova/pyannote-audio.git@hub0.10 openvino>=2023.1.0
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu  "librosa>=0.8.1" "matplotlib<3.8" "ruamel.yaml>=0.17.8,<0.17.29" "torch>=2.1" torchvision torchaudio "git+https://github.com/eaidova/pyannote-audio.git@hub0.10" "openvino>=2023.1.0"
 
+
+.. parsed-literal::
+
+    WARNING: typer 0.12.3 does not provide the extra 'all'
+    
 
 .. parsed-literal::
 
@@ -85,7 +90,7 @@ Prerequisites
 Prepare pipeline
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Traditional Speaker Diarization systems can be generalized into a
 five-step process:
@@ -134,7 +139,7 @@ hub <https://huggingface.co/pyannote/speaker-diarization>`__.
    license before downloading or using its weights, visit the
    `pyannote/speaker-diarization <https://huggingface.co/pyannote/speaker-diarization>`__
    to read accept the license before you proceed. To use this model, you
-   must be a registered user in Hugging Face Hub. You will need to use
+   must be a registered user in 🤗 Hugging Face Hub. You will need to use
    an access token for the code below to run. For more information on
    access tokens, please refer to `this section of the
    documentation <https://huggingface.co/docs/hub/security-tokens>`__.
@@ -160,16 +165,38 @@ hub <https://huggingface.co/pyannote/speaker-diarization>`__.
     
     pipeline = Pipeline.from_pretrained("philschmid/pyannote-speaker-diarization-endpoint")
 
+
+.. parsed-literal::
+
+    2024-04-09 23:48:53.776702: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-09 23:48:53.810955: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+
+
+.. parsed-literal::
+
+    2024-04-09 23:48:54.340440: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+
+
+.. parsed-literal::
+
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/pyannote/audio/core/io.py:42: UserWarning: torchaudio._backend.set_audio_backend has been deprecated. With dispatcher enabled, this function is no-op. You can remove the function call.
+      torchaudio.set_audio_backend("soundfile")
+
+
 Load test audio file
 --------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    import sys
-    
-    sys.path.append("../utils")
+    # Fetch `notebook_utils` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+        filename='notebook_utils.py'
+    )
     
     from notebook_utils import download_file
     
@@ -221,7 +248,7 @@ Load test audio file
 Run inference pipeline
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For running inference, we should provide a path to input audio to the
 pipeline
@@ -242,7 +269,7 @@ pipeline
 
 .. parsed-literal::
 
-    Diarization pipeline took 15.45 s
+    Diarization pipeline took 17.03 s
 
 
 The result of running the pipeline can be represented as a diagram
@@ -284,7 +311,7 @@ We can also print each time frame and corresponding speaker:
 Convert model to OpenVINO Intermediate Representation format
 ------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For best results with OpenVINO, it is recommended to convert the model
 to OpenVINO IR format. OpenVINO supports PyTorch via ONNX conversion. We
@@ -325,7 +352,7 @@ with ``ov.save_model``.
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -354,7 +381,7 @@ select device from dropdown list for running inference using OpenVINO
 Replace segmentation model with OpenVINO
 ----------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -386,13 +413,24 @@ Replace segmentation model with OpenVINO
 Run speaker diarization with OpenVINO
 -------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     start = time.perf_counter()
     diarization = pipeline(AUDIO_FILE)
     end = time.perf_counter()
+
+
+.. parsed-literal::
+
+    Model is not converging.  Current: 16444.281598619917 is not greater than 16444.330820454463. Delta is -0.04922183454618789
+
+
+.. parsed-literal::
+
+    Model is not converging.  Current: 16444.281598619917 is not greater than 16444.330820454463. Delta is -0.04922183454618789
+
 
 .. code:: ipython3
 
@@ -401,7 +439,7 @@ Run speaker diarization with OpenVINO
 
 .. parsed-literal::
 
-    Diarization pipeline took 14.78 s
+    Diarization pipeline took 16.64 s
 
 
 .. code:: ipython3

@@ -17,37 +17,37 @@ Additionally, you can also upload a video file.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Preparation <#preparation>`__
+-  `Preparation <#Preparation>`__
 
-   -  `Install requirements <#install-requirements>`__
-   -  `Imports <#imports>`__
+   -  `Install requirements <#Install-requirements>`__
+   -  `Imports <#Imports>`__
 
--  `The Model <#the-model>`__
+-  `The Model <#The-Model>`__
 
-   -  `Download the Model <#download-the-model>`__
-   -  `Convert the Model <#convert-the-model>`__
-   -  `Load the Model <#load-the-model>`__
+   -  `Download the Model <#Download-the-Model>`__
+   -  `Convert the Model <#Convert-the-Model>`__
+   -  `Load the Model <#Load-the-Model>`__
 
--  `Processing <#processing>`__
+-  `Processing <#Processing>`__
 
-   -  `Process Results <#process-results>`__
-   -  `Main Processing Function <#main-processing-function>`__
+   -  `Process Results <#Process-Results>`__
+   -  `Main Processing Function <#Main-Processing-Function>`__
 
--  `Run <#run>`__
+-  `Run <#Run>`__
 
-   -  `Run Live Object Detection <#run-live-object-detection>`__
+   -  `Run Live Object Detection <#Run-Live-Object-Detection>`__
 
--  `References <#references>`__
+-  `References <#References>`__
 
 Preparation
 -----------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -58,7 +58,7 @@ Install requirements
     # Fetch `notebook_utils` module
     import urllib.request
     urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/notebook_utils.py',
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
         filename='notebook_utils.py'
     )
 
@@ -76,7 +76,7 @@ Install requirements
     magika 0.5.1 requires numpy<2.0,>=1.24; python_version >= "3.8" and python_version < "3.9", but you have numpy 1.23.5 which is incompatible.
     mobileclip 0.1.0 requires torch==1.13.1, but you have torch 2.1.0+cpu which is incompatible.
     mobileclip 0.1.0 requires torchvision==0.14.1, but you have torchvision 0.16.0+cpu which is incompatible.
-    optimum-intel 1.17.0.dev0+a3bf172 requires transformers<4.40.0,>=4.36.0, but you have transformers 4.34.1 which is incompatible.
+    optimum-intel 1.17.0.dev0+e79da77 requires transformers<4.40.0,>=4.36.0, but you have transformers 4.34.1 which is incompatible.
     
 
 .. parsed-literal::
@@ -93,14 +93,14 @@ Install requirements
 
 .. parsed-literal::
 
-    ('notebook_utils.py', <http.client.HTTPMessage at 0x7f53ffd45f10>)
+    ('notebook_utils.py', <http.client.HTTPMessage at 0x7f0114f58700>)
 
 
 
 Imports
 ~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -121,12 +121,12 @@ Imports
 The Model
 ---------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the Model
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use the ``download_file``, a function from the ``notebook_utils`` file.
 It automatically creates a directory structure and downloads the
@@ -171,7 +171,7 @@ Representation (OpenVINO IR).
 Convert the Model
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The pre-trained model is in TensorFlow format. To use it with OpenVINO,
 convert it to OpenVINO IR format, using `Model Conversion
@@ -207,7 +207,7 @@ converted, this step is skipped.
 Load the Model
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Only a few lines of code are required to run the model. First,
 initialize OpenVINO Runtime. Then, read the network architecture and
@@ -277,12 +277,12 @@ output.
 Processing
 ----------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Process Results
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, list all available classes and create colors for them. Then, in
 the post-process stage, transform boxes with normalized coordinates
@@ -374,7 +374,7 @@ threshold (0.5). Finally, draw boxes and labels inside them.
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run object detection on the specified source. Either a webcam or a video
 file.
@@ -487,12 +487,12 @@ file.
 Run
 ---
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run Live Object Detection
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use a webcam as the video input. By default, the primary webcam is set
 with ``source=0``. If you have multiple webcams, each one will be
@@ -538,7 +538,7 @@ Run the object detection:
 References
 ----------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 1. `SSDLite
    MobileNetV2 <https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/ssdlite_mobilenet_v2>`__

@@ -45,17 +45,17 @@ convert the model to OpenVINO™ IR format.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `About Pix2Struct <#about-pix2struct>`__
--  `Prerequisites <#prerequisites>`__
--  `Download and Convert Model <#download-and-convert-model>`__
--  `Select inference device <#select-inference-device>`__
--  `Test model inference <#test-model-inference>`__
--  `Interactive demo <#interactive-demo>`__
+-  `About Pix2Struct <#About-Pix2Struct>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Download and Convert Model <#Download-and-Convert-Model>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `Test model inference <#Test-model-inference>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 About Pix2Struct
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Pix2Struct is an image encoder - text decoder model that is trained on
 image-text pairs for various tasks, including image captioning and
@@ -87,7 +87,7 @@ absolute positional embeddings are used for the input patches.
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, we need to install the `Hugging Face
 Optimum <https://huggingface.co/docs/transformers/index>`__ library
@@ -99,13 +99,13 @@ documentation <https://huggingface.co/docs/optimum/intel/inference>`__.
 
 .. code:: ipython3
 
-    %pip install -q torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "torch>=2.1" torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
     %pip install -q "git+https://github.com/huggingface/optimum-intel.git" "openvino>=2023.1.0" "transformers>=4.33.0" "peft==0.6.2" onnx gradio --extra-index-url https://download.pytorch.org/whl/cpu
 
 Download and Convert Model
 --------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Optimum Intel can be used to load optimized models from the `Hugging
 Face Hub <https://huggingface.co/docs/optimum/intel/hf.co/models>`__ and
@@ -167,7 +167,7 @@ applicable for other models from pix2struct family.
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -199,7 +199,7 @@ select device from dropdown list for running inference using OpenVINO
 Test model inference
 --------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The diagram below demonstrates how the model works:
 |pix2struct_diagram.png|
@@ -285,7 +285,7 @@ documentation <https://docs.openvino.ai/2024/get-started.html#openvino-advanced-
 Interactive demo
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 

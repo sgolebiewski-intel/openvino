@@ -22,24 +22,24 @@ to build up a multiple inference task pipeline:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Import <#import>`__
+-  `Import <#Import>`__
 -  `Prepare the Model and Test
-   Image <#prepare-the-model-and-test-image>`__
--  `Configuration <#configuration>`__
--  `Load the Models <#load-the-models>`__
--  `Data Process <#data-process>`__
--  `Main Function <#main-function>`__
+   Image <#Prepare-the-Model-and-Test-Image>`__
+-  `Configuration <#Configuration>`__
+-  `Load the Models <#Load-the-Models>`__
+-  `Data Process <#Data-Process>`__
+-  `Main Function <#Main-Function>`__
 
    -  `Initialize the model and
-      parameters. <#initialize-the-model-and-parameters->`__
-   -  `Run meter detection model <#run-meter-detection-model>`__
-   -  `Run meter segmentation model <#run-meter-segmentation-model>`__
+      parameters. <#Initialize-the-model-and-parameters.>`__
+   -  `Run meter detection model <#Run-meter-detection-model>`__
+   -  `Run meter segmentation model <#Run-meter-segmentation-model>`__
    -  `Postprocess the models result and calculate the final
-      readings <#postprocess-the-models-result-and-calculate-the-final-readings>`__
+      readings <#Postprocess-the-models-result-and-calculate-the-final-readings>`__
    -  `Get the reading result on the meter
-      picture <#get-the-reading-result-on-the-meter-picture>`__
+      picture <#Get-the-reading-result-on-the-meter-picture>`__
 
--  `Try it with your meter photos! <#try-it-with-your-meter-photos>`__
+-  `Try it with your meter photos! <#Try-it-with-your-meter-photos!>`__
 
 .. code:: ipython3
 
@@ -67,12 +67,11 @@ Table of contents:
 Import
 ------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import os
-    import sys
     from pathlib import Path
     import numpy as np
     import math
@@ -81,13 +80,18 @@ Import
     import matplotlib.pyplot as plt
     import openvino as ov
     
-    sys.path.append("../utils")
+    # Fetch `notebook_utils` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+        filename='notebook_utils.py'
+    )
     from notebook_utils import download_file, segmentation_map_to_image
 
 Prepare the Model and Test Image
 --------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__ Download PPYOLOv2 and
+`back to top ⬆️ <#Table-of-contents:>`__ Download PPYOLOv2 and
 DeepLabV3P pre-trained models from PaddlePaddle community.
 
 .. code:: ipython3
@@ -163,7 +167,7 @@ DeepLabV3P pre-trained models from PaddlePaddle community.
 Configuration
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__ Add parameter configuration for
+`back to top ⬆️ <#Table-of-contents:>`__ Add parameter configuration for
 reading calculation.
 
 .. code:: ipython3
@@ -193,7 +197,7 @@ reading calculation.
 Load the Models
 ---------------
 
-`back to top ⬆️ <#table-of-contents>`__ Define a common class for model
+`back to top ⬆️ <#Table-of-contents:>`__ Define a common class for model
 loading and inference
 
 .. code:: ipython3
@@ -237,7 +241,7 @@ loading and inference
 Data Process
 ------------
 
-`back to top ⬆️ <#table-of-contents>`__ Including the preprocessing and
+`back to top ⬆️ <#Table-of-contents:>`__ Including the preprocessing and
 postprocessing tasks of each model.
 
 .. code:: ipython3
@@ -568,12 +572,12 @@ postprocessing tasks of each model.
 Main Function
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Initialize the model and parameters.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -635,7 +639,7 @@ bounds of input batch size.
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7f9e2a033c40>
+    <matplotlib.image.AxesImage at 0x7febfb3be070>
 
 
 
@@ -646,7 +650,7 @@ bounds of input batch size.
 Run meter detection model
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__ Detect the location of the
+`back to top ⬆️ <#Table-of-contents:>`__ Detect the location of the
 meter and prepare the ROI images for segmentation.
 
 .. code:: ipython3
@@ -691,7 +695,7 @@ meter and prepare the ROI images for segmentation.
 Run meter segmentation model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__ Get the results of segmentation
+`back to top ⬆️ <#Table-of-contents:>`__ Get the results of segmentation
 task on detected ROI.
 
 .. code:: ipython3
@@ -732,7 +736,7 @@ task on detected ROI.
 Postprocess the models result and calculate the final readings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__ Use OpenCV function to find the
+`back to top ⬆️ <#Table-of-contents:>`__ Use OpenCV function to find the
 location of the pointer in a scale map.
 
 .. code:: ipython3
@@ -770,7 +774,7 @@ location of the pointer in a scale map.
 Get the reading result on the meter picture
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -803,4 +807,4 @@ Get the reading result on the meter picture
 Try it with your meter photos!
 ------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__

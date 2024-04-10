@@ -19,35 +19,35 @@ This notebook works best with small images (up to 800x600 resolution).
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Settings <#settings>`__
+-  `Imports <#Imports>`__
+-  `Settings <#Settings>`__
 -  `Inference on PaddlePaddle
-   Model <#inference-on-paddlepaddle-model>`__
+   Model <#Inference-on-PaddlePaddle-Model>`__
 
-   -  `Investigate PaddleGAN Model <#investigate-paddlegan-model>`__
-   -  `Do Inference <#do-inference>`__
+   -  `Investigate PaddleGAN Model <#Investigate-PaddleGAN-Model>`__
+   -  `Do Inference <#Do-Inference>`__
 
 -  `Convert PaddleGAN Model to ONNX and OpenVINO
-   IR <#convert-paddlegan-model-to-onnx-and-openvino-ir>`__
+   IR <#Convert-PaddleGAN-Model-to-ONNX-and-OpenVINO-IR>`__
 
    -  `Convert PaddlePaddle Model to
-      ONNX <#convert-paddlepaddle-model-to-onnx>`__
+      ONNX <#Convert-PaddlePaddle-Model-to-ONNX>`__
    -  `Convert ONNX Model to OpenVINO IR with Model Conversion Python
-      API <#convert-onnx-model-to-openvino-ir-with-model-conversion-python-api>`__
+      API <#Convert-ONNX-Model-to-OpenVINO-IR-with-Model-Conversion-Python-API>`__
 
 -  `Do Inference on OpenVINO IR
-   Model <#do-inference-on-openvino-ir-model>`__
+   Model <#Do-Inference-on-OpenVINO-IR-Model>`__
 
-   -  `Select inference device <#select-inference-device>`__
-   -  `Show an Animated GIF <#show-an-animated-gif>`__
-   -  `Create a Comparison Video <#create-a-comparison-video>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Show an Animated GIF <#Show-an-Animated-GIF>`__
+   -  `Create a Comparison Video <#Create-a-Comparison-Video>`__
 
-      -  `Download the video <#download-the-video>`__
+      -  `Download the video <#Download-the-video>`__
 
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -150,7 +150,7 @@ Imports
     # Fetch `notebook_utils` module
     import urllib.request
     urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/notebook_utils.py',
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
         filename='notebook_utils.py'
     )
     from notebook_utils import NotebookAlert, download_file
@@ -158,7 +158,7 @@ Imports
 Settings
 --------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -175,12 +175,12 @@ Settings
 Inference on PaddlePaddle Model
 -------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Investigate PaddleGAN Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The `PaddleGAN
 documentation <https://github.com/PaddlePaddle/PaddleGAN>`__ explains
@@ -198,7 +198,7 @@ source code.
 
 .. parsed-literal::
 
-    [03/27 15:13:40] ppgan INFO: Found /opt/home/k8sworker/.cache/ppgan/DF2K_JPEG.pdparams
+    [04/10 00:46:00] ppgan INFO: Found /opt/home/k8sworker/.cache/ppgan/DF2K_JPEG.pdparams
 
 
 .. code:: ipython3
@@ -239,7 +239,7 @@ To get more information about how the model looks like, use the
 Do Inference
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To show inference on the PaddlePaddle model, set ``PADDLEGAN_INFERENCE``
 to ``True`` in the cell below. Keep in mind that performing inference
@@ -300,7 +300,7 @@ may take some time.
 Convert PaddleGAN Model to ONNX and OpenVINO IR
 -----------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To convert the PaddlePaddle model to OpenVINO IR, first convert the
 model to ONNX, and then convert the ONNX model to the OpenVINO IR
@@ -309,7 +309,7 @@ format.
 Convert PaddlePaddle Model to ONNX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -326,12 +326,12 @@ Convert PaddlePaddle Model to ONNX
 
 .. parsed-literal::
 
-    2024-03-27 15:13:47 [INFO]	Static PaddlePaddle model saved in model/paddle_model_static_onnx_temp_dir.
+    2024-04-10 00:46:07 [INFO]	Static PaddlePaddle model saved in model/paddle_model_static_onnx_temp_dir.
 
 
 .. parsed-literal::
 
-    I0327 15:13:47.160895 1214219 program_interpreter.cc:212] New Executor is Running.
+    I0410 00:46:07.458886 3028523 program_interpreter.cc:212] New Executor is Running.
 
 
 .. parsed-literal::
@@ -340,19 +340,19 @@ Convert PaddlePaddle Model to ONNX
     [Paddle2ONNX] Model file path: model/paddle_model_static_onnx_temp_dir/model.pdmodel
     [Paddle2ONNX] Paramters file path: model/paddle_model_static_onnx_temp_dir/model.pdiparams
     [Paddle2ONNX] Start to parsing Paddle model...
+    [Paddle2ONNX] Use opset_version = 13 for ONNX export.
+    [Paddle2ONNX] PaddlePaddle model is exported as ONNX format now.
 
 
 .. parsed-literal::
 
-    [Paddle2ONNX] Use opset_version = 13 for ONNX export.
-    [Paddle2ONNX] PaddlePaddle model is exported as ONNX format now.
-    2024-03-27 15:13:50 [INFO]	ONNX model saved in model/paddlegan_sr.onnx.
+    2024-04-10 00:46:11 [INFO]	ONNX model saved in model/paddlegan_sr.onnx.
 
 
 Convert ONNX Model to OpenVINO IR with `Model Conversion Python API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -375,7 +375,7 @@ Convert ONNX Model to OpenVINO IR with `Model Conversion Python API <https://doc
 Do Inference on OpenVINO IR Model
 ---------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -388,7 +388,7 @@ Do Inference on OpenVINO IR Model
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -431,7 +431,7 @@ select device from dropdown list for running inference using OpenVINO
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7f5a919154c0>
+    <matplotlib.image.AxesImage at 0x7f21e92b09d0>
 
 
 
@@ -460,7 +460,7 @@ select device from dropdown list for running inference using OpenVINO
 
 .. parsed-literal::
 
-    Inference duration: 3.22 seconds
+    Inference duration: 3.23 seconds
 
 
 .. code:: ipython3
@@ -483,7 +483,7 @@ select device from dropdown list for running inference using OpenVINO
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7f5a58309070>
+    <matplotlib.image.AxesImage at 0x7f21d41ab310>
 
 
 
@@ -494,7 +494,7 @@ select device from dropdown list for running inference using OpenVINO
 Show an Animated GIF
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To visualize the difference between the bicubic image and the
 superresolution image, create an animated GIF image that switches
@@ -530,7 +530,7 @@ between both versions.
 Create a Comparison Video
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Create a video with a “slider”, showing the bicubic image to the right
 and the superresolution image on the left.
@@ -590,7 +590,7 @@ open it directly from the images directory, and play it locally.
 Download the video
 ^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Please, click the link below to download the video or just run cell if
 you use the Google Colab

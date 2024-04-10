@@ -27,34 +27,34 @@ of increased latency, however.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Install required libraries <#install-required-libraries>`__
--  `Prepare the environment <#prepare-the-environment>`__
+-  `Install required libraries <#Install-required-libraries>`__
+-  `Prepare the environment <#Prepare-the-environment>`__
 -  `Load OneFormer fine-tuned on COCO for universal
-   segmentation <#load-oneformer-fine-tuned-on-coco-for-universal-segmentation>`__
+   segmentation <#Load-OneFormer-fine-tuned-on-COCO-for-universal-segmentation>`__
 -  `Convert the model to OpenVINO IR
-   format <#convert-the-model-to-openvino-ir-format>`__
--  `Select inference device <#select-inference-device>`__
--  `Choose a segmentation task <#choose-a-segmentation-task>`__
--  `Inference <#inference>`__
--  `Quantization <#quantization>`__
+   format <#Convert-the-model-to-OpenVINO-IR-format>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `Choose a segmentation task <#Choose-a-segmentation-task>`__
+-  `Inference <#Inference>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Preparing calibration dataset <#preparing-calibration-dataset>`__
-   -  `Run quantization <#run-quantization>`__
+   -  `Preparing calibration dataset <#Preparing-calibration-dataset>`__
+   -  `Run quantization <#Run-quantization>`__
    -  `Compare model size and
-      performance <#compare-model-size-and-performance>`__
+      performance <#Compare-model-size-and-performance>`__
 
--  `Interactive Demo <#interactive-demo>`__
+-  `Interactive Demo <#Interactive-Demo>`__
 
 Install required libraries
 --------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import platform
     
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "transformers>=4.26.0" "openvino>=2023.1.0" "nncf>=2.7.0" gradio torch scipy ipywidgets Pillow
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "transformers>=4.26.0" "openvino>=2023.1.0" "nncf>=2.7.0" gradio "torch>=2.1" scipy ipywidgets Pillow
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -70,7 +70,7 @@ Install required libraries
 Prepare the environment
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Import all required packages and set paths for models and constant
 variables.
@@ -80,7 +80,6 @@ variables.
     import warnings
     from collections import defaultdict
     from pathlib import Path
-    import sys
     
     from transformers import OneFormerProcessor, OneFormerForUniversalSegmentation
     from transformers.models.oneformer.modeling_oneformer import OneFormerForUniversalSegmentationOutput
@@ -92,7 +91,12 @@ variables.
     
     import openvino
     
-    sys.path.append("../utils")
+    # Fetch `notebook_utils` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+        filename='notebook_utils.py'
+    )
     from notebook_utils import download_file
 
 .. code:: ipython3
@@ -103,7 +107,7 @@ variables.
 Load OneFormer fine-tuned on COCO for universal segmentation
 ------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Here we use the ``from_pretrained`` method of
 ``OneFormerForUniversalSegmentation`` to load the `HuggingFace OneFormer
@@ -145,7 +149,7 @@ images and post-process model outputs for visualization.
 Convert the model to OpenVINO IR format
 ---------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Convert the PyTorch model to IR format to take advantage of OpenVINO
 optimization tools and features. The ``openvino.convert_model`` python
@@ -183,7 +187,7 @@ should provide PyTorch model instance and example input to
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select device from dropdown list for running inference using OpenVINO
 
@@ -385,7 +389,7 @@ the inference results.
 Choose a segmentation task
 --------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -406,7 +410,7 @@ Choose a segmentation task
 Inference
 ---------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -435,7 +439,7 @@ Inference
 Quantization
 ------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -481,15 +485,19 @@ not selected
 
 .. code:: ipython3
 
-    import sys
-    sys.path.append("../utils")
+    # Fetch `skip_kernel_extension` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
+        filename='skip_kernel_extension.py'
+    )
     
     %load_ext skip_kernel_extension
 
 Preparing calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use images from
 `COCO128 <https://www.kaggle.com/datasets/ultralytics/coco128>`__
@@ -557,7 +565,7 @@ dataset as calibration samples.
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Below we call ``nncf.quantize()`` in order to apply quantization to
 OneFormer model.
@@ -639,7 +647,7 @@ Let’s see quantized model prediction next to original model prediction.
 Compare model size and performance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Below we compare original and quantized model footprint and inference
 speed.
@@ -708,7 +716,7 @@ speed.
 Interactive Demo
 ----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -798,7 +806,7 @@ Interactive Demo
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

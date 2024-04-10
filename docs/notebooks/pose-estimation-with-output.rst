@@ -17,22 +17,22 @@ Additionally, you can also upload a video file.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `The model <#the-model>`__
+-  `Imports <#Imports>`__
+-  `The model <#The-model>`__
 
-   -  `Download the model <#download-the-model>`__
-   -  `Load the model <#load-the-model>`__
+   -  `Download the model <#Download-the-model>`__
+   -  `Load the model <#Load-the-model>`__
 
--  `Processing <#processing>`__
+-  `Processing <#Processing>`__
 
-   -  `OpenPose Decoder <#openpose-decoder>`__
-   -  `Process Results <#process-results>`__
-   -  `Draw Pose Overlays <#draw-pose-overlays>`__
-   -  `Main Processing Function <#main-processing-function>`__
+   -  `OpenPose Decoder <#OpenPose-Decoder>`__
+   -  `Process Results <#Process-Results>`__
+   -  `Draw Pose Overlays <#Draw-Pose-Overlays>`__
+   -  `Main Processing Function <#Main-Processing-Function>`__
 
--  `Run <#run>`__
+-  `Run <#Run>`__
 
-   -  `Run Live Pose Estimation <#run-live-pose-estimation>`__
+   -  `Run Live Pose Estimation <#Run-Live-Pose-Estimation>`__
 
 .. code:: ipython3
 
@@ -47,12 +47,11 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import collections
-    import sys
     import time
     from pathlib import Path
     
@@ -64,18 +63,23 @@ Imports
     
     from decoder import OpenPoseDecoder
     
-    sys.path.append("../utils")
+    # Fetch `notebook_utils` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+        filename='notebook_utils.py'
+    )
     import notebook_utils as utils
 
 The model
 ---------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the model
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use the ``download_file``, a function from the ``notebook_utils`` file.
 It automatically creates a directory structure and downloads the
@@ -119,7 +123,7 @@ precision in the code below.
 Load the model
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Downloaded models are located in a fixed structure, which indicates a
 vendor, the name of the model and a precision.
@@ -190,12 +194,12 @@ there is 1 input and 2 outputs: PAFs and keypoints heatmap.
 Processing
 ----------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenPose Decoder
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To transform the raw results from the neural network into pose
 estimations, you need OpenPose Decoder. It is provided in the `Open
@@ -216,7 +220,7 @@ of Open Model Zoo.
 Process Results
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 A bunch of useful functions to transform results into poses.
 
@@ -289,7 +293,7 @@ factor.
 Draw Pose Overlays
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Draw pose overlays on the image to visualize estimated poses. Joints are
 drawn as circles and limbs are drawn as lines. The code is based on the
@@ -329,7 +333,7 @@ from Open Model Zoo.
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run pose estimation on the specified source. Either a webcam or a video
 file.
@@ -426,12 +430,12 @@ file.
 Run
 ---
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run Live Pose Estimation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use a webcam as the video input. By default, the primary webcam is set
 with ``source=0``. If you have multiple webcams, each one will be

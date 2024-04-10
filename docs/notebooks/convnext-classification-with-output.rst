@@ -2,7 +2,7 @@ Classification with ConvNeXt and OpenVINO
 =========================================
 
 The
-`torchvision.models <http/pytorch.ovisistabmodels.html>`__
+```torchvision.models`` <https://pytorch.org/vision/stable/models.html>`__
 subpackage contains definitions of models for addressing different
 tasks, including: image classification, pixelwise semantic segmentation,
 object detection, instance segmentation, person keypoint detection,
@@ -10,7 +10,7 @@ video classification, and optical flow. Throughout this notebook we will
 show how to use one of them.
 
 The ConvNeXt model is based on the `A ConvNet for the
-2020s <http/arxiv.oa2201.03545>`__ paper. The outcome of this
+2020s <https://arxiv.org/abs/2201.03545>`__ paper. The outcome of this
 exploration is a family of pure ConvNet models dubbed ConvNeXt.
 Constructed entirely from standard ConvNet modules, ConvNeXts compete
 favorably with Transformers in terms of accuracy and scalability,
@@ -18,29 +18,29 @@ achieving 87.8% ImageNet top-1 accuracy and outperforming Swin
 Transformers on COCO detection and ADE20K segmentation, while
 maintaining the simplicity and efficiency of standard ConvNets. The
 ``torchvision.models`` subpackage
-`contains <htpytorch.ovisimamodeconvnext.html>`__
+`contains <https://pytorch.org/vision/main/models/convnext.html>`__
 several pretrained ConvNeXt model. In this tutorial we will use ConvNeXt
 Tiny model.
 
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Get a test image <#get-a-test-image>`__
--  `Get a pretrained model <#get-a-pretrained-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Get a test image <#Get-a-test-image>`__
+-  `Get a pretrained model <#Get-a-pretrained-model>`__
 -  `Define a preprocessing and prepare an input
-   data <#define-a-preprocessing-and-prepare-an-input-data>`__
+   data <#Define-a-preprocessing-and-prepare-an-input-data>`__
 -  `Use the original model to run an
-   inference <#use-the-original-model-to-run-an-inference>`__
+   inference <#Use-the-original-model-to-run-an-inference>`__
 -  `Convert the model to OpenVINO Intermediate representation
-   format <#convert-the-model-to-openvino-intermediate-representation-format>`__
+   format <#Convert-the-model-to-OpenVINO-Intermediate-representation-format>`__
 -  `Use the OpenVINO IR model to run an
-   inference <#use-the-openvino-ir-model-to-run-an-inference>`__
+   inference <#Use-the-OpenVINO-IR-model-to-run-an-inference>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -51,13 +51,6 @@ Prerequisites
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
-
-.. parsed-literal::
-
-    ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    mobileclip 0.1.0 requires timm>=0.9.5, but you have timm 0.4.12 which is incompatible.
-    pytorch-lightning 1.6.5 requires protobuf<=3.20.1, but you have protobuf 3.20.3 which is incompatible.
     
 
 .. parsed-literal::
@@ -78,7 +71,7 @@ Prerequisites
 Get a test image
 ----------------
 
-First of all lets get a test
+`back to top ⬆️ <#Table-of-contents:>`__ First of all lets get a test
 image from an open dataset.
 
 .. code:: ipython3
@@ -105,9 +98,9 @@ image from an open dataset.
 Get a pretrained model
 ----------------------
 
-Torchvision provides a
+`back to top ⬆️ <#Table-of-contents:>`__ Torchvision provides a
 mechanism of `listing and retrieving available
-models <http/pytorch.ovisistabmodels.html#listing-and-retrieving-available-models>`__.
+models <https://pytorch.org/vision/stable/models.html#listing-and-retrieving-available-models>`__.
 
 .. code:: ipython3
 
@@ -129,14 +122,14 @@ models <http/pytorch.ovisistabmodels.html#listing-and-retrieving-available-model
 We will use ``convnext_tiny``. To get a pretrained model just use
 ``models.get_model("convnext_tiny", weights='DEFAULT')`` or a specific
 method of ``torchvision.models`` for this model using `default
-weights <http/pytorch.ovisistabmodegenerattorchvision.models.convnext_tiny.html#torchvision.models.ConvNeXt_Tiny_Weights>`__
+weights <https://pytorch.org/vision/stable/models/generated/torchvision.models.convnext_tiny.html#torchvision.models.ConvNeXt_Tiny_Weights>`__
 that is equivalent to ``ConvNeXt_Tiny_Weights.IMAGENET1K_V1``. If you
 don’t specify ``weight`` or specify ``weights=None`` it will be a random
 initialization. To get all available weights for the model you can call
 ``weights_enum = models.get_model_weights("convnext_tiny")``, but there
 is only one for this model. You can find more information how to
 initialize pre-trained models
-`here <http/pytorch.ovisistabmodels.html#initializing-pre-trained-models>`__.
+`here <https://pytorch.org/vision/stable/models.html#initializing-pre-trained-models>`__.
 
 .. code:: ipython3
 
@@ -145,10 +138,10 @@ initialize pre-trained models
 Define a preprocessing and prepare an input data
 ------------------------------------------------
 
-You can use
+`back to top ⬆️ <#Table-of-contents:>`__ You can use
 ``torchvision.transforms`` to make a preprocessing or
 use\ `preprocessing transforms from the model
-wight <http/pytorch.ovisistabmodels.html#using-the-pre-trained-models>`__.
+wight <https://pytorch.org/vision/stable/models.html#using-the-pre-trained-models>`__.
 
 .. code:: ipython3
 
@@ -160,10 +153,17 @@ wight <http/pytorch.ovisistabmodels.html#using-the-pre-trained-models>`__.
     input_data = preprocess(image)
     input_data = torch.stack([input_data], dim=0)
 
+
+.. parsed-literal::
+
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+      warnings.warn(
+
+
 Use the original model to run an inference
 ------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -202,13 +202,13 @@ And print results
 
     Predicted Class: 281
     Predicted Label: n02123045 tabby, tabby cat
-    Predicted Probability: 0.4381963908672333
+    Predicted Probability: 0.5662789344787598
 
 
 Convert the model to OpenVINO Intermediate representation format
 ----------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO supports PyTorch through conversion to OpenVINO Intermediate
 Representation (IR) format. To take the advantage of OpenVINO
@@ -277,7 +277,7 @@ Select device from dropdown list for running inference using OpenVINO
 Use the OpenVINO IR model to run an inference
 ---------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -289,5 +289,5 @@ Use the OpenVINO IR model to run an inference
 
     Predicted Class: 281
     Predicted Label: n02123045 tabby, tabby cat
-    Predicted Probability: 0.6133298873901367
+    Predicted Probability: 0.6132656931877136
 

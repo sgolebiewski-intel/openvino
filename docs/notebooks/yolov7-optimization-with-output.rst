@@ -41,40 +41,40 @@ The tutorial consists of the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Get Pytorch model <#get-pytorch-model>`__
--  `Prerequisites <#prerequisites>`__
--  `Check model inference <#check-model-inference>`__
--  `Export to ONNX <#export-to-onnx>`__
+-  `Get Pytorch model <#Get-Pytorch-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Check model inference <#Check-model-inference>`__
+-  `Export to ONNX <#Export-to-ONNX>`__
 -  `Convert ONNX Model to OpenVINO Intermediate Representation
-   (IR) <#convert-onnx-model-to-openvino-intermediate-representation-ir>`__
--  `Verify model inference <#verify-model-inference>`__
+   (IR) <#Convert-ONNX-Model-to-OpenVINO-Intermediate-Representation-(IR)>`__
+-  `Verify model inference <#Verify-model-inference>`__
 
-   -  `Preprocessing <#preprocessing>`__
-   -  `Postprocessing <#postprocessing>`__
-   -  `Select inference device <#select-inference-device>`__
+   -  `Preprocessing <#Preprocessing>`__
+   -  `Postprocessing <#Postprocessing>`__
+   -  `Select inference device <#Select-inference-device>`__
 
--  `Verify model accuracy <#verify-model-accuracy>`__
+-  `Verify model accuracy <#Verify-model-accuracy>`__
 
-   -  `Download dataset <#download-dataset>`__
-   -  `Create dataloader <#create-dataloader>`__
-   -  `Define validation function <#define-validation-function>`__
+   -  `Download dataset <#Download-dataset>`__
+   -  `Create dataloader <#Create-dataloader>`__
+   -  `Define validation function <#Define-validation-function>`__
 
 -  `Optimize model using NNCF Post-training Quantization
-   API <#optimize-model-using-nncf-post-training-quantization-api>`__
+   API <#Optimize-model-using-NNCF-Post-training-Quantization-API>`__
 -  `Validate Quantized model
-   inference <#validate-quantized-model-inference>`__
+   inference <#Validate-Quantized-model-inference>`__
 -  `Validate quantized model
-   accuracy <#validate-quantized-model-accuracy>`__
+   accuracy <#Validate-quantized-model-accuracy>`__
 -  `Compare Performance of the Original and Quantized
-   Models <#compare-performance-of-the-original-and-quantized-models>`__
+   Models <#Compare-Performance-of-the-Original-and-Quantized-Models>`__
 
 Get Pytorch model
 -----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Generally, PyTorch models represent an instance of the
-`torch.nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
+```torch.nn.Module`` <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
 class, initialized by a state dictionary with model weights. We will use
 the YOLOv7 tiny model pre-trained on a COCO dataset, which is available
 in this `repo <https://github.com/WongKinYiu/yolov7>`__. Typical steps
@@ -91,7 +91,7 @@ the YOLOv7 model to ONNX, so we do not need to do these steps manually.
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -127,14 +127,19 @@ Prerequisites
 
 .. code:: ipython3
 
-    import sys
-    from pathlib import Path
-    sys.path.append("../utils")
+    # Fetch `notebook_utils` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+        filename='notebook_utils.py'
+    )
     from notebook_utils import download_file
 
 .. code:: ipython3
 
     # Clone YOLOv7 repo
+    from pathlib import Path
+    
     if not Path('yolov7').exists():
         !git clone https://github.com/WongKinYiu/yolov7
     %cd yolov7
@@ -148,40 +153,15 @@ Prerequisites
 .. parsed-literal::
 
     remote: Enumerating objects: 1197, done.[K
-
-
-.. parsed-literal::
-
-    Receiving objects:   0% (1/1197)
-Receiving objects:   1% (12/1197)
-Receiving objects:   2% (24/1197)
-Receiving objects:   3% (36/1197)
-Receiving objects:   4% (48/1197)
-Receiving objects:   5% (60/1197)
-Receiving objects:   6% (72/1197)
-Receiving objects:   7% (84/1197)
-Receiving objects:   8% (96/1197)
-Receiving objects:   9% (108/1197)
-Receiving objects:  10% (120/1197)
-Receiving objects:  11% (132/1197)
-Receiving objects:  12% (144/1197)
-Receiving objects:  13% (156/1197)
-Receiving objects:  14% (168/1197)
-Receiving objects:  15% (180/1197)
-Receiving objects:  16% (192/1197)
-Receiving objects:  17% (204/1197)
-Receiving objects:  18% (216/1197)
-Receiving objects:  19% (228/1197)
-Receiving objects:  20% (240/1197)
-Receiving objects:  21% (252/1197)
+    Receiving objects:   0% (1/1197)Receiving objects:   1% (12/1197)Receiving objects:   2% (24/1197)Receiving objects:   3% (36/1197)Receiving objects:   4% (48/1197)
 
 .. parsed-literal::
 
-    Receiving objects:  22% (264/1197)
-Receiving objects:  23% (276/1197)
-Receiving objects:  24% (288/1197)
-Receiving objects:  25% (300/1197)
-Receiving objects:  26% (312/1197)
+    Receiving objects:   5% (60/1197)Receiving objects:   6% (72/1197)Receiving objects:   7% (84/1197)Receiving objects:   8% (96/1197)Receiving objects:   9% (108/1197)Receiving objects:  10% (120/1197)Receiving objects:  11% (132/1197)Receiving objects:  12% (144/1197)Receiving objects:  13% (156/1197)Receiving objects:  14% (168/1197)Receiving objects:  15% (180/1197)Receiving objects:  16% (192/1197)Receiving objects:  17% (204/1197)Receiving objects:  18% (216/1197)Receiving objects:  19% (228/1197)Receiving objects:  20% (240/1197)Receiving objects:  21% (252/1197)Receiving objects:  22% (264/1197)Receiving objects:  23% (276/1197)
+
+.. parsed-literal::
+
+    Receiving objects:  24% (288/1197)Receiving objects:  25% (300/1197)Receiving objects:  26% (312/1197)
 
 .. parsed-literal::
 
@@ -189,185 +169,58 @@ Receiving objects:  26% (312/1197)
 
 .. parsed-literal::
 
-    Receiving objects:  28% (336/1197), 9.83 MiB | 19.65 MiB/s
+    Receiving objects:  28% (336/1197)
 
 .. parsed-literal::
 
-    Receiving objects:  28% (340/1197), 19.37 MiB | 19.37 MiB/s
+    Receiving objects:  28% (339/1197), 23.06 MiB | 22.55 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  28% (347/1197), 35.76 MiB | 17.88 MiB/s
+    Receiving objects:  29% (348/1197), 34.14 MiB | 22.44 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  29% (348/1197), 35.76 MiB | 17.88 MiB/s
+    Receiving objects:  30% (360/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  31% (372/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  32% (384/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  33% (396/1197), 34.14 MiB | 22.44 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  30% (360/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  31% (372/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  32% (384/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  33% (396/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  34% (407/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  35% (419/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  36% (431/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  37% (443/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  38% (455/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  39% (467/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  40% (479/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  41% (491/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  42% (503/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  43% (515/1197), 35.76 MiB | 17.88 MiB/s
+    Receiving objects:  34% (407/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  35% (419/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  36% (431/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  37% (443/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  38% (455/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  39% (467/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  40% (479/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  41% (491/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  42% (503/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  43% (515/1197), 34.14 MiB | 22.44 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  44% (527/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  45% (539/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  46% (551/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  47% (563/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  48% (575/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  49% (587/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  50% (599/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  51% (611/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  52% (623/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  53% (635/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  54% (647/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  55% (659/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  56% (671/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  57% (683/1197), 35.76 MiB | 17.88 MiB/s
-Receiving objects:  58% (695/1197), 35.76 MiB | 17.88 MiB/s
+    Receiving objects:  44% (527/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  45% (539/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  46% (551/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  47% (563/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  48% (575/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  49% (587/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  50% (599/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  51% (611/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  52% (623/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  53% (635/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  54% (647/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  55% (659/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  56% (671/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  57% (683/1197), 34.14 MiB | 22.44 MiB/sReceiving objects:  58% (695/1197), 34.14 MiB | 22.44 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  59% (707/1197), 35.76 MiB | 17.88 MiB/s
+    Receiving objects:  59% (707/1197), 34.14 MiB | 22.44 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  59% (715/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  60% (719/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  61% (731/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  62% (743/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  63% (755/1197), 57.35 MiB | 18.99 MiB/s
+    Receiving objects:  59% (715/1197), 45.89 MiB | 22.33 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  64% (767/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  65% (779/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  66% (791/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  67% (802/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  68% (814/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  69% (826/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  70% (838/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  71% (850/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  72% (862/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  73% (874/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  74% (886/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  75% (898/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  76% (910/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  77% (922/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  78% (934/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  79% (946/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  80% (958/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  81% (970/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  82% (982/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  83% (994/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  84% (1006/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  85% (1018/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  86% (1030/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  87% (1042/1197), 57.35 MiB | 18.99 MiB/s
+    Receiving objects:  60% (719/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  61% (731/1197), 57.78 MiB | 22.61 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  88% (1054/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  89% (1066/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  90% (1078/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  91% (1090/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  92% (1102/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  93% (1114/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  94% (1126/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  95% (1138/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  96% (1150/1197), 57.35 MiB | 18.99 MiB/s
-Receiving objects:  97% (1162/1197), 57.35 MiB | 18.99 MiB/s
+    Receiving objects:  62% (743/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  63% (755/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  64% (767/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  65% (779/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  66% (791/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  67% (802/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  68% (814/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  69% (826/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  70% (838/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  71% (850/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  72% (862/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  73% (874/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  74% (886/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  75% (898/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  76% (910/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  77% (922/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  78% (934/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  79% (946/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  80% (958/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  81% (970/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  82% (982/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  83% (994/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  84% (1006/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  85% (1018/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  86% (1030/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  87% (1042/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  88% (1054/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  89% (1066/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  90% (1078/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  91% (1090/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  92% (1102/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  93% (1114/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  94% (1126/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  95% (1138/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  96% (1150/1197), 57.78 MiB | 22.61 MiB/sReceiving objects:  97% (1162/1197), 57.78 MiB | 22.61 MiB/s
+
+.. parsed-literal::
+
+    Receiving objects:  97% (1172/1197), 69.63 MiB | 22.59 MiB/s
 
 .. parsed-literal::
 
     remote: Total 1197 (delta 0), reused 0 (delta 0), pack-reused 1197[K
-    Receiving objects:  98% (1174/1197), 68.98 MiB | 19.60 MiB/s
-Receiving objects:  99% (1186/1197), 68.98 MiB | 19.60 MiB/s
-Receiving objects: 100% (1197/1197), 68.98 MiB | 19.60 MiB/s
-Receiving objects: 100% (1197/1197), 74.23 MiB | 19.75 MiB/s, done.
-    Resolving deltas:   0% (0/519)
-Resolving deltas:   1% (8/519)
-Resolving deltas:   3% (17/519)
-Resolving deltas:   4% (21/519)
-Resolving deltas:   5% (29/519)
-Resolving deltas:   6% (32/519)
-Resolving deltas:   7% (40/519)
-Resolving deltas:  10% (53/519)
-Resolving deltas:  11% (58/519)
-Resolving deltas:  12% (65/519)
-Resolving deltas:  13% (69/519)
-Resolving deltas:  14% (75/519)
-Resolving deltas:  15% (78/519)
-Resolving deltas:  17% (89/519)
-Resolving deltas:  18% (94/519)
-Resolving deltas:  22% (115/519)
-Resolving deltas:  24% (125/519)
-Resolving deltas:  27% (141/519)
-Resolving deltas:  33% (172/519)
-Resolving deltas:  35% (182/519)
-Resolving deltas:  36% (189/519)
-Resolving deltas:  39% (203/519)
-Resolving deltas:  40% (212/519)
-Resolving deltas:  48% (253/519)
-Resolving deltas:  49% (255/519)
-Resolving deltas:  50% (260/519)
-Resolving deltas:  51% (268/519)
-Resolving deltas:  52% (272/519)
-
-.. parsed-literal::
-
-    Resolving deltas:  53% (280/519)
-Resolving deltas:  57% (301/519)
-Resolving deltas:  66% (346/519)
-Resolving deltas:  67% (350/519)
-Resolving deltas:  68% (354/519)
-Resolving deltas:  69% (362/519)
-Resolving deltas:  70% (364/519)
-Resolving deltas:  71% (369/519)
-Resolving deltas:  72% (374/519)
-Resolving deltas:  73% (379/519)
-Resolving deltas:  74% (385/519)
-Resolving deltas:  75% (392/519)
-Resolving deltas:  76% (396/519)
-Resolving deltas:  77% (400/519)
-Resolving deltas:  78% (406/519)
-Resolving deltas:  79% (411/519)
-Resolving deltas:  80% (418/519)
-Resolving deltas:  82% (426/519)
-Resolving deltas:  83% (432/519)
-Resolving deltas:  84% (437/519)
-Resolving deltas:  85% (446/519)
-Resolving deltas:  86% (449/519)
-Resolving deltas:  87% (452/519)
-Resolving deltas:  88% (458/519)
-Resolving deltas:  89% (462/519)
-Resolving deltas:  90% (469/519)
-Resolving deltas:  91% (476/519)
-Resolving deltas:  93% (487/519)
-Resolving deltas:  94% (488/519)
-Resolving deltas:  95% (496/519)
-Resolving deltas:  96% (501/519)
-Resolving deltas:  97% (506/519)
-Resolving deltas:  99% (517/519)
-Resolving deltas: 100% (519/519)
-Resolving deltas: 100% (519/519), done.
+    Receiving objects:  98% (1174/1197), 69.63 MiB | 22.59 MiB/sReceiving objects:  99% (1186/1197), 69.63 MiB | 22.59 MiB/sReceiving objects: 100% (1197/1197), 69.63 MiB | 22.59 MiB/sReceiving objects: 100% (1197/1197), 74.23 MiB | 22.60 MiB/s, done.
+    Resolving deltas:   0% (0/520)Resolving deltas:   1% (8/520)Resolving deltas:   2% (15/520)Resolving deltas:   3% (17/520)Resolving deltas:   4% (21/520)Resolving deltas:   5% (26/520)Resolving deltas:   6% (32/520)Resolving deltas:   8% (43/520)Resolving deltas:   9% (50/520)Resolving deltas:  10% (52/520)Resolving deltas:  11% (58/520)Resolving deltas:  13% (68/520)Resolving deltas:  14% (73/520)Resolving deltas:  16% (87/520)Resolving deltas:  17% (91/520)Resolving deltas:  21% (113/520)Resolving deltas:  22% (116/520)Resolving deltas:  23% (123/520)Resolving deltas:  26% (140/520)Resolving deltas:  32% (171/520)Resolving deltas:  33% (172/520)Resolving deltas:  34% (181/520)Resolving deltas:  35% (182/520)Resolving deltas:  36% (188/520)Resolving deltas:  38% (202/520)Resolving deltas:  39% (204/520)Resolving deltas:  40% (211/520)Resolving deltas:  48% (252/520)Resolving deltas:  49% (255/520)Resolving deltas:  51% (267/520)Resolving deltas:  52% (271/520)Resolving deltas:  53% (279/520)Resolving deltas:  57% (300/520)Resolving deltas:  62% (326/520)Resolving deltas:  64% (335/520)Resolving deltas:  66% (344/520)Resolving deltas:  68% (354/520)Resolving deltas:  69% (359/520)Resolving deltas:  70% (364/520)Resolving deltas:  71% (371/520)Resolving deltas:  72% (377/520)Resolving deltas:  73% (380/520)Resolving deltas:  74% (385/520)Resolving deltas:  75% (392/520)Resolving deltas:  76% (397/520)Resolving deltas:  77% (401/520)Resolving deltas:  78% (408/520)Resolving deltas:  79% (411/520)Resolving deltas:  80% (421/520)Resolving deltas:  81% (422/520)Resolving deltas:  82% (427/520)Resolving deltas:  83% (433/520)Resolving deltas:  84% (438/520)Resolving deltas:  85% (443/520)Resolving deltas:  86% (449/520)Resolving deltas:  87% (454/520)Resolving deltas:  88% (459/520)Resolving deltas:  89% (466/520)Resolving deltas:  90% (468/520)Resolving deltas:  91% (477/520)Resolving deltas:  92% (480/520)Resolving deltas:  93% (485/520)Resolving deltas:  94% (491/520)Resolving deltas:  95% (496/520)Resolving deltas:  96% (500/520)Resolving deltas:  97% (507/520)Resolving deltas:  99% (517/520)Resolving deltas: 100% (520/520)Resolving deltas: 100% (520/520), done.
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/notebooks/yolov7-optimization/yolov7
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/yolov7-optimization/yolov7
 
 
 .. code:: ipython3
@@ -392,14 +245,14 @@ Resolving deltas: 100% (519/519), done.
 
 .. parsed-literal::
 
-    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/notebooks/yolov7-optimization/yolov7/model/yolov7-tiny.pt')
+    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/yolov7-optimization/yolov7/model/yolov7-tiny.pt')
 
 
 
 Check model inference
 ---------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ``detect.py`` script run pytorch model inference and save image as
 result,
@@ -412,11 +265,7 @@ result,
 .. parsed-literal::
 
     Namespace(agnostic_nms=False, augment=False, classes=None, conf_thres=0.25, device='', exist_ok=False, img_size=640, iou_thres=0.45, name='exp', no_trace=False, nosave=False, project='runs/detect', save_conf=False, save_txt=False, source='inference/images/horses.jpg', update=False, view_img=False, weights=['model/yolov7-tiny.pt'])
-
-
-.. parsed-literal::
-
-    YOLOR 🚀 v0.1-128-ga207844 torch 1.13.1+cpu CPU
+    YOLOR 🚀 v0.1-128-ga207844 torch 2.1.0+cpu CPU
     
 
 
@@ -427,7 +276,7 @@ result,
 
 .. parsed-literal::
 
-    Model Summary: 200 layers, 6219709 parameters, 229245 gradients
+    Model Summary: 200 layers, 6219709 parameters, 229245 gradients, 13.7 GFLOPS
      Convert model to Traced-model... 
 
 
@@ -440,7 +289,7 @@ result,
 
 .. parsed-literal::
 
-    5 horses, Done. (73.3ms) Inference, (0.8ms) NMS
+    5 horses, Done. (73.7ms) Inference, (0.8ms) NMS
      The image with the result is saved in: runs/detect/exp/horses.jpg
     Done. (0.087s)
 
@@ -461,7 +310,7 @@ result,
 Export to ONNX
 --------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To export an ONNX format of the model, we will use ``export.py`` script.
 Let us check its arguments.
@@ -538,7 +387,11 @@ an end2end ONNX model, you can check this
 
     Import onnx_graphsurgeon failure: No module named 'onnx_graphsurgeon'
     Namespace(batch_size=1, conf_thres=0.25, device='cpu', dynamic=False, dynamic_batch=False, end2end=False, fp16=False, grid=True, img_size=[640, 640], include_nms=False, int8=False, iou_thres=0.45, max_wh=None, simplify=False, topk_all=100, weights='model/yolov7-tiny.pt')
-    YOLOR 🚀 v0.1-128-ga207844 torch 1.13.1+cpu CPU
+
+
+.. parsed-literal::
+
+    YOLOR 🚀 v0.1-128-ga207844 torch 2.1.0+cpu CPU
     
 
 
@@ -549,13 +402,13 @@ an end2end ONNX model, you can check this
 
 .. parsed-literal::
 
-    Model Summary: 200 layers, 6219709 parameters, 6219709 gradients
+    Model Summary: 200 layers, 6219709 parameters, 6219709 gradients, 13.7 GFLOPS
 
 
 .. parsed-literal::
 
     
-    Starting TorchScript export with torch 1.13.1+cpu...
+    Starting TorchScript export with torch 2.1.0+cpu...
 
 
 .. parsed-literal::
@@ -563,7 +416,7 @@ an end2end ONNX model, you can check this
     TorchScript export success, saved as model/yolov7-tiny.torchscript.pt
     CoreML export failure: No module named 'coremltools'
     
-    Starting TorchScript-Lite export with torch 1.13.1+cpu...
+    Starting TorchScript-Lite export with torch 2.1.0+cpu...
 
 
 .. parsed-literal::
@@ -577,13 +430,13 @@ an end2end ONNX model, you can check this
 
     ONNX export success, saved as model/yolov7-tiny.onnx
     
-    Export complete (2.43s). Visualize with https://github.com/lutzroeder/netron.
+    Export complete (2.60s). Visualize with https://github.com/lutzroeder/netron.
 
 
 Convert ONNX Model to OpenVINO Intermediate Representation (IR)
 ---------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__ While ONNX models are directly
+`back to top ⬆️ <#Table-of-contents:>`__ While ONNX models are directly
 supported by OpenVINO runtime, it can be useful to convert them to IR
 format to take the advantage of OpenVINO model conversion API features.
 The ``ov.convert_model`` python function of `model conversion
@@ -604,7 +457,7 @@ However, it can also be save on device in OpenVINO IR format using
 Verify model inference
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To test model work, we create inference pipeline similar to
 ``detect.py``. The pipeline consists of preprocessing step, inference of
@@ -613,7 +466,7 @@ OpenVINO model, and results post-processing to get bounding boxes.
 Preprocessing
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model input is a tensor with the ``[1, 3, 640, 640]`` shape in
 ``N, C, H, W`` format, where
@@ -704,7 +557,7 @@ To keep specific shape, preprocessing automatically enables padding.
 Postprocessing
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model output contains detection boxes candidates. It is a tensor with
 the ``[1,25200,85]`` shape in the ``B, N, 85`` format, where:
@@ -785,7 +638,7 @@ algorithm and rescale boxes coordinates to original image size.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -833,12 +686,12 @@ select device from dropdown list for running inference using OpenVINO
 Verify model accuracy
 ---------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download dataset
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 YOLOv7 tiny is pre-trained on the COCO dataset, so in order to evaluate
 the model accuracy, we need to download it. According to the
@@ -849,9 +702,6 @@ the original model evaluation scripts.
 .. code:: ipython3
 
     from zipfile import ZipFile
-    
-    sys.path.append("../../utils")
-    from notebook_utils import download_file
     
     DATA_URL = "http://images.cocodataset.org/zips/val2017.zip"
     LABELS_URL = "https://github.com/ultralytics/yolov5/releases/download/v1.0/coco2017labels-segments.zip"
@@ -883,7 +733,7 @@ the original model evaluation scripts.
 Create dataloader
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -909,93 +759,83 @@ Create dataloader
 
 .. parsed-literal::
 
-    
-Scanning images:   0%|          | 0/5000 [00:00<?, ?it/s]
+    Scanning images:   0%|          | 0/5000 [00:00<?, ?it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 291 found, 1 missing, 0 empty, 0 corrupted:   6%|▌         | 292/5000 [00:00<00:01, 2908.87it/s]
+    val: Scanning 'coco/val2017' images and labels... 268 found, 1 missing, 0 empty, 0 corrupted:   5%|▌         | 269/5000 [00:00<00:01, 2689.89it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 578 found, 6 missing, 0 empty, 0 corrupted:  12%|█▏        | 584/5000 [00:00<00:01, 2910.03it/s]
+    val: Scanning 'coco/val2017' images and labels... 533 found, 5 missing, 0 empty, 0 corrupted:  11%|█         | 538/5000 [00:00<00:01, 2452.72it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 871 found, 8 missing, 0 empty, 0 corrupted:  18%|█▊        | 879/5000 [00:00<00:01, 2923.63it/s]
+    val: Scanning 'coco/val2017' images and labels... 798 found, 6 missing, 0 empty, 0 corrupted:  16%|█▌        | 804/5000 [00:00<00:01, 2539.20it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 1172 found, 10 missing, 0 empty, 0 corrupted:  24%|██▎       | 1182/5000 [00:00<00:01, 2962.36it/s]
+    val: Scanning 'coco/val2017' images and labels... 1071 found, 10 missing, 0 empty, 0 corrupted:  22%|██▏       | 1081/5000 [00:00<00:01, 2624.57it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 1469 found, 10 missing, 0 empty, 0 corrupted:  30%|██▉       | 1479/5000 [00:00<00:01, 2947.80it/s]
+    val: Scanning 'coco/val2017' images and labels... 1336 found, 10 missing, 0 empty, 0 corrupted:  27%|██▋       | 1346/5000 [00:00<00:01, 2630.64it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 1766 found, 14 missing, 0 empty, 0 corrupted:  36%|███▌      | 1780/5000 [00:00<00:01, 2967.71it/s]
+    val: Scanning 'coco/val2017' images and labels... 1602 found, 12 missing, 0 empty, 0 corrupted:  32%|███▏      | 1614/5000 [00:00<00:01, 2646.51it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 2063 found, 16 missing, 0 empty, 0 corrupted:  42%|████▏     | 2079/5000 [00:00<00:00, 2972.59it/s]
+    val: Scanning 'coco/val2017' images and labels... 1871 found, 14 missing, 0 empty, 0 corrupted:  38%|███▊      | 1885/5000 [00:00<00:01, 2666.01it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 2355 found, 22 missing, 0 empty, 0 corrupted:  48%|████▊     | 2377/5000 [00:00<00:01, 2162.12it/s]
+    val: Scanning 'coco/val2017' images and labels... 2143 found, 17 missing, 0 empty, 0 corrupted:  43%|████▎     | 2160/5000 [00:00<00:01, 2692.49it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 2640 found, 23 missing, 0 empty, 0 corrupted:  53%|█████▎    | 2663/5000 [00:01<00:01, 2334.86it/s]
+    val: Scanning 'coco/val2017' images and labels... 2412 found, 23 missing, 0 empty, 0 corrupted:  49%|████▊     | 2435/5000 [00:00<00:00, 2708.91it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 2936 found, 28 missing, 0 empty, 0 corrupted:  59%|█████▉    | 2964/5000 [00:01<00:00, 2510.84it/s]
+    val: Scanning 'coco/val2017' images and labels... 2682 found, 25 missing, 0 empty, 0 corrupted:  54%|█████▍    | 2707/5000 [00:01<00:00, 2704.69it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 3230 found, 31 missing, 0 empty, 0 corrupted:  65%|██████▌   | 3261/5000 [00:01<00:00, 2634.62it/s]
+    val: Scanning 'coco/val2017' images and labels... 2951 found, 29 missing, 0 empty, 0 corrupted:  60%|█████▉    | 2980/5000 [00:01<00:00, 2710.90it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 3522 found, 34 missing, 0 empty, 0 corrupted:  71%|███████   | 3556/5000 [00:01<00:00, 2720.41it/s]
+    val: Scanning 'coco/val2017' images and labels... 3225 found, 31 missing, 0 empty, 0 corrupted:  65%|██████▌   | 3256/5000 [00:01<00:00, 2724.67it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 3817 found, 34 missing, 0 empty, 0 corrupted:  77%|███████▋  | 3851/5000 [00:01<00:00, 2784.81it/s]
+    val: Scanning 'coco/val2017' images and labels... 3495 found, 34 missing, 0 empty, 0 corrupted:  71%|███████   | 3529/5000 [00:01<00:00, 2710.78it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 4110 found, 39 missing, 0 empty, 0 corrupted:  83%|████████▎ | 4149/5000 [00:01<00:00, 2839.41it/s]
+    val: Scanning 'coco/val2017' images and labels... 3767 found, 34 missing, 0 empty, 0 corrupted:  76%|███████▌  | 3801/5000 [00:01<00:00, 2691.40it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 4408 found, 42 missing, 0 empty, 0 corrupted:  89%|████████▉ | 4450/5000 [00:01<00:00, 2888.22it/s]
+    val: Scanning 'coco/val2017' images and labels... 4037 found, 37 missing, 0 empty, 0 corrupted:  81%|████████▏ | 4074/5000 [00:01<00:00, 2701.37it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 4707 found, 46 missing, 0 empty, 0 corrupted:  95%|█████████▌| 4753/5000 [00:01<00:00, 2927.27it/s]
+    val: Scanning 'coco/val2017' images and labels... 4304 found, 41 missing, 0 empty, 0 corrupted:  87%|████████▋ | 4345/5000 [00:01<00:00, 2473.14it/s]
 
 .. parsed-literal::
 
-    
-val: Scanning 'coco/val2017' images and labels... 4952 found, 48 missing, 0 empty, 0 corrupted: 100%|██████████| 5000/5000 [00:01<00:00, 2768.03it/s]
+    val: Scanning 'coco/val2017' images and labels... 4576 found, 43 missing, 0 empty, 0 corrupted:  92%|█████████▏| 4619/5000 [00:01<00:00, 2546.99it/s]
+
+.. parsed-literal::
+
+    val: Scanning 'coco/val2017' images and labels... 4829 found, 48 missing, 0 empty, 0 corrupted:  98%|█████████▊| 4877/5000 [00:01<00:00, 2478.69it/s]
+
+.. parsed-literal::
+
+    val: Scanning 'coco/val2017' images and labels... 4952 found, 48 missing, 0 empty, 0 corrupted: 100%|██████████| 5000/5000 [00:01<00:00, 2613.79it/s]
 
 .. parsed-literal::
 
@@ -1005,7 +845,7 @@ val: Scanning 'coco/val2017' images and labels... 4952 found, 48 missing, 0 empt
 Define validation function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We will reuse validation metrics provided in the YOLOv7 repo with a
 modification for this case (removing extra steps). The original model
@@ -1173,7 +1013,7 @@ Validation function reports following list of accuracy metrics:
 Optimize model using NNCF Post-training Quantization API
 --------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -1241,14 +1081,14 @@ asymmetric quantization of activations.
 
 .. parsed-literal::
 
-    2024-03-27 15:25:24.121341: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-27 15:25:24.153185: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-10 00:55:46.301991: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-10 00:55:46.334090: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-03-27 15:25:24.688219: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-10 00:55:46.910476: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 
@@ -1274,7 +1114,7 @@ asymmetric quantization of activations.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
       return Tensor(self.data * unwrap_tensor_data(other))
 
 
@@ -1302,7 +1142,7 @@ asymmetric quantization of activations.
 Validate Quantized model inference
 ----------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1334,7 +1174,7 @@ Validate Quantized model inference
 Validate quantized model accuracy
 ---------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1370,7 +1210,7 @@ significant.
 Compare Performance of the Original and Quantized Models
 --------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Finally, use the OpenVINO `Benchmark
 Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
@@ -1425,7 +1265,7 @@ models.
 
 .. parsed-literal::
 
-    [ INFO ] Read model took 13.50 ms
+    [ INFO ] Read model took 13.25 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     images (node: images) : f32 / [...] / [1,3,640,640]
@@ -1443,14 +1283,18 @@ models.
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 269.77 ms
+    [ INFO ] Compile model took 293.81 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
-    [ INFO ]   NETWORK_NAME: torch_jit
+    [ INFO ]   NETWORK_NAME: main_graph
     [ INFO ]   EXECUTION_DEVICES: ['CPU']
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
     [ INFO ]   OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
     [ INFO ]   MULTI_DEVICE_PRIORITIES: CPU
+
+
+.. parsed-literal::
+
     [ INFO ]   CPU:
     [ INFO ]     AFFINITY: Affinity.CORE
     [ INFO ]     CPU_DENORMALS_OPTIMIZATION: False
@@ -1464,7 +1308,7 @@ models.
     [ INFO ]     INFERENCE_PRECISION_HINT: <Type: 'float32'>
     [ INFO ]     KV_CACHE_PRECISION: <Type: 'float16'>
     [ INFO ]     LOG_LEVEL: Level.NO
-    [ INFO ]     NETWORK_NAME: torch_jit
+    [ INFO ]     NETWORK_NAME: main_graph
     [ INFO ]     NUM_STREAMS: 6
     [ INFO ]     OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
     [ INFO ]     PERFORMANCE_HINT: THROUGHPUT
@@ -1476,31 +1320,27 @@ models.
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'images'!. This input will be filled with random values!
     [ INFO ] Fill input 'images' with random values 
-
-
-.. parsed-literal::
-
     [Step 10/11] Measuring performance (Start inference asynchronously, 6 inference requests, limits: 120000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
 
 
 .. parsed-literal::
 
-    [ INFO ] First inference took 54.66 ms
+    [ INFO ] First inference took 44.75 ms
 
 
 .. parsed-literal::
 
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            11586 iterations
-    [ INFO ] Duration:         120108.30 ms
+    [ INFO ] Count:            11574 iterations
+    [ INFO ] Duration:         120105.22 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        61.92 ms
-    [ INFO ]    Average:       62.05 ms
-    [ INFO ]    Min:           32.51 ms
-    [ INFO ]    Max:           84.18 ms
-    [ INFO ] Throughput:   96.46 FPS
+    [ INFO ]    Median:        61.88 ms
+    [ INFO ]    Average:       62.12 ms
+    [ INFO ]    Min:           52.58 ms
+    [ INFO ]    Max:           116.69 ms
+    [ INFO ] Throughput:   96.37 FPS
 
 
 .. code:: ipython3
@@ -1531,7 +1371,7 @@ models.
 
 .. parsed-literal::
 
-    [ INFO ] Read model took 22.66 ms
+    [ INFO ] Read model took 22.31 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     images (node: images) : f32 / [...] / [1,3,640,640]
@@ -1549,10 +1389,10 @@ models.
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 496.85 ms
+    [ INFO ] Compile model took 485.48 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
-    [ INFO ]   NETWORK_NAME: torch_jit
+    [ INFO ]   NETWORK_NAME: main_graph
     [ INFO ]   EXECUTION_DEVICES: ['CPU']
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
     [ INFO ]   OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
@@ -1570,7 +1410,7 @@ models.
     [ INFO ]     INFERENCE_PRECISION_HINT: <Type: 'float32'>
     [ INFO ]     KV_CACHE_PRECISION: <Type: 'float16'>
     [ INFO ]     LOG_LEVEL: Level.NO
-    [ INFO ]     NETWORK_NAME: torch_jit
+    [ INFO ]     NETWORK_NAME: main_graph
     [ INFO ]     NUM_STREAMS: 6
     [ INFO ]     OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
     [ INFO ]     PERFORMANCE_HINT: THROUGHPUT
@@ -1582,25 +1422,25 @@ models.
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'images'!. This input will be filled with random values!
     [ INFO ] Fill input 'images' with random values 
-    [Step 10/11] Measuring performance (Start inference asynchronously, 6 inference requests, limits: 120000 ms duration)
-    [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
 
 
 .. parsed-literal::
 
-    [ INFO ] First inference took 26.90 ms
+    [Step 10/11] Measuring performance (Start inference asynchronously, 6 inference requests, limits: 120000 ms duration)
+    [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
+    [ INFO ] First inference took 25.46 ms
 
 
 .. parsed-literal::
 
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            32958 iterations
-    [ INFO ] Duration:         120023.90 ms
+    [ INFO ] Count:            33186 iterations
+    [ INFO ] Duration:         120026.16 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        21.58 ms
-    [ INFO ]    Average:       21.73 ms
-    [ INFO ]    Min:           16.16 ms
-    [ INFO ]    Max:           48.80 ms
-    [ INFO ] Throughput:   274.60 FPS
+    [ INFO ]    Median:        21.50 ms
+    [ INFO ]    Average:       21.59 ms
+    [ INFO ]    Min:           15.49 ms
+    [ INFO ]    Max:           43.02 ms
+    [ INFO ] Throughput:   276.49 FPS
 

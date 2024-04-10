@@ -1,4 +1,4 @@
-Hugging Face Model Hub with OpenVINO™
+🤗 Hugging Face Model Hub with OpenVINO™
 =======================================
 
 The Hugging Face (HF) `Model Hub <https://huggingface.co/models>`__ is a
@@ -21,35 +21,35 @@ Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
 -  `Converting a Model from the HF Transformers
-   Package <#converting-a-model-from-the-hf-transformers-package>`__
+   Package <#Converting-a-Model-from-the-HF-Transformers-Package>`__
 
-   -  `Installing Requirements <#installing-requirements>`__
-   -  `Imports <#imports>`__
+   -  `Installing Requirements <#Installing-Requirements>`__
+   -  `Imports <#Imports>`__
    -  `Initializing a Model Using the HF Transformers
-      Package <#initializing-a-model-using-the-hf-transformers-package>`__
-   -  `Original Model inference <#original-model-inference>`__
+      Package <#Initializing-a-Model-Using-the-HF-Transformers-Package>`__
+   -  `Original Model inference <#Original-Model-inference>`__
    -  `Converting the Model to OpenVINO IR
-      format <#converting-the-model-to-openvino-ir-format>`__
-   -  `Converted Model Inference <#converted-model-inference>`__
+      format <#Converting-the-Model-to-OpenVINO-IR-format>`__
+   -  `Converted Model Inference <#Converted-Model-Inference>`__
 
 -  `Converting a Model Using the Optimum Intel
-   Package <#converting-a-model-using-the-optimum-intel-package>`__
+   Package <#Converting-a-Model-Using-the-Optimum-Intel-Package>`__
 
    -  `Install Requirements for
-      Optimum <#install-requirements-for-optimum>`__
-   -  `Import Optimum <#import-optimum>`__
+      Optimum <#Install-Requirements-for-Optimum>`__
+   -  `Import Optimum <#Import-Optimum>`__
    -  `Initialize and Convert the Model Automatically using OVModel
-      class <#initialize-and-convert-the-model-automatically-using-ovmodel-class>`__
+      class <#Initialize-and-Convert-the-Model-Automatically-using-OVModel-class>`__
    -  `Convert model using Optimum CLI
-      interface <#convert-model-using-optimum-cli-interface>`__
-   -  `The Optimum Model Inference <#the-optimum-model-inference>`__
+      interface <#Convert-model-using-Optimum-CLI-interface>`__
+   -  `The Optimum Model Inference <#The-Optimum-Model-Inference>`__
 
 .. |image0| image:: https://github.com/huggingface/optimum-intel/raw/main/readme_logo.png
 
 Converting a Model from the HF Transformers Package
 ---------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Hugging Face transformers package provides API for initializing a model
 and loading a set of pre-trained weights using the model text handle.
@@ -61,11 +61,11 @@ by popularity and novelty.
 Installing Requirements
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "transformers[torch]>=4.33.0"
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "transformers>=4.33.0" "torch>=2.1.0"
     %pip install -q ipywidgets
     %pip install -q "openvino>=2023.1.0"
 
@@ -88,7 +88,7 @@ Installing Requirements
 Imports
 ~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -103,7 +103,7 @@ Imports
 Initializing a Model Using the HF Transformers Package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We will use `roberta text sentiment
 classification <https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest>`__
@@ -129,7 +129,7 @@ tutorials <https://huggingface.co/learn/nlp-course/chapter2/2?fw=pt#behind-the-p
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
       return self.fget.__get__(instance, owner)()
     Some weights of the model checkpoint at cardiffnlp/twitter-roberta-base-sentiment-latest were not used when initializing RobertaForSequenceClassification: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
     - This IS expected if you are initializing RobertaForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
@@ -139,7 +139,7 @@ tutorials <https://huggingface.co/learn/nlp-course/chapter2/2?fw=pt#behind-the-p
 Original Model inference
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let’s do a classification of a simple prompt below.
 
@@ -171,7 +171,7 @@ Let’s do a classification of a simple prompt below.
 Converting the Model to OpenVINO IR format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__ We use the OpenVINO `Model
+`back to top ⬆️ <#Table-of-contents:>`__ We use the OpenVINO `Model
 conversion
 API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html#convert-a-model-with-python-convert-model>`__
 to convert the model (this one is implemented in PyTorch) to OpenVINO
@@ -193,14 +193,14 @@ Note how we reuse our real ``encoded_input``, passing it to the
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
 
 
 Converted Model Inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, we pick a device to do the model inference
 
@@ -267,9 +267,9 @@ first example in the list above relies on the ``diffusers``.
 Converting a Model Using the Optimum Intel Package
 --------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
-Optimum Intel is the interface between the Transformers and
+🤗 Optimum Intel is the interface between the 🤗 Transformers and
 Diffusers libraries and the different tools and libraries provided by
 Intel to accelerate end-to-end pipelines on Intel architectures.
 
@@ -281,7 +281,7 @@ OpenVINO Runtime.
 Install Requirements for Optimum
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -304,7 +304,7 @@ Install Requirements for Optimum
 Import Optimum
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Documentation for Optimum Intel states: >You can now easily perform
 inference with OpenVINO Runtime on a variety of Intel processors (see
@@ -344,26 +344,20 @@ documentation <https://huggingface.co/docs/optimum/intel/inference>`__.
 
 .. parsed-literal::
 
-    2024-03-27 13:22:24.478738: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-27 13:22:24.513960: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-09 23:20:51.883082: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-09 23:20:51.918754: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-03-27 13:22:25.074910: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-
-
-.. parsed-literal::
-
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/import_utils.py:519: FutureWarning: `is_torch_tpu_available` is deprecated and will be removed in 4.41.0. Please use the `is_torch_xla_available` instead.
-      warnings.warn(
+    2024-04-09 23:20:52.478116: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 Initialize and Convert the Model Automatically using OVModel class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To load a Transformers model and convert it to the OpenVINO format on
 the fly, you can set ``export=True`` when loading your model. The model
@@ -431,7 +425,7 @@ inference run.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
 
 
@@ -443,7 +437,7 @@ inference run.
 Convert model using Optimum CLI interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Alternatively, you can use the Optimum CLI interface for converting
 models (supported starting optimum-intel 1.12 version). General command
@@ -491,7 +485,7 @@ Full list of supported arguments available via ``--help``
 
 .. parsed-literal::
 
-    2024-03-27 13:22:37.168684: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-09 23:21:04.603325: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 .. parsed-literal::
@@ -521,21 +515,21 @@ Full list of supported arguments available via ``--help``
       --task TASK           The task to export the model for. If not specified,
                             the task will be auto-inferred based on the model.
                             Available tasks depend on the model, but are among:
-                            ['image-segmentation', 'token-classification', 'text-
-                            to-audio', 'automatic-speech-recognition', 'audio-
-                            xvector', 'stable-diffusion-xl', 'image-
-                            classification', 'stable-diffusion', 'semantic-
-                            segmentation', 'masked-im', 'multiple-choice',
-                            'text2text-generation', 'zero-shot-image-
-                            classification', 'fill-mask', 'conversational', 'text-
-                            generation', 'depth-estimation', 'text-
-                            classification', 'object-detection', 'image-to-text',
-                            'question-answering', 'audio-classification',
-                            'sentence-similarity', 'image-to-image', 'mask-
-                            generation', 'audio-frame-classification', 'zero-shot-
-                            object-detection', 'feature-extraction']. For decoder
-                            models, use `xxx-with-past` to export the model using
-                            past key values in the decoder.
+                            ['image-to-image', 'semantic-segmentation', 'stable-
+                            diffusion', 'depth-estimation', 'zero-shot-image-
+                            classification', 'audio-classification',
+                            'conversational', 'stable-diffusion-xl', 'text-
+                            generation', 'automatic-speech-recognition', 'object-
+                            detection', 'image-segmentation', 'audio-xvector',
+                            'feature-extraction', 'text-to-audio', 'text2text-
+                            generation', 'token-classification', 'text-
+                            classification', 'audio-frame-classification', 'image-
+                            to-text', 'image-classification', 'fill-mask', 'mask-
+                            generation', 'multiple-choice', 'masked-im',
+                            'question-answering', 'sentence-similarity', 'zero-
+                            shot-object-detection']. For decoder models, use `xxx-
+                            with-past` to export the model using past key values
+                            in the decoder.
       --cache_dir CACHE_DIR
                             Path indicating where to store cache.
       --framework {pt,tf}   The framework to use for the export. If not provided,
@@ -599,7 +593,7 @@ compression:
 
 .. parsed-literal::
 
-    2024-03-27 13:22:41.461720: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-09 23:21:08.867818: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 .. parsed-literal::
@@ -614,12 +608,6 @@ compression:
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/import_utils.py:519: FutureWarning: `is_torch_tpu_available` is deprecated and will be removed in 4.41.0. Please use the `is_torch_xla_available` instead.
-      warnings.warn(
-
-
-.. parsed-literal::
-
     `--fp16` option is deprecated and will be removed in a future version. Use `--weight-format` instead.
 
 
@@ -630,7 +618,7 @@ compression:
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
       return self.fget.__get__(instance, owner)()
 
 
@@ -652,7 +640,7 @@ compression:
     Using framework PyTorch: 2.1.0+cpu
     Overriding 1 configuration item(s)
     	- use_cache -> False
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
 
 
@@ -677,7 +665,7 @@ link <https://huggingface.co/models?library=openvino&sort=trending>`__.
 The Optimum Model Inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model inference is exactly the same as for the original model!
 

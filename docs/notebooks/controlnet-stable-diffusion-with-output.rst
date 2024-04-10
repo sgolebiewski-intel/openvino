@@ -13,7 +13,7 @@ process. ControlNet provides a minimal interface allowing users to
 customize the generation process to a great extent.
 
 ControlNet was introduced in `Adding Conditional Control to
-Text-to-Image Diffusion Models <http/arxiv.oa2302.05543>`__
+Text-to-Image Diffusion Models <https://arxiv.org/abs/2302.05543>`__
 paper. It provides a framework that enables support for various spatial
 contexts such as a depth map, a segmentation map, a scribble, and key
 points that can serve as additional conditionings to Diffusion models
@@ -23,7 +23,7 @@ This notebook explores ControlNet in depth, especially a new technique
 for imparting high levels of control over the shape of synthesized
 images. It demonstrates how to run it, using OpenVINO. An additional
 part demonstrates how to run quantization with
-`NNCF <http/github.copenvinotoolknn>`__ to speed up
+`NNCF <https://github.com/openvinotoolkit/nncf/>`__ to speed up
 pipeline. Let us get “controlling”!
 
 Background
@@ -32,13 +32,13 @@ Background
 Stable Diffusion
 ~~~~~~~~~~~~~~~~
 
-`Stable Diffusion <http/github.cCompVstable-diffusion>`__ is a
+`Stable Diffusion <https://github.com/CompVis/stable-diffusion>`__ is a
 text-to-image latent diffusion model created by researchers and
 engineers from CompVis, Stability AI, and LAION. Diffusion models as
 mentioned above can generate high-quality images. Stable Diffusion is
 based on a particular type of diffusion model called Latent Diffusion,
 proposed in `High-Resolution Image Synthesis with Latent Diffusion
-Models <http/arxiv.oa2112.10752>`__ paper. Generally speaking,
+Models <https://arxiv.org/abs/2112.10752>`__ paper. Generally speaking,
 diffusion models are machine learning systems that are trained to
 denoise random Gaussian noise step by step, to get to a sample of
 interest, such as an image. Diffusion models have been shown to achieve
@@ -56,14 +56,14 @@ latent (compressed) representations of the images.
 There are three main components in latent diffusion:
 
 -  A text-encoder, for example `CLIP’s Text
-   Encoder <http/huggingface.dotransformemodel_dclip#transformers.CLIPTextModel>`__
+   Encoder <https://huggingface.co/docs/transformers/model_doc/clip#transformers.CLIPTextModel>`__
    for creation condition to generate image from text prompt.
 -  A U-Net for step-by-step denoising latent image representation.
 -  An autoencoder (VAE) for encoding input image to latent space (if
    required) and decoding latent space to image back after generation.
 
 For more details regarding Stable Diffusion work, refer to the `project
-website <http/ommer-lab.cresearlatent-diffusion-mode>`__.
+website <https://ommer-lab.com/research/latent-diffusion-models/>`__.
 There is a tutorial for Stable Diffusion Text-to-Image generation with
 OpenVINO, see the following
 `notebook <stable-diffusion-text-to-image-with-output.html>`__.
@@ -144,71 +144,71 @@ discussed steps are also applicable to other annotation modes.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Instantiating Generation
-   Pipeline <#instantiating-generation-pipeline>`__
+   Pipeline <#Instantiating-Generation-Pipeline>`__
 
    -  `ControlNet in Diffusers
-      library <#controlnet-in-diffusers-library>`__
-   -  `OpenPose <#openpose>`__
+      library <#ControlNet-in-Diffusers-library>`__
+   -  `OpenPose <#OpenPose>`__
 
 -  `Convert models to OpenVINO Intermediate representation (IR)
-   format <#convert-models-to-openvino-intermediate-representation-ir-format>`__
+   format <#Convert-models-to-OpenVINO-Intermediate-representation-(IR)-format>`__
 
-   -  `OpenPose conversion <#openpose-conversion>`__
+   -  `OpenPose conversion <#OpenPose-conversion>`__
 
--  `Select inference device <#select-inference-device>`__
+-  `Select inference device <#Select-inference-device>`__
 
-   -  `ControlNet conversion <#controlnet-conversion>`__
-   -  `UNet conversion <#unet-conversion>`__
-   -  `Text Encoder <#text-encoder>`__
-   -  `VAE Decoder conversion <#vae-decoder-conversion>`__
+   -  `ControlNet conversion <#ControlNet-conversion>`__
+   -  `UNet conversion <#UNet-conversion>`__
+   -  `Text Encoder <#Text-Encoder>`__
+   -  `VAE Decoder conversion <#VAE-Decoder-conversion>`__
 
--  `Prepare Inference pipeline <#prepare-inference-pipeline>`__
+-  `Prepare Inference pipeline <#Prepare-Inference-pipeline>`__
 -  `Running Text-to-Image Generation with ControlNet Conditioning and
-   OpenVINO <#running-text-to-image-generation-with-controlnet-conditioning-and-openvino>`__
+   OpenVINO <#Running-Text-to-Image-Generation-with-ControlNet-Conditioning-and-OpenVINO>`__
 -  `Select inference device for Stable Diffusion
-   pipeline <#select-inference-device-for-stable-diffusion-pipeline>`__
--  `Quantization <#quantization>`__
+   pipeline <#Select-inference-device-for-Stable-Diffusion-pipeline>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Prepare calibration datasets <#prepare-calibration-datasets>`__
-   -  `Run quantization <#run-quantization>`__
-   -  `Compare model file sizes <#compare-model-file-sizes>`__
+   -  `Prepare calibration datasets <#Prepare-calibration-datasets>`__
+   -  `Run quantization <#Run-quantization>`__
+   -  `Compare model file sizes <#Compare-model-file-sizes>`__
    -  `Compare inference time of the FP16 and INT8
-      pipelines <#compare-inference-time-of-the-fp16-and-int8-pipelines>`__
+      pipelines <#Compare-inference-time-of-the-FP16-and-INT8-pipelines>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "torch" "torchvision"
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "torch>=2.1" "torchvision"
     %pip install -q "diffusers>=0.14.0" "transformers>=4.30.2" "controlnet-aux>=0.0.6" "gradio>=3.36" --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "openvino>=2023.1.0" "datasets>=2.14.6" "nncf>=2.7.0"
 
 Instantiating Generation Pipeline
 ---------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ControlNet in Diffusers library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For working with Stable Diffusion and ControlNet models, we will use
-Hugging Face `Diffusers <http/github.chuggingfadiffusers>`__
+Hugging Face `Diffusers <https://github.com/huggingface/diffusers>`__
 library. To experiment with ControlNet, Diffusers exposes the
-`StableDiffusionControlNetPipeline <http/huggingface.dodiffusemaapipelinstable_diffusicontrolnet>`__
+```StableDiffusionControlNetPipeline`` <https://huggingface.co/docs/diffusers/main/en/api/pipelines/stable_diffusion/controlnet>`__
 similar to the `other Diffusers
-pipelines <http/huggingface.dodiffuseapipelinoverview>`__.
+pipelines <https://huggingface.co/docs/diffusers/api/pipelines/overview>`__.
 Central to the ``StableDiffusionControlNetPipeline`` is the
 ``controlnet`` argument which enables providing a particularly trained
-`ControlNetModel <hthuggingface.dodiffusemaamodels#diffusers.ControlNetModel>`__
+```ControlNetModel`` <https://huggingface.co/docs/diffusers/main/en/api/models#diffusers.ControlNetModel>`__
 instance while keeping the pre-trained diffusion model weights the same.
 The code below demonstrates how to create
 ``StableDiffusionControlNetPipeline``, using the ``controlnet-openpose``
@@ -227,10 +227,10 @@ controlnet model and ``stable-diffusion-v1-5``:
 OpenPose
 ~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Annotation is an important part of working with ControlNet.
-`OpenPose <http/github.cCMU-Perceptual-Computing-Lopenpose>`__
+`OpenPose <https://github.com/CMU-Perceptual-Computing-Lab/openpose>`__
 is a fast keypoint detection model that can extract human poses like
 positions of hands, legs, and head. Below is the ControlNet workflow
 using OpenPose. Keypoints are extracted from the input image using
@@ -311,7 +311,7 @@ Now, let us check its result on example image:
 Convert models to OpenVINO Intermediate representation (IR) format
 ------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Starting from 2023.0 release, OpenVINO supports PyTorch models
 conversion directly. We need to provide a model object, input data for
@@ -333,7 +333,7 @@ Let us convert each part:
 OpenPose conversion
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenPose model is represented in the pipeline as a wrapper on the
 PyTorch model which not only detects poses on an input image but is also
@@ -428,7 +428,7 @@ model with the OpenVINO model, using the following code:
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -474,7 +474,7 @@ Great! As we can see, it works perfectly.
 ControlNet conversion
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ControlNet model accepts the same inputs like UNet in Stable
 Diffusion pipeline and additional condition sample - skeleton key points
@@ -539,7 +539,7 @@ blocks, which serves additional context for the UNet model.
 UNet conversion
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The process of UNet model conversion remains the same, like for original
 Stable Diffusion model, but with respect to the new inputs generated by
@@ -655,7 +655,7 @@ ControlNet.
 Text Encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The text-encoder is responsible for transforming the input prompt, for
 example, “a photo of an astronaut riding a horse” into an embedding
@@ -727,7 +727,7 @@ hidden states.
 VAE Decoder conversion
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The VAE model has two parts, an encoder, and a decoder. The encoder is
 used to convert the image into a low-dimensional latent representation,
@@ -795,7 +795,7 @@ diffusion
 Prepare Inference pipeline
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Putting it all together, let us now take a closer look at how the model
 works in inference by illustrating the logical flow. |detailed workflow|
@@ -820,28 +820,28 @@ this computation, each having its pros and cons. For Stable Diffusion,
 it is recommended to use one of:
 
 -  `PNDM
-   scheduler <http/github.chuggingfadiffuseblmasdiffuseschedulescheduling_pndm.py>`__
+   scheduler <https://github.com/huggingface/diffusers/blob/main/src/diffusers/schedulers/scheduling_pndm.py>`__
 -  `DDIM
-   scheduler <http/github.chuggingfadiffuseblmasdiffuseschedulescheduling_ddim.py>`__
+   scheduler <https://github.com/huggingface/diffusers/blob/main/src/diffusers/schedulers/scheduling_ddim.py>`__
 -  `K-LMS
-   scheduler <http/github.chuggingfadiffuseblmasdiffuseschedulescheduling_lms_discrete.py>`__
+   scheduler <https://github.com/huggingface/diffusers/blob/main/src/diffusers/schedulers/scheduling_lms_discrete.py>`__
 
 Theory on how the scheduler algorithm function works is out of scope for
 this notebook, but in short, you should remember that they compute the
 predicted denoised image representation from the previous noise
 representation and the predicted noise residual. For more information,
 it is recommended to look into `Elucidating the Design Space of
-Diffusion-Based Generative Models <http/arxiv.oa2206.00364>`__
+Diffusion-Based Generative Models <https://arxiv.org/abs/2206.00364>`__
 
 In this tutorial, instead of using Stable Diffusion’s default
-`PNDMScheduler <http/huggingface.dodiffusemaaschedulepndm>`__,
+```PNDMScheduler`` <https://huggingface.co/docs/diffusers/main/en/api/schedulers/pndm>`__,
 we use one of the currently fastest diffusion model schedulers, called
-`UniPCMultistepScheduler <http/huggingface.dodiffusemaascheduleunipc>`__.
+```UniPCMultistepScheduler`` <https://huggingface.co/docs/diffusers/main/en/api/schedulers/unipc>`__.
 Choosing an improved scheduler can drastically reduce inference time -
 in this case, we can reduce the number of inference steps from 50 to 20
 while more or less keeping the same image generation quality. More
 information regarding schedulers can be found
-`here <http/huggingface.dodiffusemausing-diffuseschedulers>`__.
+`here <https://huggingface.co/docs/diffusers/main/en/using-diffusers/schedulers>`__.
 
 The *denoising* process is repeated a given number of times (by default
 50) to step-by-step retrieve better latent image representations. Once
@@ -1245,7 +1245,7 @@ on OpenVINO.
 Running Text-to-Image Generation with ControlNet Conditioning and OpenVINO
 --------------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, we are ready to start generation. For improving the generation
 process, we also introduce an opportunity to provide a
@@ -1253,14 +1253,14 @@ process, we also introduce an opportunity to provide a
 toward the images associated with it, while negative prompt steers the
 diffusion away from it. More explanation of how it works can be found in
 this
-`article <http/stable-diffusion-art.chow-negative-prompt-wo>`__.
+`article <https://stable-diffusion-art.com/how-negative-prompt-work/>`__.
 We can keep this field empty if we want to generate image without
 negative prompting.
 
 Select inference device for Stable Diffusion pipeline
 -----------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -1320,9 +1320,9 @@ select device from dropdown list for running inference using OpenVINO
 Quantization
 ------------
 
+`back to top ⬆️ <#Table-of-contents:>`__
 
-
-`NNCF <http/github.copenvinotoolknn>`__ enables
+`NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
 graph and then using a subset of the training dataset to initialize the
 parameters of these additional quantization layers. Quantized operations
@@ -1369,8 +1369,12 @@ Let’s load ``skip magic`` extension to skip quantization if
 
 .. code:: ipython3
 
-    import sys
-    sys.path.append("../utils")
+    # Fetch `skip_kernel_extension` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
+        filename='skip_kernel_extension.py'
+    )
     
     int8_pipe = None
     
@@ -1379,10 +1383,10 @@ Let’s load ``skip magic`` extension to skip quantization if
 Prepare calibration datasets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use a portion of
-`jschoormahumanpose_densepose <http/huggingface.datasejschoormahumanpose_densepose>`__
+```jschoormans/humanpose_densepose`` <https://huggingface.co/datasets/jschoormans/humanpose_densepose>`__
 dataset from Hugging Face as calibration data. We use a prompts below as
 negative prompts for ControlNet and UNet. To collect intermediate model
 inputs for calibration we should customize ``CompiledModel``.
@@ -1498,7 +1502,7 @@ inputs for calibration we should customize ``CompiledModel``.
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Create a quantized model from the pre-trained converted OpenVINO model.
 ``FastBiasCorrection`` algorithm is disabled due to minimal accuracy
@@ -1577,7 +1581,7 @@ pipelines.
 Compare model file sizes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1620,7 +1624,7 @@ Compare model file sizes
 Compare inference time of the FP16 and INT8 pipelines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 pipelines, we use mean inference time on 3 samples.
@@ -1680,7 +1684,7 @@ pipelines, we use mean inference time on 3 samples.
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Please select below whether you would like to use the quantized model to
 launch the interactive demo.

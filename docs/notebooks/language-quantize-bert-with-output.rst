@@ -25,25 +25,25 @@ and datasets. It consists of the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Settings <#settings>`__
--  `Prepare the Model <#prepare-the-model>`__
--  `Prepare the Dataset <#prepare-the-dataset>`__
+-  `Imports <#Imports>`__
+-  `Settings <#Settings>`__
+-  `Prepare the Model <#Prepare-the-Model>`__
+-  `Prepare the Dataset <#Prepare-the-Dataset>`__
 -  `Optimize model using NNCF Post-training Quantization
-   API <#optimize-model-using-nncf-post-training-quantization-api>`__
--  `Load and Test OpenVINO Model <#load-and-test-openvino-model>`__
+   API <#Optimize-model-using-NNCF-Post-training-Quantization-API>`__
+-  `Load and Test OpenVINO Model <#Load-and-Test-OpenVINO-Model>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Compare F1-score of FP32 and INT8
-   models <#compare-f1-score-of-fp32-and-int8-models>`__
+   models <#Compare-F1-score-of-FP32-and-INT8-models>`__
 -  `Compare Performance of the Original, Converted and Quantized
-   Models <#compare-performance-of-the-original-converted-and-quantized-models>`__
+   Models <#Compare-Performance-of-the-Original,-Converted-and-Quantized-Models>`__
 
 .. code:: ipython3
 
     %pip install -q "nncf>=2.5.0" 
-    %pip install -q transformers datasets evaluate --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q transformers "torch>=2.1" datasets evaluate --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "openvino>=2023.1.0"
 
 
@@ -65,7 +65,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -88,7 +88,7 @@ Imports
     # Fetch `notebook_utils` module
     import urllib.request
     urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/notebook_utils.py',
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
         filename='notebook_utils.py'
     )
     from notebook_utils import download_file
@@ -96,14 +96,14 @@ Imports
 
 .. parsed-literal::
 
-    2024-03-27 13:26:22.866674: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-27 13:26:22.901672: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-09 23:24:52.506177: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-09 23:24:52.539977: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-03-27 13:26:23.549722: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-09 23:24:53.185139: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 .. parsed-literal::
@@ -114,7 +114,7 @@ Imports
 Settings
 --------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -131,7 +131,7 @@ Settings
 Prepare the Model
 -----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Perform the following:
 
@@ -191,7 +191,7 @@ PyTorch model formats are supported:
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
       return self.fget.__get__(instance, owner)()
 
 
@@ -217,14 +217,14 @@ PyTorch model formats are supported:
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
 
 
 Prepare the Dataset
 -------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We download the `General Language Understanding Evaluation
 (GLUE) <https://gluebenchmark.com/>`__ dataset for the MRPC task from
@@ -251,7 +251,7 @@ tokenizer from HuggingFace.
 Optimize model using NNCF Post-training Quantization API
 --------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -387,7 +387,7 @@ The optimization process contains the following steps:
 Load and Test OpenVINO Model
 ----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To load and test converted model, perform the following:
 
@@ -399,7 +399,7 @@ To load and test converted model, perform the following:
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -460,7 +460,7 @@ changing ``sample_idx`` to another value (from 0 to 407).
 Compare F1-score of FP32 and INT8 models
 ----------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -514,7 +514,7 @@ Compare F1-score of FP32 and INT8 models
 Compare Performance of the Original, Converted and Quantized Models
 -------------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Compare the original PyTorch model with OpenVINO converted and quantized
 models (``FP32``, ``INT8``) to see the difference in performance. It is
@@ -571,17 +571,17 @@ Frames Per Second (FPS) for images.
 
 .. parsed-literal::
 
-    PyTorch model on CPU: 0.073 seconds per sentence, SPS: 13.77
+    PyTorch model on CPU: 0.074 seconds per sentence, SPS: 13.57
 
 
 .. parsed-literal::
 
-    IR FP32 model in OpenVINO Runtime/AUTO: 0.021 seconds per sentence, SPS: 48.68
+    IR FP32 model in OpenVINO Runtime/AUTO: 0.020 seconds per sentence, SPS: 48.95
 
 
 .. parsed-literal::
 
-    OpenVINO IR INT8 model in OpenVINO Runtime/AUTO: 0.009 seconds per sentence, SPS: 112.58
+    OpenVINO IR INT8 model in OpenVINO Runtime/AUTO: 0.008 seconds per sentence, SPS: 117.94
 
 
 Finally, measure the inference performance of OpenVINO ``FP32`` and
@@ -622,7 +622,7 @@ in OpenVINO.
     Device with "device" name is not registered in the OpenVINO Runtime
     
     Traceback (most recent call last):
-      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/tools/benchmark/main.py", line 166, in main
+      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/tools/benchmark/main.py", line 166, in main
         supported_properties = benchmark.core.get_property(device, properties.supported_properties())
     RuntimeError: Exception from src/inference/src/cpp/core.cpp:216:
     Exception from src/inference/src/dev/core_impl.cpp:556:
@@ -641,11 +641,11 @@ in OpenVINO.
 
     [Step 1/11] Parsing and validating input arguments
     [ INFO ] Parsing input parameters
-    [Step 2/11] Loading OpenVINO Runtime
 
 
 .. parsed-literal::
 
+    [Step 2/11] Loading OpenVINO Runtime
     [ WARNING ] Default duration 120 seconds is used for unknown device device.value
     [ INFO ] OpenVINO:
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
@@ -659,7 +659,7 @@ in OpenVINO.
     Device with "device" name is not registered in the OpenVINO Runtime
     
     Traceback (most recent call last):
-      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/tools/benchmark/main.py", line 166, in main
+      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/tools/benchmark/main.py", line 166, in main
         supported_properties = benchmark.core.get_property(device, properties.supported_properties())
     RuntimeError: Exception from src/inference/src/cpp/core.cpp:216:
     Exception from src/inference/src/dev/core_impl.cpp:556:

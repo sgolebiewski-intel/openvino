@@ -14,9 +14,9 @@ information extraction of large amounts of data.
 
 This tutorial shows how to perform named entity recognition using
 OpenVINO. We will use the pre-trained model
-`elastic/distilbert-base-cased-finetuned-conll03-english <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__.
+```elastic/distilbert-base-cased-finetuned-conll03-english`` <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__.
 It is DistilBERT based model, trained on
-`conll03 english dataset <https://huggingface.co/datasets/conll2003>`__.
+```conll03 english dataset`` <https://huggingface.co/datasets/conll2003>`__.
 The model can recognize four named entities in text: persons, locations,
 organizations and names of miscellaneous entities that do not belong to
 the previous three groups. The model is sensitive to capital letters.
@@ -28,73 +28,109 @@ convert the model to OpenVINO™ IR format and quantize it.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Download the NER model <#download-the-ner-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Download the NER model <#Download-the-NER-model>`__
 -  `Quantize the model, using Hugging Face Optimum
-   API <#quantize-the-model-using-hugging-face-optimum-api>`__
+   API <#Quantize-the-model,-using-Hugging-Face-Optimum-API>`__
 -  `Compare the Original and Quantized
-   Models <#compare-the-original-and-quantized-models>`__
+   Models <#Compare-the-Original-and-Quantized-Models>`__
 
-   -  `Compare performance <#compare-performance>`__
-   -  `Compare size of the models <#compare-size-of-the-models>`__
+   -  `Compare performance <#Compare-performance>`__
+   -  `Compare size of the models <#Compare-size-of-the-models>`__
 
 -  `Prepare demo for Named Entity Recognition OpenVINO
-   Runtime <#prepare-demo-for-named-entity-recognition-openvino-runtime>`__
+   Runtime <#Prepare-demo-for-Named-Entity-Recognition-OpenVINO-Runtime>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q "diffusers>=0.17.1" "openvino>=2023.1.0" "nncf>=2.5.0" "gradio" "onnx>=1.11.0" "transformers>=4.33.0" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "diffusers>=0.17.1" "openvino>=2023.1.0" "nncf>=2.5.0" "gradio" "onnx>=1.11.0" "transformers>=4.33.0" "torch>=2.1" --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "git+https://github.com/huggingface/optimum-intel.git"
 
 
 .. parsed-literal::
 
-    
-    [notice] A new release of pip is available: 23.3.2 -> 24.0
-    [notice] To update, run: pip install --upgrade pip
     Note: you may need to restart the kernel to use updated packages.
-    
-    [notice] A new release of pip is available: 23.3.2 -> 24.0
-    [notice] To update, run: pip install --upgrade pip
     Note: you may need to restart the kernel to use updated packages.
 
 
 Download the NER model
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We load the
-`distilbert-base-cased-finetuned-conll03-english <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__
+```distilbert-base-cased-finetuned-conll03-english`` <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__
 model from the `Hugging Face Hub <https://huggingface.co/models>`__ with
 `Hugging Face Transformers
-library <https://huggingface.co/docs/transformers/index>`__.
+library <https://huggingface.co/docs/transformers/index>`__\ and Optimum
+Intel with OpenVINO integration.
 
-Model class initialization starts with calling ``from_pretrained``
-method. To easily save the model, you can use the ``save_pretrained()``
-method.
+``OVModelForTokenClassification`` is represent model class for Named
+Entity Recognition task in Optimum Intel. Model class initialization
+starts with calling ``from_pretrained`` method. For conversion original
+PyTorch model to OpenVINO format on the fly, ``export=True`` parameter
+should be used. To easily save the model, you can use the
+``save_pretrained()`` method. After saving the model on disk, we can use
+pre-converted model for next usage, and speedup deployment process.
 
 .. code:: ipython3
 
-    from transformers import AutoTokenizer, AutoModelForTokenClassification
+    from pathlib import Path
+    from transformers import AutoTokenizer
+    from optimum.intel import OVModelForTokenClassification
+    
+    original_ner_model_dir = Path('original_ner_model')
     
     model_id = "elastic/distilbert-base-cased-finetuned-conll03-english"
-    model = AutoModelForTokenClassification.from_pretrained(model_id)
-    
-    original_ner_model_dir = 'original_ner_model'
-    model.save_pretrained(original_ner_model_dir)
+    if not original_ner_model_dir.exists():
+        model = OVModelForTokenClassification.from_pretrained(model_id, export=True)
+        
+        model.save_pretrained(original_ner_model_dir)
+    else:
+        model = OVModelForTokenClassification.from_pretrained(model_id, export=True)
     
     tokenizer = AutoTokenizer.from_pretrained(model_id)
+
+
+.. parsed-literal::
+
+    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, tensorflow, onnx, openvino
+
+
+.. parsed-literal::
+
+    No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
+    2024-04-05 18:35:04.594311: I tensorflow/core/util/port.cc:111] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-05 18:35:04.596755: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+    2024-04-05 18:35:04.628293: E tensorflow/compiler/xla/stream_executor/cuda/cuda_dnn.cc:9342] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+    2024-04-05 18:35:04.628326: E tensorflow/compiler/xla/stream_executor/cuda/cuda_fft.cc:609] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+    2024-04-05 18:35:04.628349: E tensorflow/compiler/xla/stream_executor/cuda/cuda_blas.cc:1518] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+    2024-04-05 18:35:04.634704: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+    2024-04-05 18:35:04.635314: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+    2024-04-05 18:35:05.607762: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    /home/ea/miniconda3/lib/python3.11/site-packages/transformers/utils/import_utils.py:519: FutureWarning: `is_torch_tpu_available` is deprecated and will be removed in 4.41.0. Please use the `is_torch_xla_available` instead.
+      warnings.warn(
+    Framework not specified. Using pt to export the model.
+    Using the export variant default. Available variants are:
+        - default: The default ONNX variant.
+    Using framework PyTorch: 2.1.2+cpu
+    /home/ea/miniconda3/lib/python3.11/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+      warnings.warn(
+    /home/ea/miniconda3/lib/python3.11/site-packages/nncf/torch/dynamic_graph/wrappers.py:80: TracerWarning: torch.tensor results are registered as constants in the trace. You can safely ignore this warning if you use this function to create tensors out of constant variables that would be the same every time you call this function. In any other case, this might cause the trace to be incorrect.
+      op1 = operator(*args, **kwargs)
+    Compiling the model to CPU ...
+
 
 Quantize the model, using Hugging Face Optimum API
 --------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Post-training static quantization introduces an additional calibration
 step where data is fed through the network in order to compute the
@@ -103,7 +139,7 @@ activations quantization parameters. For quantization it will be used
 API <https://huggingface.co/docs/optimum/intel/index>`__.
 
 To handle the NNCF quantization process we use class
-`OVQuantizer <https://huggingface.co/docs/optimum/intel/reference_ov#optimum.intel.OVQuantizer>`__.
+```OVQuantizer`` <https://huggingface.co/docs/optimum/intel/reference_ov#optimum.intel.OVQuantizer>`__.
 The quantization with Hugging Face Optimum Intel API contains the next
 steps: \* Model class initialization starts with calling
 ``from_pretrained()`` method. \* Next we create calibration dataset with
@@ -145,30 +181,12 @@ corresponding ``OVModelForXxx`` class. So we use
     quantized_ner_model_dir = "quantized_ner_model"
     
     # Apply static quantization and save the resulting model in the OpenVINO IR format
-    quantizer.quantize(calibration_dataset=calibration_dataset, save_directory=quantized_ner_model_dir)
+    quantizer.quantize(calibration_dataset=calibration_dataset, save_directory=quantized_ner_model_dir, subset_size=len(calibration_dataset))
 
 
 .. parsed-literal::
 
-    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, tensorflow, onnx, openvino
-
-
-.. parsed-literal::
-
-    2024-02-22 10:51:17.449018: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-02-22 10:51:17.450787: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
-    2024-02-22 10:51:17.485744: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-02-22 10:51:18.196389: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-    WARNING[XFORMERS]: xFormers can't load C++/CUDA extensions. xFormers was built for:
-        PyTorch 2.1.0+cu121 with CUDA 1201 (you have 2.2.0+cu121)
-        Python  3.8.18 (you have 3.8.10)
-      Please reinstall xformers (see https://github.com/facebookresearch/xformers#installing-xformers)
-      Memory-efficient attention, SwiGLU, sparse and more won't be available.
-      Set XFORMERS_MORE_DETAILS=1 for more details
-    /home/ea/work/my_optimum_intel/optimum_env/lib/python3.8/site-packages/diffusers/utils/outputs.py:63: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
-      torch.utils._pytree._register_pytree_node(
-    /home/ea/work/my_optimum_intel/optimum_env/lib/python3.8/site-packages/datasets/load.py:2483: FutureWarning: 'use_auth_token' was deprecated in favor of 'token' in version 2.14.0 and will be removed in 3.0.0.
+    /home/ea/miniconda3/lib/python3.11/site-packages/datasets/load.py:2516: FutureWarning: 'use_auth_token' was deprecated in favor of 'token' in version 2.14.0 and will be removed in 3.0.0.
     You can remove this warning by passing 'token=<use_auth_token>' instead.
       warnings.warn(
 
@@ -176,165 +194,91 @@ corresponding ``OVModelForXxx`` class. So we use
 
 .. parsed-literal::
 
-    Downloading data:   0%|          | 0.00/1.23M [00:00<?, ?B/s]
+    Output()
 
 
 
-.. parsed-literal::
+.. raw:: html
 
-    Downloading data:   0%|          | 0.00/312k [00:00<?, ?B/s]
-
-
-
-.. parsed-literal::
-
-    Downloading data:   0%|          | 0.00/283k [00:00<?, ?B/s]
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 
 
 
-.. parsed-literal::
 
-    Generating train split: 0 examples [00:00, ? examples/s]
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
 
 
 
 .. parsed-literal::
 
-    Generating validation split: 0 examples [00:00, ? examples/s]
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
 
 
 
 .. parsed-literal::
 
-    Generating test split: 0 examples [00:00, ? examples/s]
+    INFO:nncf:18 ignored nodes were found by name in the NNCFGraph
+    INFO:nncf:25 ignored nodes were found by name in the NNCFGraph
 
 
 
 .. parsed-literal::
 
-    Map:   0%|          | 0/100 [00:00<?, ? examples/s]
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
+
 
 
 .. parsed-literal::
 
-    Passing the argument `library_name` to `get_supported_tasks_for_model_type` is required, but got library_name=None. Defaulting to `transformers`. An error will be raised in a future version of Optimum if `library_name` is not provided.
-    No configuration describing the quantization process was provided, a default OVConfig will be generated.
+    Output()
 
 
-.. parsed-literal::
 
-    INFO:nncf:Not adding activation input quantizer for operation: 3 DistilBertForTokenClassification/DistilBertModel[distilbert]/Embeddings[embeddings]/NNCFEmbedding[position_embeddings]/embedding_0
-    INFO:nncf:Not adding activation input quantizer for operation: 2 DistilBertForTokenClassification/DistilBertModel[distilbert]/Embeddings[embeddings]/NNCFEmbedding[word_embeddings]/embedding_0
-    INFO:nncf:Not adding activation input quantizer for operation: 4 DistilBertForTokenClassification/DistilBertModel[distilbert]/Embeddings[embeddings]/__add___0
-    INFO:nncf:Not adding activation input quantizer for operation: 5 DistilBertForTokenClassification/DistilBertModel[distilbert]/Embeddings[embeddings]/NNCFLayerNorm[LayerNorm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 6 DistilBertForTokenClassification/DistilBertModel[distilbert]/Embeddings[embeddings]/Dropout[dropout]/dropout_0
-    INFO:nncf:Not adding activation input quantizer for operation: 16 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[0]/MultiHeadSelfAttention[attention]/__truediv___0
-    INFO:nncf:Not adding activation input quantizer for operation: 25 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[0]/MultiHeadSelfAttention[attention]/matmul_1
-    INFO:nncf:Not adding activation input quantizer for operation: 30 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[0]/__add___0
-    INFO:nncf:Not adding activation input quantizer for operation: 31 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[0]/NNCFLayerNorm[sa_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 35 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[0]/__add___1
-    INFO:nncf:Not adding activation input quantizer for operation: 36 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[0]/NNCFLayerNorm[output_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 46 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[1]/MultiHeadSelfAttention[attention]/__truediv___0
-    INFO:nncf:Not adding activation input quantizer for operation: 55 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[1]/MultiHeadSelfAttention[attention]/matmul_1
-    INFO:nncf:Not adding activation input quantizer for operation: 60 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[1]/__add___0
-    INFO:nncf:Not adding activation input quantizer for operation: 61 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[1]/NNCFLayerNorm[sa_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 65 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[1]/__add___1
-    INFO:nncf:Not adding activation input quantizer for operation: 66 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[1]/NNCFLayerNorm[output_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 76 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[2]/MultiHeadSelfAttention[attention]/__truediv___0
-    INFO:nncf:Not adding activation input quantizer for operation: 85 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[2]/MultiHeadSelfAttention[attention]/matmul_1
-    INFO:nncf:Not adding activation input quantizer for operation: 90 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[2]/__add___0
-    INFO:nncf:Not adding activation input quantizer for operation: 91 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[2]/NNCFLayerNorm[sa_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 95 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[2]/__add___1
-    INFO:nncf:Not adding activation input quantizer for operation: 96 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[2]/NNCFLayerNorm[output_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 106 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[3]/MultiHeadSelfAttention[attention]/__truediv___0
-    INFO:nncf:Not adding activation input quantizer for operation: 115 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[3]/MultiHeadSelfAttention[attention]/matmul_1
-    INFO:nncf:Not adding activation input quantizer for operation: 120 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[3]/__add___0
-    INFO:nncf:Not adding activation input quantizer for operation: 121 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[3]/NNCFLayerNorm[sa_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 125 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[3]/__add___1
-    INFO:nncf:Not adding activation input quantizer for operation: 126 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[3]/NNCFLayerNorm[output_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 136 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[4]/MultiHeadSelfAttention[attention]/__truediv___0
-    INFO:nncf:Not adding activation input quantizer for operation: 145 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[4]/MultiHeadSelfAttention[attention]/matmul_1
-    INFO:nncf:Not adding activation input quantizer for operation: 150 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[4]/__add___0
-    INFO:nncf:Not adding activation input quantizer for operation: 151 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[4]/NNCFLayerNorm[sa_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 155 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[4]/__add___1
-    INFO:nncf:Not adding activation input quantizer for operation: 156 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[4]/NNCFLayerNorm[output_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 166 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[5]/MultiHeadSelfAttention[attention]/__truediv___0
-    INFO:nncf:Not adding activation input quantizer for operation: 175 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[5]/MultiHeadSelfAttention[attention]/matmul_1
-    INFO:nncf:Not adding activation input quantizer for operation: 180 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[5]/__add___0
-    INFO:nncf:Not adding activation input quantizer for operation: 181 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[5]/NNCFLayerNorm[sa_layer_norm]/layer_norm_0
-    INFO:nncf:Not adding activation input quantizer for operation: 185 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[5]/__add___1
-    INFO:nncf:Not adding activation input quantizer for operation: 186 DistilBertForTokenClassification/DistilBertModel[distilbert]/Transformer[transformer]/ModuleList[layer]/TransformerBlock[5]/NNCFLayerNorm[output_layer_norm]/layer_norm_0
-    INFO:nncf:Collecting tensor statistics |█               | 33 / 300
-    INFO:nncf:Collecting tensor statistics |███             | 66 / 300
-    INFO:nncf:Collecting tensor statistics |█████           | 99 / 300
-    INFO:nncf:Compiling and loading torch extension: quantized_functions_cpu...
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 
 
-.. parsed-literal::
-
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
 
 
-.. parsed-literal::
+.. raw:: html
 
-    INFO:nncf:Finished loading torch extension: quantized_functions_cpu
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
 
-
-.. parsed-literal::
-
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    Using framework PyTorch: 2.2.0+cu121
-
-
-.. parsed-literal::
-
-    WARNING:nncf:You are setting `forward` on an NNCF-processed model object.
-    NNCF relies on custom-wrapping the `forward` call in order to function properly.
-    Arbitrary adjustments to the forward function on an NNCFNetwork object have undefined behavior.
-    If you need to replace the underlying forward function of the original model so that NNCF should be using that instead of the original forward function that NNCF saved during the compressed model creation, you can do this by calling:
-    model.nncf.set_original_unbound_forward(fn)
-    if `fn` has an unbound 0-th `self` argument, or
-    with model.nncf.temporary_bound_original_forward(fn): ...
-    if `fn` already had 0-th `self` argument bound or never had it in the first place.
-    WARNING:tensorflow:Please fix your imports. Module tensorflow.python.training.tracking.base has been moved to tensorflow.python.trackable.base. The old module will be deleted in version 2.11.
-
-
-.. parsed-literal::
-
-    [ WARNING ]  Please fix your imports. Module %s has been moved to %s. The old module will be deleted in version %s.
-    /home/ea/work/my_optimum_intel/optimum_env/lib/python3.8/site-packages/nncf/torch/dynamic_graph/wrappers.py:90: TracerWarning: torch.tensor results are registered as constants in the trace. You can safely ignore this warning if you use this function to create tensors out of constant variables that would be the same every time you call this function. In any other case, this might cause the trace to be incorrect.
-      result = operator(\*args, \*\*kwargs)
-
-
-.. parsed-literal::
-
-    WARNING:nncf:You are setting `forward` on an NNCF-processed model object.
-    NNCF relies on custom-wrapping the `forward` call in order to function properly.
-    Arbitrary adjustments to the forward function on an NNCFNetwork object have undefined behavior.
-    If you need to replace the underlying forward function of the original model so that NNCF should be using that instead of the original forward function that NNCF saved during the compressed model creation, you can do this by calling:
-    model.nncf.set_original_unbound_forward(fn)
-    if `fn` has an unbound 0-th `self` argument, or
-    with model.nncf.temporary_bound_original_forward(fn): ...
-    if `fn` already had 0-th `self` argument bound or never had it in the first place.
-
-
-.. parsed-literal::
-
-    Configuration saved in quantized_ner_model/openvino_config.json
 
 
 .. code:: ipython3
@@ -376,17 +320,17 @@ corresponding ``OVModelForXxx`` class. So we use
 Compare the Original and Quantized Models
 -----------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Compare the original
-`distilbert-base-cased-finetuned-conll03-english <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__
+```distilbert-base-cased-finetuned-conll03-english`` <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__
 model with quantized and converted to OpenVINO IR format models to see
 the difference.
 
 Compare performance
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 As the Optimum Inference models are API compatible with Hugging Face
 Transformers models, we can just use ``pipleine()`` from `Hugging Face
@@ -400,12 +344,6 @@ inference.
     ner_pipeline_optimized = pipeline("token-classification", model=optimized_model, tokenizer=tokenizer)
     
     ner_pipeline_original = pipeline("token-classification", model=model, tokenizer=tokenizer)
-
-
-.. parsed-literal::
-
-    device must be of type <class 'str'> but got <class 'torch.device'> instead
-
 
 .. code:: ipython3
 
@@ -436,36 +374,34 @@ inference.
 
 .. parsed-literal::
 
-    Median inference time of quantized model: 0.007757613499961735 
-    Median inference time of original model: 0.09963577150028868 
+    Median inference time of quantized model: 0.0063508255407214165 
+    Median inference time of original model: 0.007429798366501927 
 
 
 Compare size of the models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     from pathlib import Path
     
-    pytorch_model_file = Path(original_ner_model_dir) / "pytorch_model.bin" 
-    if not pytorch_model_file.exists():
-        pytorch_model_file = pytorch_model_file.parent / "model.safetensors"
-    print(f'Size of original model in Bytes is {pytorch_model_file.stat().st_size}')
+    fp_model_file = Path(original_ner_model_dir) / "openvino_model.bin" 
+    print(f'Size of original model in Bytes is {fp_model_file.stat().st_size}')
     print(f'Size of quantized model in Bytes is {Path(quantized_ner_model_dir, "openvino_model.bin").stat().st_size}')
 
 
 .. parsed-literal::
 
-    Size of original model in Bytes is 260803668
-    Size of quantized model in Bytes is 133539000
+    Size of original model in Bytes is 260795516
+    Size of quantized model in Bytes is 65802712
 
 
 Prepare demo for Named Entity Recognition OpenVINO Runtime
 ----------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, you can try NER model on own text. Put your sentence to input text
 box, click Submit button, the model label the recognized entities in the
@@ -497,18 +433,3 @@ text.
     # if you are launching remotely, specify server_name and server_port
     # demo.launch(server_name='your server name', server_port='server port in int')
     # Read more in the docs: https://gradio.app/docs/
-
-
-.. parsed-literal::
-
-    Running on local URL:  http://127.0.0.1:7860
-    
-    To create a public link, set `share=True` in `launch()`.
-
-
-
-
-
-
-
-

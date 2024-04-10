@@ -3,14 +3,14 @@ Live 3D Human Pose Estimation with OpenVINO
 
 This notebook demonstrates live 3D Human Pose Estimation with OpenVINO
 via a webcam. We utilize the model
-`human-pose-estimation-3d-0001 <http/github.copenvinotoolkopen_model_ztrmastmodepublhuman-pose-estimation-3d-0001>`__
+`human-pose-estimation-3d-0001 <https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/human-pose-estimation-3d-0001>`__
 from `Open Model
-Zoo <http/github.copenvinotoolkopen_model_z>`__. At the end
+Zoo <https://github.com/openvinotoolkit/open_model_zoo/>`__. At the end
 of this notebook, you will see live inference results from your webcam
 (if available). Alternatively, you can also upload a video file to test
 out the algorithms. **Make sure you have properly installed
 the**\ `Jupyter
-extension <http/github.cjupyter-widgepythreejs#jupyterlab>`__\ **and
+extension <https://github.com/jupyter-widgets/pythreejs#jupyterlab>`__\ **and
 been using JupyterLab to run the demo as suggested in the
 ``README.md``**
 
@@ -29,28 +29,28 @@ Windows: Chrome* *macOS: Safari*
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Imports <#imports>`__
--  `The model <#the-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Imports <#Imports>`__
+-  `The model <#The-model>`__
 
-   -  `Download the model <#download-the-model>`__
+   -  `Download the model <#Download-the-model>`__
    -  `Convert Model to OpenVINO IR
-      format <#convert-model-to-openvino-ir-format>`__
-   -  `Select inference device <#select-inference-device>`__
-   -  `Load the model <#load-the-model>`__
+      format <#Convert-Model-to-OpenVINO-IR-format>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Load the model <#Load-the-model>`__
 
--  `Processing <#processing>`__
+-  `Processing <#Processing>`__
 
-   -  `Model Inference <#model-inference>`__
-   -  `Draw 2D Pose Overlays <#draw-2d-pose-overlays>`__
-   -  `Main Processing Function <#main-processing-function>`__
+   -  `Model Inference <#Model-Inference>`__
+   -  `Draw 2D Pose Overlays <#Draw-2D-Pose-Overlays>`__
+   -  `Main Processing Function <#Main-Processing-Function>`__
 
--  `Run <#run>`__
+-  `Run <#Run>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 **The ``pythreejs`` extension may not display properly when using the
 latest Jupyter Notebook release (2.4.1). Therefore, it is recommended to
@@ -65,66 +65,74 @@ use Jupyter Lab instead.**
 
     Collecting pythreejs
       Using cached pythreejs-2.4.2-py3-none-any.whl.metadata (5.4 kB)
-    Requirement already satisfied: openvino-dev>=2024.0.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (2024.0.0)
-    Requirement already satisfied: ipywidgets>=7.2.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from pythreejs) (8.1.2)
+
+
+.. parsed-literal::
+
+    Requirement already satisfied: openvino-dev>=2024.0.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (2024.0.0)
+    Requirement already satisfied: ipywidgets>=7.2.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from pythreejs) (8.1.2)
 
 
 .. parsed-literal::
 
     Collecting ipydatawidgets>=1.1.1 (from pythreejs)
       Using cached ipydatawidgets-4.3.5-py2.py3-none-any.whl.metadata (1.4 kB)
-    Requirement already satisfied: numpy in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from pythreejs) (1.23.5)
-    Requirement already satisfied: traitlets in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from pythreejs) (5.14.2)
-    Requirement already satisfied: defusedxml>=0.7.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (0.7.1)
-    Requirement already satisfied: networkx<=3.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (3.1)
-    Requirement already satisfied: openvino-telemetry>=2023.2.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (2023.2.1)
-    Requirement already satisfied: packaging in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (24.0)
-    Requirement already satisfied: pyyaml>=5.4.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (6.0.1)
-    Requirement already satisfied: requests>=2.25.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (2.31.0)
-    Requirement already satisfied: openvino==2024.0.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (2024.0.0)
+    Requirement already satisfied: numpy in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from pythreejs) (1.23.5)
+    Requirement already satisfied: traitlets in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from pythreejs) (5.14.2)
+
+
+.. parsed-literal::
+
+    Requirement already satisfied: defusedxml>=0.7.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (0.7.1)
+    Requirement already satisfied: networkx<=3.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (3.1)
+    Requirement already satisfied: openvino-telemetry>=2023.2.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (2024.1.0)
+    Requirement already satisfied: packaging in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (24.0)
+    Requirement already satisfied: pyyaml>=5.4.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (6.0.1)
+    Requirement already satisfied: requests>=2.25.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (2.31.0)
+    Requirement already satisfied: openvino==2024.0.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino-dev>=2024.0.0) (2024.0.0)
 
 
 .. parsed-literal::
 
     Collecting traittypes>=0.2.0 (from ipydatawidgets>=1.1.1->pythreejs)
       Using cached traittypes-0.2.1-py2.py3-none-any.whl.metadata (1.0 kB)
-    Requirement already satisfied: comm>=0.1.3 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipywidgets>=7.2.1->pythreejs) (0.2.2)
-    Requirement already satisfied: ipython>=6.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipywidgets>=7.2.1->pythreejs) (8.12.3)
-    Requirement already satisfied: widgetsnbextension~=4.0.10 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipywidgets>=7.2.1->pythreejs) (4.0.10)
-    Requirement already satisfied: jupyterlab-widgets~=3.0.10 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipywidgets>=7.2.1->pythreejs) (3.0.10)
+    Requirement already satisfied: comm>=0.1.3 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipywidgets>=7.2.1->pythreejs) (0.2.2)
+    Requirement already satisfied: ipython>=6.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipywidgets>=7.2.1->pythreejs) (8.12.3)
+    Requirement already satisfied: widgetsnbextension~=4.0.10 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipywidgets>=7.2.1->pythreejs) (4.0.10)
 
 
 .. parsed-literal::
 
-    Requirement already satisfied: charset-normalizer<4,>=2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (3.3.2)
-    Requirement already satisfied: idna<4,>=2.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (3.6)
-    Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (2.2.1)
-    Requirement already satisfied: certifi>=2017.4.17 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (2024.2.2)
+    Requirement already satisfied: jupyterlab-widgets~=3.0.10 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipywidgets>=7.2.1->pythreejs) (3.0.10)
+    Requirement already satisfied: charset-normalizer<4,>=2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (3.3.2)
+    Requirement already satisfied: idna<4,>=2.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (3.6)
+    Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (2.2.1)
+    Requirement already satisfied: certifi>=2017.4.17 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests>=2.25.1->openvino-dev>=2024.0.0) (2024.2.2)
 
 
 .. parsed-literal::
 
-    Requirement already satisfied: backcall in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.2.0)
-    Requirement already satisfied: decorator in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (5.1.1)
-    Requirement already satisfied: jedi>=0.16 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.19.1)
-    Requirement already satisfied: matplotlib-inline in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.1.6)
-    Requirement already satisfied: pickleshare in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.7.5)
-    Requirement already satisfied: prompt-toolkit!=3.0.37,<3.1.0,>=3.0.30 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (3.0.43)
-    Requirement already satisfied: pygments>=2.4.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (2.17.2)
-    Requirement already satisfied: stack-data in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.6.3)
-    Requirement already satisfied: typing-extensions in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (4.10.0)
-    Requirement already satisfied: pexpect>4.3 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (4.9.0)
-    Requirement already satisfied: parso<0.9.0,>=0.8.3 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from jedi>=0.16->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.8.3)
-    Requirement already satisfied: ptyprocess>=0.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from pexpect>4.3->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.7.0)
-    Requirement already satisfied: wcwidth in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from prompt-toolkit!=3.0.37,<3.1.0,>=3.0.30->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.2.13)
+    Requirement already satisfied: backcall in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.2.0)
+    Requirement already satisfied: decorator in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (5.1.1)
+    Requirement already satisfied: jedi>=0.16 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.19.1)
+    Requirement already satisfied: matplotlib-inline in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.1.6)
+    Requirement already satisfied: pickleshare in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.7.5)
+    Requirement already satisfied: prompt-toolkit!=3.0.37,<3.1.0,>=3.0.30 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (3.0.43)
+    Requirement already satisfied: pygments>=2.4.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (2.17.2)
+    Requirement already satisfied: stack-data in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.6.3)
+    Requirement already satisfied: typing-extensions in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (4.11.0)
+    Requirement already satisfied: pexpect>4.3 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (4.9.0)
 
 
 .. parsed-literal::
 
-    Requirement already satisfied: executing>=1.2.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from stack-data->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (2.0.1)
-    Requirement already satisfied: asttokens>=2.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from stack-data->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (2.4.1)
-    Requirement already satisfied: pure-eval in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from stack-data->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.2.2)
-    Requirement already satisfied: six>=1.12.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from asttokens>=2.1.0->stack-data->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (1.16.0)
+    Requirement already satisfied: parso<0.9.0,>=0.8.3 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from jedi>=0.16->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.8.4)
+    Requirement already satisfied: ptyprocess>=0.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from pexpect>4.3->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.7.0)
+    Requirement already satisfied: wcwidth in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from prompt-toolkit!=3.0.37,<3.1.0,>=3.0.30->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.2.13)
+    Requirement already satisfied: executing>=1.2.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from stack-data->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (2.0.1)
+    Requirement already satisfied: asttokens>=2.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from stack-data->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (2.4.1)
+    Requirement already satisfied: pure-eval in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from stack-data->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (0.2.2)
+    Requirement already satisfied: six>=1.12.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from asttokens>=2.1.0->stack-data->ipython>=6.1.0->ipywidgets>=7.2.1->pythreejs) (1.16.0)
 
 
 .. parsed-literal::
@@ -152,7 +160,7 @@ use Jupyter Lab instead.**
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -167,7 +175,12 @@ Imports
     from IPython.display import clear_output, display
     import openvino as ov
     
-    sys.path.append("../utils")
+    # Fetch `notebook_utils` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+        filename='notebook_utils.py'
+    )
     import notebook_utils as utils
     
     sys.path.append("./engine")
@@ -177,12 +190,12 @@ Imports
 The model
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the model
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use ``omz_downloader``, which is a command line tool from the
 ``openvino-dev`` package. ``omz_downloader`` automatically creates a
@@ -221,596 +234,38 @@ directory structure and downloads the selected model.
 
 .. parsed-literal::
 
-    ... 0%, 32 KB, 872 KB/s, 0 seconds passed
+    ... 0%, 32 KB, 996 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 0%, 64 KB, 889 KB/s, 0 seconds passed
-... 0%, 96 KB, 1300 KB/s, 0 seconds passed
-... 0%, 128 KB, 1183 KB/s, 0 seconds passed
-... 0%, 160 KB, 1449 KB/s, 0 seconds passed
-... 1%, 192 KB, 1712 KB/s, 0 seconds passed
-... 1%, 224 KB, 1949 KB/s, 0 seconds passed
+    ... 0%, 64 KB, 981 KB/s, 0 seconds passed... 0%, 96 KB, 1406 KB/s, 0 seconds passed... 0%, 128 KB, 1299 KB/s, 0 seconds passed... 0%, 160 KB, 1592 KB/s, 0 seconds passed... 1%, 192 KB, 1873 KB/s, 0 seconds passed... 1%, 224 KB, 2130 KB/s, 0 seconds passed... 1%, 256 KB, 2384 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 1%, 256 KB, 2185 KB/s, 0 seconds passed
-... 1%, 288 KB, 1982 KB/s, 0 seconds passed
-... 1%, 320 KB, 2180 KB/s, 0 seconds passed
-... 1%, 352 KB, 2385 KB/s, 0 seconds passed
-... 2%, 384 KB, 2570 KB/s, 0 seconds passed
-... 2%, 416 KB, 2755 KB/s, 0 seconds passed
-... 2%, 448 KB, 2942 KB/s, 0 seconds passed
-... 2%, 480 KB, 3100 KB/s, 0 seconds passed
-... 2%, 512 KB, 3296 KB/s, 0 seconds passed
-... 3%, 544 KB, 3464 KB/s, 0 seconds passed
-... 3%, 576 KB, 3645 KB/s, 0 seconds passed
+    ... 1%, 288 KB, 2181 KB/s, 0 seconds passed... 1%, 320 KB, 2415 KB/s, 0 seconds passed... 1%, 352 KB, 2647 KB/s, 0 seconds passed... 2%, 384 KB, 2864 KB/s, 0 seconds passed... 2%, 416 KB, 3083 KB/s, 0 seconds passed... 2%, 448 KB, 3297 KB/s, 0 seconds passed... 2%, 480 KB, 3524 KB/s, 0 seconds passed... 2%, 512 KB, 3664 KB/s, 0 seconds passed... 3%, 544 KB, 3872 KB/s, 0 seconds passed... 3%, 576 KB, 3478 KB/s, 0 seconds passed... 3%, 608 KB, 3661 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 3%, 608 KB, 3336 KB/s, 0 seconds passed
-... 3%, 640 KB, 3501 KB/s, 0 seconds passed
-... 3%, 672 KB, 3668 KB/s, 0 seconds passed
-... 3%, 704 KB, 3834 KB/s, 0 seconds passed
-... 4%, 736 KB, 4000 KB/s, 0 seconds passed
-... 4%, 768 KB, 4159 KB/s, 0 seconds passed
-... 4%, 800 KB, 4319 KB/s, 0 seconds passed
-... 4%, 832 KB, 4483 KB/s, 0 seconds passed
-... 4%, 864 KB, 4647 KB/s, 0 seconds passed
-... 4%, 896 KB, 4809 KB/s, 0 seconds passed
-... 5%, 928 KB, 4970 KB/s, 0 seconds passed
-... 5%, 960 KB, 5126 KB/s, 0 seconds passed
-... 5%, 992 KB, 5285 KB/s, 0 seconds passed
-... 5%, 1024 KB, 5444 KB/s, 0 seconds passed
-... 5%, 1056 KB, 5515 KB/s, 0 seconds passed
-... 6%, 1088 KB, 5670 KB/s, 0 seconds passed
-... 6%, 1120 KB, 5813 KB/s, 0 seconds passed
-... 6%, 1152 KB, 5966 KB/s, 0 seconds passed
+    ... 3%, 640 KB, 3846 KB/s, 0 seconds passed... 3%, 672 KB, 4023 KB/s, 0 seconds passed... 3%, 704 KB, 4202 KB/s, 0 seconds passed... 4%, 736 KB, 4381 KB/s, 0 seconds passed... 4%, 768 KB, 4562 KB/s, 0 seconds passed... 4%, 800 KB, 4732 KB/s, 0 seconds passed... 4%, 832 KB, 4909 KB/s, 0 seconds passed... 4%, 864 KB, 5086 KB/s, 0 seconds passed... 4%, 896 KB, 5262 KB/s, 0 seconds passed... 5%, 928 KB, 5435 KB/s, 0 seconds passed... 5%, 960 KB, 5608 KB/s, 0 seconds passed... 5%, 992 KB, 5781 KB/s, 0 seconds passed... 5%, 1024 KB, 5956 KB/s, 0 seconds passed... 5%, 1056 KB, 6131 KB/s, 0 seconds passed... 6%, 1088 KB, 6306 KB/s, 0 seconds passed... 6%, 1120 KB, 6438 KB/s, 0 seconds passed... 6%, 1152 KB, 5806 KB/s, 0 seconds passed... 6%, 1184 KB, 5938 KB/s, 0 seconds passed... 6%, 1216 KB, 6084 KB/s, 0 seconds passed... 6%, 1248 KB, 6228 KB/s, 0 seconds passed... 7%, 1280 KB, 6374 KB/s, 0 seconds passed... 7%, 1312 KB, 6521 KB/s, 0 seconds passed... 7%, 1344 KB, 6666 KB/s, 0 seconds passed... 7%, 1376 KB, 6812 KB/s, 0 seconds passed... 7%, 1408 KB, 6960 KB/s, 0 seconds passed... 8%, 1440 KB, 7108 KB/s, 0 seconds passed... 8%, 1472 KB, 7255 KB/s, 0 seconds passed... 8%, 1504 KB, 7394 KB/s, 0 seconds passed... 8%, 1536 KB, 7537 KB/s, 0 seconds passed... 8%, 1568 KB, 7680 KB/s, 0 seconds passed... 8%, 1600 KB, 7822 KB/s, 0 seconds passed... 9%, 1632 KB, 7963 KB/s, 0 seconds passed... 9%, 1664 KB, 8105 KB/s, 0 seconds passed... 9%, 1696 KB, 8246 KB/s, 0 seconds passed... 9%, 1728 KB, 8386 KB/s, 0 seconds passed... 9%, 1760 KB, 8525 KB/s, 0 seconds passed... 9%, 1792 KB, 8663 KB/s, 0 seconds passed... 10%, 1824 KB, 8801 KB/s, 0 seconds passed... 10%, 1856 KB, 8941 KB/s, 0 seconds passed... 10%, 1888 KB, 9080 KB/s, 0 seconds passed... 10%, 1920 KB, 9220 KB/s, 0 seconds passed... 10%, 1952 KB, 9358 KB/s, 0 seconds passed... 11%, 1984 KB, 9497 KB/s, 0 seconds passed... 11%, 2016 KB, 9636 KB/s, 0 seconds passed... 11%, 2048 KB, 9773 KB/s, 0 seconds passed... 11%, 2080 KB, 9910 KB/s, 0 seconds passed... 11%, 2112 KB, 10046 KB/s, 0 seconds passed... 11%, 2144 KB, 10183 KB/s, 0 seconds passed... 12%, 2176 KB, 10322 KB/s, 0 seconds passed... 12%, 2208 KB, 10461 KB/s, 0 seconds passed... 12%, 2240 KB, 10600 KB/s, 0 seconds passed... 12%, 2272 KB, 10739 KB/s, 0 seconds passed... 12%, 2304 KB, 10877 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 6%, 1184 KB, 5406 KB/s, 0 seconds passed
-... 6%, 1216 KB, 5538 KB/s, 0 seconds passed
-... 6%, 1248 KB, 5673 KB/s, 0 seconds passed
-... 7%, 1280 KB, 5809 KB/s, 0 seconds passed
-... 7%, 1312 KB, 5938 KB/s, 0 seconds passed
-... 7%, 1344 KB, 6072 KB/s, 0 seconds passed
-... 7%, 1376 KB, 6205 KB/s, 0 seconds passed
-... 7%, 1408 KB, 6338 KB/s, 0 seconds passed
-... 8%, 1440 KB, 6470 KB/s, 0 seconds passed
-... 8%, 1472 KB, 6602 KB/s, 0 seconds passed
-... 8%, 1504 KB, 6733 KB/s, 0 seconds passed
-... 8%, 1536 KB, 6865 KB/s, 0 seconds passed
-... 8%, 1568 KB, 6996 KB/s, 0 seconds passed
-... 8%, 1600 KB, 7127 KB/s, 0 seconds passed
-... 9%, 1632 KB, 7257 KB/s, 0 seconds passed
-... 9%, 1664 KB, 7387 KB/s, 0 seconds passed
-... 9%, 1696 KB, 7516 KB/s, 0 seconds passed
-... 9%, 1728 KB, 7644 KB/s, 0 seconds passed
-... 9%, 1760 KB, 7773 KB/s, 0 seconds passed
-... 9%, 1792 KB, 7901 KB/s, 0 seconds passed
-... 10%, 1824 KB, 8028 KB/s, 0 seconds passed
-... 10%, 1856 KB, 8155 KB/s, 0 seconds passed
-... 10%, 1888 KB, 8282 KB/s, 0 seconds passed
-... 10%, 1920 KB, 8409 KB/s, 0 seconds passed
-... 10%, 1952 KB, 8535 KB/s, 0 seconds passed
-... 11%, 1984 KB, 8663 KB/s, 0 seconds passed
-... 11%, 2016 KB, 8792 KB/s, 0 seconds passed
-... 11%, 2048 KB, 8917 KB/s, 0 seconds passed
-... 11%, 2080 KB, 9042 KB/s, 0 seconds passed
-... 11%, 2112 KB, 9166 KB/s, 0 seconds passed
-... 11%, 2144 KB, 9290 KB/s, 0 seconds passed
-... 12%, 2176 KB, 9414 KB/s, 0 seconds passed
-... 12%, 2208 KB, 9538 KB/s, 0 seconds passed
-... 12%, 2240 KB, 9663 KB/s, 0 seconds passed
-... 12%, 2272 KB, 9789 KB/s, 0 seconds passed
-... 12%, 2304 KB, 9914 KB/s, 0 seconds passed
-... 12%, 2336 KB, 10040 KB/s, 0 seconds passed
-... 13%, 2368 KB, 10165 KB/s, 0 seconds passed
-... 13%, 2400 KB, 9422 KB/s, 0 seconds passed
-... 13%, 2432 KB, 9387 KB/s, 0 seconds passed
-... 13%, 2464 KB, 9493 KB/s, 0 seconds passed
-... 13%, 2496 KB, 9572 KB/s, 0 seconds passed
-... 14%, 2528 KB, 9674 KB/s, 0 seconds passed
-... 14%, 2560 KB, 9781 KB/s, 0 seconds passed
-... 14%, 2592 KB, 9888 KB/s, 0 seconds passed
-... 14%, 2624 KB, 9995 KB/s, 0 seconds passed
-... 14%, 2656 KB, 10102 KB/s, 0 seconds passed
-... 14%, 2688 KB, 10210 KB/s, 0 seconds passed
-... 15%, 2720 KB, 10316 KB/s, 0 seconds passed
-... 15%, 2752 KB, 10423 KB/s, 0 seconds passed
-... 15%, 2784 KB, 10529 KB/s, 0 seconds passed
-... 15%, 2816 KB, 10635 KB/s, 0 seconds passed
-... 15%, 2848 KB, 10740 KB/s, 0 seconds passed
-... 16%, 2880 KB, 10845 KB/s, 0 seconds passed
-... 16%, 2912 KB, 10949 KB/s, 0 seconds passed
-... 16%, 2944 KB, 11053 KB/s, 0 seconds passed
-... 16%, 2976 KB, 11157 KB/s, 0 seconds passed
-... 16%, 3008 KB, 11262 KB/s, 0 seconds passed
-... 16%, 3040 KB, 11365 KB/s, 0 seconds passed
-... 17%, 3072 KB, 11467 KB/s, 0 seconds passed
-... 17%, 3104 KB, 11570 KB/s, 0 seconds passed
-... 17%, 3136 KB, 11673 KB/s, 0 seconds passed
-... 17%, 3168 KB, 11776 KB/s, 0 seconds passed
+    ... 12%, 2336 KB, 10040 KB/s, 0 seconds passed... 13%, 2368 KB, 10032 KB/s, 0 seconds passed... 13%, 2400 KB, 10146 KB/s, 0 seconds passed... 13%, 2432 KB, 10264 KB/s, 0 seconds passed... 13%, 2464 KB, 10382 KB/s, 0 seconds passed... 13%, 2496 KB, 10499 KB/s, 0 seconds passed... 14%, 2528 KB, 10616 KB/s, 0 seconds passed... 14%, 2560 KB, 10734 KB/s, 0 seconds passed... 14%, 2592 KB, 10849 KB/s, 0 seconds passed... 14%, 2624 KB, 10965 KB/s, 0 seconds passed... 14%, 2656 KB, 11082 KB/s, 0 seconds passed... 14%, 2688 KB, 11197 KB/s, 0 seconds passed... 15%, 2720 KB, 11313 KB/s, 0 seconds passed... 15%, 2752 KB, 11429 KB/s, 0 seconds passed... 15%, 2784 KB, 11544 KB/s, 0 seconds passed... 15%, 2816 KB, 11658 KB/s, 0 seconds passed... 15%, 2848 KB, 11772 KB/s, 0 seconds passed... 16%, 2880 KB, 11887 KB/s, 0 seconds passed... 16%, 2912 KB, 11999 KB/s, 0 seconds passed... 16%, 2944 KB, 12111 KB/s, 0 seconds passed... 16%, 2976 KB, 12224 KB/s, 0 seconds passed... 16%, 3008 KB, 12336 KB/s, 0 seconds passed... 16%, 3040 KB, 12449 KB/s, 0 seconds passed... 17%, 3072 KB, 12559 KB/s, 0 seconds passed... 17%, 3104 KB, 12671 KB/s, 0 seconds passed... 17%, 3136 KB, 12782 KB/s, 0 seconds passed... 17%, 3168 KB, 12893 KB/s, 0 seconds passed... 17%, 3200 KB, 13003 KB/s, 0 seconds passed... 17%, 3232 KB, 13113 KB/s, 0 seconds passed... 18%, 3264 KB, 13221 KB/s, 0 seconds passed... 18%, 3296 KB, 13331 KB/s, 0 seconds passed... 18%, 3328 KB, 13440 KB/s, 0 seconds passed... 18%, 3360 KB, 13548 KB/s, 0 seconds passed... 18%, 3392 KB, 13657 KB/s, 0 seconds passed... 19%, 3424 KB, 13773 KB/s, 0 seconds passed... 19%, 3456 KB, 13888 KB/s, 0 seconds passed... 19%, 3488 KB, 14002 KB/s, 0 seconds passed... 19%, 3520 KB, 14116 KB/s, 0 seconds passed... 19%, 3552 KB, 14230 KB/s, 0 seconds passed... 19%, 3584 KB, 14344 KB/s, 0 seconds passed... 20%, 3616 KB, 14458 KB/s, 0 seconds passed... 20%, 3648 KB, 14572 KB/s, 0 seconds passed... 20%, 3680 KB, 14685 KB/s, 0 seconds passed... 20%, 3712 KB, 14799 KB/s, 0 seconds passed... 20%, 3744 KB, 14912 KB/s, 0 seconds passed... 20%, 3776 KB, 15026 KB/s, 0 seconds passed... 21%, 3808 KB, 15139 KB/s, 0 seconds passed... 21%, 3840 KB, 15251 KB/s, 0 seconds passed... 21%, 3872 KB, 15363 KB/s, 0 seconds passed... 21%, 3904 KB, 15476 KB/s, 0 seconds passed... 21%, 3936 KB, 15588 KB/s, 0 seconds passed... 22%, 3968 KB, 15700 KB/s, 0 seconds passed... 22%, 4000 KB, 15812 KB/s, 0 seconds passed... 22%, 4032 KB, 15923 KB/s, 0 seconds passed... 22%, 4064 KB, 16035 KB/s, 0 seconds passed... 22%, 4096 KB, 16145 KB/s, 0 seconds passed... 22%, 4128 KB, 16256 KB/s, 0 seconds passed... 23%, 4160 KB, 16367 KB/s, 0 seconds passed... 23%, 4192 KB, 16478 KB/s, 0 seconds passed... 23%, 4224 KB, 16587 KB/s, 0 seconds passed... 23%, 4256 KB, 16695 KB/s, 0 seconds passed... 23%, 4288 KB, 16804 KB/s, 0 seconds passed... 24%, 4320 KB, 16914 KB/s, 0 seconds passed... 24%, 4352 KB, 17022 KB/s, 0 seconds passed... 24%, 4384 KB, 17131 KB/s, 0 seconds passed... 24%, 4416 KB, 17241 KB/s, 0 seconds passed... 24%, 4448 KB, 17352 KB/s, 0 seconds passed... 24%, 4480 KB, 17464 KB/s, 0 seconds passed... 25%, 4512 KB, 17576 KB/s, 0 seconds passed... 25%, 4544 KB, 17687 KB/s, 0 seconds passed... 25%, 4576 KB, 17799 KB/s, 0 seconds passed... 25%, 4608 KB, 17910 KB/s, 0 seconds passed... 25%, 4640 KB, 18021 KB/s, 0 seconds passed... 25%, 4672 KB, 18132 KB/s, 0 seconds passed... 26%, 4704 KB, 17667 KB/s, 0 seconds passed... 26%, 4736 KB, 17769 KB/s, 0 seconds passed... 26%, 4768 KB, 17876 KB/s, 0 seconds passed... 26%, 4800 KB, 17976 KB/s, 0 seconds passed... 26%, 4832 KB, 18078 KB/s, 0 seconds passed... 27%, 4864 KB, 18176 KB/s, 0 seconds passed... 27%, 4896 KB, 18274 KB/s, 0 seconds passed... 27%, 4928 KB, 18364 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 17%, 3200 KB, 11878 KB/s, 0 seconds passed
-... 17%, 3232 KB, 11979 KB/s, 0 seconds passed
-... 18%, 3264 KB, 12081 KB/s, 0 seconds passed
-... 18%, 3296 KB, 12182 KB/s, 0 seconds passed
-... 18%, 3328 KB, 12283 KB/s, 0 seconds passed
-... 18%, 3360 KB, 12384 KB/s, 0 seconds passed
-... 18%, 3392 KB, 12484 KB/s, 0 seconds passed
-... 19%, 3424 KB, 12585 KB/s, 0 seconds passed
-... 19%, 3456 KB, 12683 KB/s, 0 seconds passed
-... 19%, 3488 KB, 12783 KB/s, 0 seconds passed
-... 19%, 3520 KB, 12883 KB/s, 0 seconds passed
-... 19%, 3552 KB, 12987 KB/s, 0 seconds passed
-... 19%, 3584 KB, 13091 KB/s, 0 seconds passed
-... 20%, 3616 KB, 13196 KB/s, 0 seconds passed
-... 20%, 3648 KB, 13301 KB/s, 0 seconds passed
-... 20%, 3680 KB, 13406 KB/s, 0 seconds passed
-... 20%, 3712 KB, 13510 KB/s, 0 seconds passed
-... 20%, 3744 KB, 13615 KB/s, 0 seconds passed
-... 20%, 3776 KB, 13719 KB/s, 0 seconds passed
-... 21%, 3808 KB, 13823 KB/s, 0 seconds passed
-... 21%, 3840 KB, 13927 KB/s, 0 seconds passed
-... 21%, 3872 KB, 14031 KB/s, 0 seconds passed
-... 21%, 3904 KB, 14134 KB/s, 0 seconds passed
-... 21%, 3936 KB, 14238 KB/s, 0 seconds passed
-... 22%, 3968 KB, 14341 KB/s, 0 seconds passed
-... 22%, 4000 KB, 14444 KB/s, 0 seconds passed
-... 22%, 4032 KB, 14547 KB/s, 0 seconds passed
-... 22%, 4064 KB, 14650 KB/s, 0 seconds passed
-... 22%, 4096 KB, 14752 KB/s, 0 seconds passed
-... 22%, 4128 KB, 14854 KB/s, 0 seconds passed
-... 23%, 4160 KB, 14955 KB/s, 0 seconds passed
-... 23%, 4192 KB, 15057 KB/s, 0 seconds passed
-... 23%, 4224 KB, 15159 KB/s, 0 seconds passed
-... 23%, 4256 KB, 15261 KB/s, 0 seconds passed
-... 23%, 4288 KB, 15362 KB/s, 0 seconds passed
-... 24%, 4320 KB, 15463 KB/s, 0 seconds passed
-... 24%, 4352 KB, 15565 KB/s, 0 seconds passed
-... 24%, 4384 KB, 15666 KB/s, 0 seconds passed
-... 24%, 4416 KB, 15766 KB/s, 0 seconds passed
-... 24%, 4448 KB, 15866 KB/s, 0 seconds passed
-... 24%, 4480 KB, 15967 KB/s, 0 seconds passed
-... 25%, 4512 KB, 16069 KB/s, 0 seconds passed
-... 25%, 4544 KB, 16172 KB/s, 0 seconds passed
-... 25%, 4576 KB, 16274 KB/s, 0 seconds passed
-... 25%, 4608 KB, 16377 KB/s, 0 seconds passed
-... 25%, 4640 KB, 16480 KB/s, 0 seconds passed
-... 25%, 4672 KB, 16581 KB/s, 0 seconds passed
-... 26%, 4704 KB, 16683 KB/s, 0 seconds passed
-... 26%, 4736 KB, 16785 KB/s, 0 seconds passed
-... 26%, 4768 KB, 16887 KB/s, 0 seconds passed
-... 26%, 4800 KB, 16278 KB/s, 0 seconds passed
-... 26%, 4832 KB, 16359 KB/s, 0 seconds passed
-... 27%, 4864 KB, 16445 KB/s, 0 seconds passed
-... 27%, 4896 KB, 16532 KB/s, 0 seconds passed
-... 27%, 4928 KB, 16620 KB/s, 0 seconds passed
-... 27%, 4960 KB, 16711 KB/s, 0 seconds passed
-... 27%, 4992 KB, 16367 KB/s, 0 seconds passed
-... 27%, 5024 KB, 16444 KB/s, 0 seconds passed
-... 28%, 5056 KB, 16525 KB/s, 0 seconds passed
-... 28%, 5088 KB, 16608 KB/s, 0 seconds passed
-... 28%, 5120 KB, 16690 KB/s, 0 seconds passed
-... 28%, 5152 KB, 16774 KB/s, 0 seconds passed
-... 28%, 5184 KB, 16857 KB/s, 0 seconds passed
-... 28%, 5216 KB, 16940 KB/s, 0 seconds passed
-... 29%, 5248 KB, 17023 KB/s, 0 seconds passed
-... 29%, 5280 KB, 17106 KB/s, 0 seconds passed
-... 29%, 5312 KB, 17189 KB/s, 0 seconds passed
-... 29%, 5344 KB, 17272 KB/s, 0 seconds passed
-... 29%, 5376 KB, 17353 KB/s, 0 seconds passed
-... 30%, 5408 KB, 17434 KB/s, 0 seconds passed
-... 30%, 5440 KB, 17516 KB/s, 0 seconds passed
-... 30%, 5472 KB, 17597 KB/s, 0 seconds passed
-... 30%, 5504 KB, 17678 KB/s, 0 seconds passed
-... 30%, 5536 KB, 17759 KB/s, 0 seconds passed
-... 30%, 5568 KB, 17839 KB/s, 0 seconds passed
-... 31%, 5600 KB, 17920 KB/s, 0 seconds passed
-... 31%, 5632 KB, 18001 KB/s, 0 seconds passed
-... 31%, 5664 KB, 18082 KB/s, 0 seconds passed
-... 31%, 5696 KB, 18165 KB/s, 0 seconds passed
-... 31%, 5728 KB, 18248 KB/s, 0 seconds passed
-... 32%, 5760 KB, 18331 KB/s, 0 seconds passed
-... 32%, 5792 KB, 18414 KB/s, 0 seconds passed
-... 32%, 5824 KB, 18498 KB/s, 0 seconds passed
-... 32%, 5856 KB, 18581 KB/s, 0 seconds passed
-... 32%, 5888 KB, 18664 KB/s, 0 seconds passed
-... 32%, 5920 KB, 18748 KB/s, 0 seconds passed
-... 33%, 5952 KB, 18831 KB/s, 0 seconds passed
-... 33%, 5984 KB, 18913 KB/s, 0 seconds passed
-... 33%, 6016 KB, 18996 KB/s, 0 seconds passed
-... 33%, 6048 KB, 19078 KB/s, 0 seconds passed
-... 33%, 6080 KB, 19160 KB/s, 0 seconds passed
-... 33%, 6112 KB, 19242 KB/s, 0 seconds passed
-... 34%, 6144 KB, 19323 KB/s, 0 seconds passed
-... 34%, 6176 KB, 19407 KB/s, 0 seconds passed
-... 34%, 6208 KB, 19490 KB/s, 0 seconds passed
-... 34%, 6240 KB, 19571 KB/s, 0 seconds passed
-... 34%, 6272 KB, 19653 KB/s, 0 seconds passed
-... 35%, 6304 KB, 19734 KB/s, 0 seconds passed
-... 35%, 6336 KB, 19815 KB/s, 0 seconds passed
-... 35%, 6368 KB, 19897 KB/s, 0 seconds passed
-... 35%, 6400 KB, 19978 KB/s, 0 seconds passed
-... 35%, 6432 KB, 20060 KB/s, 0 seconds passed
+    ... 27%, 4960 KB, 18453 KB/s, 0 seconds passed... 27%, 4992 KB, 18544 KB/s, 0 seconds passed... 27%, 5024 KB, 18641 KB/s, 0 seconds passed... 28%, 5056 KB, 18744 KB/s, 0 seconds passed... 28%, 5088 KB, 18837 KB/s, 0 seconds passed... 28%, 5120 KB, 18933 KB/s, 0 seconds passed... 28%, 5152 KB, 19021 KB/s, 0 seconds passed... 28%, 5184 KB, 19112 KB/s, 0 seconds passed... 28%, 5216 KB, 19204 KB/s, 0 seconds passed... 29%, 5248 KB, 19299 KB/s, 0 seconds passed... 29%, 5280 KB, 19386 KB/s, 0 seconds passed... 29%, 5312 KB, 19414 KB/s, 0 seconds passed... 29%, 5344 KB, 19512 KB/s, 0 seconds passed... 29%, 5376 KB, 19610 KB/s, 0 seconds passed... 30%, 5408 KB, 19707 KB/s, 0 seconds passed... 30%, 5440 KB, 19804 KB/s, 0 seconds passed... 30%, 5472 KB, 19902 KB/s, 0 seconds passed... 30%, 5504 KB, 19995 KB/s, 0 seconds passed... 30%, 5536 KB, 20092 KB/s, 0 seconds passed... 30%, 5568 KB, 19746 KB/s, 0 seconds passed... 31%, 5600 KB, 19840 KB/s, 0 seconds passed... 31%, 5632 KB, 19935 KB/s, 0 seconds passed... 31%, 5664 KB, 20028 KB/s, 0 seconds passed... 31%, 5696 KB, 20120 KB/s, 0 seconds passed... 31%, 5728 KB, 20214 KB/s, 0 seconds passed... 32%, 5760 KB, 20307 KB/s, 0 seconds passed... 32%, 5792 KB, 20400 KB/s, 0 seconds passed... 32%, 5824 KB, 20491 KB/s, 0 seconds passed... 32%, 5856 KB, 20584 KB/s, 0 seconds passed... 32%, 5888 KB, 20677 KB/s, 0 seconds passed... 32%, 5920 KB, 20771 KB/s, 0 seconds passed... 33%, 5952 KB, 20859 KB/s, 0 seconds passed... 33%, 5984 KB, 20952 KB/s, 0 seconds passed... 33%, 6016 KB, 21045 KB/s, 0 seconds passed... 33%, 6048 KB, 21137 KB/s, 0 seconds passed... 33%, 6080 KB, 21225 KB/s, 0 seconds passed... 33%, 6112 KB, 21316 KB/s, 0 seconds passed... 34%, 6144 KB, 21409 KB/s, 0 seconds passed... 34%, 6176 KB, 21500 KB/s, 0 seconds passed... 34%, 6208 KB, 21588 KB/s, 0 seconds passed... 34%, 6240 KB, 21679 KB/s, 0 seconds passed... 34%, 6272 KB, 21770 KB/s, 0 seconds passed... 35%, 6304 KB, 21862 KB/s, 0 seconds passed... 35%, 6336 KB, 21950 KB/s, 0 seconds passed... 35%, 6368 KB, 22037 KB/s, 0 seconds passed... 35%, 6400 KB, 22125 KB/s, 0 seconds passed... 35%, 6432 KB, 22215 KB/s, 0 seconds passed... 35%, 6464 KB, 22304 KB/s, 0 seconds passed... 36%, 6496 KB, 22392 KB/s, 0 seconds passed... 36%, 6528 KB, 22480 KB/s, 0 seconds passed... 36%, 6560 KB, 22567 KB/s, 0 seconds passed... 36%, 6592 KB, 22655 KB/s, 0 seconds passed... 36%, 6624 KB, 22742 KB/s, 0 seconds passed... 36%, 6656 KB, 22830 KB/s, 0 seconds passed... 37%, 6688 KB, 22791 KB/s, 0 seconds passed... 37%, 6720 KB, 22858 KB/s, 0 seconds passed... 37%, 6752 KB, 22926 KB/s, 0 seconds passed... 37%, 6784 KB, 22999 KB/s, 0 seconds passed... 37%, 6816 KB, 23078 KB/s, 0 seconds passed... 38%, 6848 KB, 23164 KB/s, 0 seconds passed... 38%, 6880 KB, 23249 KB/s, 0 seconds passed... 38%, 6912 KB, 23335 KB/s, 0 seconds passed... 38%, 6944 KB, 23421 KB/s, 0 seconds passed... 38%, 6976 KB, 23506 KB/s, 0 seconds passed... 38%, 7008 KB, 23591 KB/s, 0 seconds passed... 39%, 7040 KB, 23676 KB/s, 0 seconds passed... 39%, 7072 KB, 23762 KB/s, 0 seconds passed... 39%, 7104 KB, 23846 KB/s, 0 seconds passed... 39%, 7136 KB, 23930 KB/s, 0 seconds passed... 39%, 7168 KB, 24017 KB/s, 0 seconds passed... 40%, 7200 KB, 24105 KB/s, 0 seconds passed... 40%, 7232 KB, 24192 KB/s, 0 seconds passed... 40%, 7264 KB, 24281 KB/s, 0 seconds passed... 40%, 7296 KB, 24369 KB/s, 0 seconds passed... 40%, 7328 KB, 24457 KB/s, 0 seconds passed... 40%, 7360 KB, 24545 KB/s, 0 seconds passed... 41%, 7392 KB, 24632 KB/s, 0 seconds passed... 41%, 7424 KB, 24718 KB/s, 0 seconds passed... 41%, 7456 KB, 24802 KB/s, 0 seconds passed... 41%, 7488 KB, 24887 KB/s, 0 seconds passed... 41%, 7520 KB, 24967 KB/s, 0 seconds passed... 41%, 7552 KB, 25051 KB/s, 0 seconds passed... 42%, 7584 KB, 25135 KB/s, 0 seconds passed... 42%, 7616 KB, 25219 KB/s, 0 seconds passed... 42%, 7648 KB, 25299 KB/s, 0 seconds passed... 42%, 7680 KB, 25381 KB/s, 0 seconds passed... 42%, 7712 KB, 25466 KB/s, 0 seconds passed... 43%, 7744 KB, 25548 KB/s, 0 seconds passed... 43%, 7776 KB, 25628 KB/s, 0 seconds passed... 43%, 7808 KB, 25711 KB/s, 0 seconds passed... 43%, 7840 KB, 25793 KB/s, 0 seconds passed... 43%, 7872 KB, 25872 KB/s, 0 seconds passed... 43%, 7904 KB, 25954 KB/s, 0 seconds passed... 44%, 7936 KB, 26036 KB/s, 0 seconds passed... 44%, 7968 KB, 26119 KB/s, 0 seconds passed... 44%, 8000 KB, 26201 KB/s, 0 seconds passed... 44%, 8032 KB, 26278 KB/s, 0 seconds passed... 44%, 8064 KB, 26360 KB/s, 0 seconds passed... 45%, 8096 KB, 26442 KB/s, 0 seconds passed... 45%, 8128 KB, 26523 KB/s, 0 seconds passed... 45%, 8160 KB, 26604 KB/s, 0 seconds passed... 45%, 8192 KB, 26681 KB/s, 0 seconds passed... 45%, 8224 KB, 26762 KB/s, 0 seconds passed... 45%, 8256 KB, 26843 KB/s, 0 seconds passed... 46%, 8288 KB, 26919 KB/s, 0 seconds passed... 46%, 8320 KB, 27000 KB/s, 0 seconds passed... 46%, 8352 KB, 27080 KB/s, 0 seconds passed... 46%, 8384 KB, 27158 KB/s, 0 seconds passed... 46%, 8416 KB, 27238 KB/s, 0 seconds passed... 46%, 8448 KB, 27315 KB/s, 0 seconds passed... 47%, 8480 KB, 27381 KB/s, 0 seconds passed... 47%, 8512 KB, 27449 KB/s, 0 seconds passed... 47%, 8544 KB, 27531 KB/s, 0 seconds passed... 47%, 8576 KB, 27621 KB/s, 0 seconds passed... 47%, 8608 KB, 27707 KB/s, 0 seconds passed... 48%, 8640 KB, 27786 KB/s, 0 seconds passed... 48%, 8672 KB, 27866 KB/s, 0 seconds passed... 48%, 8704 KB, 27945 KB/s, 0 seconds passed... 48%, 8736 KB, 28019 KB/s, 0 seconds passed... 48%, 8768 KB, 28098 KB/s, 0 seconds passed... 48%, 8800 KB, 28177 KB/s, 0 seconds passed... 49%, 8832 KB, 28251 KB/s, 0 seconds passed... 49%, 8864 KB, 28330 KB/s, 0 seconds passed... 49%, 8896 KB, 28408 KB/s, 0 seconds passed... 49%, 8928 KB, 28481 KB/s, 0 seconds passed... 49%, 8960 KB, 28559 KB/s, 0 seconds passed... 49%, 8992 KB, 28638 KB/s, 0 seconds passed... 50%, 9024 KB, 28715 KB/s, 0 seconds passed... 50%, 9056 KB, 28787 KB/s, 0 seconds passed... 50%, 9088 KB, 28865 KB/s, 0 seconds passed... 50%, 9120 KB, 28943 KB/s, 0 seconds passed... 50%, 9152 KB, 29015 KB/s, 0 seconds passed... 51%, 9184 KB, 29093 KB/s, 0 seconds passed... 51%, 9216 KB, 29170 KB/s, 0 seconds passed... 51%, 9248 KB, 29247 KB/s, 0 seconds passed... 51%, 9280 KB, 29319 KB/s, 0 seconds passed... 51%, 9312 KB, 29395 KB/s, 0 seconds passed... 51%, 9344 KB, 29472 KB/s, 0 seconds passed... 52%, 9376 KB, 29543 KB/s, 0 seconds passed... 52%, 9408 KB, 29620 KB/s, 0 seconds passed... 52%, 9440 KB, 29696 KB/s, 0 seconds passed... 52%, 9472 KB, 29767 KB/s, 0 seconds passed... 52%, 9504 KB, 29843 KB/s, 0 seconds passed... 53%, 9536 KB, 29919 KB/s, 0 seconds passed... 53%, 9568 KB, 29989 KB/s, 0 seconds passed... 53%, 9600 KB, 30065 KB/s, 0 seconds passed... 53%, 9632 KB, 30141 KB/s, 0 seconds passed... 53%, 9664 KB, 30215 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 35%, 6464 KB, 20140 KB/s, 0 seconds passed
-... 36%, 6496 KB, 20220 KB/s, 0 seconds passed
-... 36%, 6528 KB, 20300 KB/s, 0 seconds passed
-... 36%, 6560 KB, 20378 KB/s, 0 seconds passed
-... 36%, 6592 KB, 20457 KB/s, 0 seconds passed
-... 36%, 6624 KB, 20536 KB/s, 0 seconds passed
-... 36%, 6656 KB, 20615 KB/s, 0 seconds passed
-... 37%, 6688 KB, 20695 KB/s, 0 seconds passed
-... 37%, 6720 KB, 20775 KB/s, 0 seconds passed
-... 37%, 6752 KB, 20861 KB/s, 0 seconds passed
-... 37%, 6784 KB, 20946 KB/s, 0 seconds passed
-... 37%, 6816 KB, 21032 KB/s, 0 seconds passed
-... 38%, 6848 KB, 21118 KB/s, 0 seconds passed
-... 38%, 6880 KB, 21204 KB/s, 0 seconds passed
-... 38%, 6912 KB, 21290 KB/s, 0 seconds passed
-... 38%, 6944 KB, 21376 KB/s, 0 seconds passed
-... 38%, 6976 KB, 21461 KB/s, 0 seconds passed
-... 38%, 7008 KB, 21546 KB/s, 0 seconds passed
-... 39%, 7040 KB, 21631 KB/s, 0 seconds passed
-... 39%, 7072 KB, 21717 KB/s, 0 seconds passed
-... 39%, 7104 KB, 21801 KB/s, 0 seconds passed
-... 39%, 7136 KB, 21886 KB/s, 0 seconds passed
-... 39%, 7168 KB, 21971 KB/s, 0 seconds passed
-... 40%, 7200 KB, 22056 KB/s, 0 seconds passed
-... 40%, 7232 KB, 22140 KB/s, 0 seconds passed
-... 40%, 7264 KB, 22224 KB/s, 0 seconds passed
-... 40%, 7296 KB, 22309 KB/s, 0 seconds passed
-... 40%, 7328 KB, 22393 KB/s, 0 seconds passed
-... 40%, 7360 KB, 22478 KB/s, 0 seconds passed
-... 41%, 7392 KB, 22562 KB/s, 0 seconds passed
-... 41%, 7424 KB, 22647 KB/s, 0 seconds passed
-... 41%, 7456 KB, 22731 KB/s, 0 seconds passed
-... 41%, 7488 KB, 22814 KB/s, 0 seconds passed
-... 41%, 7520 KB, 22896 KB/s, 0 seconds passed
-... 41%, 7552 KB, 22980 KB/s, 0 seconds passed
-... 42%, 7584 KB, 23064 KB/s, 0 seconds passed
-... 42%, 7616 KB, 23148 KB/s, 0 seconds passed
-... 42%, 7648 KB, 23231 KB/s, 0 seconds passed
-... 42%, 7680 KB, 23315 KB/s, 0 seconds passed
-... 42%, 7712 KB, 23398 KB/s, 0 seconds passed
-... 43%, 7744 KB, 23480 KB/s, 0 seconds passed
-... 43%, 7776 KB, 23563 KB/s, 0 seconds passed
-... 43%, 7808 KB, 23646 KB/s, 0 seconds passed
-... 43%, 7840 KB, 23729 KB/s, 0 seconds passed
-... 43%, 7872 KB, 23812 KB/s, 0 seconds passed
-... 43%, 7904 KB, 23895 KB/s, 0 seconds passed
-... 44%, 7936 KB, 23978 KB/s, 0 seconds passed
-... 44%, 7968 KB, 24055 KB/s, 0 seconds passed
-... 44%, 8000 KB, 24132 KB/s, 0 seconds passed
-... 44%, 8032 KB, 24206 KB/s, 0 seconds passed
-... 44%, 8064 KB, 24283 KB/s, 0 seconds passed
-... 45%, 8096 KB, 24360 KB/s, 0 seconds passed
-... 45%, 8128 KB, 24437 KB/s, 0 seconds passed
-... 45%, 8160 KB, 24514 KB/s, 0 seconds passed
-... 45%, 8192 KB, 24586 KB/s, 0 seconds passed
-... 45%, 8224 KB, 24663 KB/s, 0 seconds passed
-... 45%, 8256 KB, 24739 KB/s, 0 seconds passed
-... 46%, 8288 KB, 24812 KB/s, 0 seconds passed
-... 46%, 8320 KB, 24888 KB/s, 0 seconds passed
-... 46%, 8352 KB, 24965 KB/s, 0 seconds passed
-... 46%, 8384 KB, 25041 KB/s, 0 seconds passed
-... 46%, 8416 KB, 25117 KB/s, 0 seconds passed
-... 46%, 8448 KB, 25188 KB/s, 0 seconds passed
-... 47%, 8480 KB, 25264 KB/s, 0 seconds passed
-... 47%, 8512 KB, 25340 KB/s, 0 seconds passed
-... 47%, 8544 KB, 25411 KB/s, 0 seconds passed
-... 47%, 8576 KB, 25486 KB/s, 0 seconds passed
-... 47%, 8608 KB, 25561 KB/s, 0 seconds passed
-... 48%, 8640 KB, 25636 KB/s, 0 seconds passed
-... 48%, 8672 KB, 25711 KB/s, 0 seconds passed
-... 48%, 8704 KB, 25778 KB/s, 0 seconds passed
-... 48%, 8736 KB, 25848 KB/s, 0 seconds passed
-... 48%, 8768 KB, 25909 KB/s, 0 seconds passed
-... 48%, 8800 KB, 25975 KB/s, 0 seconds passed
-... 49%, 8832 KB, 26059 KB/s, 0 seconds passed
-... 49%, 8864 KB, 26143 KB/s, 0 seconds passed
-... 49%, 8896 KB, 26218 KB/s, 0 seconds passed
-... 49%, 8928 KB, 26288 KB/s, 0 seconds passed
-... 49%, 8960 KB, 26362 KB/s, 0 seconds passed
-... 49%, 8992 KB, 26436 KB/s, 0 seconds passed
-... 50%, 9024 KB, 26509 KB/s, 0 seconds passed
-... 50%, 9056 KB, 26583 KB/s, 0 seconds passed
-... 50%, 9088 KB, 26652 KB/s, 0 seconds passed
-... 50%, 9120 KB, 26725 KB/s, 0 seconds passed
-... 50%, 9152 KB, 26798 KB/s, 0 seconds passed
-... 51%, 9184 KB, 26871 KB/s, 0 seconds passed
-... 51%, 9216 KB, 26940 KB/s, 0 seconds passed
-... 51%, 9248 KB, 27013 KB/s, 0 seconds passed
-... 51%, 9280 KB, 27090 KB/s, 0 seconds passed
-... 51%, 9312 KB, 27158 KB/s, 0 seconds passed
-... 51%, 9344 KB, 27231 KB/s, 0 seconds passed
-... 52%, 9376 KB, 27303 KB/s, 0 seconds passed
-... 52%, 9408 KB, 27371 KB/s, 0 seconds passed
-... 52%, 9440 KB, 27444 KB/s, 0 seconds passed
-... 52%, 9472 KB, 27516 KB/s, 0 seconds passed
-... 52%, 9504 KB, 27583 KB/s, 0 seconds passed
-... 53%, 9536 KB, 27642 KB/s, 0 seconds passed
-... 53%, 9568 KB, 27701 KB/s, 0 seconds passed
-... 53%, 9600 KB, 27764 KB/s, 0 seconds passed
-... 53%, 9632 KB, 27126 KB/s, 0 seconds passed
-... 53%, 9664 KB, 27185 KB/s, 0 seconds passed
-... 53%, 9696 KB, 27245 KB/s, 0 seconds passed
-... 54%, 9728 KB, 27305 KB/s, 0 seconds passed
-... 54%, 9760 KB, 27367 KB/s, 0 seconds passed
-... 54%, 9792 KB, 27429 KB/s, 0 seconds passed
-... 54%, 9824 KB, 27492 KB/s, 0 seconds passed
-... 54%, 9856 KB, 27554 KB/s, 0 seconds passed
-... 54%, 9888 KB, 27614 KB/s, 0 seconds passed
-... 55%, 9920 KB, 27675 KB/s, 0 seconds passed
-... 55%, 9952 KB, 27737 KB/s, 0 seconds passed
-... 55%, 9984 KB, 27799 KB/s, 0 seconds passed
-... 55%, 10016 KB, 27860 KB/s, 0 seconds passed
-... 55%, 10048 KB, 27920 KB/s, 0 seconds passed
-... 56%, 10080 KB, 27980 KB/s, 0 seconds passed
-... 56%, 10112 KB, 28041 KB/s, 0 seconds passed
-... 56%, 10144 KB, 28101 KB/s, 0 seconds passed
-... 56%, 10176 KB, 28162 KB/s, 0 seconds passed
-... 56%, 10208 KB, 28225 KB/s, 0 seconds passed
-... 56%, 10240 KB, 28290 KB/s, 0 seconds passed
-... 57%, 10272 KB, 28356 KB/s, 0 seconds passed
-... 57%, 10304 KB, 28422 KB/s, 0 seconds passed
-... 57%, 10336 KB, 28489 KB/s, 0 seconds passed
+    ... 53%, 9696 KB, 30286 KB/s, 0 seconds passed... 54%, 9728 KB, 30361 KB/s, 0 seconds passed... 54%, 9760 KB, 30436 KB/s, 0 seconds passed... 54%, 9792 KB, 30511 KB/s, 0 seconds passed... 54%, 9824 KB, 30580 KB/s, 0 seconds passed... 54%, 9856 KB, 30654 KB/s, 0 seconds passed... 54%, 9888 KB, 30729 KB/s, 0 seconds passed... 55%, 9920 KB, 30799 KB/s, 0 seconds passed... 55%, 9952 KB, 30873 KB/s, 0 seconds passed... 55%, 9984 KB, 30946 KB/s, 0 seconds passed... 55%, 10016 KB, 31016 KB/s, 0 seconds passed... 55%, 10048 KB, 30988 KB/s, 0 seconds passed... 56%, 10080 KB, 31059 KB/s, 0 seconds passed... 56%, 10112 KB, 31134 KB/s, 0 seconds passed... 56%, 10144 KB, 31208 KB/s, 0 seconds passed... 56%, 10176 KB, 31281 KB/s, 0 seconds passed... 56%, 10208 KB, 31349 KB/s, 0 seconds passed... 56%, 10240 KB, 31422 KB/s, 0 seconds passed... 57%, 10272 KB, 31495 KB/s, 0 seconds passed... 57%, 10304 KB, 31562 KB/s, 0 seconds passed... 57%, 10336 KB, 31635 KB/s, 0 seconds passed... 57%, 10368 KB, 31707 KB/s, 0 seconds passed... 57%, 10400 KB, 31779 KB/s, 0 seconds passed... 57%, 10432 KB, 31852 KB/s, 0 seconds passed... 58%, 10464 KB, 31919 KB/s, 0 seconds passed... 58%, 10496 KB, 31986 KB/s, 0 seconds passed... 58%, 10528 KB, 32044 KB/s, 0 seconds passed... 58%, 10560 KB, 32103 KB/s, 0 seconds passed... 58%, 10592 KB, 32164 KB/s, 0 seconds passed... 59%, 10624 KB, 32226 KB/s, 0 seconds passed... 59%, 10656 KB, 32287 KB/s, 0 seconds passed... 59%, 10688 KB, 32348 KB/s, 0 seconds passed... 59%, 10720 KB, 32407 KB/s, 0 seconds passed... 59%, 10752 KB, 32468 KB/s, 0 seconds passed... 59%, 10784 KB, 32530 KB/s, 0 seconds passed... 60%, 10816 KB, 32590 KB/s, 0 seconds passed... 60%, 10848 KB, 32652 KB/s, 0 seconds passed... 60%, 10880 KB, 32712 KB/s, 0 seconds passed... 60%, 10912 KB, 32772 KB/s, 0 seconds passed... 60%, 10944 KB, 32832 KB/s, 0 seconds passed... 61%, 10976 KB, 32893 KB/s, 0 seconds passed... 61%, 11008 KB, 32950 KB/s, 0 seconds passed... 61%, 11040 KB, 33010 KB/s, 0 seconds passed... 61%, 11072 KB, 33067 KB/s, 0 seconds passed... 61%, 11104 KB, 33127 KB/s, 0 seconds passed... 61%, 11136 KB, 33187 KB/s, 0 seconds passed... 62%, 11168 KB, 33246 KB/s, 0 seconds passed... 62%, 11200 KB, 33306 KB/s, 0 seconds passed... 62%, 11232 KB, 33371 KB/s, 0 seconds passed... 62%, 11264 KB, 33439 KB/s, 0 seconds passed... 62%, 11296 KB, 33506 KB/s, 0 seconds passed... 62%, 11328 KB, 33573 KB/s, 0 seconds passed... 63%, 11360 KB, 33640 KB/s, 0 seconds passed... 63%, 11392 KB, 33708 KB/s, 0 seconds passed... 63%, 11424 KB, 33774 KB/s, 0 seconds passed... 63%, 11456 KB, 32654 KB/s, 0 seconds passed... 63%, 11488 KB, 32706 KB/s, 0 seconds passed... 64%, 11520 KB, 32760 KB/s, 0 seconds passed... 64%, 11552 KB, 32815 KB/s, 0 seconds passed... 64%, 11584 KB, 32872 KB/s, 0 seconds passed... 64%, 11616 KB, 32927 KB/s, 0 seconds passed... 64%, 11648 KB, 32981 KB/s, 0 seconds passed... 64%, 11680 KB, 33034 KB/s, 0 seconds passed... 65%, 11712 KB, 33090 KB/s, 0 seconds passed... 65%, 11744 KB, 33146 KB/s, 0 seconds passed... 65%, 11776 KB, 33199 KB/s, 0 seconds passed... 65%, 11808 KB, 33254 KB/s, 0 seconds passed... 65%, 11840 KB, 33306 KB/s, 0 seconds passed... 65%, 11872 KB, 33360 KB/s, 0 seconds passed... 66%, 11904 KB, 33413 KB/s, 0 seconds passed... 66%, 11936 KB, 33467 KB/s, 0 seconds passed... 66%, 11968 KB, 33521 KB/s, 0 seconds passed... 66%, 12000 KB, 33574 KB/s, 0 seconds passed... 66%, 12032 KB, 33628 KB/s, 0 seconds passed... 67%, 12064 KB, 33687 KB/s, 0 seconds passed... 67%, 12096 KB, 33748 KB/s, 0 seconds passed... 67%, 12128 KB, 33808 KB/s, 0 seconds passed... 67%, 12160 KB, 33872 KB/s, 0 seconds passed... 67%, 12192 KB, 33936 KB/s, 0 seconds passed... 67%, 12224 KB, 34000 KB/s, 0 seconds passed... 68%, 12256 KB, 34063 KB/s, 0 seconds passed... 68%, 12288 KB, 33910 KB/s, 0 seconds passed... 68%, 12320 KB, 33960 KB/s, 0 seconds passed... 68%, 12352 KB, 34015 KB/s, 0 seconds passed... 68%, 12384 KB, 34070 KB/s, 0 seconds passed... 69%, 12416 KB, 34124 KB/s, 0 seconds passed... 69%, 12448 KB, 34180 KB/s, 0 seconds passed... 69%, 12480 KB, 34235 KB/s, 0 seconds passed... 69%, 12512 KB, 34291 KB/s, 0 seconds passed... 69%, 12544 KB, 34344 KB/s, 0 seconds passed... 69%, 12576 KB, 34399 KB/s, 0 seconds passed... 70%, 12608 KB, 34453 KB/s, 0 seconds passed... 70%, 12640 KB, 34507 KB/s, 0 seconds passed... 70%, 12672 KB, 34559 KB/s, 0 seconds passed... 70%, 12704 KB, 34612 KB/s, 0 seconds passed... 70%, 12736 KB, 34666 KB/s, 0 seconds passed... 70%, 12768 KB, 34721 KB/s, 0 seconds passed... 71%, 12800 KB, 34775 KB/s, 0 seconds passed... 71%, 12832 KB, 34830 KB/s, 0 seconds passed... 71%, 12864 KB, 34883 KB/s, 0 seconds passed... 71%, 12896 KB, 34940 KB/s, 0 seconds passed... 71%, 12928 KB, 34999 KB/s, 0 seconds passed... 72%, 12960 KB, 35059 KB/s, 0 seconds passed... 72%, 12992 KB, 35118 KB/s, 0 seconds passed... 72%, 13024 KB, 35178 KB/s, 0 seconds passed... 72%, 13056 KB, 35236 KB/s, 0 seconds passed... 72%, 13088 KB, 35293 KB/s, 0 seconds passed... 72%, 13120 KB, 35352 KB/s, 0 seconds passed
 
 .. parsed-literal::
 
-    ... 57%, 10368 KB, 17538 KB/s, 0 seconds passed
-... 57%, 10400 KB, 17319 KB/s, 0 seconds passed
-... 57%, 10432 KB, 17081 KB/s, 0 seconds passed
-... 58%, 10464 KB, 16880 KB/s, 0 seconds passed
-... 58%, 10496 KB, 16918 KB/s, 0 seconds passed
-... 58%, 10528 KB, 16958 KB/s, 0 seconds passed
-... 58%, 10560 KB, 16999 KB/s, 0 seconds passed
-... 58%, 10592 KB, 17040 KB/s, 0 seconds passed
-... 59%, 10624 KB, 17080 KB/s, 0 seconds passed
-... 59%, 10656 KB, 17121 KB/s, 0 seconds passed
-... 59%, 10688 KB, 17162 KB/s, 0 seconds passed
-... 59%, 10720 KB, 17202 KB/s, 0 seconds passed
-... 59%, 10752 KB, 17243 KB/s, 0 seconds passed
-... 59%, 10784 KB, 17283 KB/s, 0 seconds passed
-... 60%, 10816 KB, 17324 KB/s, 0 seconds passed
-... 60%, 10848 KB, 17365 KB/s, 0 seconds passed
-... 60%, 10880 KB, 17406 KB/s, 0 seconds passed
-... 60%, 10912 KB, 17446 KB/s, 0 seconds passed
-... 60%, 10944 KB, 17486 KB/s, 0 seconds passed
-... 61%, 10976 KB, 17526 KB/s, 0 seconds passed
-... 61%, 11008 KB, 17567 KB/s, 0 seconds passed
-... 61%, 11040 KB, 17607 KB/s, 0 seconds passed
-... 61%, 11072 KB, 17647 KB/s, 0 seconds passed
-... 61%, 11104 KB, 17688 KB/s, 0 seconds passed
+    ... 73%, 13152 KB, 35411 KB/s, 0 seconds passed... 73%, 13184 KB, 35470 KB/s, 0 seconds passed... 73%, 13216 KB, 35529 KB/s, 0 seconds passed... 73%, 13248 KB, 35588 KB/s, 0 seconds passed... 73%, 13280 KB, 35647 KB/s, 0 seconds passed... 73%, 13312 KB, 35703 KB/s, 0 seconds passed... 74%, 13344 KB, 35762 KB/s, 0 seconds passed... 74%, 13376 KB, 35821 KB/s, 0 seconds passed... 74%, 13408 KB, 35880 KB/s, 0 seconds passed... 74%, 13440 KB, 35937 KB/s, 0 seconds passed... 74%, 13472 KB, 35993 KB/s, 0 seconds passed... 75%, 13504 KB, 36051 KB/s, 0 seconds passed... 75%, 13536 KB, 36108 KB/s, 0 seconds passed... 75%, 13568 KB, 36166 KB/s, 0 seconds passed... 75%, 13600 KB, 36224 KB/s, 0 seconds passed... 75%, 13632 KB, 36282 KB/s, 0 seconds passed... 75%, 13664 KB, 36338 KB/s, 0 seconds passed... 76%, 13696 KB, 36396 KB/s, 0 seconds passed... 76%, 13728 KB, 36454 KB/s, 0 seconds passed... 76%, 13760 KB, 36511 KB/s, 0 seconds passed... 76%, 13792 KB, 36568 KB/s, 0 seconds passed... 76%, 13824 KB, 36625 KB/s, 0 seconds passed... 77%, 13856 KB, 36682 KB/s, 0 seconds passed... 77%, 13888 KB, 36740 KB/s, 0 seconds passed... 77%, 13920 KB, 36796 KB/s, 0 seconds passed... 77%, 13952 KB, 36853 KB/s, 0 seconds passed... 77%, 13984 KB, 36908 KB/s, 0 seconds passed... 77%, 14016 KB, 36975 KB/s, 0 seconds passed... 78%, 14048 KB, 37041 KB/s, 0 seconds passed... 78%, 14080 KB, 37107 KB/s, 0 seconds passed... 78%, 14112 KB, 37173 KB/s, 0 seconds passed... 78%, 14144 KB, 37238 KB/s, 0 seconds passed... 78%, 14176 KB, 37303 KB/s, 0 seconds passed... 78%, 14208 KB, 37368 KB/s, 0 seconds passed... 79%, 14240 KB, 37434 KB/s, 0 seconds passed... 79%, 14272 KB, 37500 KB/s, 0 seconds passed... 79%, 14304 KB, 37566 KB/s, 0 seconds passed... 79%, 14336 KB, 37631 KB/s, 0 seconds passed... 79%, 14368 KB, 37697 KB/s, 0 seconds passed... 80%, 14400 KB, 37762 KB/s, 0 seconds passed... 80%, 14432 KB, 37827 KB/s, 0 seconds passed... 80%, 14464 KB, 37893 KB/s, 0 seconds passed... 80%, 14496 KB, 37958 KB/s, 0 seconds passed... 80%, 14528 KB, 38023 KB/s, 0 seconds passed... 80%, 14560 KB, 38088 KB/s, 0 seconds passed... 81%, 14592 KB, 38152 KB/s, 0 seconds passed... 81%, 14624 KB, 38216 KB/s, 0 seconds passed... 81%, 14656 KB, 38276 KB/s, 0 seconds passed... 81%, 14688 KB, 38334 KB/s, 0 seconds passed... 81%, 14720 KB, 38385 KB/s, 0 seconds passed... 82%, 14752 KB, 38443 KB/s, 0 seconds passed... 82%, 14784 KB, 38499 KB/s, 0 seconds passed... 82%, 14816 KB, 38551 KB/s, 0 seconds passed... 82%, 14848 KB, 38608 KB/s, 0 seconds passed... 82%, 14880 KB, 38664 KB/s, 0 seconds passed... 82%, 14912 KB, 38710 KB/s, 0 seconds passed... 83%, 14944 KB, 38767 KB/s, 0 seconds passed... 83%, 14976 KB, 38818 KB/s, 0 seconds passed... 83%, 15008 KB, 38874 KB/s, 0 seconds passed... 83%, 15040 KB, 38931 KB/s, 0 seconds passed... 83%, 15072 KB, 38987 KB/s, 0 seconds passed... 83%, 15104 KB, 39038 KB/s, 0 seconds passed... 84%, 15136 KB, 39099 KB/s, 0 seconds passed... 84%, 15168 KB, 39155 KB/s, 0 seconds passed... 84%, 15200 KB, 39205 KB/s, 0 seconds passed... 84%, 15232 KB, 39261 KB/s, 0 seconds passed... 84%, 15264 KB, 39317 KB/s, 0 seconds passed... 85%, 15296 KB, 39373 KB/s, 0 seconds passed... 85%, 15328 KB, 39423 KB/s, 0 seconds passed... 85%, 15360 KB, 39479 KB/s, 0 seconds passed... 85%, 15392 KB, 39523 KB/s, 0 seconds passed... 85%, 15424 KB, 39579 KB/s, 0 seconds passed... 85%, 15456 KB, 39629 KB/s, 0 seconds passed... 86%, 15488 KB, 39685 KB/s, 0 seconds passed... 86%, 15520 KB, 39740 KB/s, 0 seconds passed... 86%, 15552 KB, 39789 KB/s, 0 seconds passed... 86%, 15584 KB, 39845 KB/s, 0 seconds passed... 86%, 15616 KB, 39899 KB/s, 0 seconds passed... 86%, 15648 KB, 39960 KB/s, 0 seconds passed... 87%, 15680 KB, 40009 KB/s, 0 seconds passed... 87%, 15712 KB, 40064 KB/s, 0 seconds passed... 87%, 15744 KB, 40119 KB/s, 0 seconds passed... 87%, 15776 KB, 40173 KB/s, 0 seconds passed... 87%, 15808 KB, 40228 KB/s, 0 seconds passed... 88%, 15840 KB, 40277 KB/s, 0 seconds passed... 88%, 15872 KB, 40332 KB/s, 0 seconds passed... 88%, 15904 KB, 40386 KB/s, 0 seconds passed... 88%, 15936 KB, 40435 KB/s, 0 seconds passed... 88%, 15968 KB, 40489 KB/s, 0 seconds passed... 88%, 16000 KB, 40543 KB/s, 0 seconds passed... 89%, 16032 KB, 40592 KB/s, 0 seconds passed... 89%, 16064 KB, 40641 KB/s, 0 seconds passed... 89%, 16096 KB, 40680 KB/s, 0 seconds passed... 89%, 16128 KB, 40733 KB/s, 0 seconds passed... 89%, 16160 KB, 40799 KB/s, 0 seconds passed... 90%, 16192 KB, 40850 KB/s, 0 seconds passed... 90%, 16224 KB, 40903 KB/s, 0 seconds passed... 90%, 16256 KB, 40951 KB/s, 0 seconds passed... 90%, 16288 KB, 41005 KB/s, 0 seconds passed... 90%, 16320 KB, 41058 KB/s, 0 seconds passed... 90%, 16352 KB, 41111 KB/s, 0 seconds passed... 91%, 16384 KB, 41159 KB/s, 0 seconds passed... 91%, 16416 KB, 41213 KB/s, 0 seconds passed... 91%, 16448 KB, 41260 KB/s, 0 seconds passed... 91%, 16480 KB, 41313 KB/s, 0 seconds passed... 91%, 16512 KB, 41366 KB/s, 0 seconds passed... 91%, 16544 KB, 41419 KB/s, 0 seconds passed... 92%, 16576 KB, 41472 KB/s, 0 seconds passed... 92%, 16608 KB, 41525 KB/s, 0 seconds passed... 92%, 16640 KB, 41577 KB/s, 0 seconds passed... 92%, 16672 KB, 41625 KB/s, 0 seconds passed... 92%, 16704 KB, 41677 KB/s, 0 seconds passed... 93%, 16736 KB, 41730 KB/s, 0 seconds passed... 93%, 16768 KB, 41777 KB/s, 0 seconds passed... 93%, 16800 KB, 41824 KB/s, 0 seconds passed... 93%, 16832 KB, 41861 KB/s, 0 seconds passed... 93%, 16864 KB, 41907 KB/s, 0 seconds passed... 93%, 16896 KB, 41973 KB/s, 0 seconds passed... 94%, 16928 KB, 42029 KB/s, 0 seconds passed... 94%, 16960 KB, 42082 KB/s, 0 seconds passed... 94%, 16992 KB, 42134 KB/s, 0 seconds passed... 94%, 17024 KB, 42180 KB/s, 0 seconds passed... 94%, 17056 KB, 42232 KB/s, 0 seconds passed... 94%, 17088 KB, 42270 KB/s, 0 seconds passed... 95%, 17120 KB, 42306 KB/s, 0 seconds passed... 95%, 17152 KB, 42344 KB/s, 0 seconds passed... 95%, 17184 KB, 42384 KB/s, 0 seconds passed... 95%, 17216 KB, 42450 KB/s, 0 seconds passed... 95%, 17248 KB, 42515 KB/s, 0 seconds passed... 96%, 17280 KB, 42579 KB/s, 0 seconds passed... 96%, 17312 KB, 42631 KB/s, 0 seconds passed... 96%, 17344 KB, 42683 KB/s, 0 seconds passed... 96%, 17376 KB, 42733 KB/s, 0 seconds passed... 96%, 17408 KB, 42779 KB/s, 0 seconds passed... 96%, 17440 KB, 42830 KB/s, 0 seconds passed... 97%, 17472 KB, 42875 KB/s, 0 seconds passed... 97%, 17504 KB, 42927 KB/s, 0 seconds passed... 97%, 17536 KB, 42972 KB/s, 0 seconds passed... 97%, 17568 KB, 43028 KB/s, 0 seconds passed... 97%, 17600 KB, 43079 KB/s, 0 seconds passed... 98%, 17632 KB, 43124 KB/s, 0 seconds passed... 98%, 17664 KB, 43175 KB/s, 0 seconds passed... 98%, 17696 KB, 43225 KB/s, 0 seconds passed... 98%, 17728 KB, 43270 KB/s, 0 seconds passed... 98%, 17760 KB, 43315 KB/s, 0 seconds passed... 98%, 17792 KB, 43365 KB/s, 0 seconds passed... 99%, 17824 KB, 43410 KB/s, 0 seconds passed... 99%, 17856 KB, 43455 KB/s, 0 seconds passed... 99%, 17888 KB, 43505 KB/s, 0 seconds passed... 99%, 17920 KB, 43555 KB/s, 0 seconds passed... 99%, 17952 KB, 43605 KB/s, 0 seconds passed... 99%, 17984 KB, 43655 KB/s, 0 seconds passed... 100%, 17990 KB, 43654 KB/s, 0 seconds passed
+
 
 .. parsed-literal::
-
-    ... 61%, 11136 KB, 17728 KB/s, 0 seconds passed
-... 62%, 11168 KB, 17768 KB/s, 0 seconds passed
-... 62%, 11200 KB, 17809 KB/s, 0 seconds passed
-... 62%, 11232 KB, 17849 KB/s, 0 seconds passed
-... 62%, 11264 KB, 17890 KB/s, 0 seconds passed
-... 62%, 11296 KB, 17929 KB/s, 0 seconds passed
-... 62%, 11328 KB, 17969 KB/s, 0 seconds passed
-... 63%, 11360 KB, 18009 KB/s, 0 seconds passed
-... 63%, 11392 KB, 18049 KB/s, 0 seconds passed
-... 63%, 11424 KB, 18089 KB/s, 0 seconds passed
-... 63%, 11456 KB, 18128 KB/s, 0 seconds passed
-... 63%, 11488 KB, 18168 KB/s, 0 seconds passed
-... 64%, 11520 KB, 18208 KB/s, 0 seconds passed
-... 64%, 11552 KB, 18248 KB/s, 0 seconds passed
-... 64%, 11584 KB, 18287 KB/s, 0 seconds passed
-... 64%, 11616 KB, 18326 KB/s, 0 seconds passed
-... 64%, 11648 KB, 18365 KB/s, 0 seconds passed
-... 64%, 11680 KB, 18405 KB/s, 0 seconds passed
-... 65%, 11712 KB, 18444 KB/s, 0 seconds passed
-... 65%, 11744 KB, 18484 KB/s, 0 seconds passed
-... 65%, 11776 KB, 18524 KB/s, 0 seconds passed
-... 65%, 11808 KB, 18563 KB/s, 0 seconds passed
-... 65%, 11840 KB, 18603 KB/s, 0 seconds passed
-... 65%, 11872 KB, 18644 KB/s, 0 seconds passed
-... 66%, 11904 KB, 18687 KB/s, 0 seconds passed
-... 66%, 11936 KB, 18730 KB/s, 0 seconds passed
-... 66%, 11968 KB, 18773 KB/s, 0 seconds passed
-... 66%, 12000 KB, 18816 KB/s, 0 seconds passed
-... 66%, 12032 KB, 18859 KB/s, 0 seconds passed
-... 67%, 12064 KB, 18901 KB/s, 0 seconds passed
-... 67%, 12096 KB, 18944 KB/s, 0 seconds passed
-... 67%, 12128 KB, 18987 KB/s, 0 seconds passed
-... 67%, 12160 KB, 19030 KB/s, 0 seconds passed
-... 67%, 12192 KB, 19073 KB/s, 0 seconds passed
-... 67%, 12224 KB, 19116 KB/s, 0 seconds passed
-... 68%, 12256 KB, 19159 KB/s, 0 seconds passed
-... 68%, 12288 KB, 19201 KB/s, 0 seconds passed
-... 68%, 12320 KB, 19244 KB/s, 0 seconds passed
-... 68%, 12352 KB, 19287 KB/s, 0 seconds passed
-... 68%, 12384 KB, 19329 KB/s, 0 seconds passed
-... 69%, 12416 KB, 19372 KB/s, 0 seconds passed
-... 69%, 12448 KB, 19414 KB/s, 0 seconds passed
-... 69%, 12480 KB, 19457 KB/s, 0 seconds passed
-... 69%, 12512 KB, 19499 KB/s, 0 seconds passed
-... 69%, 12544 KB, 19541 KB/s, 0 seconds passed
-... 69%, 12576 KB, 19583 KB/s, 0 seconds passed
-... 70%, 12608 KB, 19626 KB/s, 0 seconds passed
-... 70%, 12640 KB, 19669 KB/s, 0 seconds passed
-... 70%, 12672 KB, 19711 KB/s, 0 seconds passed
-... 70%, 12704 KB, 19753 KB/s, 0 seconds passed
-... 70%, 12736 KB, 19795 KB/s, 0 seconds passed
-... 70%, 12768 KB, 19838 KB/s, 0 seconds passed
-... 71%, 12800 KB, 19880 KB/s, 0 seconds passed
-... 71%, 12832 KB, 19922 KB/s, 0 seconds passed
-... 71%, 12864 KB, 19964 KB/s, 0 seconds passed
-... 71%, 12896 KB, 20006 KB/s, 0 seconds passed
-... 71%, 12928 KB, 20049 KB/s, 0 seconds passed
-... 72%, 12960 KB, 20091 KB/s, 0 seconds passed
-... 72%, 12992 KB, 20133 KB/s, 0 seconds passed
-... 72%, 13024 KB, 20174 KB/s, 0 seconds passed
-... 72%, 13056 KB, 20215 KB/s, 0 seconds passed
-... 72%, 13088 KB, 20257 KB/s, 0 seconds passed
-... 72%, 13120 KB, 20298 KB/s, 0 seconds passed
-... 73%, 13152 KB, 20340 KB/s, 0 seconds passed
-... 73%, 13184 KB, 20382 KB/s, 0 seconds passed
-... 73%, 13216 KB, 20426 KB/s, 0 seconds passed
-... 73%, 13248 KB, 20470 KB/s, 0 seconds passed
-... 73%, 13280 KB, 20514 KB/s, 0 seconds passed
-... 73%, 13312 KB, 20558 KB/s, 0 seconds passed
-... 74%, 13344 KB, 20602 KB/s, 0 seconds passed
-... 74%, 13376 KB, 20646 KB/s, 0 seconds passed
-... 74%, 13408 KB, 20690 KB/s, 0 seconds passed
-... 74%, 13440 KB, 20734 KB/s, 0 seconds passed
-... 74%, 13472 KB, 20778 KB/s, 0 seconds passed
-... 75%, 13504 KB, 20822 KB/s, 0 seconds passed
-... 75%, 13536 KB, 20866 KB/s, 0 seconds passed
-... 75%, 13568 KB, 20910 KB/s, 0 seconds passed
-... 75%, 13600 KB, 20954 KB/s, 0 seconds passed
-... 75%, 13632 KB, 20997 KB/s, 0 seconds passed
-... 75%, 13664 KB, 21041 KB/s, 0 seconds passed
-... 76%, 13696 KB, 21085 KB/s, 0 seconds passed
-... 76%, 13728 KB, 21129 KB/s, 0 seconds passed
-... 76%, 13760 KB, 21172 KB/s, 0 seconds passed
-... 76%, 13792 KB, 21216 KB/s, 0 seconds passed
-... 76%, 13824 KB, 21260 KB/s, 0 seconds passed
-... 77%, 13856 KB, 21303 KB/s, 0 seconds passed
-... 77%, 13888 KB, 21347 KB/s, 0 seconds passed
-... 77%, 13920 KB, 21391 KB/s, 0 seconds passed
-... 77%, 13952 KB, 21435 KB/s, 0 seconds passed
-... 77%, 13984 KB, 21479 KB/s, 0 seconds passed
-... 77%, 14016 KB, 21523 KB/s, 0 seconds passed
-... 78%, 14048 KB, 21566 KB/s, 0 seconds passed
-... 78%, 14080 KB, 21610 KB/s, 0 seconds passed
-... 78%, 14112 KB, 21654 KB/s, 0 seconds passed
-... 78%, 14144 KB, 21696 KB/s, 0 seconds passed
-... 78%, 14176 KB, 21736 KB/s, 0 seconds passed
-... 78%, 14208 KB, 21777 KB/s, 0 seconds passed
-... 79%, 14240 KB, 21815 KB/s, 0 seconds passed
-... 79%, 14272 KB, 21855 KB/s, 0 seconds passed
-... 79%, 14304 KB, 21896 KB/s, 0 seconds passed
-... 79%, 14336 KB, 21936 KB/s, 0 seconds passed
-... 79%, 14368 KB, 21973 KB/s, 0 seconds passed
-... 80%, 14400 KB, 22014 KB/s, 0 seconds passed
-... 80%, 14432 KB, 22054 KB/s, 0 seconds passed
-... 80%, 14464 KB, 22092 KB/s, 0 seconds passed
-... 80%, 14496 KB, 22132 KB/s, 0 seconds passed
-... 80%, 14528 KB, 22172 KB/s, 0 seconds passed
-... 80%, 14560 KB, 22210 KB/s, 0 seconds passed
-... 81%, 14592 KB, 22250 KB/s, 0 seconds passed
-... 81%, 14624 KB, 22290 KB/s, 0 seconds passed
-... 81%, 14656 KB, 22328 KB/s, 0 seconds passed
-... 81%, 14688 KB, 22368 KB/s, 0 seconds passed
-... 81%, 14720 KB, 22408 KB/s, 0 seconds passed
-... 82%, 14752 KB, 22446 KB/s, 0 seconds passed
-... 82%, 14784 KB, 22485 KB/s, 0 seconds passed
-... 82%, 14816 KB, 22525 KB/s, 0 seconds passed
-... 82%, 14848 KB, 22565 KB/s, 0 seconds passed
-... 82%, 14880 KB, 22603 KB/s, 0 seconds passed
-... 82%, 14912 KB, 22642 KB/s, 0 seconds passed
-... 83%, 14944 KB, 22682 KB/s, 0 seconds passed
-... 83%, 14976 KB, 22720 KB/s, 0 seconds passed
-... 83%, 15008 KB, 22759 KB/s, 0 seconds passed
-... 83%, 15040 KB, 22798 KB/s, 0 seconds passed
-... 83%, 15072 KB, 22836 KB/s, 0 seconds passed
-... 83%, 15104 KB, 22875 KB/s, 0 seconds passed
-... 84%, 15136 KB, 22915 KB/s, 0 seconds passed
-... 84%, 15168 KB, 22952 KB/s, 0 seconds passed
-... 84%, 15200 KB, 22992 KB/s, 0 seconds passed
-... 84%, 15232 KB, 23031 KB/s, 0 seconds passed
-... 84%, 15264 KB, 23068 KB/s, 0 seconds passed
-... 85%, 15296 KB, 23107 KB/s, 0 seconds passed
-... 85%, 15328 KB, 23147 KB/s, 0 seconds passed
-... 85%, 15360 KB, 23186 KB/s, 0 seconds passed
-... 85%, 15392 KB, 23223 KB/s, 0 seconds passed
-... 85%, 15424 KB, 23262 KB/s, 0 seconds passed
-... 85%, 15456 KB, 23300 KB/s, 0 seconds passed
-... 86%, 15488 KB, 23339 KB/s, 0 seconds passed
-... 86%, 15520 KB, 23378 KB/s, 0 seconds passed
-... 86%, 15552 KB, 23415 KB/s, 0 seconds passed
-... 86%, 15584 KB, 23449 KB/s, 0 seconds passed
-... 86%, 15616 KB, 23488 KB/s, 0 seconds passed
-... 86%, 15648 KB, 23531 KB/s, 0 seconds passed
-... 87%, 15680 KB, 23568 KB/s, 0 seconds passed
-... 87%, 15712 KB, 23607 KB/s, 0 seconds passed
-... 87%, 15744 KB, 23645 KB/s, 0 seconds passed
-... 87%, 15776 KB, 23682 KB/s, 0 seconds passed
-... 87%, 15808 KB, 23721 KB/s, 0 seconds passed
-... 88%, 15840 KB, 23759 KB/s, 0 seconds passed
-... 88%, 15872 KB, 23798 KB/s, 0 seconds passed
-... 88%, 15904 KB, 23835 KB/s, 0 seconds passed
-... 88%, 15936 KB, 23873 KB/s, 0 seconds passed
-... 88%, 15968 KB, 23912 KB/s, 0 seconds passed
-... 88%, 16000 KB, 23950 KB/s, 0 seconds passed
-... 89%, 16032 KB, 23989 KB/s, 0 seconds passed
-... 89%, 16064 KB, 24025 KB/s, 0 seconds passed
-... 89%, 16096 KB, 24064 KB/s, 0 seconds passed
-... 89%, 16128 KB, 24102 KB/s, 0 seconds passed
-... 89%, 16160 KB, 24139 KB/s, 0 seconds passed
-... 90%, 16192 KB, 24177 KB/s, 0 seconds passed
-... 90%, 16224 KB, 24215 KB/s, 0 seconds passed
-... 90%, 16256 KB, 24253 KB/s, 0 seconds passed
-... 90%, 16288 KB, 24291 KB/s, 0 seconds passed
-... 90%, 16320 KB, 24328 KB/s, 0 seconds passed
-... 90%, 16352 KB, 24366 KB/s, 0 seconds passed
-... 91%, 16384 KB, 24404 KB/s, 0 seconds passed
-... 91%, 16416 KB, 24440 KB/s, 0 seconds passed
-... 91%, 16448 KB, 24479 KB/s, 0 seconds passed
-... 91%, 16480 KB, 24517 KB/s, 0 seconds passed
-... 91%, 16512 KB, 24555 KB/s, 0 seconds passed
-... 91%, 16544 KB, 24591 KB/s, 0 seconds passed
-... 92%, 16576 KB, 24629 KB/s, 0 seconds passed
-... 92%, 16608 KB, 24667 KB/s, 0 seconds passed
-... 92%, 16640 KB, 24703 KB/s, 0 seconds passed
-... 92%, 16672 KB, 24736 KB/s, 0 seconds passed
-... 92%, 16704 KB, 24769 KB/s, 0 seconds passed
-... 93%, 16736 KB, 24802 KB/s, 0 seconds passed
-... 93%, 16768 KB, 24845 KB/s, 0 seconds passed
-... 93%, 16800 KB, 24887 KB/s, 0 seconds passed
-... 93%, 16832 KB, 24921 KB/s, 0 seconds passed
-... 93%, 16864 KB, 24954 KB/s, 0 seconds passed
-... 93%, 16896 KB, 24993 KB/s, 0 seconds passed
-... 94%, 16928 KB, 25035 KB/s, 0 seconds passed
-... 94%, 16960 KB, 25071 KB/s, 0 seconds passed
-... 94%, 16992 KB, 25109 KB/s, 0 seconds passed
-... 94%, 17024 KB, 25147 KB/s, 0 seconds passed
-... 94%, 17056 KB, 25182 KB/s, 0 seconds passed
-... 94%, 17088 KB, 25220 KB/s, 0 seconds passed
-... 95%, 17120 KB, 25257 KB/s, 0 seconds passed
-... 95%, 17152 KB, 25293 KB/s, 0 seconds passed
-... 95%, 17184 KB, 25330 KB/s, 0 seconds passed
-... 95%, 17216 KB, 25367 KB/s, 0 seconds passed
-... 95%, 17248 KB, 25405 KB/s, 0 seconds passed
-... 96%, 17280 KB, 25440 KB/s, 0 seconds passed
-
-.. parsed-literal::
-
-    ... 96%, 17312 KB, 25477 KB/s, 0 seconds passed
-... 96%, 17344 KB, 25513 KB/s, 0 seconds passed
-... 96%, 17376 KB, 25550 KB/s, 0 seconds passed
-... 96%, 17408 KB, 25587 KB/s, 0 seconds passed
-... 96%, 17440 KB, 25622 KB/s, 0 seconds passed
-... 97%, 17472 KB, 25659 KB/s, 0 seconds passed
-... 97%, 17504 KB, 25696 KB/s, 0 seconds passed
-... 97%, 17536 KB, 25734 KB/s, 0 seconds passed
-... 97%, 17568 KB, 25768 KB/s, 0 seconds passed
-... 97%, 17600 KB, 25806 KB/s, 0 seconds passed
-... 98%, 17632 KB, 25841 KB/s, 0 seconds passed
-... 98%, 17664 KB, 25878 KB/s, 0 seconds passed
-... 98%, 17696 KB, 25915 KB/s, 0 seconds passed
-... 98%, 17728 KB, 25950 KB/s, 0 seconds passed
-... 98%, 17760 KB, 25987 KB/s, 0 seconds passed
-... 98%, 17792 KB, 26023 KB/s, 0 seconds passed
-... 99%, 17824 KB, 26060 KB/s, 0 seconds passed
-... 99%, 17856 KB, 26097 KB/s, 0 seconds passed
-... 99%, 17888 KB, 26132 KB/s, 0 seconds passed
-... 99%, 17920 KB, 26167 KB/s, 0 seconds passed
-... 99%, 17952 KB, 26203 KB/s, 0 seconds passed
-... 99%, 17984 KB, 26242 KB/s, 0 seconds passed
-... 100%, 17990 KB, 26245 KB/s, 0 seconds passed
 
     
     ========== Unpacking model/public/human-pose-estimation-3d-0001/human-pose-estimation-3d-0001.tar.gz
@@ -824,7 +279,7 @@ directory structure and downloads the selected model.
 Convert Model to OpenVINO IR format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The selected model comes from the public directory, which means it must
 be converted into OpenVINO Intermediate Representation (OpenVINO IR). We
@@ -847,7 +302,7 @@ IR format.
 .. parsed-literal::
 
     ========== Converting human-pose-estimation-3d-0001 to ONNX
-    Conversion to ONNX command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/omz_tools/internal_scripts/pytorch_to_onnx.py --model-path=model/public/human-pose-estimation-3d-0001 --model-name=PoseEstimationWithMobileNet --model-param=is_convertible_by_mo=True --import-module=model --weights=model/public/human-pose-estimation-3d-0001/human-pose-estimation-3d-0001.pth --input-shape=1,3,256,448 --input-names=data --output-names=features,heatmaps,pafs --output-file=model/public/human-pose-estimation-3d-0001/human-pose-estimation-3d-0001.onnx
+    Conversion to ONNX command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/omz_tools/internal_scripts/pytorch_to_onnx.py --model-path=model/public/human-pose-estimation-3d-0001 --model-name=PoseEstimationWithMobileNet --model-param=is_convertible_by_mo=True --import-module=model --weights=model/public/human-pose-estimation-3d-0001/human-pose-estimation-3d-0001.pth --input-shape=1,3,256,448 --input-names=data --output-names=features,heatmaps,pafs --output-file=model/public/human-pose-estimation-3d-0001/human-pose-estimation-3d-0001.onnx
     
 
 
@@ -860,7 +315,7 @@ IR format.
 
     
     ========== Converting human-pose-estimation-3d-0001 to IR (FP32)
-    Conversion command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/bin/mo --framework=onnx --output_dir=model/public/human-pose-estimation-3d-0001/FP32 --model_name=human-pose-estimation-3d-0001 --input=data '--mean_values=data[128.0,128.0,128.0]' '--scale_values=data[255.0,255.0,255.0]' --output=features,heatmaps,pafs --input_model=model/public/human-pose-estimation-3d-0001/human-pose-estimation-3d-0001.onnx '--layout=data(NCHW)' '--input_shape=[1, 3, 256, 448]' --compress_to_fp16=False
+    Conversion command: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/bin/python -- /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/bin/mo --framework=onnx --output_dir=model/public/human-pose-estimation-3d-0001/FP32 --model_name=human-pose-estimation-3d-0001 --input=data '--mean_values=data[128.0,128.0,128.0]' '--scale_values=data[255.0,255.0,255.0]' --output=features,heatmaps,pafs --input_model=model/public/human-pose-estimation-3d-0001/human-pose-estimation-3d-0001.onnx '--layout=data(NCHW)' '--input_shape=[1, 3, 256, 448]' --compress_to_fp16=False
     
 
 
@@ -868,13 +323,9 @@ IR format.
 
     [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release. Please use OpenVINO Model Converter (OVC). OVC represents a lightweight alternative of MO and provides simplified model conversion API. 
     Find more information about transition from MO to OVC at https://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
-
-
-.. parsed-literal::
-
     [ SUCCESS ] Generated IR version 11 model.
-    [ SUCCESS ] XML file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/notebooks/3D-pose-estimation-webcam/model/public/human-pose-estimation-3d-0001/FP32/human-pose-estimation-3d-0001.xml
-    [ SUCCESS ] BIN file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/notebooks/3D-pose-estimation-webcam/model/public/human-pose-estimation-3d-0001/FP32/human-pose-estimation-3d-0001.bin
+    [ SUCCESS ] XML file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/3D-pose-estimation-webcam/model/public/human-pose-estimation-3d-0001/FP32/human-pose-estimation-3d-0001.xml
+    [ SUCCESS ] BIN file: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/3D-pose-estimation-webcam/model/public/human-pose-estimation-3d-0001/FP32/human-pose-estimation-3d-0001.bin
 
 
 .. parsed-literal::
@@ -885,7 +336,7 @@ IR format.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -914,7 +365,7 @@ select device from dropdown list for running inference using OpenVINO
 Load the model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Converted models are located in a fixed structure, which indicates
 vendor, model name and precision.
@@ -958,12 +409,12 @@ heat maps, PAF (part affinity fields) and features.
 Processing
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model Inference
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Frames captured from video files or the live webcam are used as the
 input for the 3D model. This is how you obtain the output heat maps, PAF
@@ -1003,7 +454,7 @@ input for the 3D model. This is how you obtain the output heat maps, PAF
 Draw 2D Pose Overlays
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We need to define some connections between the joints in advance, so
 that we can draw the structure of the human body in the resulting image
@@ -1087,7 +538,7 @@ from Open Model Zoo.
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run 3D pose estimation on the specified source. It could be either a
 webcam feed or a video file.
@@ -1253,7 +704,7 @@ webcam feed or a video file.
 Run
 ---
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run, using a webcam as the video input. By default, the primary webcam
 is set with ``source=0``. If you have multiple webcams, each one will be
@@ -1273,7 +724,7 @@ Firefox, may cause flickering. If you experience flickering, set
 
 If you do not have a webcam, you can still run this demo with a video
 file. Any `format supported by
-OpenCV <http/docs.opencv.o4.5dtutorial_py_video_display.html>`__
+OpenCV <https://docs.opencv.org/4.5.1/dd/d43/tutorial_py_video_display.html>`__
 will work.
 
 Using the following method, you can click and move your mouse over the

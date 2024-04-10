@@ -3,48 +3,48 @@ Post-Training Quantization and Weights Compression of DeepFloyd IF model with NN
 
 The goal of this tutorial is to demonstrate how to speed up the model by
 applying 8-bit post-training quantization and weights compression from
-`NNCF <http/github.copenvinotoolknn>`__ (Neural Network
+`NNCF <https://github.com/openvinotoolkit/nncf/>`__ (Neural Network
 Compression Framework) and infer optimized model via OpenVINO™ Toolkit.
 
    **NOTE**: you should run
-   `deep-floyd-if-convert <deep-floyd-if-convert-with-output.html>`__ notebook
+   `deep-floyd-if-convert <deep-floyd-if-convert.ipynb>`__ notebook
    first to generate OpenVINO IR model that is used for optimization.
 
 The optimization process contains the following steps: 1. Compress
 weights of the converted OpenVINO text encoder from
-`notebook <deep-floyd-if-convert-with-output.html>`__ with NNCF. 2. Quantize the
+`notebook <deep-floyd-if-convert.ipynb>`__ with NNCF. 2. Quantize the
 converted stage_1 and stage_2 U-Nets from
-`notebook <deep-floyd-if-convert-with-output.html>`__ with NNCF. 2. Check the model
+`notebook <deep-floyd-if-convert.ipynb>`__ with NNCF. 2. Check the model
 result using the same input data from the
-`notebook <deep-floyd-if-convert-with-output.html>`__. 3. Compare model size of
+`notebook <deep-floyd-if-convert.ipynb>`__. 3. Compare model size of
 converted and optimized models. 4. Compare performance of converted and
 optimized models.
 
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Compress weights <#compress-weights>`__
--  `Quantize <#quantize>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Compress weights <#Compress-weights>`__
+-  `Quantize <#Quantize>`__
 
-   -  `Prepare dataset <#prepare-dataset>`__
-   -  `Quantize first stage U-Net <#quantize-first-stage-u-net>`__
-   -  `Quantize second stage U-Net <#quantize-second-stage-u-net>`__
+   -  `Prepare dataset <#Prepare-dataset>`__
+   -  `Quantize first stage U-Net <#Quantize-first-stage-U-Net>`__
+   -  `Quantize second stage U-Net <#Quantize-second-stage-U-Net>`__
 
--  `Run optimized OpenVINO model <#run-optimized-openvino-model>`__
+-  `Run optimized OpenVINO model <#Run-optimized-OpenVINO-model>`__
 
-   -  `Compare file sizes <#compare-file-sizes>`__
+   -  `Compare file sizes <#Compare-file-sizes>`__
    -  `Compare performance time of the converted and optimized
-      models <#compare-performance-time-of-the-converted-and-optimized-models>`__
+      models <#Compare-performance-time-of-the-converted-and-optimized-models>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q datasets "nncf>=2.6.0"
+    %pip install -q datasets "nncf>=2.6.0" "torch>=2.1"
 
 .. code:: ipython3
 
@@ -108,7 +108,7 @@ Prerequisites
 Compress weights
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Text encoder model consumes ~22 GB of disk space. To avoid running out
 of memory, we suggest using 8-bit weights compression instead of
@@ -143,20 +143,20 @@ quantized model, but this will significantly reduce the model footprint.
 Quantize
 --------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Prepare dataset
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 DeepFloyd IF consists of a U-Net model for first and second stages.
 First stage U-Net generates 64x64 px image based on text prompt, second
 stage U-Net generates a 256x256 px image based on image from previous
 step. We use a portion of train
-`LAION2B <http/huggingface.dataselailaion2B-en-aesthetic>`__
+`LAION2B <https://huggingface.co/datasets/laion/laion2B-en-aesthetic>`__
 dataset from Hugging Face as calibration data. LAION2B is the English
-subset of the `LAION5B <http/laion.bllaion->`__ dataset,
+subset of the `LAION5B <https://laion.ai/blog/laion-5b/>`__ dataset,
 contains over 2 billion objects.
 
 .. code:: ipython3
@@ -314,7 +314,7 @@ To collect intermediate model inputs for calibration we should customize
 Quantize first stage U-Net
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -438,7 +438,7 @@ Quantize first stage U-Net
 Quantize second stage U-Net
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -474,11 +474,11 @@ Quantize second stage U-Net
 Run optimized OpenVINO model
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let us check predictions with the optimized OpenVINO DeepFloyd IF model
 result using the same input data from the `1st
-notebook <deep-floyd-if-with-output.html>`__.
+notebook <deep-floyd-if.ipynb>`__.
 
 .. code:: ipython3
 
@@ -702,7 +702,7 @@ notebook <deep-floyd-if-with-output.html>`__.
 Compare file sizes
 ^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let’s calculate the compression rate of the optimized IRs file size
 relative to the FP16 OpenVINO models file size
@@ -743,11 +743,11 @@ relative to the FP16 OpenVINO models file size
 Compare performance time of the converted and optimized models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of OpenVINO FP16 and INT8 models,
 use `Benchmark
-Tool <http/docs.openvino.20learn-openviopenvino-samplbenchmark-tool.html>`__.
+Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__.
 
    **NOTE**: For more accurate performance, run ``benchmark_app`` in a
    terminal/command prompt after closing other applications. Run

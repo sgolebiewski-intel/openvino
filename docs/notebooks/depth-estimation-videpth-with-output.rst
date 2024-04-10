@@ -60,65 +60,62 @@ Image taken from the VI-Depth repository.
    </p>
 
 We will be consulting the `VI-Depth
-repository <http/github.cisl-oVI-Depth>`__ for the
+repository <https://github.com/isl-org/VI-Depth>`__ for the
 pre-processing, model transformations and basic utility code. A part of
 it has already been kept as it is in the `utils <utils>`__ directory. At
 the same time we will learn how to perform `model
-conversion <http/docs.openvino.20openvino-workflmodel-preparaticonvert-model-pytorch.html>`__
+conversion <https://docs.openvino.ai/2024/openvino-workflow/model-preparation/convert-model-pytorch.html>`__
 for converting a model in a different format to the standard OpenVINO™
 IR model representation *via* another format.
 
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Loading models and checkpoints <#loading-models-and-checkpoints>`__
+-  `Imports <#Imports>`__
+-  `Loading models and checkpoints <#Loading-models-and-checkpoints>`__
 
    -  `Cleaning up the model
-      directory <#cleaning-up-the-model-directory>`__
-   -  `Transformation of models <#transformation-of-models>`__
+      directory <#Cleaning-up-the-model-directory>`__
+   -  `Transformation of models <#Transformation-of-models>`__
 
-      -  `Dummy input creation <#dummy-input-creation>`__
+      -  `Dummy input creation <#Dummy-input-creation>`__
       -  `Conversion of depth model to OpenVINO IR
-         format <#conversion-of-depth-model-to-openvino-ir-format>`__
+         format <#Conversion-of-depth-model-to-OpenVINO-IR-format>`__
 
-         -  `Select inference device <#select-inference-device>`__
-         -  `Compilation of depth model <#compilation-of-depth-model>`__
+         -  `Select inference device <#Select-inference-device>`__
+         -  `Compilation of depth model <#Compilation-of-depth-model>`__
          -  `Computation of scale and shift
-            parameters <#computation-of-scale-and-shift-parameters>`__
+            parameters <#Computation-of-scale-and-shift-parameters>`__
 
       -  `Conversion of Scale Map Learner model to OpenVINO IR
-         format <#conversion-of-scale-map-learner-model-to-openvino-ir-format>`__
+         format <#Conversion-of-Scale-Map-Learner-model-to-OpenVINO-IR-format>`__
 
-         -  `Select inference device <#select-inference-device>`__
+         -  `Select inference device <#Select-inference-device>`__
          -  `Compilation of the ScaleMapLearner(SML)
-            model <#compilation-of-the-scalemaplearnersml-model>`__
+            model <#Compilation-of-the-ScaleMapLearner(SML)-model>`__
 
       -  `Storing and visualizing dummy results
-         obtained <#storing-and-visualizing-dummy-results-obtained>`__
+         obtained <#Storing-and-visualizing-dummy-results-obtained>`__
 
    -  `Running inference on a test
-      image <#running-inference-on-a-test-image>`__
+      image <#Running-inference-on-a-test-image>`__
    -  `Store and visualize Inference
-      results <#store-and-visualize-inference-results>`__
+      results <#Store-and-visualize-Inference-results>`__
 
       -  `Cleaning up the data
-         directory <#cleaning-up-the-data-directory>`__
+         directory <#Cleaning-up-the-data-directory>`__
 
-   -  `Concluding notes <#concluding-notes>`__
+   -  `Concluding notes <#Concluding-notes>`__
 
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # Import sys beforehand to inform of Python version <= 3.7 not being supported
     import sys
-    
-    if sys.version_info.minor < 8:
-        print('Python3.7 is not supported. Some features might not work as expected')
         
     # Download the correct version of the PyTorch deep learning library associated with image models
     # alongside the lightning module
@@ -142,7 +139,12 @@ Imports
     from shutil import rmtree
     from typing import Optional, Tuple
     
-    sys.path.append('../utils')
+    # Fetch `notebook_utils` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+        filename='notebook_utils.py'
+    )
     from notebook_utils import download_file
     
     sys.path.append('vi_depth_utils')
@@ -161,14 +163,14 @@ Imports
 Loading models and checkpoints
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The complete pipeline here requires only two models: one for depth
 estimation and a ScaleMapLearner model which is responsible for
 regressing a dense scale map. The table of models which has been given
-in the original `VI-Depth repo <http/github.cisl-oVI-Depth>`__
+in the original `VI-Depth repo <https://github.com/isl-org/VI-Depth>`__
 has been presented as it is for the users to download from.
-`VOID <http/github.calexklwovoid-dataset>`__ is the name of the
+`VOID <https://github.com/alexklwong/void-dataset>`__ is the name of the
 original dataset from on which these models have been trained. The
 numbers after the word **VOID** represent the checkpoint in the model
 obtained after training samples for sparse dense maps corresponding to
@@ -187,20 +189,20 @@ Depth Predictor  SML on VOID 150                                                
 ===============================================================================================================================
 ===============================================================================================================================
 ================================================================================================================================
-DPT-BEiT-Large   `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_beit_large_512.nsamples.150.ckpt>`__  `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_beit_large_512.nsamples.500.ckpt>`__  `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_beit_large_512.nsamples.1500.ckpt>`__
-DPT-SwinV2-Large `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_swin2_large_384.nsamples.150.ckpt>`__ `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_swin2_large_384.nsamples.500.ckpt>`__ `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_swin2_large_384.nsamples.1500.ckpt>`__
-DPT-Large        `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_large.nsamples.150.ckpt>`__           `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_large.nsamples.500.ckpt>`__           `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_large.nsamples.1500.ckpt>`__
-DPT-Hybrid       `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_hybrid.nsamples.150.ckpt>`__\ \*      `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_hybrid.nsamples.500.ckpt>`__          `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_hybrid.nsamples.1500.ckpt>`__
-DPT-SwinV2-Tiny  `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_swin2_tiny_256.nsamples.150.ckpt>`__  `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_swin2_tiny_256.nsamples.500.ckpt>`__  `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_swin2_tiny_256.nsamples.1500.ckpt>`__
-DPT-LeViT        `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_levit_224.nsamples.150.ckpt>`__       `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_levit_224.nsamples.500.ckpt>`__       `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_levit_224.nsamples.1500.ckpt>`__
-MiDaS-small      `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.midas_small.nsamples.150.ckpt>`__         `model <http/github.cisl-oVI-Depreleasdownlosml_model.dpredictor.midas_small.nsamples.500.ckpt>`__         `model <http/github.cisl-oVI-Depreleasdownlosml_model.dpredictor.midas_small.nsamples.1500.ckpt>`__
+DPT-BEiT-Large   `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_beit_large_512.nsamples.150.ckpt>`__  `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_beit_large_512.nsamples.500.ckpt>`__  `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_beit_large_512.nsamples.1500.ckpt>`__
+DPT-SwinV2-Large `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_swin2_large_384.nsamples.150.ckpt>`__ `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_swin2_large_384.nsamples.500.ckpt>`__ `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_swin2_large_384.nsamples.1500.ckpt>`__
+DPT-Large        `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_large.nsamples.150.ckpt>`__           `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_large.nsamples.500.ckpt>`__           `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_large.nsamples.1500.ckpt>`__
+DPT-Hybrid       `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_hybrid.nsamples.150.ckpt>`__\ \*      `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_hybrid.nsamples.500.ckpt>`__          `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_hybrid.nsamples.1500.ckpt>`__
+DPT-SwinV2-Tiny  `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_swin2_tiny_256.nsamples.150.ckpt>`__  `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_swin2_tiny_256.nsamples.500.ckpt>`__  `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_swin2_tiny_256.nsamples.1500.ckpt>`__
+DPT-LeViT        `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_levit_224.nsamples.150.ckpt>`__       `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_levit_224.nsamples.500.ckpt>`__       `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_levit_224.nsamples.1500.ckpt>`__
+MiDaS-small      `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.midas_small.nsamples.150.ckpt>`__         `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.midas_small.nsamples.500.ckpt>`__         `model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.midas_small.nsamples.1500.ckpt>`__
 ================
 ===============================================================================================================================
 ===============================================================================================================================
 ================================================================================================================================
 
 \*Also available with pre-training on TartanAir:
-`model <http/github.cisl-oVI-Depreleasdownlosml_model.dpredictor.dpt_hybrid.nsamples.150.pretrained.ckpt>`__
+`model <https://github.com/isl-org/VI-Depth/releases/download/v1/sml_model.dpredictor.dpt_hybrid.nsamples.150.pretrained.ckpt>`__
 
 .. code:: ipython3
 
@@ -278,7 +280,7 @@ MiDaS-small      `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.m
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/hub.py:294: UserWarning: You are about to download and run code from an untrusted repository. In a future release, this won't be allowed. To add the repository to your trusted list, change the command to {calling_fn}(..., trust_repo=False) and a command prompt will appear asking for an explicit confirmation of trust, or load(..., trust_repo=True), which will assume that the prompt is to be answered with 'yes'. You can also use load(..., trust_repo='check') which will only prompt for confirmation if the repo is not already trusted. This will eventually be the default behaviour
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/hub.py:294: UserWarning: You are about to download and run code from an untrusted repository. In a future release, this won't be allowed. To add the repository to your trusted list, change the command to {calling_fn}(..., trust_repo=False) and a command prompt will appear asking for an explicit confirmation of trust, or load(..., trust_repo=True), which will assume that the prompt is to be answered with 'yes'. You can also use load(..., trust_repo='check') which will only prompt for confirmation if the repo is not already trusted. This will eventually be the default behaviour
       warnings.warn(
     Downloading: "https://github.com/rwightman/gen-efficientnet-pytorch/zipball/master" to model/master.zip
 
@@ -295,98 +297,47 @@ MiDaS-small      `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.m
 
 .. parsed-literal::
 
-    
-  0%|          | 0.00/81.8M [00:00<?, ?B/s]
+      0%|          | 0.00/81.8M [00:00<?, ?B/s]
 
 .. parsed-literal::
 
-    
-  0%|          | 256k/81.8M [00:00<00:33, 2.56MB/s]
+      0%|          | 280k/81.8M [00:00<00:30, 2.78MB/s]
 
 .. parsed-literal::
 
-    
-  2%|▏         | 1.58M/81.8M [00:00<00:09, 9.18MB/s]
+      3%|▎         | 2.37M/81.8M [00:00<00:06, 13.8MB/s]
 
 .. parsed-literal::
 
-    
-  9%|▉         | 7.67M/81.8M [00:00<00:02, 34.0MB/s]
+     14%|█▎        | 11.2M/81.8M [00:00<00:01, 49.4MB/s]
 
 .. parsed-literal::
 
-    
- 15%|█▌        | 12.4M/81.8M [00:00<00:01, 40.3MB/s]
+     27%|██▋       | 21.7M/81.8M [00:00<00:00, 73.0MB/s]
 
 .. parsed-literal::
 
-    
- 26%|██▌       | 21.0M/81.8M [00:00<00:01, 57.9MB/s]
+     39%|███▉      | 31.9M/81.8M [00:00<00:00, 85.2MB/s]
 
 .. parsed-literal::
 
-    
- 33%|███▎      | 26.9M/81.8M [00:00<00:00, 59.3MB/s]
+     51%|█████▏    | 42.0M/81.8M [00:00<00:00, 92.4MB/s]
 
 .. parsed-literal::
 
-    
- 40%|███▉      | 32.6M/81.8M [00:00<00:01, 47.6MB/s]
+     63%|██████▎   | 51.9M/81.8M [00:00<00:00, 96.0MB/s]
 
 .. parsed-literal::
 
-    
- 46%|████▌     | 37.7M/81.8M [00:00<00:00, 48.9MB/s]
+     76%|███████▋  | 62.4M/81.8M [00:00<00:00, 100MB/s] 
 
 .. parsed-literal::
 
-    
- 52%|█████▏    | 42.6M/81.8M [00:00<00:00, 47.6MB/s]
+     89%|████████▊ | 72.4M/81.8M [00:00<00:00, 102MB/s]
 
 .. parsed-literal::
 
-    
- 59%|█████▊    | 48.0M/81.8M [00:01<00:00, 43.9MB/s]
-
-.. parsed-literal::
-
-    
- 64%|██████▍   | 52.4M/81.8M [00:01<00:00, 43.7MB/s]
-
-.. parsed-literal::
-
-    
- 70%|██████▉   | 57.2M/81.8M [00:01<00:00, 45.6MB/s]
-
-.. parsed-literal::
-
-    
- 75%|███████▌  | 61.7M/81.8M [00:01<00:00, 45.5MB/s]
-
-.. parsed-literal::
-
-    
- 81%|████████  | 66.1M/81.8M [00:01<00:00, 45.8MB/s]
-
-.. parsed-literal::
-
-    
- 87%|████████▋ | 70.9M/81.8M [00:01<00:00, 37.7MB/s]
-
-.. parsed-literal::
-
-    
- 92%|█████████▏| 75.0M/81.8M [00:01<00:00, 38.9MB/s]
-
-.. parsed-literal::
-
-    
- 96%|█████████▋| 78.9M/81.8M [00:01<00:00, 36.2MB/s]
-
-.. parsed-literal::
-
-    
-100%|██████████| 81.8M/81.8M [00:02<00:00, 42.1MB/s]
+    100%|██████████| 81.8M/81.8M [00:00<00:00, 86.5MB/s]
 
 .. parsed-literal::
 
@@ -396,10 +347,10 @@ MiDaS-small      `model <htgithub.cisl-oVI-Depreleasdownlosml_model.dpredictor.m
 Cleaning up the model directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 From the verbose of the previous step it is obvious that
-`torch.hub.load <http/pytorch.odostabhub.html#torch.hub.load>`__
+```torch.hub.load`` <https://pytorch.org/docs/stable/hub.html#torch.hub.load>`__
 downloads a lot of unnecessary files. We shall move remove the
 unnecessary directories and files which were created during the download
 process.
@@ -419,7 +370,7 @@ process.
 Transformation of models
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Each of the models need an appropriate transformation which can be
 invoked by the ``get_model_transforms`` function. It needs only the
@@ -456,7 +407,7 @@ model are always in direct correspondence with each other.
 Dummy input creation
 ^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Dummy inputs help during conversion. Although ``ov.convert_model``
 accepts any dummy input for a single pass through the model and thereby
@@ -539,7 +490,7 @@ dataset
 Conversion of depth model to OpenVINO IR format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Starting from 2023.0.0 release, OpenVINO supports PyTorch model via
 conversion to OpenVINO Intermediate Representation format (IR). To have
@@ -574,7 +525,7 @@ we shall follow the following steps:
 Select inference device
 '''''''''''''''''''''''
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -605,7 +556,7 @@ select device from dropdown list for running inference using OpenVINO
 Compilation of depth model
 ''''''''''''''''''''''''''
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now we can go ahead and compile our depth model.
 
@@ -662,7 +613,7 @@ Now we can go ahead and compile our depth model.
 Computation of scale and shift parameters
 '''''''''''''''''''''''''''''''''''''''''
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Computation of these parameters required the depth estimation model
 output from the previous step. These are the regression based parameters
@@ -772,7 +723,7 @@ purpose has already been created.
 Conversion of Scale Map Learner model to OpenVINO IR format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The OpenVINO™ toolkit provides direct method of converting PyTorch
 models to the intermediate representation format. To have the associated
@@ -852,7 +803,7 @@ common format of all checkpoint files from the model releases.
 Select inference device
 '''''''''''''''''''''''
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -872,7 +823,7 @@ select device from dropdown list for running inference using OpenVINO
 Compilation of the ScaleMapLearner(SML) model
 '''''''''''''''''''''''''''''''''''''''''''''
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now we can go ahead and compile our SML model.
 
@@ -931,7 +882,7 @@ Now we can go ahead and compile our SML model.
 Storing and visualizing dummy results obtained
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -988,7 +939,7 @@ Storing and visualizing dummy results obtained
 Running inference on a test image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now role of both the dummy inputs i.e. the dummy image as well as its
 associated depth map is now over. Since we have access to the compiled
@@ -998,7 +949,7 @@ plotting of the depth map.
 
 If you haven’t noticed already the data directory of this tutorial has
 been arranged as follows. This allows us to comply to these
-`rules <http/github.cpronoymopenvino_notebooblmastCONTRIBUTING.md#file-structure>`__.
+`rules <https://github.com/pronoym99/openvino_notebooks/blob/latest/CONTRIBUTING.md#file-structure>`__.
 
 .. code:: bash
 
@@ -1011,14 +962,14 @@ been arranged as follows. This allows us to comply to these
           └── <timestamp>.png     # as 16b PNG files
 
 At the same time, the depth storage method `used in the VOID
-dataset <http/github.calexklwovoid-datasblmastsdata_utils.py>`__
+dataset <https://github.com/alexklwong/void-dataset/blob/master/src/data_utils.py>`__
 is assumed.
 
 If you are thinking of the file name format of the image for inference,
 here is the reasoning.
 
 The dataset was collected using the Intel `RealSense D435i
-camera <http/realsense.intel.cdepth-camera>`__, which was
+camera <https://realsense.intel.com/depth-camera>`__, which was
 configured to produce synchronized accelerometer and gyroscope
 measurements at 400 Hz, along with synchronized VGA-size (640 x 480) RGB
 and depth streams at 30 Hz. The depth frames are acquired using active
@@ -1030,7 +981,7 @@ purposes later.
 
 *The image for inference and it sparse depth map is taken from the
 compressed dataset
-present*\ `here <http/drive.google.cuc?id=1bbN46kR_hcH3GG8-jGRqAI433uddYrnc>`__
+present*\ `here <https://drive.google.com/uc?id=1bbN46kR_hcH3GG8-jGRqAI433uddYrnc>`__
 
 .. code:: ipython3
 
@@ -1081,7 +1032,7 @@ present*\ `here <http/drive.google.cuc?id=1bbN46kR_hcH3GG8-jGRqAI433uddYrnc>`__
 Store and visualize Inference results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1130,7 +1081,7 @@ Store and visualize Inference results
 Cleaning up the data directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We will *follow suit* for the directory in which we downloaded images
 and depth maps from another repo. We shall move remove the unnecessary
@@ -1144,19 +1095,19 @@ directories and files which were created during the download process.
 Concluding notes
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
    1. The code for this tutorial is adapted from the `VI-Depth
-      repository <http/github.cisl-oVI-Depth>`__.
+      repository <https://github.com/isl-org/VI-Depth>`__.
    2. Users may choose to download the original and raw datasets from
       the `VOID
-      dataset <http/github.calexklwovoid-datas>`__.
-   3. The `isl-oVI-Depth <http/github.cisl-oVI-Depth>`__
+      dataset <https://github.com/alexklwong/void-dataset/>`__.
+   3. The `isl-org/VI-Depth <https://github.com/isl-org/VI-Depth>`__
       works on a slightly older version of released model assets from
       its `MiDaS sibling
-      repository <http/github.cisl-oMiDaS>`__. However, the new
+      repository <https://github.com/isl-org/MiDaS>`__. However, the new
       releases beginning from
-      `v3.1 <http/github.cisl-oMiDreleastv3_1>`__
+      `v3.1 <https://github.com/isl-org/MiDaS/releases/tag/v3_1>`__
       directly have OpenVINO™ ``.xml`` and ``.bin`` model files as their
       assets thereby rendering the **major pre-processing and model
       compilation step irrelevant**.

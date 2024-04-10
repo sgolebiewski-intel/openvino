@@ -2,9 +2,9 @@ Part Segmentation of 3D Point Clouds with OpenVINO™
 ===================================================
 
 This notebook demonstrates how to process `point
-cloud <http/en.wikipedia.owiPoint_cloud>`__ data and run 3D
+cloud <https://en.wikipedia.org/wiki/Point_cloud>`__ data and run 3D
 Part Segmentation with OpenVINO. We use the
-`PointNet <http/arxiv.oa1612.00593>`__ pre-trained model to
+`PointNet <https://arxiv.org/abs/1612.00593>`__ pre-trained model to
 detect each part of a chair and return its category.
 
 PointNet
@@ -25,13 +25,13 @@ of the art.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Prepare the Model <#prepare-the-model>`__
--  `Data Processing Module <#data-processing-module>`__
--  `Visualize the original 3D data <#visualize-the-original-3d-data>`__
--  `Run inference <#run-inference>`__
+-  `Imports <#Imports>`__
+-  `Prepare the Model <#Prepare-the-Model>`__
+-  `Data Processing Module <#Data-Processing-Module>`__
+-  `Visualize the original 3D data <#Visualize-the-original-3D-data>`__
+-  `Run inference <#Run-inference>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 .. code:: ipython3
 
@@ -58,7 +58,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -71,7 +71,7 @@ Imports
     # Fetch `notebook_utils` module
     import urllib.request
     urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/notebook_utils.py',
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
         filename='notebook_utils.py'
     )
     
@@ -80,12 +80,12 @@ Imports
 Prepare the Model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the pre-trained PointNet ONNX model. This pre-trained model is
-provided by `axinc-ai <http/github.caxinc-ai>`__, and you can
+provided by ```axinc-ai`` <https://github.com/axinc-ai>`__, and you can
 find more point clouds examples
-`here <http/github.caxinc-ailia-modetrmastpoint_segmentation>`__.
+`here <https://github.com/axinc-ai/ailia-models/tree/master/point_segmentation>`__.
 
 .. code:: ipython3
 
@@ -104,7 +104,7 @@ function returns an OpenVINO model ready to load on a device and start
 making predictions. We can save it on a disk for next usage with
 ``ov.save_model``. For more information about model conversion Python
 API, see this
-`page <http/docs.openvino.20openvino-workflmodel-preparation.html>`__.
+`page <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__.
 
 .. code:: ipython3
 
@@ -125,7 +125,7 @@ API, see this
 Data Processing Module
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -182,10 +182,10 @@ Data Processing Module
 Visualize the original 3D data
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The point cloud data can be downloaded from
-`ShapeNet <http/shapenet.cs.stanford.eericshapenetcore_partanno_segmentation_benchmark_v0.zip>`__,
+`ShapeNet <https://shapenet.cs.stanford.edu/ericyi/shapenetcore_partanno_segmentation_benchmark_v0.zip>`__,
 a large-scale dataset of 3D shapes. Here, we select the 3D data of a
 chair for example.
 
@@ -216,7 +216,7 @@ chair for example.
 
 .. parsed-literal::
 
-    /tmp/ipykernel_1131736/2347079344.py:12: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
+    /tmp/ipykernel_2972167/2347079344.py:12: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
       ax.scatter3D(X, Y, Z, s=5, cmap="jet", marker="o", label='chair')
 
 
@@ -227,7 +227,7 @@ chair for example.
 Run inference
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run inference and visualize the results of 3D segmentation. - The input
 data is a point cloud with ``1 batch size``\ ，\ ``3 axis value`` (x, y,
@@ -258,7 +258,7 @@ each input point.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -317,7 +317,7 @@ select device from dropdown list for running inference using OpenVINO
 
 .. parsed-literal::
 
-    /tmp/ipykernel_1131736/68687822.py:23: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
+    /tmp/ipykernel_2972167/68687822.py:23: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
       ax.scatter(XCur, YCur, ZCur, s=5, cmap="jet", marker="o", label=classes[i])
 
 

@@ -3,15 +3,15 @@ Human Action Recognition with OpenVINO™
 
 This notebook demonstrates live human action recognition with OpenVINO,
 using the `Action Recognition
-Models <http/docs.openvino.2020usergroup13.html>`__ from `Open
-Model Zoo <http/github.copenvinotoolkopen_model_zoo>`__,
+Models <https://docs.openvino.ai/2020.2/usergroup13.html>`__ from `Open
+Model Zoo <https://github.com/openvinotoolkit/open_model_zoo>`__,
 specifically an
-`Encoder <http/docs.openvino.2020_models_intel_action_recognition_0001_encoder_description_action_recognition_0001_encoder.html>`__
+`Encoder <https://docs.openvino.ai/2020.2/_models_intel_action_recognition_0001_encoder_description_action_recognition_0001_encoder.html>`__
 and a
-`Decoder <http/docs.openvino.2020_models_intel_action_recognition_0001_decoder_description_action_recognition_0001_decoder.html>`__.
+`Decoder <https://docs.openvino.ai/2020.2/_models_intel_action_recognition_0001_decoder_description_action_recognition_0001_decoder.html>`__.
 Both models create a sequence to sequence (``"seq2seq"``) [1] system to
 identify the human activities for `Kinetics-400
-dataset <http/deepmind.cresearopen-sourkinetics>`__. The
+dataset <https://deepmind.com/research/open-source/kinetics>`__. The
 models use the Video Transformer approach with ResNet34 encoder [2]. The
 notebook shows how to create the following pipeline:
 
@@ -31,29 +31,29 @@ The encoder captures ``"context"`` of the inputs to be analyzed by the
 decoder, and finally gets the human action and confidence.
 
 [2] `Video
-Transformer <http/en.wikipedia.owiTransformer_(machine_learning_model)>`__
+Transformer <https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)>`__
 and
-`ResNet34 <http/pytorch.ovisimamodegenerattorchvision.models.resnet34.html>`__.
+`ResNet34 <https://pytorch.org/vision/main/models/generated/torchvision.models.resnet34.html>`__.
 
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `The models <#the-models>`__
+-  `Imports <#Imports>`__
+-  `The models <#The-models>`__
 
-   -  `Download the models <#download-the-models>`__
-   -  `Load your labels <#load-your-labels>`__
-   -  `Load the models <#load-the-models>`__
+   -  `Download the models <#Download-the-models>`__
+   -  `Load your labels <#Load-your-labels>`__
+   -  `Load the models <#Load-the-models>`__
 
       -  `Model Initialization
-         function <#model-initialization-function>`__
+         function <#Model-Initialization-function>`__
       -  `Initialization for Encoder and
-         Decoder <#initialization-for-encoder-and-decoder>`__
+         Decoder <#Initialization-for-Encoder-and-Decoder>`__
 
-   -  `Helper functions <#helper-functions>`__
-   -  `AI Functions <#ai-functions>`__
-   -  `Main Processing Function <#main-processing-function>`__
-   -  `Run Action Recognition <#run-action-recognition>`__
+   -  `Helper functions <#Helper-functions>`__
+   -  `AI Functions <#AI-Functions>`__
+   -  `Main Processing Function <#Main-Processing-Function>`__
+   -  `Run Action Recognition <#Run-Action-Recognition>`__
 
 .. code:: ipython3
 
@@ -68,7 +68,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -88,7 +88,7 @@ Imports
     # Fetch `notebook_utils` module
     import urllib.request
     urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/notebook_utils.py',
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
         filename='notebook_utils.py'
     )
     import notebook_utils as utils
@@ -96,12 +96,12 @@ Imports
 The models
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the models
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use the ``download_ir_model``, a function from the ``notebook_utils``
 file. It automatically creates a directory structure and downloads the
@@ -157,10 +157,10 @@ and the system automatically downloads the two models
 Load your labels
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This tutorial uses `Kinetics-400
-dataset <http/deepmind.cresearopen-sourkinetics>`__, and
+dataset <https://deepmind.com/research/open-source/kinetics>`__, and
 also provides the text file embedded into this notebook.
 
    **NOTE**: If you want to run
@@ -195,7 +195,7 @@ also provides the text file embedded into this notebook.
 Load the models
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load the two models for this particular architecture, Encoder and
 Decoder. Downloaded models are located in a fixed structure, indicating
@@ -237,7 +237,7 @@ Select device from dropdown list for running inference using OpenVINO
 Model Initialization function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -271,7 +271,7 @@ Model Initialization function
 Initialization for Encoder and Decoder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -288,7 +288,7 @@ Initialization for Encoder and Decoder
 Helper functions
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use the following helper functions for preprocessing and postprocessing
 frames:
@@ -411,7 +411,7 @@ frames:
 AI Functions
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Following the pipeline above, you will use the next functions to:
 
@@ -503,7 +503,7 @@ Following the pipeline above, you will use the next functions to:
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Running action recognition function will run in different operations,
 either a webcam or a video file. See the list of procedures below:
@@ -656,10 +656,10 @@ either a webcam or a video file. See the list of procedures below:
 Run Action Recognition
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Find out how the model works in a video file. `Any format
-supported <http/docs.opencv.o4.5dtutorial_py_video_display.html>`__
+supported <https://docs.opencv.org/4.5.1/dd/d43/tutorial_py_video_display.html>`__
 by OpenCV will work. You can press the stop button anytime while the
 video file is running, and it will activate the webcam for the next
 step.
@@ -667,7 +667,7 @@ step.
    **NOTE**: Sometimes, the video can be cut off if there are corrupted
    frames. In that case, you can convert it. If you experience any
    problems with your video, use the
-   `HandBrake <http/handbrake.>`__ and select the MPEG format.
+   `HandBrake <https://handbrake.fr/>`__ and select the MPEG format.
 
 if you want to use a web camera as an input source for the demo, please
 change the value of ``USE_WEBCAM`` variable to True and specify

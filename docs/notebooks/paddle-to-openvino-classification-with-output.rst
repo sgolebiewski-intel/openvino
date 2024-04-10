@@ -17,31 +17,31 @@ Source of the
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Preparation <#preparation>`__
+-  `Preparation <#Preparation>`__
 
-   -  `Imports <#imports>`__
-   -  `Settings <#settings>`__
+   -  `Imports <#Imports>`__
+   -  `Settings <#Settings>`__
 
 -  `Show Inference on PaddlePaddle
-   Model <#show-inference-on-paddlepaddle-model>`__
+   Model <#Show-Inference-on-PaddlePaddle-Model>`__
 -  `Convert the Model to OpenVINO IR
-   Format <#convert-the-model-to-openvino-ir-format>`__
--  `Select inference device <#select-inference-device>`__
+   Format <#Convert-the-Model-to-OpenVINO-IR-Format>`__
+-  `Select inference device <#Select-inference-device>`__
 -  `Show Inference on OpenVINO
-   Model <#show-inference-on-openvino-model>`__
--  `Timing and Comparison <#timing-and-comparison>`__
--  `Select inference device <#select-inference-device>`__
--  `References <#references>`__
+   Model <#Show-Inference-on-OpenVINO-Model>`__
+-  `Timing and Comparison <#Timing-and-Comparison>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `References <#References>`__
 
 Preparation
 -----------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Imports
 ~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -51,8 +51,8 @@ Imports
         %pip install -q "paddlepaddle>=2.5.1,<2.6.0"
     else:
         %pip install -q "paddlepaddle>=2.5.1"
-    %pip install -q paddleclas --no-deps
-    %pip install -q "prettytable" "ujson" "visualdl>=2.2.0" "faiss-cpu>=1.7.1"
+    %pip install -q "paddleclas>=2.5.2" --no-deps
+    %pip install -q "prettytable" "ujson" "visualdl>=2.5.3" "faiss-cpu>=1.7.1"
     # Install openvino package
     %pip install -q "openvino>=2023.1.0"
 
@@ -94,7 +94,7 @@ Imports
 
 .. parsed-literal::
 
-    --2024-03-27 13:44:15--  http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.19_amd64.deb
+    --2024-04-09 23:43:08--  http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.19_amd64.deb
     Resolving proxy-dmz.intel.com (proxy-dmz.intel.com)... 10.241.208.166
     Connecting to proxy-dmz.intel.com (proxy-dmz.intel.com)|10.241.208.166|:911... connected.
     Proxy request sent, awaiting response... 
@@ -102,7 +102,7 @@ Imports
 .. parsed-literal::
 
     404 Not Found
-    2024-03-27 13:44:16 ERROR 404: Not Found.
+    2024-04-09 23:43:08 ERROR 404: Not Found.
     
 
 
@@ -126,7 +126,7 @@ Imports
     # Fetch `notebook_utils` module
     import urllib.request
     urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/notebook_utils.py',
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
         filename='notebook_utils.py'
     )
     
@@ -135,18 +135,18 @@ Imports
 
 .. parsed-literal::
 
-    2024-03-27 13:44:17 INFO: Loading faiss with AVX512 support.
+    2024-04-09 23:43:10 INFO: Loading faiss with AVX512 support.
 
 
 .. parsed-literal::
 
-    2024-03-27 13:44:17 INFO: Successfully loaded faiss with AVX512 support.
+    2024-04-09 23:43:10 INFO: Successfully loaded faiss with AVX512 support.
 
 
 Settings
 ~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Set ``IMAGE_FILENAME`` to the filename of an image to use. Set
 ``MODEL_NAME`` to the PaddlePaddle model to download from PaddleHub.
@@ -205,7 +205,7 @@ PaddleHub. This may take a while.
 Show Inference on PaddlePaddle Model
 ------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In the next cell, we load the model, load and display an image, do
 inference on that image, and then show the top three prediction results.
@@ -224,7 +224,7 @@ inference on that image, and then show the top three prediction results.
 
 .. parsed-literal::
 
-    [2024/03/27 13:44:44] ppcls WARNING: The current running environment does not support the use of GPU. CPU has been used instead.
+    [2024/04/09 23:43:29] ppcls WARNING: The current running environment does not support the use of GPU. CPU has been used instead.
 
 
 .. parsed-literal::
@@ -294,7 +294,7 @@ clipping values.
 
 .. parsed-literal::
 
-    2024-03-27 13:44:44 WARNING: Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+    2024-04-09 23:43:29 WARNING: Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
 
 
 .. parsed-literal::
@@ -306,7 +306,7 @@ clipping values.
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7f81a45bfee0>
+    <matplotlib.image.AxesImage at 0x7fec64523ca0>
 
 
 
@@ -333,7 +333,7 @@ OpenVINO model.
 Convert the Model to OpenVINO IR Format
 ---------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Call the OpenVINO Model Conversion API to convert the PaddlePaddle model
 to OpenVINO IR, with FP32 precision. ``ov.convert_model`` function
@@ -356,7 +356,7 @@ for more information about the Model Conversion API.
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -386,7 +386,7 @@ select device from dropdown list for running inference using OpenVINO
 Show Inference on OpenVINO Model
 --------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load the IR model, get model information, load the image, do inference,
 convert the inference to a meaningful result, and show the output. See
@@ -435,7 +435,7 @@ Notebook <openvino-api-with-output.html>`__ for more information.
 Timing and Comparison
 ---------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Measure the time it takes to do inference on fifty images and compare
 the result. The timing information gives an indication of performance.
@@ -466,10 +466,6 @@ Note that many optimizations are possible to improve the performance.
     CPU: Intel(R) Core(TM) i9-10920X CPU @ 3.50GHz
 
 
-
-    
-
-
 .. code:: ipython3
 
     # Show inference speed on PaddlePaddle model
@@ -492,7 +488,7 @@ Note that many optimizations are possible to improve the performance.
 
 .. parsed-literal::
 
-    PaddlePaddle model on CPU: 0.0075 seconds per image, FPS: 134.04
+    PaddlePaddle model on CPU: 0.0076 seconds per image, FPS: 131.97
     
     PaddlePaddle result:
     Labrador retriever, 0.75138
@@ -509,7 +505,7 @@ Note that many optimizations are possible to improve the performance.
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -556,7 +552,7 @@ select device from dropdown list for running inference using OpenVINO
 
 .. parsed-literal::
 
-    OpenVINO IR model in OpenVINO Runtime (AUTO): 0.0029 seconds per image, FPS: 340.70
+    OpenVINO IR model in OpenVINO Runtime (AUTO): 0.0029 seconds per image, FPS: 345.78
     
     OpenVINO result:
     Labrador retriever, 0.74909
@@ -573,7 +569,7 @@ select device from dropdown list for running inference using OpenVINO
 References
 ----------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 -  `PaddleClas <https://github.com/PaddlePaddle/PaddleClas>`__
 -  `OpenVINO PaddlePaddle

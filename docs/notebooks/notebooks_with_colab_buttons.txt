@@ -39,6 +39,7 @@ pix2struct-docvqa
 pytorch-onnx-to-openvino
 pytorch-to-openvino
 question-answering
+291-rmbg-background-removal
 segmenter-semantic-segmentation
 siglip-zero-shot-image-classification
 softvc-voice-conversion

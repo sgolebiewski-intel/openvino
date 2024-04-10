@@ -33,7 +33,7 @@ which randomly sampled text snippets are close to a given image, meaning
 that a text better describes the image. Here is a visualization of the
 pre-training process:
 
-|image1| `image_source <http/openai.cblcl>`__
+|image1| `image_source <https://openai.com/blog/clip/>`__
 
 To solve the task, CLIP uses two parts: ``Image Encoder`` and
 ``Text Encoder``. Both parts are used to produce embeddings, which are
@@ -83,21 +83,21 @@ Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
 -  `Initial Implementation with Transformers and
-   Pytorch <#initial-implementation-with-transformers-and-pytorch>`__
+   Pytorch <#Initial-Implementation-with-Transformers-and-Pytorch>`__
 -  `Separate Text and Visual
-   Processing <#separate-text-and-visual-processing>`__
+   Processing <#Separate-Text-and-Visual-Processing>`__
 -  `Convert to OpenVINO™ Intermediate Representation (IR)
-   Format <#convert-to-openvino-intermediate-representation-ir-format>`__
--  `Inference with OpenVINO™ <#inference-with-openvino>`__
+   Format <#Convert-to-OpenVINO™-Intermediate-Representation-(IR)-Format>`__
+-  `Inference with OpenVINO™ <#Inference-with-OpenVINO™>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Accelerate Inference with
-   AsyncInferQueue <#accelerate-inference-with-asyncinferqueue>`__
+   ``AsyncInferQueue`` <#Accelerate-Inference-with-AsyncInferQueue>`__
 -  `Pack the Pipeline into a
-   Function <#pack-the-pipeline-into-a-function>`__
--  `Interactive demo with Gradio <#interactive-demo-with-gradio>`__
--  `What To Do Next <#what-to-do-next>`__
+   Function <#Pack-the-Pipeline-into-a-Function>`__
+-  `Interactive demo with Gradio <#Interactive-demo-with-Gradio>`__
+-  `What To Do Next <#What-To-Do-Next>`__
 
 .. |image0| image:: https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG
 .. |image1| image:: https://openaiassets.blob.core.windows.net/$web/clip/draft/20210104b/overview-a.svg
@@ -105,13 +105,13 @@ Table of contents:
 Initial Implementation with Transformers and Pytorch
 ----------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # Install requirements
     %pip install -q "openvino>=2023.1.0"
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu transformers torch gradio
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu transformers "torch>=2.1" gradio
 
 .. code:: ipython3
 
@@ -326,7 +326,7 @@ Let us overlay the saliency map on the image:
 Separate Text and Visual Processing
 -----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The code above is functional, but there are some repeated computations
 that can be avoided. The text embedding can be computed once because it
@@ -376,7 +376,7 @@ build a saliency map.
 Convert to OpenVINO™ Intermediate Representation (IR) Format
 ------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The process of building a saliency map can be quite time-consuming. To
 speed it up, you will use OpenVINO. OpenVINO is an inference framework
@@ -395,7 +395,7 @@ better conversion results, we need to guarantee that model can be
 successfully traced. ``model.config.torchscript = True`` parameters
 allows to prepare HuggingFace models for TorchScript tracing. More
 details about that can be found in HuggingFace Transformers
-`documentation <http/huggingface.dotransformetorchscript>`__
+`documentation <https://huggingface.co/docs/transformers/torchscript>`__
 
 .. code:: ipython3
 
@@ -475,7 +475,7 @@ and ready to be loaded and inferred with OpenVINO™.
 Inference with OpenVINO™
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 1. Create an instance of the ``Core`` object that will handle any
    interaction with OpenVINO runtime for you.
@@ -494,7 +494,7 @@ Inference with OpenVINO™
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -574,7 +574,7 @@ the inference process is mostly similar.
 Accelerate Inference with ``AsyncInferQueue``
 ---------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Up until now, the pipeline was synchronous, which means that the data
 preparation, model input population, model inference, and output
@@ -706,7 +706,7 @@ should pass a progress bar object and call ``update`` method after
 Pack the Pipeline into a Function
 ---------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let us wrap all code in the function and add a user interface to it.
 
@@ -816,7 +816,7 @@ The second version will enable loading the image from your computer.
 Interactive demo with Gradio
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -857,15 +857,15 @@ Interactive demo with Gradio
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 
 
 What To Do Next
 ---------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now that you have a convenient interface and accelerated inference, you
 can explore the CLIP capabilities further. For example:
@@ -882,7 +882,7 @@ can explore the CLIP capabilities further. For example:
    ``update_saliency_map`` functions to process multiple crop images at
    once and accelerate the pipeline even more.
 -  Optimize models with
-   `NNCF <http/docs.openvino.20openvino-workflmodel-optimization-guiquantizing-models-post-trainibasic-quantization-flow.html>`__
+   `NNCF <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training/basic-quantization-flow.html>`__
    to get further acceleration. You can find example how to quantize
    CLIP model in `this
-   notebook <clip-zero-shot-image-classification>`__
+   notebook <../clip-zero-shot-image-classification>`__

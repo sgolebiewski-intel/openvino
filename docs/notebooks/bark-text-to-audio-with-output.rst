@@ -2,7 +2,7 @@ Text-to-speech generation using Bark and OpenVINO
 =================================================
 
 🐶 Bark is a transformer-based text-to-audio model created by
-`Suno <http/suno.ai>`__. Bark can generate highly realistic,
+`Suno <https://suno.ai>`__. Bark can generate highly realistic,
 multilingual speech as well as other audio - including music, background
 noise and simple sound effects. The model can also produce nonverbal
 communications like laughing, sighing and crying.
@@ -57,24 +57,24 @@ is used to act as an audio representation.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Download and Convert models <#download-and-convert-models>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Download and Convert models <#Download-and-Convert-models>`__
 
-   -  `Text Encoder <#text-encoder>`__
-   -  `Coarse encoder <#coarse-encoder>`__
-   -  `Fine encoder <#fine-encoder>`__
-   -  `Prepare Inference pipeline <#prepare-inference-pipeline>`__
+   -  `Text Encoder <#Text-Encoder>`__
+   -  `Coarse encoder <#Coarse-encoder>`__
+   -  `Fine encoder <#Fine-encoder>`__
+   -  `Prepare Inference pipeline <#Prepare-Inference-pipeline>`__
 
--  `Run model inference <#run-model-inference>`__
+-  `Run model inference <#Run-model-inference>`__
 
-   -  `Select Inference device <#select-inference-device>`__
+   -  `Select Inference device <#Select-Inference-device>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -104,7 +104,7 @@ Prerequisites
 Download and Convert models
 ---------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -117,7 +117,7 @@ Download and Convert models
 Text Encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Text encoder is responsible for embedding initial text prompt into
 high-level semantic tokens. it uses tokenizer for conversion input text
@@ -191,7 +191,7 @@ models for that.
 Coarse encoder
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Coarse encoder is a causal autoregressive transformer, that takes as
 input the results of the text encoder model. It aims at predicting the
@@ -369,7 +369,7 @@ provide empty tensor on the first step.
 Fine encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Fine encoder is time a non-causal autoencoder transformer, which
 iteratively predicts the last codebooks based on the sum of the previous
@@ -400,7 +400,7 @@ codebooks embeddings obtained using Coarse encoder.
 Prepare Inference pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For better usability, classes for working with models provided below.
 
@@ -975,7 +975,7 @@ consists from several steps, illustrated on the diagram below:
 Run model inference
 -------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now is time to see model in action. We need only wrap our models to
 classes and run ``generate_audio`` function.
@@ -983,7 +983,7 @@ classes and run ``generate_audio`` function.
 Select Inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -1074,7 +1074,7 @@ select device from dropdown list for running inference using OpenVINO
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 

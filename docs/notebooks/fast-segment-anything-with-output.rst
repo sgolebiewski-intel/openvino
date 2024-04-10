@@ -18,7 +18,7 @@ two consecutive stages: all-instance segmentation and prompt-guided
 selection.
 
 In the first stage,
-`YOLOv8-seg <https://docs.ultralytics.com/tasks/segment/>`__ is used
+```YOLOv8-seg`` <https://docs.ultralytics.com/tasks/segment/>`__ is used
 to produce segmentation masks for all instances in the image. In the
 second stage, FastSAM outputs the region-of-interest corresponding to
 the prompt.
@@ -31,38 +31,38 @@ the prompt.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 
-   -  `Install requirements <#install-requirements>`__
-   -  `Imports <#imports>`__
+   -  `Install requirements <#Install-requirements>`__
+   -  `Imports <#Imports>`__
 
--  `FastSAM in Ultralytics <#fastsam-in-ultralytics>`__
+-  `FastSAM in Ultralytics <#FastSAM-in-Ultralytics>`__
 -  `Convert the model to OpenVINO Intermediate representation (IR)
-   format <#convert-the-model-to-openvino-intermediate-representation-ir-format>`__
+   format <#Convert-the-model-to-OpenVINO-Intermediate-representation-(IR)-format>`__
 -  `Embedding the converted models into the original
-   pipeline <#embedding-the-converted-models-into-the-original-pipeline>`__
+   pipeline <#Embedding-the-converted-models-into-the-original-pipeline>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
    -  `Adapt OpenVINO models to the original
-      pipeline <#adapt-openvino-models-to-the-original-pipeline>`__
+      pipeline <#Adapt-OpenVINO-models-to-the-original-pipeline>`__
 
 -  `Optimize the model using NNCF Post-training Quantization
-   API <#optimize-the-model-using-nncf-post-training-quantization-api>`__
+   API <#Optimize-the-model-using-NNCF-Post-training-Quantization-API>`__
 
    -  `Compare the performance of the Original and Quantized
-      Models <#compare-the-performance-of-the-original-and-quantized-models>`__
+      Models <#Compare-the-performance-of-the-Original-and-Quantized-Models>`__
 
--  `Try out the converted pipeline <#try-out-the-converted-pipeline>`__
+-  `Try out the converted pipeline <#Try-out-the-converted-pipeline>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -89,13 +89,18 @@ Install requirements
 
 .. parsed-literal::
 
+    WARNING: typer 0.12.3 does not provide the extra 'all'
+    
+
+.. parsed-literal::
+
     Note: you may need to restart the kernel to use updated packages.
 
 
 Imports
 ~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -110,12 +115,12 @@ Imports
     import urllib.request
     # Fetch skip_kernel_extension module
     urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/skip_kernel_extension.py',
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
         filename='skip_kernel_extension.py'
     )
     # Fetch `notebook_utils` module
     urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/notebook_utils.py',
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
         filename='notebook_utils.py'
     )
     from notebook_utils import download_file
@@ -124,7 +129,7 @@ Imports
 FastSAM in Ultralytics
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To work with `Fast Segment Anything
 Model <https://github.com/CASIA-IVA-Lab/FastSAM>`__ by
@@ -152,160 +157,201 @@ model and generate a segmentation map.
 
 .. parsed-literal::
 
-    
-  0%|          | 0.00/138M [00:00<?, ?B/s]
+      0%|          | 0.00/138M [00:00<?, ?B/s]
 
 .. parsed-literal::
 
-    
-  0%|          | 320k/138M [00:00<00:44, 3.27MB/s]
+      0%|          | 256k/138M [00:00<00:55, 2.61MB/s]
 
 .. parsed-literal::
 
-    
-  2%|▏         | 2.39M/138M [00:00<00:10, 14.1MB/s]
+      2%|▏         | 2.20M/138M [00:00<00:10, 13.1MB/s]
 
 .. parsed-literal::
 
-    
-  7%|▋         | 10.3M/138M [00:00<00:02, 45.6MB/s]
+      7%|▋         | 10.2M/138M [00:00<00:02, 45.3MB/s]
 
 .. parsed-literal::
 
-    
- 13%|█▎        | 17.9M/138M [00:00<00:02, 59.0MB/s]
+     13%|█▎        | 17.5M/138M [00:00<00:02, 57.8MB/s]
 
 .. parsed-literal::
 
-    
- 17%|█▋        | 23.5M/138M [00:00<00:02, 56.1MB/s]
+     17%|█▋        | 23.0M/138M [00:00<00:02, 41.4MB/s]
 
 .. parsed-literal::
 
-    
- 21%|██        | 28.9M/138M [00:00<00:02, 46.5MB/s]
+     20%|█▉        | 27.5M/138M [00:00<00:02, 40.6MB/s]
 
 .. parsed-literal::
 
-    
- 24%|██▍       | 33.6M/138M [00:00<00:02, 45.6MB/s]
+     23%|██▎       | 31.8M/138M [00:00<00:02, 41.6MB/s]
 
 .. parsed-literal::
 
-    
- 28%|██▊       | 39.0M/138M [00:00<00:02, 48.7MB/s]
+     26%|██▌       | 36.0M/138M [00:00<00:02, 42.2MB/s]
 
 .. parsed-literal::
 
-    
- 32%|███▏      | 43.8M/138M [00:01<00:02, 42.8MB/s]
+     29%|██▉       | 40.2M/138M [00:01<00:03, 33.7MB/s]
 
 .. parsed-literal::
 
-    
- 35%|███▍      | 48.1M/138M [00:01<00:02, 43.3MB/s]
+     32%|███▏      | 43.8M/138M [00:01<00:02, 34.5MB/s]
 
 .. parsed-literal::
 
-    
- 38%|███▊      | 52.4M/138M [00:01<00:02, 37.5MB/s]
+     34%|███▍      | 47.3M/138M [00:01<00:02, 34.5MB/s]
 
 .. parsed-literal::
 
-    
- 43%|████▎     | 59.9M/138M [00:01<00:01, 45.4MB/s]
+     37%|███▋      | 51.5M/138M [00:01<00:02, 37.0MB/s]
 
 .. parsed-literal::
 
-    
- 47%|████▋     | 64.4M/138M [00:01<00:01, 45.3MB/s]
+     40%|████      | 55.7M/138M [00:01<00:02, 38.8MB/s]
 
 .. parsed-literal::
 
-    
- 50%|████▉     | 68.9M/138M [00:01<00:01, 45.6MB/s]
+     43%|████▎     | 59.5M/138M [00:01<00:02, 30.7MB/s]
 
 .. parsed-literal::
 
-    
- 53%|█████▎    | 73.3M/138M [00:01<00:01, 45.8MB/s]
+     46%|████▌     | 63.5M/138M [00:01<00:02, 33.3MB/s]
 
 .. parsed-literal::
 
-    
- 56%|█████▌    | 77.7M/138M [00:01<00:01, 45.6MB/s]
+     48%|████▊     | 66.9M/138M [00:01<00:02, 32.0MB/s]
 
 .. parsed-literal::
 
-    
- 59%|█████▉    | 82.1M/138M [00:01<00:01, 45.5MB/s]
+     51%|█████     | 70.2M/138M [00:02<00:02, 30.7MB/s]
 
 .. parsed-literal::
 
-    
- 63%|██████▎   | 86.9M/138M [00:02<00:01, 46.9MB/s]
+     53%|█████▎    | 73.2M/138M [00:02<00:02, 31.0MB/s]
 
 .. parsed-literal::
 
-    
- 66%|██████▌   | 91.5M/138M [00:02<00:01, 46.8MB/s]
+     55%|█████▌    | 76.3M/138M [00:02<00:02, 31.2MB/s]
 
 .. parsed-literal::
 
-    
- 69%|██████▉   | 96.0M/138M [00:02<00:00, 46.9MB/s]
+     57%|█████▋    | 79.4M/138M [00:02<00:01, 31.4MB/s]
 
 .. parsed-literal::
 
-    
- 73%|███████▎  | 100M/138M [00:02<00:00, 40.8MB/s] 
+     60%|█████▉    | 82.5M/138M [00:02<00:01, 31.8MB/s]
 
 .. parsed-literal::
 
-    
- 76%|███████▌  | 105M/138M [00:02<00:00, 41.9MB/s]
+     62%|██████▏   | 85.6M/138M [00:02<00:01, 31.6MB/s]
 
 .. parsed-literal::
 
-    
- 79%|███████▉  | 109M/138M [00:02<00:00, 42.9MB/s]
+     64%|██████▍   | 88.6M/138M [00:02<00:02, 24.6MB/s]
 
 .. parsed-literal::
 
-    
- 82%|████████▏ | 114M/138M [00:02<00:00, 43.7MB/s]
+     67%|██████▋   | 92.8M/138M [00:02<00:01, 29.2MB/s]
 
 .. parsed-literal::
 
-    
- 85%|████████▌ | 118M/138M [00:02<00:00, 44.0MB/s]
+     69%|██████▉   | 95.9M/138M [00:03<00:01, 26.7MB/s]
 
 .. parsed-literal::
 
-    
- 89%|████████▊ | 123M/138M [00:02<00:00, 45.9MB/s]
+     71%|███████▏  | 98.6M/138M [00:03<00:01, 22.6MB/s]
 
 .. parsed-literal::
 
-    
- 92%|█████████▏| 127M/138M [00:02<00:00, 46.1MB/s]
+     73%|███████▎  | 101M/138M [00:03<00:01, 20.4MB/s] 
 
 .. parsed-literal::
 
-    
- 95%|█████████▌| 132M/138M [00:03<00:00, 46.0MB/s]
+     75%|███████▍  | 103M/138M [00:03<00:01, 19.6MB/s]
 
 .. parsed-literal::
 
-    
- 98%|█████████▊| 136M/138M [00:03<00:00, 46.1MB/s]
+     76%|███████▌  | 105M/138M [00:03<00:01, 19.0MB/s]
 
 .. parsed-literal::
 
-    
-100%|██████████| 138M/138M [00:03<00:00, 44.3MB/s]
+     77%|███████▋  | 107M/138M [00:03<00:01, 17.9MB/s]
 
+.. parsed-literal::
 
+     79%|███████▊  | 109M/138M [00:03<00:01, 17.6MB/s]
+
+.. parsed-literal::
+
+     80%|███████▉  | 110M/138M [00:03<00:01, 17.6MB/s]
+
+.. parsed-literal::
+
+     81%|████████  | 112M/138M [00:04<00:01, 17.5MB/s]
+
+.. parsed-literal::
+
+     82%|████████▏ | 114M/138M [00:04<00:01, 17.5MB/s]
+
+.. parsed-literal::
+
+     84%|████████▎ | 116M/138M [00:04<00:01, 17.5MB/s]
+
+.. parsed-literal::
+
+     85%|████████▍ | 117M/138M [00:04<00:01, 17.0MB/s]
+
+.. parsed-literal::
+
+     86%|████████▌ | 119M/138M [00:04<00:01, 17.6MB/s]
+
+.. parsed-literal::
+
+     87%|████████▋ | 121M/138M [00:04<00:01, 15.8MB/s]
+
+.. parsed-literal::
+
+     89%|████████▉ | 123M/138M [00:04<00:00, 18.0MB/s]
+
+.. parsed-literal::
+
+     90%|█████████ | 125M/138M [00:04<00:00, 18.0MB/s]
+
+.. parsed-literal::
+
+     92%|█████████▏| 127M/138M [00:04<00:00, 17.9MB/s]
+
+.. parsed-literal::
+
+     93%|█████████▎| 128M/138M [00:05<00:00, 18.0MB/s]
+
+.. parsed-literal::
+
+     94%|█████████▍| 130M/138M [00:05<00:00, 18.0MB/s]
+
+.. parsed-literal::
+
+     95%|█████████▌| 132M/138M [00:05<00:00, 18.2MB/s]
+
+.. parsed-literal::
+
+     97%|█████████▋| 134M/138M [00:05<00:00, 18.2MB/s]
+
+.. parsed-literal::
+
+     98%|█████████▊| 135M/138M [00:05<00:00, 18.2MB/s]
+
+.. parsed-literal::
+
+     99%|█████████▉| 137M/138M [00:05<00:00, 15.2MB/s]
+
+.. parsed-literal::
+
+    100%|██████████| 138M/138M [00:05<00:00, 25.8MB/s]
+
+.. parsed-literal::
 
     
 
@@ -316,19 +362,19 @@ model and generate a segmentation map.
     coco_bike.jpg:   0%|          | 0.00/182k [00:00<?, ?B/s]
 
 
-
+.. parsed-literal::
 
     
 
 
 .. parsed-literal::
 
-    image 1/1 /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/notebooks/fast-segment-anything/coco_bike.jpg: 768x1024 37 objects, 625.5ms
+    image 1/1 /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/fast-segment-anything/coco_bike.jpg: 768x1024 37 objects, 604.4ms
 
 
 .. parsed-literal::
 
-    Speed: 3.5ms preprocess, 625.5ms inference, 29.4ms postprocess per image at shape (1, 3, 768, 1024)
+    Speed: 3.0ms preprocess, 604.4ms inference, 25.5ms postprocess per image at shape (1, 3, 768, 1024)
 
 
 The model returns segmentation maps for all the objects on the image.
@@ -348,7 +394,7 @@ Observe the results below.
 Convert the model to OpenVINO Intermediate representation (IR) format
 ---------------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The Ultralytics Model export API enables conversion of PyTorch models to
 OpenVINO IR format. Under the hood it utilizes the
@@ -384,7 +430,7 @@ tracing. The FastSAM model itself is based on YOLOv8 model.
 
 .. parsed-literal::
 
-    ONNX: export success ✅ 3.2s, saved as 'FastSAM-x.onnx' (275.9 MB)
+    ONNX: export success ✅ 3.3s, saved as 'FastSAM-x.onnx' (275.9 MB)
 
 
 .. parsed-literal::
@@ -395,14 +441,14 @@ tracing. The FastSAM model itself is based on YOLOv8 model.
 
 .. parsed-literal::
 
-    OpenVINO: export success ✅ 1.1s, saved as 'FastSAM-x_openvino_model/' (276.0 MB)
+    OpenVINO: export success ✅ 1.0s, saved as 'FastSAM-x_openvino_model/' (276.0 MB)
 
 
 .. parsed-literal::
 
     
-    Export complete (7.3s)
-    Results saved to /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/notebooks/fast-segment-anything
+    Export complete (7.2s)
+    Results saved to /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/fast-segment-anything
     Predict:         yolo predict task=segment model=FastSAM-x_openvino_model imgsz=1024  
     Validate:        yolo val task=segment model=FastSAM-x_openvino_model imgsz=1024 data=ultralytics/datasets/sa.yaml  
     Visualize:       https://netron.app
@@ -411,7 +457,7 @@ tracing. The FastSAM model itself is based on YOLOv8 model.
 Embedding the converted models into the original pipeline
 ---------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO™ Runtime Python API is used to compile the model in OpenVINO IR
 format. The
@@ -427,7 +473,7 @@ used to compile the model.
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select device that will be used to do models inference using OpenVINO
 from the dropdown list:
@@ -455,7 +501,7 @@ from the dropdown list:
 Adapt OpenVINO models to the original pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Here we create wrapper classes for the OpenVINO model that we want to
 embed in the original inference pipeline. Here are some of the things to
@@ -503,19 +549,19 @@ pipeline.
     ov_results = model(image_uri, device=device.value, retina_masks=True, imgsz=1024, conf=0.6, iou=0.9)
 
 
-
+.. parsed-literal::
 
     
 
 
 .. parsed-literal::
 
-    image 1/1 /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/notebooks/fast-segment-anything/coco_bike.jpg: 1024x1024 42 objects, 504.4ms
+    image 1/1 /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/fast-segment-anything/coco_bike.jpg: 1024x1024 42 objects, 497.7ms
 
 
 .. parsed-literal::
 
-    Speed: 9.7ms preprocess, 504.4ms inference, 34.4ms postprocess per image at shape (1, 3, 1024, 1024)
+    Speed: 9.3ms preprocess, 497.7ms inference, 30.0ms postprocess per image at shape (1, 3, 1024, 1024)
 
 
 One can observe the converted model outputs in the next cell, they is
@@ -535,7 +581,7 @@ the same as of the original model.
 Optimize the model using NNCF Post-training Quantization API
 ------------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -802,7 +848,7 @@ repo <../yolov8-optimization/>`__.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
       return Tensor(self.data * unwrap_tensor_data(other))
 
 
@@ -830,7 +876,7 @@ repo <../yolov8-optimization/>`__.
 Compare the performance of the Original and Quantized Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Finally, we iterate both the OV model and the quantized model over the
 calibration dataset to measure the performance.
@@ -863,8 +909,8 @@ calibration dataset to measure the performance.
 
 .. parsed-literal::
 
-    Segmented in 68 seconds.
-    Resulting in 1.88 fps
+    Segmented in 67 seconds.
+    Resulting in 1.91 fps
 
 
 .. code:: ipython3
@@ -893,13 +939,13 @@ calibration dataset to measure the performance.
 
     Segmented in 22 seconds
     Resulting in 5.82 fps
-    That is 3.09 times faster!
+    That is 3.05 times faster!
 
 
 Try out the converted pipeline
 ------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The demo app below is created using `Gradio
 package <https://www.gradio.app/docs/interface>`__.
@@ -1214,7 +1260,7 @@ based on user input.
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

@@ -26,7 +26,7 @@ fantastic world of diffusion models for everyone!
 
 This notebook demonstrates how to run stable diffusion model using
 `Diffusers <https://huggingface.co/docs/diffusers/index>`__ library and
-`OpenVINO TorchDynamo
+`OpenVINO ``TorchDynamo``
 backend <https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html>`__
 for Text-to-Image and Image-to-Image generation tasks.
 
@@ -39,23 +39,28 @@ Notebook contains the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Stable Diffusion with Diffusers
-   library <#stable-diffusion-with-diffusers-library>`__
--  `OpenVINO TorchDynamo backend <#openvino-torchdynamo-backend>`__
+   library <#Stable-Diffusion-with-Diffusers-library>`__
+-  `OpenVINO TorchDynamo backend <#OpenVINO-TorchDynamo-backend>`__
 
-   -  `Run Image generation <#run-image-generation>`__
+   -  `Run Image generation <#Run-Image-generation>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 -  `Support for Automatic1111 Stable Diffusion
-   WebUI <#support-for-automatic1111-stable-diffusion-webui>`__
+   WebUI <#Support-for-Automatic1111-Stable-Diffusion-WebUI>`__
 
 .. code:: ipython3
 
     import sys
     from IPython.display import HTML, display
     
-    sys.path.append("../utils")
+    # Fetch `ipython_exit` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/ipython_exit.py',
+        filename='ipython_exit.py'
+    )
     from ipython_exit import exit
     
     if sys.platform == "win32":
@@ -65,13 +70,18 @@ Table of contents:
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q torch transformers diffusers gradio ipywidgets --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "torch>=2.1" transformers diffusers gradio ipywidgets --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "openvino>=2023.3.0"
 
+
+.. parsed-literal::
+
+    WARNING: typer 0.12.3 does not provide the extra 'all'
+    
 
 .. parsed-literal::
 
@@ -106,20 +116,20 @@ Prerequisites
 
 .. parsed-literal::
 
-    2024-03-27 14:52:59.240125: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-27 14:52:59.273883: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-10 00:23:06.058801: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-10 00:23:06.093049: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-03-27 14:52:59.805339: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-10 00:23:06.656282: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 Stable Diffusion with Diffusers library
 ---------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To work with Stable Diffusion v2.1, we will use Hugging Face Diffusers
 library. To experiment with Stable Diffusion models, Diffusers exposes
@@ -149,7 +159,7 @@ The code below demonstrates how to create the
 OpenVINO TorchDynamo backend
 ----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The `OpenVINO TorchDynamo
 backend <https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html>`__
@@ -216,7 +226,7 @@ options <https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html#opti
 
 
 
-To use `torch.compile()
+To use ```torch.compile()``
 method <https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html>`__,
 you just need to add an import statement and define the OpenVINO
 backend:
@@ -234,7 +244,7 @@ backend:
 Run Image generation
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -258,7 +268,7 @@ Run Image generation
 Interactive demo
 ================
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now you can start the demo, choose the inference mode, define prompts
 (and input image for Image-to-Image generation) and run inference
@@ -404,15 +414,15 @@ pipeline. Optionally, you can also change some input parameters.
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 
 
 Support for Automatic1111 Stable Diffusion WebUI
 ------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Automatic1111 Stable Diffusion WebUI is an open-source repository that
 hosts a browser-based interface for the Stable Diffusion based image

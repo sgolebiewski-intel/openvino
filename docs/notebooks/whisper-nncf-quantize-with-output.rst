@@ -22,23 +22,23 @@ The optimization process contains the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Create and initialize quantization
-    <#create-and-initialize-quantization-#0>`__
+   ⇑(#0) <#Create-and-initialize-quantization-⇑(#0)>`__
 
-   -  `Prepare calibration datasets <#prepare-calibration-datasets>`__
+   -  `Prepare calibration datasets <#Prepare-calibration-datasets>`__
    -  `Quantize Whisper encoder and decoder
-      models <#quantize-whisper-encoder-and-decoder-models>`__
+      models <#Quantize-Whisper-encoder-and-decoder-models>`__
 
 -  `Transcribe video with quantized OpenVINO
-   model <#transcribe-video-with-quantized-openvino-model>`__
+   model <#Transcribe-video-with-quantized-OpenVINO-model>`__
 -  `Compare performance and accuracy of the FP32 and INT8
-   IRs <#compare-performance-and-accuracy-of-the-fp32-and-int8-irs>`__
+   IRs <#Compare-performance-and-accuracy-of-the-FP32-and-INT8-IRs>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install dependencies.
 
@@ -137,7 +137,7 @@ Select the task for the model:
 
 
 ## Create and initialize quantization `⇑ <#0>`__ `back to top
-⬆️ <#table-of-contents>`__
+⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding the quantization layers into the
@@ -184,7 +184,7 @@ Load FP32 model IR.
 Prepare calibration datasets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Whisper consists of an encoder and a decoder models. We need to collect
 calibration data for both of them.
@@ -257,7 +257,7 @@ dataset from Hugging Face as calibration data.
 Quantize Whisper encoder and decoder models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Quantize both encoder and decoder models using ``nncf.quantize()`` API
 and save the quantized IRs after that.
@@ -352,7 +352,7 @@ and save the quantized IRs after that.
 Transcribe video with quantized OpenVINO model
 ----------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load ``INT8`` models saved above into a new instance of Whisper model.
 
@@ -492,7 +492,7 @@ As you can see the result is almost the same.
 Compare performance and accuracy of the FP32 and INT8 IRs
 ---------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Compare model file size.
 

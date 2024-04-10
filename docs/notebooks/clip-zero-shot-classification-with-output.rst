@@ -11,7 +11,7 @@ knowledge of the classes.
    zero-shot-pipeline
 
 `\**image
-source\* <http/huggingface.taszero-shot-image-classification>`__
+source\* <https://huggingface.co/tasks/zero-shot-image-classification>`__
 
 Zero-shot learning resolves several challenges in image retrieval
 systems. For example, with the rapid growth of categories on the web, it
@@ -19,10 +19,10 @@ is challenging to index images based on unseen categories. We can
 associate unseen categories to images with zero-shot learning by
 exploiting attributes to model’s relationship between visual features
 and labels. In this tutorial, we will use the `OpenAI
-CLIP <http/github.copenCLIP>`__ model to perform zero-shot
+CLIP <https://github.com/openai/CLIP>`__ model to perform zero-shot
 image classification. Additionally, the notebook demonstrates how to
 optimize the model using
-`NNCF <http/github.copenvinotoolknn>`__.
+`NNCF <https://github.com/openvinotoolkit/nncf/>`__.
 
 The notebook contains the following steps:
 
@@ -39,36 +39,36 @@ The notebook contains the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Instantiate model <#instantiate-model>`__
--  `Run PyTorch model inference <#run-pytorch-model-inference>`__
+-  `Instantiate model <#Instantiate-model>`__
+-  `Run PyTorch model inference <#Run-PyTorch-model-inference>`__
 -  `Convert model to OpenVINO Intermediate Representation (IR)
-   format. <#convert-model-to-openvino-intermediate-representation-ir-format->`__
--  `Run OpenVINO model <#run-openvino-model>`__
+   format. <#Convert-model-to-OpenVINO-Intermediate-Representation-(IR)-format.>`__
+-  `Run OpenVINO model <#Run-OpenVINO-model>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Quantize model to INT8 using
-   NNCF <#quantize-model-to-int8-using-nncf>`__
+   NNCF <#Quantize-model-to-INT8-using-NNCF>`__
 
-   -  `Prepare datasets <#prepare-datasets>`__
-   -  `Perform quantization <#perform-quantization>`__
-   -  `Run quantized OpenVINO model <#run-quantized-openvino-model>`__
-   -  `Compare File Size <#compare-file-size>`__
+   -  `Prepare datasets <#Prepare-datasets>`__
+   -  `Perform quantization <#Perform-quantization>`__
+   -  `Run quantized OpenVINO model <#Run-quantized-OpenVINO-model>`__
+   -  `Compare File Size <#Compare-File-Size>`__
    -  `Compare inference time of the FP16 IR and quantized
-      models <#compare-inference-time-of-the-fp16-ir-and-quantized-models>`__
+      models <#Compare-inference-time-of-the-FP16-IR-and-quantized-models>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Instantiate model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 CLIP (Contrastive Language-Image Pre-Training) is a neural network
 trained on various (image, text) pairs. It can be instructed in natural
 language to predict the most relevant text snippet, given an image,
 without directly optimizing for the task. CLIP uses a
-`ViT <http/arxiv.oa2010.11929>`__ like transformer to get
+`ViT <https://arxiv.org/abs/2010.11929>`__ like transformer to get
 visual features and a causal language model to get the text features.
 The text and visual features are then projected into a latent space with
 identical dimensions. The dot product between the projected image and
@@ -79,16 +79,16 @@ text features is then used as a similarity score.
 
    clip
 
-`\**image_source\* <http/github.copenCLblmaREADME.md>`__
+`\**image_source\* <https://github.com/openai/CLIP/blob/main/README.md>`__
 
 You can find more information about this model in the `research
-paper <http/arxiv.oa2103.00020>`__, `OpenAI
-blog <http/openai.cblcl>`__, `model
-card <http/github.copenCLblmamodel-card.md>`__ and
-GitHub `repository <http/github.copenCLIP>`__.
+paper <https://arxiv.org/abs/2103.00020>`__, `OpenAI
+blog <https://openai.com/blog/clip/>`__, `model
+card <https://github.com/openai/CLIP/blob/main/model-card.md>`__ and
+GitHub `repository <https://github.com/openai/CLIP>`__.
 
 In this notebook, we will use
-`openclip-vit-base-patch16 <http/huggingface.openclip-vit-base-patch16>`__,
+`openai/clip-vit-base-patch16 <https://huggingface.co/openai/clip-vit-base-patch16>`__,
 available via Hugging Face Transformers, but the same steps are
 applicable for other CLIP family models.
 
@@ -101,7 +101,7 @@ tokenizer and preparing the images.
 
 .. code:: ipython3
 
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu gradio "openvino>=2023.1.0" "transformers[torch]>=4.30" "datasets" "nncf>=2.6.0"
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu gradio "openvino>=2023.1.0" "transformers[torch]>=4.30" "datasets" "nncf>=2.6.0" "torch>=2.1"
 
 
 .. parsed-literal::
@@ -167,7 +167,7 @@ tokenizer and preparing the images.
 Run PyTorch model inference
 ---------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To perform classification, define labels and load an image in RGB
 format. To give the model wider text context and improve guidance, we
@@ -211,13 +211,13 @@ similarity score for the final result.
 Convert model to OpenVINO Intermediate Representation (IR) format.
 ------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For best results with OpenVINO, it is recommended to convert the model
 to OpenVINO IR format. OpenVINO supports PyTorch via Model conversion
 API. To convert the PyTorch model to OpenVINO IR format we will use
 ``ov.convert_model`` of `model conversion
-API <http/docs.openvino.20openvino-workflmodel-preparation.html>`__.
+API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__.
 The ``ov.convert_model`` Python function returns an OpenVINO Model
 object ready to load on the device and start making predictions. We can
 save it on disk for the next usage with ``ov.save_model``.
@@ -236,7 +236,7 @@ save it on disk for the next usage with ``ov.save_model``.
 Run OpenVINO model
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The steps for making predictions with the OpenVINO CLIP model are
 similar to the PyTorch model. Let us check the model result using the
@@ -252,7 +252,7 @@ same input data from the example above with PyTorch.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -299,14 +299,14 @@ Great! Looks like we got the same result.
 Quantize model to INT8 using NNCF
 ---------------------------------
 
-## Quantize model to INT8 using
+`back to top ⬆️ <#Table-of-contents:>`__ ## Quantize model to INT8 using
 NNCF
 
 The goal of this part of tutorial is to demonstrate how to speed up the
 model by applying 8-bit post-training quantization from
-`NNCF <http/github.copenvinotoolknn>`__ (Neural Network
+`NNCF <https://github.com/openvinotoolkit/nncf/>`__ (Neural Network
 Compression Framework) and infer quantized model via OpenVINO™ Toolkit.
-`NNCF <http/github.copenvinotoolknn>`__ enables
+`NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
 graph and then using a subset of the training dataset to initialize the
 parameters of these additional quantization layers. Quantized operations
@@ -347,7 +347,7 @@ inference faster. The optimization process contains the following steps:
 
     # Fetch skip_kernel_extension module
     urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/skip_kernel_extension.py',
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
         filename='skip_kernel_extension.py'
     )
     
@@ -356,10 +356,10 @@ inference faster. The optimization process contains the following steps:
 Prepare datasets
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The `Conceptual
-Captions <http/ai.google.cresearConceptualCaptio>`__ dataset
+Captions <https://ai.google.com/research/ConceptualCaptions/>`__ dataset
 consisting of ~3.3M images annotated with captions is used to quantize
 model.
 
@@ -507,7 +507,7 @@ model.
 Perform quantization
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Create a quantized model from the pre-trained ``FP16`` model.
 
@@ -627,7 +627,7 @@ Create a quantized model from the pre-trained ``FP16`` model.
 Run quantized OpenVINO model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The steps for making predictions with the quantized OpenVINO CLIP model
 are similar to the PyTorch model. Let us check the model result using
@@ -656,7 +656,7 @@ Nice! Results looks similar to fp16 model results before quantization.
 Compare File Size
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -681,7 +681,7 @@ Compare File Size
 Compare inference time of the FP16 IR and quantized models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To measure the inference
+`back to top ⬆️ <#Table-of-contents:>`__ To measure the inference
 performance of the ``FP16`` and ``INT8`` models, we use median inference
 time on calibration dataset. So we can approximately estimate the speed
 up of the dynamic quantized models.
@@ -724,7 +724,7 @@ up of the dynamic quantized models.
 Interactive demo
 ----------------
 
-## Interactive demo
+`back to top ⬆️ <#Table-of-contents:>`__ ## Interactive demo
 
 Now, it is your turn! You can provide your own image and comma-separated
 list of labels for zero-shot classification.

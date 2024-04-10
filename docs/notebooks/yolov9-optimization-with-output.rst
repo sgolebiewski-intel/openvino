@@ -21,31 +21,31 @@ The tutorial consists of the following steps:
 -  Compare performance of the FP32 and quantized models.
 -  Run optimized model inference on video #### Table of contents:
 
--  `Prerequisites <#prerequisites>`__
--  `Get PyTorch model <#get-pytorch-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Get PyTorch model <#Get-PyTorch-model>`__
 -  `Convert PyTorch model to OpenVINO
-   IR <#convert-pytorch-model-to-openvino-ir>`__
--  `Verify model inference <#verify-model-inference>`__
+   IR <#Convert-PyTorch-model-to-OpenVINO-IR>`__
+-  `Verify model inference <#Verify-model-inference>`__
 
-   -  `Preprocessing <#preprocessing>`__
-   -  `Postprocessing <#postprocessing>`__
-   -  `Select inference device <#select-inference-device>`__
+   -  `Preprocessing <#Preprocessing>`__
+   -  `Postprocessing <#Postprocessing>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Optimize model using NNCF Post-training Quantization
-   API <#optimize-model-using-nncf-post-training-quantization-api>`__
+   API <#Optimize-model-using-NNCF-Post-training-Quantization-API>`__
 
-   -  `Prepare dataset <#prepare-dataset>`__
-   -  `Perform model quantization <#perform-model-quantization>`__
+   -  `Prepare dataset <#Prepare-dataset>`__
+   -  `Perform model quantization <#Perform-model-quantization>`__
 
--  `Run quantized model inference <#run-quantized-model-inference>`__
+-  `Run quantized model inference <#Run-quantized-model-inference>`__
 -  `Compare Performance of the Original and Quantized
-   Models <#compare-performance-of-the-original-and-quantized-models>`__
--  `Run Live Object Detection <#run-live-object-detection>`__
+   Models <#Compare-Performance-of-the-Original-and-Quantized-Models>`__
+-  `Run Live Object Detection <#Run-Live-Object-Detection>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#table-of-contents>`__ ## Prerequisites
+`back to top ⬆️ <#Table-of-contents:>`__ ## Prerequisites
 
 .. code:: ipython3
 
@@ -81,10 +81,14 @@ Prerequisites
 
 .. code:: ipython3
 
-    import sys
     from pathlib import Path
-    sys.path.append("../utils")
-    from notebook_utils import download_file
+    # Fetch `notebook_utils` module
+    import urllib.request
+    urllib.request.urlretrieve(
+        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
+        filename='notebook_utils.py'
+    )
+    from notebook_utils import download_file, VideoPlayer
     
     if not Path('yolov9').exists():
         !git clone https://github.com/WongKinYiu/yolov9
@@ -98,383 +102,42 @@ Prerequisites
 
 .. parsed-literal::
 
-    remote: Enumerating objects: 621, done.[K
-    remote: Counting objects:   0% (1/238)[K
-remote: Counting objects:   1% (3/238)[K
-remote: Counting objects:   2% (5/238)[K
-remote: Counting objects:   3% (8/238)[K
-remote: Counting objects:   4% (10/238)[K
-remote: Counting objects:   5% (12/238)[K
-remote: Counting objects:   6% (15/238)[K
-remote: Counting objects:   7% (17/238)[K
-remote: Counting objects:   8% (20/238)[K
-remote: Counting objects:   9% (22/238)[K
-remote: Counting objects:  10% (24/238)[K
-remote: Counting objects:  11% (27/238)[K
-remote: Counting objects:  12% (29/238)[K
-remote: Counting objects:  13% (31/238)[K
-remote: Counting objects:  14% (34/238)[K
-remote: Counting objects:  15% (36/238)[K
-remote: Counting objects:  16% (39/238)[K
-remote: Counting objects:  17% (41/238)[K
-remote: Counting objects:  18% (43/238)[K
-remote: Counting objects:  19% (46/238)[K
-remote: Counting objects:  20% (48/238)[K
-remote: Counting objects:  21% (50/238)[K
-remote: Counting objects:  22% (53/238)[K
-remote: Counting objects:  23% (55/238)[K
-remote: Counting objects:  24% (58/238)[K
-remote: Counting objects:  25% (60/238)[K
-remote: Counting objects:  26% (62/238)[K
-remote: Counting objects:  27% (65/238)[K
-remote: Counting objects:  28% (67/238)[K
-remote: Counting objects:  29% (70/238)[K
-remote: Counting objects:  30% (72/238)[K
-remote: Counting objects:  31% (74/238)[K
-remote: Counting objects:  32% (77/238)[K
-remote: Counting objects:  33% (79/238)[K
-remote: Counting objects:  34% (81/238)[K
-remote: Counting objects:  35% (84/238)[K
-remote: Counting objects:  36% (86/238)[K
-remote: Counting objects:  37% (89/238)[K
-remote: Counting objects:  38% (91/238)[K
-remote: Counting objects:  39% (93/238)[K
-remote: Counting objects:  40% (96/238)[K
-remote: Counting objects:  41% (98/238)[K
-remote: Counting objects:  42% (100/238)[K
-remote: Counting objects:  43% (103/238)[K
-remote: Counting objects:  44% (105/238)[K
-remote: Counting objects:  45% (108/238)[K
-remote: Counting objects:  46% (110/238)[K
-remote: Counting objects:  47% (112/238)[K
-remote: Counting objects:  48% (115/238)[K
-remote: Counting objects:  49% (117/238)[K
-remote: Counting objects:  50% (119/238)[K
-remote: Counting objects:  51% (122/238)[K
-remote: Counting objects:  52% (124/238)[K
-remote: Counting objects:  53% (127/238)[K
-remote: Counting objects:  54% (129/238)[K
-remote: Counting objects:  55% (131/238)[K
-remote: Counting objects:  56% (134/238)[K
-remote: Counting objects:  57% (136/238)[K
-remote: Counting objects:  58% (139/238)[K
-remote: Counting objects:  59% (141/238)[K
-remote: Counting objects:  60% (143/238)[K
-remote: Counting objects:  61% (146/238)[K
-remote: Counting objects:  62% (148/238)[K
-remote: Counting objects:  63% (150/238)[K
-remote: Counting objects:  64% (153/238)[K
-remote: Counting objects:  65% (155/238)[K
-remote: Counting objects:  66% (158/238)[K
-remote: Counting objects:  67% (160/238)[K
-remote: Counting objects:  68% (162/238)[K
-remote: Counting objects:  69% (165/238)[K
-remote: Counting objects:  70% (167/238)[K
-remote: Counting objects:  71% (169/238)[K
-remote: Counting objects:  72% (172/238)[K
-remote: Counting objects:  73% (174/238)[K
-remote: Counting objects:  74% (177/238)[K
-remote: Counting objects:  75% (179/238)[K
-remote: Counting objects:  76% (181/238)[K
-remote: Counting objects:  77% (184/238)[K
-remote: Counting objects:  78% (186/238)[K
-remote: Counting objects:  79% (189/238)[K
-remote: Counting objects:  80% (191/238)[K
-remote: Counting objects:  81% (193/238)[K
-remote: Counting objects:  82% (196/238)[K
-remote: Counting objects:  83% (198/238)[K
-remote: Counting objects:  84% (200/238)[K
-remote: Counting objects:  85% (203/238)[K
-remote: Counting objects:  86% (205/238)[K
-remote: Counting objects:  87% (208/238)[K
-remote: Counting objects:  88% (210/238)[K
-remote: Counting objects:  89% (212/238)[K
-remote: Counting objects:  90% (215/238)[K
-remote: Counting objects:  91% (217/238)[K
-remote: Counting objects:  92% (219/238)[K
-remote: Counting objects:  93% (222/238)[K
-remote: Counting objects:  94% (224/238)[K
-remote: Counting objects:  95% (227/238)[K
-remote: Counting objects:  96% (229/238)[K
-remote: Counting objects:  97% (231/238)[K
-remote: Counting objects:  98% (234/238)[K
-remote: Counting objects:  99% (236/238)[K
-remote: Counting objects: 100% (238/238)[K
-remote: Counting objects: 100% (238/238), done.[K
-    remote: Compressing objects:   0% (1/116)[K
-remote: Compressing objects:   1% (2/116)[K
-remote: Compressing objects:   2% (3/116)[K
-remote: Compressing objects:   3% (4/116)[K
-remote: Compressing objects:   4% (5/116)[K
-remote: Compressing objects:   5% (6/116)[K
-remote: Compressing objects:   6% (7/116)[K
-remote: Compressing objects:   7% (9/116)[K
-remote: Compressing objects:   8% (10/116)[K
-remote: Compressing objects:   9% (11/116)[K
-remote: Compressing objects:  10% (12/116)[K
-remote: Compressing objects:  11% (13/116)[K
-remote: Compressing objects:  12% (14/116)[K
-remote: Compressing objects:  13% (16/116)[K
-remote: Compressing objects:  14% (17/116)[K
-remote: Compressing objects:  15% (18/116)[K
-remote: Compressing objects:  16% (19/116)[K
-remote: Compressing objects:  17% (20/116)[K
-remote: Compressing objects:  18% (21/116)[K
-remote: Compressing objects:  19% (23/116)[K
-remote: Compressing objects:  20% (24/116)[K
-remote: Compressing objects:  21% (25/116)[K
-remote: Compressing objects:  22% (26/116)[K
-remote: Compressing objects:  23% (27/116)[K
-remote: Compressing objects:  24% (28/116)[K
-remote: Compressing objects:  25% (29/116)[K
-remote: Compressing objects:  26% (31/116)[K
-remote: Compressing objects:  27% (32/116)[K
-remote: Compressing objects:  28% (33/116)[K
-remote: Compressing objects:  29% (34/116)[K
-remote: Compressing objects:  30% (35/116)[K
-remote: Compressing objects:  31% (36/116)[K
-remote: Compressing objects:  32% (38/116)[K
-remote: Compressing objects:  33% (39/116)[K
-remote: Compressing objects:  34% (40/116)[K
-remote: Compressing objects:  35% (41/116)[K
-remote: Compressing objects:  36% (42/116)[K
-remote: Compressing objects:  37% (43/116)[K
-remote: Compressing objects:  38% (45/116)[K
-remote: Compressing objects:  39% (46/116)[K
-remote: Compressing objects:  40% (47/116)[K
-remote: Compressing objects:  41% (48/116)[K
-remote: Compressing objects:  42% (49/116)[K
-remote: Compressing objects:  43% (50/116)[K
-remote: Compressing objects:  44% (52/116)[K
-remote: Compressing objects:  45% (53/116)[K
-remote: Compressing objects:  46% (54/116)[K
-remote: Compressing objects:  47% (55/116)[K
-remote: Compressing objects:  48% (56/116)[K
-remote: Compressing objects:  49% (57/116)[K
-remote: Compressing objects:  50% (58/116)[K
-remote: Compressing objects:  51% (60/116)[K
-remote: Compressing objects:  52% (61/116)[K
-remote: Compressing objects:  53% (62/116)[K
-remote: Compressing objects:  54% (63/116)[K
-remote: Compressing objects:  55% (64/116)[K
-remote: Compressing objects:  56% (65/116)[K
-remote: Compressing objects:  57% (67/116)[K
-remote: Compressing objects:  58% (68/116)[K
-remote: Compressing objects:  59% (69/116)[K
-remote: Compressing objects:  60% (70/116)[K
-remote: Compressing objects:  61% (71/116)[K
-remote: Compressing objects:  62% (72/116)[K
-remote: Compressing objects:  63% (74/116)[K
-remote: Compressing objects:  64% (75/116)[K
-remote: Compressing objects:  65% (76/116)[K
-remote: Compressing objects:  66% (77/116)[K
-remote: Compressing objects:  67% (78/116)[K
-remote: Compressing objects:  68% (79/116)[K
-remote: Compressing objects:  69% (81/116)[K
-remote: Compressing objects:  70% (82/116)[K
-remote: Compressing objects:  71% (83/116)[K
-remote: Compressing objects:  72% (84/116)[K
-remote: Compressing objects:  73% (85/116)[K
-remote: Compressing objects:  74% (86/116)[K
-remote: Compressing objects:  75% (87/116)[K
-remote: Compressing objects:  76% (89/116)[K
-remote: Compressing objects:  77% (90/116)[K
-remote: Compressing objects:  78% (91/116)[K
-remote: Compressing objects:  79% (92/116)[K
-remote: Compressing objects:  80% (93/116)[K
-remote: Compressing objects:  81% (94/116)[K
-remote: Compressing objects:  82% (96/116)[K
-remote: Compressing objects:  83% (97/116)[K
-remote: Compressing objects:  84% (98/116)[K
-remote: Compressing objects:  85% (99/116)[K
-remote: Compressing objects:  86% (100/116)[K
-remote: Compressing objects:  87% (101/116)[K
-remote: Compressing objects:  88% (103/116)[K
-remote: Compressing objects:  89% (104/116)[K
-remote: Compressing objects:  90% (105/116)[K
-remote: Compressing objects:  91% (106/116)[K
-remote: Compressing objects:  92% (107/116)[K
-remote: Compressing objects:  93% (108/116)[K
-remote: Compressing objects:  94% (110/116)[K
-remote: Compressing objects:  95% (111/116)[K
-remote: Compressing objects:  96% (112/116)[K
-remote: Compressing objects:  97% (113/116)[K
-remote: Compressing objects:  98% (114/116)[K
-remote: Compressing objects:  99% (115/116)[K
-remote: Compressing objects: 100% (116/116)[K
-remote: Compressing objects: 100% (116/116), done.[K
+    remote: Enumerating objects: 654, done.[K
+    remote: Counting objects:   3% (1/33)[Kremote: Counting objects:   6% (2/33)[Kremote: Counting objects:   9% (3/33)[Kremote: Counting objects:  12% (4/33)[Kremote: Counting objects:  15% (5/33)[Kremote: Counting objects:  18% (6/33)[Kremote: Counting objects:  21% (7/33)[Kremote: Counting objects:  24% (8/33)[Kremote: Counting objects:  27% (9/33)[Kremote: Counting objects:  30% (10/33)[Kremote: Counting objects:  33% (11/33)[Kremote: Counting objects:  36% (12/33)[Kremote: Counting objects:  39% (13/33)[Kremote: Counting objects:  42% (14/33)[Kremote: Counting objects:  45% (15/33)[Kremote: Counting objects:  48% (16/33)[Kremote: Counting objects:  51% (17/33)[Kremote: Counting objects:  54% (18/33)[Kremote: Counting objects:  57% (19/33)[Kremote: Counting objects:  60% (20/33)[Kremote: Counting objects:  63% (21/33)[Kremote: Counting objects:  66% (22/33)[Kremote: Counting objects:  69% (23/33)[Kremote: Counting objects:  72% (24/33)[Kremote: Counting objects:  75% (25/33)[Kremote: Counting objects:  78% (26/33)[Kremote: Counting objects:  81% (27/33)[Kremote: Counting objects:  84% (28/33)[Kremote: Counting objects:  87% (29/33)[Kremote: Counting objects:  90% (30/33)[Kremote: Counting objects:  93% (31/33)[Kremote: Counting objects:  96% (32/33)[Kremote: Counting objects: 100% (33/33)[Kremote: Counting objects: 100% (33/33), done.[K
+    remote: Compressing objects:   3% (1/26)[Kremote: Compressing objects:   7% (2/26)[Kremote: Compressing objects:  11% (3/26)[Kremote: Compressing objects:  15% (4/26)[Kremote: Compressing objects:  19% (5/26)[Kremote: Compressing objects:  23% (6/26)[Kremote: Compressing objects:  26% (7/26)[Kremote: Compressing objects:  30% (8/26)[Kremote: Compressing objects:  34% (9/26)[Kremote: Compressing objects:  38% (10/26)[Kremote: Compressing objects:  42% (11/26)[Kremote: Compressing objects:  46% (12/26)[Kremote: Compressing objects:  50% (13/26)[Kremote: Compressing objects:  53% (14/26)[Kremote: Compressing objects:  57% (15/26)[Kremote: Compressing objects:  61% (16/26)[Kremote: Compressing objects:  65% (17/26)[Kremote: Compressing objects:  69% (18/26)[Kremote: Compressing objects:  73% (19/26)[Kremote: Compressing objects:  76% (20/26)[Kremote: Compressing objects:  80% (21/26)[Kremote: Compressing objects:  84% (22/26)[Kremote: Compressing objects:  88% (23/26)[Kremote: Compressing objects:  92% (24/26)[Kremote: Compressing objects:  96% (25/26)[Kremote: Compressing objects: 100% (26/26)[Kremote: Compressing objects: 100% (26/26), done.[K
 
 
 .. parsed-literal::
 
-    Receiving objects:   0% (1/621)
+    Receiving objects:   0% (1/654)Receiving objects:   1% (7/654)Receiving objects:   2% (14/654)Receiving objects:   3% (20/654)Receiving objects:   4% (27/654)Receiving objects:   5% (33/654)Receiving objects:   6% (40/654)Receiving objects:   7% (46/654)Receiving objects:   8% (53/654)Receiving objects:   9% (59/654)Receiving objects:  10% (66/654)Receiving objects:  11% (72/654)Receiving objects:  12% (79/654)Receiving objects:  13% (86/654)Receiving objects:  14% (92/654)
 
 .. parsed-literal::
 
-    Receiving objects:   1% (7/621)
-Receiving objects:   2% (13/621)
-Receiving objects:   3% (19/621)
-Receiving objects:   4% (25/621)
-Receiving objects:   5% (32/621)
-Receiving objects:   6% (38/621)
-Receiving objects:   7% (44/621)
-Receiving objects:   8% (50/621)
-Receiving objects:   9% (56/621)
-Receiving objects:  10% (63/621)
-Receiving objects:  11% (69/621)
+    Receiving objects:  15% (99/654)Receiving objects:  16% (105/654)Receiving objects:  17% (112/654)Receiving objects:  18% (118/654)Receiving objects:  19% (125/654)Receiving objects:  20% (131/654)Receiving objects:  21% (138/654)Receiving objects:  22% (144/654)Receiving objects:  23% (151/654)Receiving objects:  24% (157/654)Receiving objects:  25% (164/654)Receiving objects:  26% (171/654)Receiving objects:  27% (177/654)Receiving objects:  28% (184/654)Receiving objects:  29% (190/654)
 
 .. parsed-literal::
 
-    Receiving objects:  12% (75/621)
-Receiving objects:  13% (81/621)
-Receiving objects:  14% (87/621)
-Receiving objects:  15% (94/621)
-Receiving objects:  16% (100/621)
-Receiving objects:  17% (106/621)
-Receiving objects:  18% (112/621)
-Receiving objects:  19% (118/621)
-Receiving objects:  20% (125/621)
-Receiving objects:  21% (131/621)
-Receiving objects:  22% (137/621)
-Receiving objects:  23% (143/621)
-Receiving objects:  24% (150/621)
-Receiving objects:  25% (156/621)
-Receiving objects:  26% (162/621)
-Receiving objects:  27% (168/621)
-Receiving objects:  28% (174/621)
-Receiving objects:  29% (181/621)
-Receiving objects:  30% (187/621)
-Receiving objects:  31% (193/621)
-Receiving objects:  32% (199/621)
-Receiving objects:  33% (205/621)
-Receiving objects:  34% (212/621)
-Receiving objects:  35% (218/621)
-Receiving objects:  36% (224/621)
-Receiving objects:  37% (230/621)
-Receiving objects:  38% (236/621)
-Receiving objects:  39% (243/621)
-Receiving objects:  40% (249/621)
-Receiving objects:  41% (255/621)
-Receiving objects:  42% (261/621)
-Receiving objects:  43% (268/621)
-Receiving objects:  44% (274/621)
-Receiving objects:  45% (280/621)
-Receiving objects:  46% (286/621)
-Receiving objects:  47% (292/621)
-Receiving objects:  48% (299/621)
-Receiving objects:  49% (305/621)
-Receiving objects:  50% (311/621)
-Receiving objects:  51% (317/621)
-Receiving objects:  52% (323/621)
-Receiving objects:  53% (330/621)
-Receiving objects:  54% (336/621)
-Receiving objects:  55% (342/621)
-Receiving objects:  56% (348/621)
-Receiving objects:  57% (354/621)
+    Receiving objects:  30% (197/654)
 
 .. parsed-literal::
 
-    Receiving objects:  58% (361/621)
-Receiving objects:  59% (367/621)
-Receiving objects:  60% (373/621)
-Receiving objects:  61% (379/621)
-Receiving objects:  62% (386/621)
-Receiving objects:  63% (392/621)
-Receiving objects:  64% (398/621)
-Receiving objects:  65% (404/621)
-Receiving objects:  66% (410/621)
-Receiving objects:  67% (417/621)
-Receiving objects:  68% (423/621)
-Receiving objects:  69% (429/621)
-Receiving objects:  70% (435/621)
-Receiving objects:  71% (441/621)
-Receiving objects:  72% (448/621)
-Receiving objects:  73% (454/621)
-Receiving objects:  74% (460/621)
-Receiving objects:  75% (466/621)
-Receiving objects:  76% (472/621)
-Receiving objects:  77% (479/621)
-Receiving objects:  78% (485/621)
-Receiving objects:  79% (491/621)
-Receiving objects:  80% (497/621)
-Receiving objects:  81% (504/621)
-Receiving objects:  82% (510/621)
-Receiving objects:  83% (516/621)
-Receiving objects:  84% (522/621)
-Receiving objects:  85% (528/621)
-Receiving objects:  86% (535/621)
-remote: Total 621 (delta 186), reused 122 (delta 122), pack-reused 383[K
-    Receiving objects:  87% (541/621)
-Receiving objects:  88% (547/621)
-Receiving objects:  89% (553/621)
-Receiving objects:  90% (559/621)
-Receiving objects:  91% (566/621)
-Receiving objects:  92% (572/621)
-Receiving objects:  93% (578/621)
-Receiving objects:  94% (584/621)
-Receiving objects:  95% (590/621)
-Receiving objects:  96% (597/621)
-Receiving objects:  97% (603/621)
-Receiving objects:  98% (609/621)
-Receiving objects:  99% (615/621)
-Receiving objects: 100% (621/621)
-Receiving objects: 100% (621/621), 3.21 MiB | 19.92 MiB/s, done.
-    Resolving deltas:   0% (0/238)
-Resolving deltas:   1% (3/238)
-Resolving deltas:   2% (6/238)
-Resolving deltas:   3% (9/238)
-Resolving deltas:   4% (11/238)
-Resolving deltas:   5% (14/238)
-Resolving deltas:   6% (16/238)
-Resolving deltas:   7% (17/238)
-Resolving deltas:   8% (21/238)
-Resolving deltas:   9% (23/238)
-Resolving deltas:  10% (25/238)
-Resolving deltas:  12% (29/238)
-Resolving deltas:  13% (32/238)
-Resolving deltas:  14% (34/238)
-Resolving deltas:  15% (36/238)
-Resolving deltas:  16% (39/238)
-Resolving deltas:  20% (48/238)
-Resolving deltas:  28% (69/238)
-Resolving deltas:  31% (74/238)
-Resolving deltas:  32% (77/238)
-Resolving deltas:  40% (97/238)
-Resolving deltas:  45% (108/238)
-Resolving deltas:  58% (139/238)
-Resolving deltas:  59% (142/238)
-Resolving deltas:  60% (144/238)
-Resolving deltas:  63% (150/238)
-Resolving deltas:  65% (156/238)
-Resolving deltas:  68% (164/238)
-Resolving deltas:  69% (166/238)
-Resolving deltas:  73% (174/238)
-Resolving deltas:  76% (183/238)
-Resolving deltas:  77% (184/238)
-Resolving deltas:  79% (190/238)
-Resolving deltas:  85% (204/238)
-Resolving deltas:  89% (212/238)
-Resolving deltas:  91% (218/238)
-Resolving deltas:  94% (224/238)
-Resolving deltas:  95% (227/238)
-Resolving deltas:  97% (231/238)
-Resolving deltas:  99% (237/238)
-Resolving deltas: 100% (238/238)
-Resolving deltas: 100% (238/238), done.
+    Receiving objects:  31% (203/654)Receiving objects:  32% (210/654)Receiving objects:  33% (216/654)Receiving objects:  34% (223/654)Receiving objects:  35% (229/654)Receiving objects:  36% (236/654)Receiving objects:  37% (242/654)Receiving objects:  38% (249/654)Receiving objects:  39% (256/654)Receiving objects:  40% (262/654)Receiving objects:  41% (269/654)Receiving objects:  42% (275/654)Receiving objects:  43% (282/654)Receiving objects:  44% (288/654)Receiving objects:  45% (295/654)Receiving objects:  46% (301/654)Receiving objects:  47% (308/654)Receiving objects:  48% (314/654)Receiving objects:  49% (321/654)Receiving objects:  50% (327/654)Receiving objects:  51% (334/654)Receiving objects:  52% (341/654)Receiving objects:  53% (347/654)Receiving objects:  54% (354/654)Receiving objects:  55% (360/654)Receiving objects:  56% (367/654)Receiving objects:  57% (373/654)Receiving objects:  58% (380/654)Receiving objects:  59% (386/654)Receiving objects:  60% (393/654)Receiving objects:  61% (399/654)Receiving objects:  62% (406/654)Receiving objects:  63% (413/654)Receiving objects:  64% (419/654)Receiving objects:  65% (426/654)Receiving objects:  66% (432/654)Receiving objects:  67% (439/654)Receiving objects:  68% (445/654)Receiving objects:  69% (452/654)Receiving objects:  70% (458/654)Receiving objects:  71% (465/654)Receiving objects:  72% (471/654)Receiving objects:  73% (478/654)Receiving objects:  74% (484/654)Receiving objects:  75% (491/654)Receiving objects:  76% (498/654)Receiving objects:  77% (504/654)Receiving objects:  78% (511/654)Receiving objects:  79% (517/654)Receiving objects:  80% (524/654)Receiving objects:  81% (530/654)Receiving objects:  82% (537/654)Receiving objects:  83% (543/654)Receiving objects:  84% (550/654)remote: Total 654 (delta 15), reused 18 (delta 7), pack-reused 621[K
+    Receiving objects:  85% (556/654)Receiving objects:  86% (563/654)Receiving objects:  87% (569/654)Receiving objects:  88% (576/654)Receiving objects:  89% (583/654)Receiving objects:  90% (589/654)Receiving objects:  91% (596/654)Receiving objects:  92% (602/654)Receiving objects:  93% (609/654)Receiving objects:  94% (615/654)Receiving objects:  95% (622/654)Receiving objects:  96% (628/654)Receiving objects:  97% (635/654)Receiving objects:  98% (641/654)Receiving objects:  99% (648/654)Receiving objects: 100% (654/654)Receiving objects: 100% (654/654), 3.24 MiB | 17.54 MiB/s, done.
+    Resolving deltas:   0% (0/254)Resolving deltas:   2% (7/254)Resolving deltas:   3% (9/254)Resolving deltas:   6% (16/254)Resolving deltas:   7% (19/254)Resolving deltas:   8% (22/254)Resolving deltas:  10% (26/254)Resolving deltas:  11% (29/254)Resolving deltas:  13% (35/254)Resolving deltas:  18% (46/254)Resolving deltas:  20% (53/254)Resolving deltas:  29% (74/254)Resolving deltas:  30% (78/254)Resolving deltas:  32% (83/254)Resolving deltas:  33% (85/254)Resolving deltas:  35% (89/254)Resolving deltas:  36% (93/254)Resolving deltas:  39% (100/254)Resolving deltas:  41% (105/254)Resolving deltas:  43% (110/254)Resolving deltas:  51% (132/254)Resolving deltas:  56% (143/254)Resolving deltas:  70% (180/254)Resolving deltas:  74% (188/254)Resolving deltas:  75% (192/254)Resolving deltas:  77% (198/254)Resolving deltas:  79% (202/254)Resolving deltas:  80% (204/254)Resolving deltas:  81% (207/254)Resolving deltas:  82% (210/254)Resolving deltas:  83% (213/254)Resolving deltas:  84% (214/254)Resolving deltas:  88% (224/254)Resolving deltas:  89% (228/254)Resolving deltas:  90% (231/254)Resolving deltas:  91% (233/254)Resolving deltas:  92% (235/254)Resolving deltas:  93% (237/254)Resolving deltas:  95% (242/254)Resolving deltas:  96% (245/254)Resolving deltas:  97% (247/254)Resolving deltas:  98% (251/254)Resolving deltas: 100% (254/254)Resolving deltas: 100% (254/254), done.
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/notebooks/yolov9-optimization/yolov9
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/yolov9-optimization/yolov9
 
 
 Get PyTorch model
 -----------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Generally, PyTorch models represent an instance of the
-`torch.nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
+```torch.nn.Module`` <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
 class, initialized by a state dictionary with model weights. We will use
 the ``gelan-c`` (light-weight version of yolov9) model pre-trained on a
 COCO dataset, which is available in this
@@ -503,14 +166,14 @@ applicable for other models from YOLO V9 family.
 
 .. parsed-literal::
 
-    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/notebooks/yolov9-optimization/yolov9/model/gelan-c.pt')
+    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/yolov9-optimization/yolov9/model/gelan-c.pt')
 
 
 
 Convert PyTorch model to OpenVINO IR
 ------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO supports PyTorch model conversion via Model Conversion API.
 ``ov.convert_model`` function accepts model object and example input for
@@ -569,14 +232,14 @@ using ``ov.save_model``.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/notebooks/yolov9-optimization/yolov9/models/yolo.py:108: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/yolov9-optimization/yolov9/models/yolo.py:108: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       elif self.dynamic or self.shape != shape:
 
 
 Verify model inference
 ----------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To test model work, we create inference pipeline similar to
 ``detect.py``. The pipeline consists of preprocessing step, inference of
@@ -585,7 +248,7 @@ OpenVINO model, and results post-processing to get bounding boxes.
 Preprocessing
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model input is a tensor with the ``[1, 3, 640, 640]`` shape in
 ``N, C, H, W`` format, where
@@ -661,7 +324,7 @@ To keep specific shape, preprocessing automatically enables padding.
 Postprocessing
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model output contains detection boxes candidates. It is a tensor with
 the ``[1,25200,85]`` shape in the ``B, N, 85`` format, where:
@@ -748,7 +411,7 @@ algorithm and rescale boxes coordinates to original image size.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -798,7 +461,7 @@ select device from dropdown list for running inference using OpenVINO
 Optimize model using NNCF Post-training Quantization API
 --------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -813,7 +476,7 @@ YOLOv9. The optimization process contains the following steps:
 Prepare dataset
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The code below downloads COCO dataset and prepares a dataloader that is
 used to evaluate the yolov9 model accuracy. We reuse its subset for
@@ -822,9 +485,6 @@ quantization.
 .. code:: ipython3
 
     from zipfile import ZipFile
-    
-    sys.path.append("../../utils")
-    from notebook_utils import download_file
     
     
     DATA_URL = "http://images.cocodataset.org/zips/val2017.zip"
@@ -878,46 +538,31 @@ quantization.
 
 .. parsed-literal::
 
-    
-val: Scanning coco/val2017...:   0%|          | 0/5000 00:00
+    val: Scanning coco/val2017...:   0%|          | 0/5000 00:00
+
+.. parsed-literal::
+
+    val: Scanning coco/val2017... 1194 images, 10 backgrounds, 0 corrupt:  24%|██▍       | 1204/5000 00:00
+
+.. parsed-literal::
+
+    val: Scanning coco/val2017... 2385 images, 23 backgrounds, 0 corrupt:  48%|████▊     | 2408/5000 00:00
+
+.. parsed-literal::
+
+    val: Scanning coco/val2017... 3520 images, 34 backgrounds, 0 corrupt:  71%|███████   | 3554/5000 00:00
+
+.. parsed-literal::
+
+    val: Scanning coco/val2017... 4649 images, 45 backgrounds, 0 corrupt:  94%|█████████▍| 4694/5000 00:00
+
+.. parsed-literal::
+
+    val: Scanning coco/val2017... 4952 images, 48 backgrounds, 0 corrupt: 100%|██████████| 5000/5000 00:00
 
 .. parsed-literal::
 
     
-val: Scanning coco/val2017... 827 images, 6 backgrounds, 0 corrupt:  17%|█▋        | 833/5000 00:00
-
-.. parsed-literal::
-
-    
-val: Scanning coco/val2017... 1820 images, 14 backgrounds, 0 corrupt:  37%|███▋      | 1834/5000 00:00
-
-.. parsed-literal::
-
-    
-val: Scanning coco/val2017... 2733 images, 26 backgrounds, 0 corrupt:  55%|█████▌    | 2759/5000 00:00
-
-.. parsed-literal::
-
-    
-val: Scanning coco/val2017... 3630 images, 34 backgrounds, 0 corrupt:  73%|███████▎  | 3664/5000 00:00
-
-.. parsed-literal::
-
-    
-val: Scanning coco/val2017... 4637 images, 45 backgrounds, 0 corrupt:  94%|█████████▎| 4682/5000 00:00
-
-.. parsed-literal::
-
-    
-val: Scanning coco/val2017... 4952 images, 48 backgrounds, 0 corrupt: 100%|██████████| 5000/5000 00:00
-
-
-
-    
-
-
-.. parsed-literal::
-
     val: New cache created: coco/val2017.cache
 
 
@@ -955,7 +600,7 @@ expected format.
 Perform model quantization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``nncf.quantize`` function provides an interface for model
 quantization. It requires an instance of the OpenVINO Model and
@@ -980,14 +625,14 @@ asymmetric quantization of activations.
 
 .. parsed-literal::
 
-    2024-03-27 15:36:10.756535: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-27 15:36:10.791012: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-10 01:05:24.897264: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-10 01:05:24.931286: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-03-27 15:36:11.330817: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-10 01:05:25.506732: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 
@@ -1013,7 +658,7 @@ asymmetric quantization of activations.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-644/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
       return Tensor(self.data * unwrap_tensor_data(other))
 
 
@@ -1041,7 +686,7 @@ asymmetric quantization of activations.
 Run quantized model inference
 -----------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 There are no changes in model usage after applying quantization. Let’s
 check the model work on the previously used image.
@@ -1072,7 +717,7 @@ check the model work on the previously used image.
 Compare Performance of the Original and Quantized Models
 --------------------------------------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use the OpenVINO `Benchmark
 Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
@@ -1112,7 +757,7 @@ models.
 
 .. parsed-literal::
 
-    [ INFO ] Read model took 27.92 ms
+    [ INFO ] Read model took 27.53 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     images (node: x) : f32 / [...] / [?,3,?,?]
@@ -1124,7 +769,7 @@ models.
     [Step 5/11] Resizing model to match image sizes and given batch
     [ INFO ] Model batch size: 1
     [ INFO ] Reshaping model: 'images': [1,3,640,640]
-    [ INFO ] Reshape model took 8.68 ms
+    [ INFO ] Reshape model took 8.44 ms
     [Step 6/11] Configuring input of the model
     [ INFO ] Model inputs:
     [ INFO ]     images (node: x) : u8 / [N,C,H,W] / [1,3,640,640]
@@ -1138,13 +783,9 @@ models.
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 582.26 ms
+    [ INFO ] Compile model took 550.18 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
-
-
-.. parsed-literal::
-
     [ INFO ]   NETWORK_NAME: Model0
     [ INFO ]   EXECUTION_DEVICES: ['CPU']
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
@@ -1165,6 +806,10 @@ models.
     [ INFO ]     LOG_LEVEL: Level.NO
     [ INFO ]     NETWORK_NAME: Model0
     [ INFO ]     NUM_STREAMS: 6
+
+
+.. parsed-literal::
+
     [ INFO ]     OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
     [ INFO ]     PERFORMANCE_HINT: THROUGHPUT
     [ INFO ]     PERFORMANCE_HINT_NUM_REQUESTS: 0
@@ -1181,21 +826,21 @@ models.
 
 .. parsed-literal::
 
-    [ INFO ] First inference took 188.96 ms
+    [ INFO ] First inference took 188.89 ms
 
 
 .. parsed-literal::
 
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            222 iterations
-    [ INFO ] Duration:         15351.79 ms
+    [ INFO ] Count:            228 iterations
+    [ INFO ] Duration:         15657.13 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        417.13 ms
-    [ INFO ]    Average:       413.97 ms
-    [ INFO ]    Min:           335.27 ms
-    [ INFO ]    Max:           449.37 ms
-    [ INFO ] Throughput:   14.46 FPS
+    [ INFO ]    Median:        412.39 ms
+    [ INFO ]    Average:       409.78 ms
+    [ INFO ]    Min:           331.11 ms
+    [ INFO ]    Max:           428.16 ms
+    [ INFO ] Throughput:   14.56 FPS
 
 
 .. code:: ipython3
@@ -1224,7 +869,7 @@ models.
 
 .. parsed-literal::
 
-    [ INFO ] Read model took 52.02 ms
+    [ INFO ] Read model took 51.82 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     images (node: x) : f32 / [...] / [1,3,640,640]
@@ -1250,13 +895,9 @@ models.
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 1181.49 ms
+    [ INFO ] Compile model took 1153.85 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
-
-
-.. parsed-literal::
-
     [ INFO ]   NETWORK_NAME: Model0
     [ INFO ]   EXECUTION_DEVICES: ['CPU']
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
@@ -1287,13 +928,17 @@ models.
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'images'!. This input will be filled with random values!
     [ INFO ] Fill input 'images' with random values 
+
+
+.. parsed-literal::
+
     [Step 10/11] Measuring performance (Start inference asynchronously, 6 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
 
 
 .. parsed-literal::
 
-    [ INFO ] First inference took 76.37 ms
+    [ INFO ] First inference took 76.26 ms
 
 
 .. parsed-literal::
@@ -1301,26 +946,25 @@ models.
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
     [ INFO ] Count:            750 iterations
-    [ INFO ] Duration:         15200.68 ms
+    [ INFO ] Duration:         15156.17 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        121.65 ms
-    [ INFO ]    Average:       121.30 ms
-    [ INFO ]    Min:           99.36 ms
-    [ INFO ]    Max:           137.82 ms
-    [ INFO ] Throughput:   49.34 FPS
+    [ INFO ]    Median:        121.38 ms
+    [ INFO ]    Average:       120.96 ms
+    [ INFO ]    Min:           98.67 ms
+    [ INFO ]    Max:           139.65 ms
+    [ INFO ] Throughput:   49.48 FPS
 
 
 Run Live Object Detection
 -------------------------
 
-`back to top ⬆️ <#table-of-contents>`__
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import collections
     import time
     from IPython import display
-    from notebook_utils import VideoPlayer
     import cv2
     
     
