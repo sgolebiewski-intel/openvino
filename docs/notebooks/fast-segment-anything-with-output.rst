@@ -18,7 +18,7 @@ two consecutive stages: all-instance segmentation and prompt-guided
 selection.
 
 In the first stage,
-```YOLOv8-seg`` <https://docs.ultralytics.com/tasks/segment/>`__ is used
+`YOLOv8-seg <https://docs.ultralytics.com/tasks/segment/>`__ is used
 to produce segmentation masks for all instances in the image. In the
 second stage, FastSAM outputs the region-of-interest corresponding to
 the prompt.
@@ -31,38 +31,38 @@ the prompt.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#Prerequisites>`__
+-  `Prerequisites <#prerequisites>`__
 
-   -  `Install requirements <#Install-requirements>`__
-   -  `Imports <#Imports>`__
+   -  `Install requirements <#install-requirements>`__
+   -  `Imports <#imports>`__
 
--  `FastSAM in Ultralytics <#FastSAM-in-Ultralytics>`__
+-  `FastSAM in Ultralytics <#fastsam-in-ultralytics>`__
 -  `Convert the model to OpenVINO Intermediate representation (IR)
-   format <#Convert-the-model-to-OpenVINO-Intermediate-representation-(IR)-format>`__
+   format <#convert-the-model-to-openvino-intermediate-representation-ir-format>`__
 -  `Embedding the converted models into the original
-   pipeline <#Embedding-the-converted-models-into-the-original-pipeline>`__
+   pipeline <#embedding-the-converted-models-into-the-original-pipeline>`__
 
-   -  `Select inference device <#Select-inference-device>`__
+   -  `Select inference device <#select-inference-device>`__
    -  `Adapt OpenVINO models to the original
-      pipeline <#Adapt-OpenVINO-models-to-the-original-pipeline>`__
+      pipeline <#adapt-openvino-models-to-the-original-pipeline>`__
 
 -  `Optimize the model using NNCF Post-training Quantization
-   API <#Optimize-the-model-using-NNCF-Post-training-Quantization-API>`__
+   API <#optimize-the-model-using-nncf-post-training-quantization-api>`__
 
    -  `Compare the performance of the Original and Quantized
-      Models <#Compare-the-performance-of-the-Original-and-Quantized-Models>`__
+      Models <#compare-the-performance-of-the-original-and-quantized-models>`__
 
--  `Try out the converted pipeline <#Try-out-the-converted-pipeline>`__
+-  `Try out the converted pipeline <#try-out-the-converted-pipeline>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 .. code:: ipython3
 
@@ -100,7 +100,7 @@ Install requirements
 Imports
 ~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 .. code:: ipython3
 
@@ -129,7 +129,7 @@ Imports
 FastSAM in Ultralytics
 ----------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 To work with `Fast Segment Anything
 Model <https://github.com/CASIA-IVA-Lab/FastSAM>`__ by
@@ -157,201 +157,250 @@ model and generate a segmentation map.
 
 .. parsed-literal::
 
-      0%|          | 0.00/138M [00:00<?, ?B/s]
+    
+  0%|          | 0.00/138M [00:00<?, ?B/s]
 
 .. parsed-literal::
 
-      0%|          | 256k/138M [00:00<00:55, 2.61MB/s]
+    
+  0%|          | 256k/138M [00:00<00:55, 2.61MB/s]
 
 .. parsed-literal::
 
-      2%|▏         | 2.20M/138M [00:00<00:10, 13.1MB/s]
+    
+  2%|▏         | 2.20M/138M [00:00<00:10, 13.1MB/s]
 
 .. parsed-literal::
 
-      7%|▋         | 10.2M/138M [00:00<00:02, 45.3MB/s]
+    
+  7%|▋         | 10.2M/138M [00:00<00:02, 45.3MB/s]
 
 .. parsed-literal::
 
-     13%|█▎        | 17.5M/138M [00:00<00:02, 57.8MB/s]
+    
+ 13%|█▎        | 17.5M/138M [00:00<00:02, 57.8MB/s]
 
 .. parsed-literal::
 
-     17%|█▋        | 23.0M/138M [00:00<00:02, 41.4MB/s]
+    
+ 17%|█▋        | 23.0M/138M [00:00<00:02, 41.4MB/s]
 
 .. parsed-literal::
 
-     20%|█▉        | 27.5M/138M [00:00<00:02, 40.6MB/s]
+    
+ 20%|█▉        | 27.5M/138M [00:00<00:02, 40.6MB/s]
 
 .. parsed-literal::
 
-     23%|██▎       | 31.8M/138M [00:00<00:02, 41.6MB/s]
+    
+ 23%|██▎       | 31.8M/138M [00:00<00:02, 41.6MB/s]
 
 .. parsed-literal::
 
-     26%|██▌       | 36.0M/138M [00:00<00:02, 42.2MB/s]
+    
+ 26%|██▌       | 36.0M/138M [00:00<00:02, 42.2MB/s]
 
 .. parsed-literal::
 
-     29%|██▉       | 40.2M/138M [00:01<00:03, 33.7MB/s]
+    
+ 29%|██▉       | 40.2M/138M [00:01<00:03, 33.7MB/s]
 
 .. parsed-literal::
 
-     32%|███▏      | 43.8M/138M [00:01<00:02, 34.5MB/s]
+    
+ 32%|███▏      | 43.8M/138M [00:01<00:02, 34.5MB/s]
 
 .. parsed-literal::
 
-     34%|███▍      | 47.3M/138M [00:01<00:02, 34.5MB/s]
+    
+ 34%|███▍      | 47.3M/138M [00:01<00:02, 34.5MB/s]
 
 .. parsed-literal::
 
-     37%|███▋      | 51.5M/138M [00:01<00:02, 37.0MB/s]
+    
+ 37%|███▋      | 51.5M/138M [00:01<00:02, 37.0MB/s]
 
 .. parsed-literal::
 
-     40%|████      | 55.7M/138M [00:01<00:02, 38.8MB/s]
+    
+ 40%|████      | 55.7M/138M [00:01<00:02, 38.8MB/s]
 
 .. parsed-literal::
 
-     43%|████▎     | 59.5M/138M [00:01<00:02, 30.7MB/s]
+    
+ 43%|████▎     | 59.5M/138M [00:01<00:02, 30.7MB/s]
 
 .. parsed-literal::
 
-     46%|████▌     | 63.5M/138M [00:01<00:02, 33.3MB/s]
+    
+ 46%|████▌     | 63.5M/138M [00:01<00:02, 33.3MB/s]
 
 .. parsed-literal::
 
-     48%|████▊     | 66.9M/138M [00:01<00:02, 32.0MB/s]
+    
+ 48%|████▊     | 66.9M/138M [00:01<00:02, 32.0MB/s]
 
 .. parsed-literal::
 
-     51%|█████     | 70.2M/138M [00:02<00:02, 30.7MB/s]
+    
+ 51%|█████     | 70.2M/138M [00:02<00:02, 30.7MB/s]
 
 .. parsed-literal::
 
-     53%|█████▎    | 73.2M/138M [00:02<00:02, 31.0MB/s]
+    
+ 53%|█████▎    | 73.2M/138M [00:02<00:02, 31.0MB/s]
 
 .. parsed-literal::
 
-     55%|█████▌    | 76.3M/138M [00:02<00:02, 31.2MB/s]
+    
+ 55%|█████▌    | 76.3M/138M [00:02<00:02, 31.2MB/s]
 
 .. parsed-literal::
 
-     57%|█████▋    | 79.4M/138M [00:02<00:01, 31.4MB/s]
+    
+ 57%|█████▋    | 79.4M/138M [00:02<00:01, 31.4MB/s]
 
 .. parsed-literal::
 
-     60%|█████▉    | 82.5M/138M [00:02<00:01, 31.8MB/s]
+    
+ 60%|█████▉    | 82.5M/138M [00:02<00:01, 31.8MB/s]
 
 .. parsed-literal::
 
-     62%|██████▏   | 85.6M/138M [00:02<00:01, 31.6MB/s]
+    
+ 62%|██████▏   | 85.6M/138M [00:02<00:01, 31.6MB/s]
 
 .. parsed-literal::
 
-     64%|██████▍   | 88.6M/138M [00:02<00:02, 24.6MB/s]
+    
+ 64%|██████▍   | 88.6M/138M [00:02<00:02, 24.6MB/s]
 
 .. parsed-literal::
 
-     67%|██████▋   | 92.8M/138M [00:02<00:01, 29.2MB/s]
+    
+ 67%|██████▋   | 92.8M/138M [00:02<00:01, 29.2MB/s]
 
 .. parsed-literal::
 
-     69%|██████▉   | 95.9M/138M [00:03<00:01, 26.7MB/s]
+    
+ 69%|██████▉   | 95.9M/138M [00:03<00:01, 26.7MB/s]
 
 .. parsed-literal::
 
-     71%|███████▏  | 98.6M/138M [00:03<00:01, 22.6MB/s]
+    
+ 71%|███████▏  | 98.6M/138M [00:03<00:01, 22.6MB/s]
 
 .. parsed-literal::
 
-     73%|███████▎  | 101M/138M [00:03<00:01, 20.4MB/s] 
+    
+ 73%|███████▎  | 101M/138M [00:03<00:01, 20.4MB/s] 
 
 .. parsed-literal::
 
-     75%|███████▍  | 103M/138M [00:03<00:01, 19.6MB/s]
+    
+ 75%|███████▍  | 103M/138M [00:03<00:01, 19.6MB/s]
 
 .. parsed-literal::
 
-     76%|███████▌  | 105M/138M [00:03<00:01, 19.0MB/s]
+    
+ 76%|███████▌  | 105M/138M [00:03<00:01, 19.0MB/s]
 
 .. parsed-literal::
 
-     77%|███████▋  | 107M/138M [00:03<00:01, 17.9MB/s]
+    
+ 77%|███████▋  | 107M/138M [00:03<00:01, 17.9MB/s]
 
 .. parsed-literal::
 
-     79%|███████▊  | 109M/138M [00:03<00:01, 17.6MB/s]
+    
+ 79%|███████▊  | 109M/138M [00:03<00:01, 17.6MB/s]
 
 .. parsed-literal::
 
-     80%|███████▉  | 110M/138M [00:03<00:01, 17.6MB/s]
+    
+ 80%|███████▉  | 110M/138M [00:03<00:01, 17.6MB/s]
 
 .. parsed-literal::
 
-     81%|████████  | 112M/138M [00:04<00:01, 17.5MB/s]
+    
+ 81%|████████  | 112M/138M [00:04<00:01, 17.5MB/s]
 
 .. parsed-literal::
 
-     82%|████████▏ | 114M/138M [00:04<00:01, 17.5MB/s]
+    
+ 82%|████████▏ | 114M/138M [00:04<00:01, 17.5MB/s]
 
 .. parsed-literal::
 
-     84%|████████▎ | 116M/138M [00:04<00:01, 17.5MB/s]
+    
+ 84%|████████▎ | 116M/138M [00:04<00:01, 17.5MB/s]
 
 .. parsed-literal::
 
-     85%|████████▍ | 117M/138M [00:04<00:01, 17.0MB/s]
+    
+ 85%|████████▍ | 117M/138M [00:04<00:01, 17.0MB/s]
 
 .. parsed-literal::
 
-     86%|████████▌ | 119M/138M [00:04<00:01, 17.6MB/s]
+    
+ 86%|████████▌ | 119M/138M [00:04<00:01, 17.6MB/s]
 
 .. parsed-literal::
 
-     87%|████████▋ | 121M/138M [00:04<00:01, 15.8MB/s]
+    
+ 87%|████████▋ | 121M/138M [00:04<00:01, 15.8MB/s]
 
 .. parsed-literal::
 
-     89%|████████▉ | 123M/138M [00:04<00:00, 18.0MB/s]
+    
+ 89%|████████▉ | 123M/138M [00:04<00:00, 18.0MB/s]
 
 .. parsed-literal::
 
-     90%|█████████ | 125M/138M [00:04<00:00, 18.0MB/s]
+    
+ 90%|█████████ | 125M/138M [00:04<00:00, 18.0MB/s]
 
 .. parsed-literal::
 
-     92%|█████████▏| 127M/138M [00:04<00:00, 17.9MB/s]
+    
+ 92%|█████████▏| 127M/138M [00:04<00:00, 17.9MB/s]
 
 .. parsed-literal::
 
-     93%|█████████▎| 128M/138M [00:05<00:00, 18.0MB/s]
+    
+ 93%|█████████▎| 128M/138M [00:05<00:00, 18.0MB/s]
 
 .. parsed-literal::
 
-     94%|█████████▍| 130M/138M [00:05<00:00, 18.0MB/s]
+    
+ 94%|█████████▍| 130M/138M [00:05<00:00, 18.0MB/s]
 
 .. parsed-literal::
 
-     95%|█████████▌| 132M/138M [00:05<00:00, 18.2MB/s]
+    
+ 95%|█████████▌| 132M/138M [00:05<00:00, 18.2MB/s]
 
 .. parsed-literal::
 
-     97%|█████████▋| 134M/138M [00:05<00:00, 18.2MB/s]
+    
+ 97%|█████████▋| 134M/138M [00:05<00:00, 18.2MB/s]
 
 .. parsed-literal::
 
-     98%|█████████▊| 135M/138M [00:05<00:00, 18.2MB/s]
+    
+ 98%|█████████▊| 135M/138M [00:05<00:00, 18.2MB/s]
 
 .. parsed-literal::
 
-     99%|█████████▉| 137M/138M [00:05<00:00, 15.2MB/s]
+    
+ 99%|█████████▉| 137M/138M [00:05<00:00, 15.2MB/s]
 
 .. parsed-literal::
 
-    100%|██████████| 138M/138M [00:05<00:00, 25.8MB/s]
+    
+100%|██████████| 138M/138M [00:05<00:00, 25.8MB/s]
 
-.. parsed-literal::
+
 
     
 
@@ -362,7 +411,7 @@ model and generate a segmentation map.
     coco_bike.jpg:   0%|          | 0.00/182k [00:00<?, ?B/s]
 
 
-.. parsed-literal::
+
 
     
 
@@ -394,7 +443,7 @@ Observe the results below.
 Convert the model to OpenVINO Intermediate representation (IR) format
 ---------------------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 The Ultralytics Model export API enables conversion of PyTorch models to
 OpenVINO IR format. Under the hood it utilizes the
@@ -457,7 +506,7 @@ tracing. The FastSAM model itself is based on YOLOv8 model.
 Embedding the converted models into the original pipeline
 ---------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 OpenVINO™ Runtime Python API is used to compile the model in OpenVINO IR
 format. The
@@ -473,7 +522,7 @@ used to compile the model.
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Select device that will be used to do models inference using OpenVINO
 from the dropdown list:
@@ -501,7 +550,7 @@ from the dropdown list:
 Adapt OpenVINO models to the original pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Here we create wrapper classes for the OpenVINO model that we want to
 embed in the original inference pipeline. Here are some of the things to
@@ -549,7 +598,7 @@ pipeline.
     ov_results = model(image_uri, device=device.value, retina_masks=True, imgsz=1024, conf=0.6, iou=0.9)
 
 
-.. parsed-literal::
+
 
     
 
@@ -581,7 +630,7 @@ the same as of the original model.
 Optimize the model using NNCF Post-training Quantization API
 ------------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -876,7 +925,7 @@ repo <../yolov8-optimization/>`__.
 Compare the performance of the Original and Quantized Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Finally, we iterate both the OV model and the quantized model over the
 calibration dataset to measure the performance.
@@ -945,7 +994,7 @@ calibration dataset to measure the performance.
 Try out the converted pipeline
 ------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 The demo app below is created using `Gradio
 package <https://www.gradio.app/docs/interface>`__.
@@ -1260,7 +1309,7 @@ based on user input.
 
 
 
-.. raw:: html
 
-    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
+
+
 

@@ -12,24 +12,24 @@ of this notebook provides live inference results from your inputs.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#Imports>`__
--  `The model <#The-model>`__
+-  `Imports <#imports>`__
+-  `The model <#the-model>`__
 
-   -  `Download the model <#Download-the-model>`__
-   -  `Load the model <#Load-the-model>`__
+   -  `Download the model <#download-the-model>`__
+   -  `Load the model <#load-the-model>`__
 
-      -  `Select inference device <#Select-inference-device>`__
+      -  `Select inference device <#select-inference-device>`__
 
--  `Processing <#Processing>`__
+-  `Processing <#processing>`__
 
-   -  `Preprocessing <#Preprocessing>`__
-   -  `Postprocessing <#Postprocessing>`__
-   -  `Main Processing Function <#Main-Processing-Function>`__
+   -  `Preprocessing <#preprocessing>`__
+   -  `Postprocessing <#postprocessing>`__
+   -  `Main Processing Function <#main-processing-function>`__
 
--  `Run <#Run>`__
+-  `Run <#run>`__
 
-   -  `Run on local paragraphs <#Run-on-local-paragraphs>`__
-   -  `Run on websites <#Run-on-websites>`__
+   -  `Run on local paragraphs <#run-on-local-paragraphs>`__
+   -  `Run on websites <#run-on-websites>`__
 
 .. code:: ipython3
 
@@ -49,7 +49,7 @@ Table of contents:
 Imports
 -------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 .. code:: ipython3
 
@@ -101,12 +101,12 @@ Imports
 The model
 ---------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Download the model
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Download pretrained models from
 https://storage.openvinotoolkit.org/repositories/open_model_zoo. If the
@@ -163,7 +163,7 @@ converted to OpenVINO Intermediate Representation (OpenVINO IR).
 Load the model
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Downloaded models are located in a fixed structure, which indicates a
 vendor, a model name and a precision. Only a few lines of code are
@@ -182,7 +182,7 @@ You can choose ``CPU`` or ``GPU`` for this model.
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -242,7 +242,7 @@ for BERT-large-like model.
 Processing
 ----------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 NLP models usually take a list of tokens as a standard input. A token is
 a single word converted to some integer. To provide the proper input,
@@ -292,7 +292,7 @@ content from provided URLs.
 Preprocessing
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 The input size in this case is 384 tokens long. The main input
 (``input_ids``) to used BERT model consists of two parts: question
@@ -377,7 +377,7 @@ documentation <https://github.com/openvinotoolkit/open_model_zoo/tree/master/mod
 Postprocessing
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 The results from the network are raw (logits). Use the softmax function
 to get the probability distribution. Then, find the best answer in the
@@ -472,7 +472,7 @@ answer should come with the highest score.
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Run question answering on a specific knowledge base (websites) and
 iterate through the questions.
@@ -516,12 +516,12 @@ iterate through the questions.
 Run
 ---
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Run on local paragraphs
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Change sources to your own to answer your questions. You can use as many
 sources as you want. Usually, you need to wait a few seconds for the
@@ -579,7 +579,7 @@ questions in the box.**
 Run on websites
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 You can also provide URLs. Note that the context (a knowledge base) is
 built from paragraphs on websites. If some information is outside the

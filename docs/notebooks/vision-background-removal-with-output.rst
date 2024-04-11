@@ -17,36 +17,36 @@ The model source is available
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Preparation <#Preparation>`__
+-  `Preparation <#preparation>`__
 
-   -  `Install requirements <#Install-requirements>`__
+   -  `Install requirements <#install-requirements>`__
    -  `Import the PyTorch Library and
-      U\ :math:`^2`-Net <#Import-the-PyTorch-Library-and-U2-Net>`__
-   -  `Settings <#Settings>`__
-   -  `Load the U\ :math:`^2`-Net Model <#Load-the-U2-Net-Model>`__
+      U\ :math:`^2`-Net <#import-the-pytorch-library-and-u2-net>`__
+   -  `Settings <#settings>`__
+   -  `Load the U\ :math:`^2`-Net Model <#load-the-u2-net-model>`__
 
 -  `Convert PyTorch U\ :math:`^2`-Net model to OpenVINO
-   IR <#Convert-PyTorch-U2-Net-model-to-OpenVINO-IR>`__
+   IR <#convert-pytorch-u2-net-model-to-openvino-ir>`__
 -  `Load and Pre-Process Input
-   Image <#Load-and-Pre-Process-Input-Image>`__
--  `Select inference device <#Select-inference-device>`__
+   Image <#load-and-pre-process-input-image>`__
+-  `Select inference device <#select-inference-device>`__
 -  `Do Inference on OpenVINO IR
-   Model <#Do-Inference-on-OpenVINO-IR-Model>`__
--  `Visualize Results <#Visualize-Results>`__
+   Model <#do-inference-on-openvino-ir-model>`__
+-  `Visualize Results <#visualize-results>`__
 
-   -  `Add a Background Image <#Add-a-Background-Image>`__
+   -  `Add a Background Image <#add-a-background-image>`__
 
--  `References <#References>`__
+-  `References <#references>`__
 
 Preparation
 -----------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 .. code:: ipython3
 
@@ -105,7 +105,7 @@ Install requirements
 Import the PyTorch Library and U\ :math:`^2`-Net
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 .. code:: ipython3
 
@@ -139,7 +139,7 @@ Import the PyTorch Library and U\ :math:`^2`-Net
 Settings
 ~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 This tutorial supports using the original U\ :math:`^2`-Net salient
 object detection model, as well as the smaller U2NETP version. Two sets
@@ -181,7 +181,7 @@ detection and human segmentation.
 Load the U\ :math:`^2`-Net Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 The U\ :math:`^2`-Net human segmentation model weights are stored on
 Google Drive. They will be downloaded if they are not present yet. The
@@ -213,22 +213,25 @@ next cell loads the model and the pre-trained weights.
 
 .. parsed-literal::
 
-      0%|          | 0.00/4.68M [00:00<?, ?B/s]
+    
+  0%|          | 0.00/4.68M [00:00<?, ?B/s]
 
 .. parsed-literal::
 
-     34%|███▎      | 1.57M/4.68M [00:00<00:00, 14.4MB/s]
+    
+ 34%|███▎      | 1.57M/4.68M [00:00<00:00, 14.4MB/s]
 
 .. parsed-literal::
 
-    100%|██████████| 4.68M/4.68M [00:00<00:00, 33.2MB/s]
+    
+100%|██████████| 4.68M/4.68M [00:00<00:00, 33.2MB/s]
 
 .. parsed-literal::
 
     Model weights have been downloaded to model/u2net_lite/u2net_lite.pth
 
 
-.. parsed-literal::
+
 
     
 
@@ -260,7 +263,7 @@ next cell loads the model and the pre-trained weights.
 Convert PyTorch U\ :math:`^2`-Net model to OpenVINO IR
 ------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 We use model conversion Python API to convert the Pytorch model to
 OpenVINO IR format. Executing the following command may take a while.
@@ -279,7 +282,7 @@ OpenVINO IR format. Executing the following command may take a while.
 Load and Pre-Process Input Image
 --------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 While OpenCV reads images in ``BGR`` format, the OpenVINO IR model
 expects images in ``RGB``. Therefore, convert the images to ``RGB``,
@@ -317,7 +320,7 @@ repository <https://github.com/xuebinqin/U-2-Net/>`__ and multiplied by
 Select inference device
 -----------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -347,7 +350,7 @@ select device from dropdown list for running inference using OpenVINO
 Do Inference on OpenVINO IR Model
 ---------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Load the OpenVINO IR model to OpenVINO Runtime and do inference.
 
@@ -378,7 +381,7 @@ Load the OpenVINO IR model to OpenVINO Runtime and do inference.
 Visualize Results
 -----------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 Show the original image, the segmentation result, and the original image
 with the background removed.
@@ -411,7 +414,7 @@ with the background removed.
 Add a Background Image
 ~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 In the segmentation result, all foreground pixels have a value of 1, all
 background pixels a value of 0. Replace the background image as follows:
@@ -478,7 +481,7 @@ background pixels a value of 0. Replace the background image as follows:
 References
 ----------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+
 
 -  `PIP install
    openvino-dev <https://github.com/openvinotoolkit/openvino/blob/releases/2023/2/docs/install_guides/pypi-openvino-dev.md>`__
