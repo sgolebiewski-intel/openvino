@@ -50,9 +50,9 @@ Prerequisites
 .. code:: ipython3
 
     import platform
-    
+
     %pip install -q "openvino>=2023.3.0" "nncf>=2.8.1" "opencv-python" "seaborn" "pandas" "scikit-learn" "torch" "torchvision"  --extra-index-url https://download.pytorch.org/whl/cpu
-    
+
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
     else:
@@ -62,7 +62,7 @@ Prerequisites
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -72,7 +72,7 @@ Prerequisites
 .. parsed-literal::
 
     DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
-    
+
 
 .. parsed-literal::
 
@@ -89,7 +89,7 @@ Prerequisites
         filename='notebook_utils.py'
     )
     from notebook_utils import download_file, VideoPlayer
-    
+
     if not Path('yolov9').exists():
         !git clone https://github.com/WongKinYiu/yolov9
     %cd yolov9
@@ -104,103 +104,103 @@ Prerequisites
 
     remote: Enumerating objects: 654, done.[K
     remote: Counting objects:   3% (1/33)[K
-remote: Counting objects:   6% (2/33)[K
-remote: Counting objects:   9% (3/33)[K
-remote: Counting objects:  12% (4/33)[K
-remote: Counting objects:  15% (5/33)[K
-remote: Counting objects:  18% (6/33)[K
-remote: Counting objects:  21% (7/33)[K
-remote: Counting objects:  24% (8/33)[K
-remote: Counting objects:  27% (9/33)[K
-remote: Counting objects:  30% (10/33)[K
-remote: Counting objects:  33% (11/33)[K
-remote: Counting objects:  36% (12/33)[K
-remote: Counting objects:  39% (13/33)[K
-remote: Counting objects:  42% (14/33)[K
-remote: Counting objects:  45% (15/33)[K
-remote: Counting objects:  48% (16/33)[K
-remote: Counting objects:  51% (17/33)[K
-remote: Counting objects:  54% (18/33)[K
-remote: Counting objects:  57% (19/33)[K
-remote: Counting objects:  60% (20/33)[K
-remote: Counting objects:  63% (21/33)[K
-remote: Counting objects:  66% (22/33)[K
-remote: Counting objects:  69% (23/33)[K
-remote: Counting objects:  72% (24/33)[K
-remote: Counting objects:  75% (25/33)[K
-remote: Counting objects:  78% (26/33)[K
-remote: Counting objects:  81% (27/33)[K
-remote: Counting objects:  84% (28/33)[K
-remote: Counting objects:  87% (29/33)[K
-remote: Counting objects:  90% (30/33)[K
-remote: Counting objects:  93% (31/33)[K
-remote: Counting objects:  96% (32/33)[K
-remote: Counting objects: 100% (33/33)[K
-remote: Counting objects: 100% (33/33), done.[K
+    remote: Counting objects:   6% (2/33)[K
+    remote: Counting objects:   9% (3/33)[K
+    remote: Counting objects:  12% (4/33)[K
+    remote: Counting objects:  15% (5/33)[K
+    remote: Counting objects:  18% (6/33)[K
+    remote: Counting objects:  21% (7/33)[K
+    remote: Counting objects:  24% (8/33)[K
+    remote: Counting objects:  27% (9/33)[K
+    remote: Counting objects:  30% (10/33)[K
+    remote: Counting objects:  33% (11/33)[K
+    remote: Counting objects:  36% (12/33)[K
+    remote: Counting objects:  39% (13/33)[K
+    remote: Counting objects:  42% (14/33)[K
+    remote: Counting objects:  45% (15/33)[K
+    remote: Counting objects:  48% (16/33)[K
+    remote: Counting objects:  51% (17/33)[K
+    remote: Counting objects:  54% (18/33)[K
+    remote: Counting objects:  57% (19/33)[K
+    remote: Counting objects:  60% (20/33)[K
+    remote: Counting objects:  63% (21/33)[K
+    remote: Counting objects:  66% (22/33)[K
+    remote: Counting objects:  69% (23/33)[K
+    remote: Counting objects:  72% (24/33)[K
+    remote: Counting objects:  75% (25/33)[K
+    remote: Counting objects:  78% (26/33)[K
+    remote: Counting objects:  81% (27/33)[K
+    remote: Counting objects:  84% (28/33)[K
+    remote: Counting objects:  87% (29/33)[K
+    remote: Counting objects:  90% (30/33)[K
+    remote: Counting objects:  93% (31/33)[K
+    remote: Counting objects:  96% (32/33)[K
+    remote: Counting objects: 100% (33/33)[K
+    remote: Counting objects: 100% (33/33), done.[K
     remote: Compressing objects:   3% (1/26)[K
-remote: Compressing objects:   7% (2/26)[K
-remote: Compressing objects:  11% (3/26)[K
-remote: Compressing objects:  15% (4/26)[K
-remote: Compressing objects:  19% (5/26)[K
-remote: Compressing objects:  23% (6/26)[K
-remote: Compressing objects:  26% (7/26)[K
-remote: Compressing objects:  30% (8/26)[K
-remote: Compressing objects:  34% (9/26)[K
-remote: Compressing objects:  38% (10/26)[K
-remote: Compressing objects:  42% (11/26)[K
-remote: Compressing objects:  46% (12/26)[K
-remote: Compressing objects:  50% (13/26)[K
-remote: Compressing objects:  53% (14/26)[K
-remote: Compressing objects:  57% (15/26)[K
-remote: Compressing objects:  61% (16/26)[K
-remote: Compressing objects:  65% (17/26)[K
-remote: Compressing objects:  69% (18/26)[K
-remote: Compressing objects:  73% (19/26)[K
-remote: Compressing objects:  76% (20/26)[K
-remote: Compressing objects:  80% (21/26)[K
-remote: Compressing objects:  84% (22/26)[K
-remote: Compressing objects:  88% (23/26)[K
-remote: Compressing objects:  92% (24/26)[K
-remote: Compressing objects:  96% (25/26)[K
-remote: Compressing objects: 100% (26/26)[K
-remote: Compressing objects: 100% (26/26), done.[K
+    remote: Compressing objects:   7% (2/26)[K
+    remote: Compressing objects:  11% (3/26)[K
+    remote: Compressing objects:  15% (4/26)[K
+    remote: Compressing objects:  19% (5/26)[K
+    remote: Compressing objects:  23% (6/26)[K
+    remote: Compressing objects:  26% (7/26)[K
+    remote: Compressing objects:  30% (8/26)[K
+    remote: Compressing objects:  34% (9/26)[K
+    remote: Compressing objects:  38% (10/26)[K
+    remote: Compressing objects:  42% (11/26)[K
+    remote: Compressing objects:  46% (12/26)[K
+    remote: Compressing objects:  50% (13/26)[K
+    remote: Compressing objects:  53% (14/26)[K
+    remote: Compressing objects:  57% (15/26)[K
+    remote: Compressing objects:  61% (16/26)[K
+    remote: Compressing objects:  65% (17/26)[K
+    remote: Compressing objects:  69% (18/26)[K
+    remote: Compressing objects:  73% (19/26)[K
+    remote: Compressing objects:  76% (20/26)[K
+    remote: Compressing objects:  80% (21/26)[K
+    remote: Compressing objects:  84% (22/26)[K
+    remote: Compressing objects:  88% (23/26)[K
+    remote: Compressing objects:  92% (24/26)[K
+    remote: Compressing objects:  96% (25/26)[K
+    remote: Compressing objects: 100% (26/26)[K
+    remote: Compressing objects: 100% (26/26), done.[K
 
 
 .. parsed-literal::
 
     Receiving objects:   0% (1/654)
-Receiving objects:   1% (7/654)
-Receiving objects:   2% (14/654)
-Receiving objects:   3% (20/654)
-Receiving objects:   4% (27/654)
-Receiving objects:   5% (33/654)
-Receiving objects:   6% (40/654)
-Receiving objects:   7% (46/654)
-Receiving objects:   8% (53/654)
-Receiving objects:   9% (59/654)
-Receiving objects:  10% (66/654)
-Receiving objects:  11% (72/654)
-Receiving objects:  12% (79/654)
-Receiving objects:  13% (86/654)
-Receiving objects:  14% (92/654)
+    Receiving objects:   1% (7/654)
+    Receiving objects:   2% (14/654)
+    Receiving objects:   3% (20/654)
+    Receiving objects:   4% (27/654)
+    Receiving objects:   5% (33/654)
+    Receiving objects:   6% (40/654)
+    Receiving objects:   7% (46/654)
+    Receiving objects:   8% (53/654)
+    Receiving objects:   9% (59/654)
+    Receiving objects:  10% (66/654)
+    Receiving objects:  11% (72/654)
+    Receiving objects:  12% (79/654)
+    Receiving objects:  13% (86/654)
+    Receiving objects:  14% (92/654)
 
 .. parsed-literal::
 
     Receiving objects:  15% (99/654)
-Receiving objects:  16% (105/654)
-Receiving objects:  17% (112/654)
-Receiving objects:  18% (118/654)
-Receiving objects:  19% (125/654)
-Receiving objects:  20% (131/654)
-Receiving objects:  21% (138/654)
-Receiving objects:  22% (144/654)
-Receiving objects:  23% (151/654)
-Receiving objects:  24% (157/654)
-Receiving objects:  25% (164/654)
-Receiving objects:  26% (171/654)
-Receiving objects:  27% (177/654)
-Receiving objects:  28% (184/654)
-Receiving objects:  29% (190/654)
+    Receiving objects:  16% (105/654)
+    Receiving objects:  17% (112/654)
+    Receiving objects:  18% (118/654)
+    Receiving objects:  19% (125/654)
+    Receiving objects:  20% (131/654)
+    Receiving objects:  21% (138/654)
+    Receiving objects:  22% (144/654)
+    Receiving objects:  23% (151/654)
+    Receiving objects:  24% (157/654)
+    Receiving objects:  25% (164/654)
+    Receiving objects:  26% (171/654)
+    Receiving objects:  27% (177/654)
+    Receiving objects:  28% (184/654)
+    Receiving objects:  29% (190/654)
 
 .. parsed-literal::
 
@@ -352,7 +352,7 @@ applicable for other models from YOLO V9 family.
     MODEL_DIR = Path("model/")
     MODEL_DIR.mkdir(exist_ok=True)
     DATA_DIR.mkdir(exist_ok=True)
-    
+
     download_file(MODEL_LINK, directory=MODEL_DIR, show_progress=True)
 
 
@@ -389,27 +389,27 @@ using ``ov.save_model``.
     import openvino as ov
     from models.yolo import Detect, DualDDetect
     from utils.general import yaml_save, yaml_load
-    
+
     weights = MODEL_DIR / "gelan-c.pt"
     ov_model_path = MODEL_DIR / weights.name.replace(".pt", "_openvino_model") / weights.name.replace(".pt", ".xml")
-    
+
     if not ov_model_path.exists():
         model = attempt_load(weights, device="cpu", inplace=True, fuse=True)
         metadata = {'stride': int(max(model.stride)), 'names': model.names}
-    
+
         model.eval()
         for k, m in model.named_modules():
             if isinstance(m, (Detect, DualDDetect)):
                 m.inplace = False
                 m.dynamic = True
                 m.export = True
-        
-        
+
+
         example_input = torch.zeros((1, 3, 640, 640))
         model(example_input)
-        
+
         ov_model = ov.convert_model(model, example_input=example_input)
-        
+
         # specify input and output names for compatibility with yolov9 repo interface
         ov_model.outputs[0].get_tensor().set_names({"output0"})
         ov_model.inputs[0].get_tensor().set_names({"images"})
@@ -422,7 +422,7 @@ using ``ov.save_model``.
 
 .. parsed-literal::
 
-    Fusing layers... 
+    Fusing layers...
 
 
 .. parsed-literal::
@@ -471,15 +471,15 @@ To keep specific shape, preprocessing automatically enables padding.
     import torch
     from PIL import Image
     from utils.augmentations import letterbox
-    
+
     image_url = "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/7b6af406-4ccb-4ded-a13d-62b7c0e42e96"
     download_file(image_url, directory=DATA_DIR, filename="test_image.jpg", show_progress=True)
-    
+
     def preprocess_image(img0: np.ndarray):
         """
-        Preprocess image according to YOLOv9 input requirements. 
+        Preprocess image according to YOLOv9 input requirements.
         Takes image in np.array format, resizes it to specific size using letterbox resize, converts color space from BGR (default in OpenCV) to RGB and changes data layout from HWC to CHW.
-        
+
         Parameters:
           img0 (np.ndarray): image for preprocessing
         Returns:
@@ -488,18 +488,18 @@ To keep specific shape, preprocessing automatically enables padding.
         """
         # resize
         img = letterbox(img0, auto=False)[0]
-        
+
         # Convert
         img = img.transpose(2, 0, 1)
         img = np.ascontiguousarray(img)
         return img, img0
-    
-    
+
+
     def prepare_input_tensor(image: np.ndarray):
         """
-        Converts preprocessed image to tensor format according to YOLOv9 input requirements. 
+        Converts preprocessed image to tensor format according to YOLOv9 input requirements.
         Takes image in np.array format with unit8 data in [0, 255] range and converts it to torch.Tensor object with float data in [0, 1] range
-        
+
         Parameters:
           image (np.ndarray): image for conversion to tensor
         Returns:
@@ -507,11 +507,11 @@ To keep specific shape, preprocessing automatically enables padding.
         """
         input_tensor = image.astype(np.float32)  # uint8 to fp16/32
         input_tensor /= 255.0  # 0 - 255 to 0.0 - 1.0
-        
+
         if input_tensor.ndim == 3:
             input_tensor = np.expand_dims(input_tensor, 0)
         return input_tensor
-    
+
     NAMES = metadata["names"]
 
 
@@ -547,11 +547,11 @@ algorithm and rescale boxes coordinates to original image size.
 .. code:: ipython3
 
     from utils.plots import Annotator, colors
-    
+
     from typing import List, Tuple
     from utils.general import scale_boxes, non_max_suppression
-    
-    
+
+
     def detect(model: ov.Model, image_path: Path, conf_thres: float = 0.25, iou_thres: float = 0.45, classes: List[int] = None, agnostic_nms: bool = False):
         """
         OpenVINO YOLOv9 model inference function. Reads image, preprocess it, runs model inference and postprocess results using NMS.
@@ -563,7 +563,7 @@ algorithm and rescale boxes coordinates to original image size.
             classes (List[int], *optional*, None): labels for prediction filtering, if not provided all predicted labels will be used
             agnostic_nms (bool, *optional*, False): apply class agnostic NMS approach or not
         Returns:
-           pred (List): list of detections with (n,6) shape, where n - number of detected boxes in format [x1, y1, x2, y2, score, label] 
+           pred (List): list of detections with (n,6) shape, where n - number of detected boxes in format [x1, y1, x2, y2, score, label]
            orig_img (np.ndarray): image before preprocessing, can be used for results visualization
            inpjut_shape (Tuple[int]): shape of model input tensor, can be used for output rescaling
         """
@@ -576,8 +576,8 @@ algorithm and rescale boxes coordinates to original image size.
         predictions = torch.from_numpy(model(input_tensor)[0])
         pred = non_max_suppression(predictions, conf_thres, iou_thres, classes=classes, agnostic=agnostic_nms)
         return pred, orig_img, input_tensor.shape
-    
-    
+
+
     def draw_boxes(predictions: np.ndarray, input_shape: Tuple[int], image: np.ndarray, names: List[str]):
         """
         Utility function for drawing predicted bounding boxes on image
@@ -591,11 +591,11 @@ algorithm and rescale boxes coordinates to original image size.
         """
         if not len(predictions):
             return image
-    
+
         annotator = Annotator(image, line_width=1, example=str(names))
         # Rescale boxes from input size to original image size
         predictions[:, :4] = scale_boxes(input_shape[2:], predictions[:, :4], image.shape).round()
-    
+
         # Write results
         for *xyxy, conf, cls in reversed(predictions):
             label = f'{names[int(cls)]} {conf:.2f}'
@@ -618,14 +618,14 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     import ipywidgets as widgets
-    
+
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
         value='AUTO',
         description='Device:',
         disabled=False,
     )
-    
+
     device
 
 
@@ -685,16 +685,16 @@ quantization.
 .. code:: ipython3
 
     from zipfile import ZipFile
-    
-    
+
+
     DATA_URL = "http://images.cocodataset.org/zips/val2017.zip"
     LABELS_URL = "https://github.com/ultralytics/yolov5/releases/download/v1.0/coco2017labels-segments.zip"
-    
+
     OUT_DIR = Path('.')
-    
+
     download_file(DATA_URL, directory=OUT_DIR, show_progress=True)
     download_file(LABELS_URL, directory=OUT_DIR, show_progress=True)
-    
+
     if not (OUT_DIR / "coco/labels").exists():
         with ZipFile('coco2017labels-segments.zip' , "r") as zip_ref:
             zip_ref.extractall(OUT_DIR)
@@ -720,12 +720,12 @@ quantization.
     import yaml
     from utils.dataloaders import create_dataloader
     from utils.general import colorstr
-    
+
     # read dataset config
     DATA_CONFIG = 'data/coco.yaml'
     with open(DATA_CONFIG) as f:
         data = yaml.load(f, Loader=yaml.SafeLoader)
-    
+
     # Dataloader
     TASK = 'val'  # path to train/val/test images
     Option = namedtuple('Options', ['single_cls'])  # imitation of commandline provided options for single class evaluation
@@ -738,37 +738,37 @@ quantization.
 
 .. parsed-literal::
 
-    
-val: Scanning coco/val2017...:   0%|          | 0/5000 00:00
+
+    val: Scanning coco/val2017...:   0%|          | 0/5000 00:00
 
 .. parsed-literal::
 
-    
-val: Scanning coco/val2017... 1194 images, 10 backgrounds, 0 corrupt:  24%|██▍       | 1204/5000 00:00
+
+    val: Scanning coco/val2017... 1194 images, 10 backgrounds, 0 corrupt:  24%|██▍       | 1204/5000 00:00
 
 .. parsed-literal::
 
-    
-val: Scanning coco/val2017... 2385 images, 23 backgrounds, 0 corrupt:  48%|████▊     | 2408/5000 00:00
+
+    val: Scanning coco/val2017... 2385 images, 23 backgrounds, 0 corrupt:  48%|████▊     | 2408/5000 00:00
 
 .. parsed-literal::
 
-    
-val: Scanning coco/val2017... 3520 images, 34 backgrounds, 0 corrupt:  71%|███████   | 3554/5000 00:00
+
+    val: Scanning coco/val2017... 3520 images, 34 backgrounds, 0 corrupt:  71%|███████   | 3554/5000 00:00
 
 .. parsed-literal::
 
-    
-val: Scanning coco/val2017... 4649 images, 45 backgrounds, 0 corrupt:  94%|█████████▍| 4694/5000 00:00
+
+    val: Scanning coco/val2017... 4649 images, 45 backgrounds, 0 corrupt:  94%|█████████▍| 4694/5000 00:00
 
 .. parsed-literal::
 
-    
-val: Scanning coco/val2017... 4952 images, 48 backgrounds, 0 corrupt: 100%|██████████| 5000/5000 00:00
+
+    val: Scanning coco/val2017... 4952 images, 48 backgrounds, 0 corrupt: 100%|██████████| 5000/5000 00:00
 
 .. parsed-literal::
 
-    
+
     val: New cache created: coco/val2017.cache
 
 
@@ -780,8 +780,8 @@ expected format.
 .. code:: ipython3
 
     import nncf
-    
-    
+
+
     def transform_fn(data_item):
         """
         Quantization transform function. Extracts and preprocess input data from dataloader item for quantization.
@@ -791,10 +791,10 @@ expected format.
             input_tensor: Input data for quantization
         """
         img = data_item[0].numpy()
-        input_tensor = prepare_input_tensor(img) 
+        input_tensor = prepare_input_tensor(img)
         return input_tensor
-    
-    
+
+
     quantization_dataset = nncf.Dataset(dataloader, transform_fn)
 
 
@@ -821,10 +821,10 @@ asymmetric quantization of activations.
 .. code:: ipython3
 
     ov_int8_model_path = MODEL_DIR / weights.name.replace(".pt","_int8_openvino_model") / weights.name.replace(".pt", "_int8.xml")
-    
+
     if not ov_int8_model_path.exists():
         quantized_model = nncf.quantize(ov_model, quantization_dataset, preset=nncf.QuantizationPreset.MIXED)
-    
+
         ov.save_model(quantized_model, ov_int8_model_path)
         yaml_save(ov_int8_model_path.parent / weights.name.replace(".pt", "_int8.yaml"), metadata)
 
@@ -900,10 +900,10 @@ check the model work on the previously used image.
 .. code:: ipython3
 
     quantized_model = core.read_model(ov_int8_model_path)
-    
+
     if device.value != "CPU":
         quantized_model.reshape({0: [1, 3, 640, 640]})
-    
+
     compiled_model = core.compile_model(quantized_model, device.value)
 
 .. code:: ipython3
@@ -949,12 +949,12 @@ models.
     [Step 2/11] Loading OpenVINO Runtime
     [ INFO ] OpenVINO:
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
+    [ INFO ]
     [ INFO ] Device info:
     [ INFO ] AUTO
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
-    [ INFO ] 
+    [ INFO ]
+    [ INFO ]
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
@@ -1025,7 +1025,7 @@ models.
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'images'!. This input will be filled with random values!
-    [ INFO ] Fill input 'images' with random values 
+    [ INFO ] Fill input 'images' with random values
     [Step 10/11] Measuring performance (Start inference asynchronously, 6 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
 
@@ -1061,12 +1061,12 @@ models.
     [Step 2/11] Loading OpenVINO Runtime
     [ INFO ] OpenVINO:
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
+    [ INFO ]
     [ INFO ] Device info:
     [ INFO ] AUTO
     [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
-    [ INFO ] 
-    [ INFO ] 
+    [ INFO ]
+    [ INFO ]
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
@@ -1133,7 +1133,7 @@ models.
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
     [ WARNING ] No input files were given for input 'images'!. This input will be filled with random values!
-    [ INFO ] Fill input 'images' with random values 
+    [ INFO ] Fill input 'images' with random values
 
 
 .. parsed-literal::
@@ -1172,8 +1172,8 @@ Run Live Object Detection
     import time
     from IPython import display
     import cv2
-    
-    
+
+
     # Main processing function to run object detection.
     def run_object_detection(source=0, flip=False, use_popup=False, skip_first_frames=0, model=ov_model, device=device.value):
         player = None
@@ -1190,7 +1190,7 @@ Run Live Object Detection
                 cv2.namedWindow(
                     winname=title, flags=cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE
                 )
-    
+
             processing_times = collections.deque()
             while True:
                 # Grab the frame.
@@ -1210,20 +1210,20 @@ Run Live Object Detection
                     )
                 # Get the results.
                 input_image = np.array(frame)
-               
+
                 start_time = time.time()
                 # model expects RGB image, while video capturing in BGR
                 detections, _, input_shape = detect(compiled_model, input_image[:, :, ::-1])
                 stop_time = time.time()
-                
+
                 image_with_boxes = draw_boxes(detections[0], input_shape, input_image, NAMES)
                 frame = image_with_boxes
-               
+
                 processing_times.append(stop_time - start_time)
                 # Use processing times from last 200 frames.
                 if len(processing_times) > 200:
                     processing_times.popleft()
-    
+
                 _, f_width = frame.shape[:2]
                 # Mean processing time [ms].
                 processing_time = np.mean(processing_times) * 1000
@@ -1287,7 +1287,7 @@ Run the object detection:
 .. code:: ipython3
 
     WEBCAM_INFERENCE = False
-    
+
     if WEBCAM_INFERENCE:
         VIDEO_SOURCE = 0  # Webcam
     else:
@@ -1309,7 +1309,7 @@ Run the object detection:
 .. code:: ipython3
 
     quantized_model = core.read_model(ov_int8_model_path)
-    
+
     run_object_detection(source=VIDEO_SOURCE, flip=True, use_popup=False, model=quantized_model, device=device.value)
 
 
