@@ -485,7 +485,7 @@ If you want to launch only one notebook, such as the *Monodepth* notebook, run t
 
 .. code:: bash
 
-   jupyter lab notebooks/201-vision-monodepth/201-vision-monodepth.ipynb
+   jupyter lab notebooks/vision-monodepth/vision-monodepth.ipynb
 
 Launch All Notebooks
 ++++++++++++++++++++
