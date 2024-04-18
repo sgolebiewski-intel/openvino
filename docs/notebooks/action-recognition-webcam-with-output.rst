@@ -38,26 +38,26 @@ and
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `The models <#the-models>`__
+-  `Imports <#Imports>`__
+-  `The models <#The-models>`__
 
-   -  `Download the models <#download-the-models>`__
-   -  `Load your labels <#load-your-labels>`__
-   -  `Load the models <#load-the-models>`__
+   -  `Download the models <#Download-the-models>`__
+   -  `Load your labels <#Load-your-labels>`__
+   -  `Load the models <#Load-the-models>`__
 
       -  `Model Initialization
-         function <#model-initialization-function>`__
+         function <#Model-Initialization-function>`__
       -  `Initialization for Encoder and
-         Decoder <#initialization-for-encoder-and-decoder>`__
+         Decoder <#Initialization-for-Encoder-and-Decoder>`__
 
-   -  `Helper functions <#helper-functions>`__
-   -  `AI Functions <#ai-functions>`__
-   -  `Main Processing Function <#main-processing-function>`__
-   -  `Run Action Recognition <#run-action-recognition>`__
+   -  `Helper functions <#Helper-functions>`__
+   -  `AI Functions <#AI-Functions>`__
+   -  `Main Processing Function <#Main-Processing-Function>`__
+   -  `Run Action Recognition <#Run-Action-Recognition>`__
 
 .. code:: ipython3
 
-    %pip install -q "openvino-dev>=2024.0.0"
+    %pip install -q "openvino>=2024.0.0" "opencv-python" "tqdm"
 
 
 .. parsed-literal::
@@ -68,7 +68,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -86,22 +86,23 @@ Imports
     from openvino.runtime.ie_api import CompiledModel
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    open("notebook_utils.py", "w").write(r.text)
     import notebook_utils as utils
 
 The models
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the models
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use the ``download_ir_model``, a function from the ``notebook_utils``
 file. It automatically creates a directory structure and downloads the
@@ -127,12 +128,8 @@ and the system automatically downloads the two models
     model_name = "action-recognition-0001"
     # Selected precision (FP32, FP16, FP16-INT8).
     precision = "FP16"
-    model_path_decoder = (
-        f"model/intel/{model_name}/{model_name}-decoder/{precision}/{model_name}-decoder.xml"
-    )
-    model_path_encoder = (
-        f"model/intel/{model_name}/{model_name}-encoder/{precision}/{model_name}-encoder.xml"
-    )
+    model_path_decoder = f"model/intel/{model_name}/{model_name}-decoder/{precision}/{model_name}-decoder.xml"
+    model_path_encoder = f"model/intel/{model_name}/{model_name}-encoder/{precision}/{model_name}-encoder.xml"
     encoder_url = f"https://storage.openvinotoolkit.org/repositories/open_model_zoo/temp/{model_name}/{model_name}-encoder/{precision}/{model_name}-encoder.xml"
     decoder_url = f"https://storage.openvinotoolkit.org/repositories/open_model_zoo/temp/{model_name}/{model_name}-decoder/{precision}/{model_name}-decoder.xml"
     
@@ -157,7 +154,7 @@ and the system automatically downloads the two models
 Load your labels
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This tutorial uses `Kinetics-400
 dataset <https://deepmind.com/research/open-source/kinetics>`__, and
@@ -172,10 +169,10 @@ also provides the text file embedded into this notebook.
     # Download the text from the openvino_notebooks storage
     vocab_file_path = utils.download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/text/kinetics.txt",
-        directory="data"
+        directory="data",
     )
     
-    with vocab_file_path.open(mode='r') as f:
+    with vocab_file_path.open(mode="r") as f:
         labels = [line.strip() for line in f]
     
     print(labels[0:9], np.shape(labels))
@@ -195,7 +192,7 @@ also provides the text file embedded into this notebook.
 Load the models
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load the two models for this particular architecture, Encoder and
 Decoder. Downloaded models are located in a fixed structure, indicating
@@ -218,8 +215,8 @@ Select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -237,7 +234,7 @@ Select device from dropdown list for running inference using OpenVINO
 Model Initialization function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -250,11 +247,11 @@ Model Initialization function
         Read the network and weights from a file, load the
         model on CPU and get input and output names of nodes
     
-        :param: 
+        :param:
                 model: model architecture path *.xml
                 device: inference device
         :retuns:
-                compiled_model: Compiled model 
+                compiled_model: Compiled model
                 input_key: Input node for model
                 output_key: Output node for model
         """
@@ -271,7 +268,7 @@ Model Initialization function
 Initialization for Encoder and Decoder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -288,7 +285,7 @@ Initialization for Encoder and Decoder
 Helper functions
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use the following helper functions for preprocessing and postprocessing
 frames:
@@ -411,7 +408,7 @@ frames:
 AI Functions
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Following the pipeline above, you will use the next functions to:
 
@@ -444,10 +441,7 @@ Following the pipeline above, you will use the next functions to:
         return preprocessed, roi
     
     
-    def encoder(
-        preprocessed: np.ndarray,
-        compiled_model: CompiledModel
-    ) -> List:
+    def encoder(preprocessed: np.ndarray, compiled_model: CompiledModel) -> List:
         """
         Encoder Inference per frame. This function calls the network previously
         configured for the encoder model (compiled_model), extracts the data
@@ -458,7 +452,7 @@ Following the pipeline above, you will use the next functions to:
         :returns: encoder_output: embedding layer that is appended with each arriving frame
         """
         output_key_en = compiled_model.output(0)
-        
+    
         # Get results on action-recognition-0001-encoder model
         infer_result_encoder = compiled_model([preprocessed])[output_key_en]
         return infer_result_encoder
@@ -503,7 +497,7 @@ Following the pipeline above, you will use the next functions to:
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Running action recognition function will run in different operations,
 either a webcam or a video file. See the list of procedures below:
@@ -656,7 +650,7 @@ either a webcam or a video file. See the list of procedures below:
 Run Action Recognition
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Find out how the model works in a video file. `Any format
 supported <https://docs.opencv.org/4.5.1/dd/d43/tutorial_py_video_display.html>`__
@@ -693,5 +687,4 @@ multi-camera systems).
 .. parsed-literal::
 
     Source ended
-
 

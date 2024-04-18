@@ -5,24 +5,24 @@ Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
 -  `Install and import required
-   packages <#install-and-import-required-packages>`__
--  `Load the model <#load-the-model>`__
--  `Convert the model <#convert-the-model>`__
+   packages <#Install-and-import-required-packages>`__
+-  `Load the model <#Load-the-model>`__
+-  `Convert the model <#Convert-the-model>`__
 
    -  `Define the conversion
-      function <#define-the-conversion-function>`__
-   -  `UNet <#unet>`__
-   -  `VAE <#vae>`__
-   -  `Text encoder <#text-encoder>`__
+      function <#Define-the-conversion-function>`__
+   -  `UNet <#UNet>`__
+   -  `VAE <#VAE>`__
+   -  `Text encoder <#Text-encoder>`__
 
--  `Build a pipeline <#build-a-pipeline>`__
--  `Inference with OpenVINO <#inference-with-openvino>`__
+-  `Build a pipeline <#Build-a-pipeline>`__
+-  `Inference with OpenVINO <#Inference-with-OpenVINO>`__
 
-   -  `Select inference device <#select-inference-device>`__
-   -  `Define a prompt <#define-a-prompt>`__
-   -  `Video generation <#video-generation>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Define a prompt <#Define-a-prompt>`__
+   -  `Video generation <#Video-generation>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 The ZeroScope model is a free and open-source text-to-video model that
 can generate realistic and engaging videos from text descriptions. It is
@@ -64,7 +64,7 @@ We will use the first one.
 Install and import required packages
 ------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To work with text-to-video synthesis model, we will use Hugging Face’s
 `Diffusers <https://github.com/huggingface/diffusers>`__ library. It
@@ -72,7 +72,7 @@ provides already pretrained model from ``cerspense``.
 
 .. code:: ipython3
 
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu  "diffusers>=0.18.0" "torch>=2.1" transformers "openvino>=2023.1.0" numpy gradio
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu  "diffusers>=0.18.0" "torch>=2.1" transformers "openvino>=2023.1.0" numpy "gradio>=4.19"
 
 .. code:: ipython3
 
@@ -115,14 +115,14 @@ reducing values below to reduce the memory consumption.
 Load the model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The model is loaded from HuggingFace using ``.from_pretrained`` method
 of ``diffusers.DiffusionPipeline``.
 
 .. code:: ipython3
 
-    pipe = diffusers.DiffusionPipeline.from_pretrained('cerspense/zeroscope_v2_576w')
+    pipe = diffusers.DiffusionPipeline.from_pretrained("cerspense/zeroscope_v2_576w")
 
 
 .. parsed-literal::
@@ -156,7 +156,7 @@ of ``diffusers.DiffusionPipeline``.
 Convert the model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The architecture for generating videos from text comprises three
 distinct sub-networks: one for extracting text features, another for
@@ -175,7 +175,7 @@ noise video.
 Define the conversion function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model components are PyTorch modules, that can be converted with
 ``ov.convert_model`` function directly. We also use ``ov.save_model``
@@ -188,6 +188,7 @@ function to serialize the result of conversion.
 .. code:: ipython3
 
     from pathlib import Path
+    
     
     def convert(model: torch.nn.Module, xml_path: str, **convert_kwargs) -> Path:
         xml_path = Path(xml_path)
@@ -206,7 +207,7 @@ function to serialize the result of conversion.
 UNet
 ~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Text-to-video generation pipeline main component is a conditional 3D
 UNet model that takes a noisy sample, conditional state, and a timestep
@@ -234,7 +235,7 @@ and returns a sample shaped output.
 VAE
 ~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Variational autoencoder (VAE) uses UNet output to decode latents to
 visual representations. Our VAE model has KL loss for encoding images
@@ -247,7 +248,7 @@ inference, we need only decoder part.
         def __init__(self, vae):
             super().__init__()
             self.vae = vae
-            
+    
         def forward(self, z: torch.FloatTensor):
             return self.vae.decode(z)
 
@@ -265,7 +266,7 @@ inference, we need only decoder part.
 Text encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Text encoder is used to encode the input prompt to tensor. Default
 tensor length is 77.
@@ -284,7 +285,7 @@ tensor length is 77.
 Build a pipeline
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -298,9 +299,7 @@ Build a pipeline
         video.clamp_(0, 1)
         # prepare the final outputs
         i, c, f, h, w = video.shape
-        images = video.permute(2, 3, 0, 4, 1).reshape(
-            f, h, i * w, c
-        )  # 1st (frames, h, batch_size, w, c) 2nd (frames, h, batch_size * w, c)
+        images = video.permute(2, 3, 0, 4, 1).reshape(f, h, i * w, c)  # 1st (frames, h, batch_size, w, c) 2nd (frames, h, batch_size * w, c)
         images = images.unbind(dim=0)  # prepare a list of indvidual (consecutive frames)
         images = [(image.cpu().numpy() * 255).astype("uint8") for image in images]  # f h w c
         return images
@@ -311,7 +310,6 @@ Build a pipeline
         from diffusers.utils import randn_tensor
     except ImportError:
         from diffusers.utils.torch_utils import randn_tensor
-    
     
     
     class OVTextToVideoSDPipeline(diffusers.DiffusionPipeline):
@@ -462,9 +460,7 @@ Build a pipeline
             with self.progress_bar(total=num_inference_steps) as progress_bar:
                 for i, t in enumerate(timesteps):
                     # expand the latents if we are doing classifier free guidance
-                    latent_model_input = (
-                        torch.cat([latents] * 2) if do_classifier_free_guidance else latents
-                    )
+                    latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
                     latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
     
                     # predict the noise residual
@@ -480,35 +476,21 @@ Build a pipeline
                     # perform guidance
                     if do_classifier_free_guidance:
                         noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
-                        noise_pred = noise_pred_uncond + guidance_scale * (
-                            noise_pred_text - noise_pred_uncond
-                        )
+                        noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
     
                     # reshape latents
                     bsz, channel, frames, width, height = latents.shape
-                    latents = latents.permute(0, 2, 1, 3, 4).reshape(
-                        bsz * frames, channel, width, height
-                    )
-                    noise_pred = noise_pred.permute(0, 2, 1, 3, 4).reshape(
-                        bsz * frames, channel, width, height
-                    )
+                    latents = latents.permute(0, 2, 1, 3, 4).reshape(bsz * frames, channel, width, height)
+                    noise_pred = noise_pred.permute(0, 2, 1, 3, 4).reshape(bsz * frames, channel, width, height)
     
                     # compute the previous noisy sample x_t -> x_t-1
-                    latents = self.scheduler.step(
-                        noise_pred, t, latents, **extra_step_kwargs
-                    ).prev_sample
+                    latents = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs).prev_sample
     
                     # reshape latents back
-                    latents = (
-                        latents[None, :]
-                        .reshape(bsz, frames, channel, width, height)
-                        .permute(0, 2, 1, 3, 4)
-                    )
+                    latents = latents[None, :].reshape(bsz, frames, channel, width, height).permute(0, 2, 1, 3, 4)
     
                     # call the callback, if provided
-                    if i == len(timesteps) - 1 or (
-                        (i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0
-                    ):
+                    if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
                         progress_bar.update()
                         if callback is not None and i % callback_steps == 0:
                             callback(i, t, latents)
@@ -573,16 +555,10 @@ Build a pipeline
                     return_tensors="pt",
                 )
                 text_input_ids = text_inputs.input_ids
-                untruncated_ids = self.tokenizer(
-                    prompt, padding="longest", return_tensors="pt"
-                ).input_ids
+                untruncated_ids = self.tokenizer(prompt, padding="longest", return_tensors="pt").input_ids
     
-                if untruncated_ids.shape[-1] >= text_input_ids.shape[-1] and not torch.equal(
-                    text_input_ids, untruncated_ids
-                ):
-                    removed_text = self.tokenizer.batch_decode(
-                        untruncated_ids[:, self.tokenizer.model_max_length - 1 : -1]
-                    )
+                if untruncated_ids.shape[-1] >= text_input_ids.shape[-1] and not torch.equal(text_input_ids, untruncated_ids):
+                    removed_text = self.tokenizer.batch_decode(untruncated_ids[:, self.tokenizer.model_max_length - 1 : -1])
                     print(
                         "The following part of your input was truncated because CLIP can only handle sequences up to"
                         f" {self.tokenizer.model_max_length} tokens: {removed_text}"
@@ -603,10 +579,7 @@ Build a pipeline
                 if negative_prompt is None:
                     uncond_tokens = [""] * batch_size
                 elif type(prompt) is not type(negative_prompt):
-                    raise TypeError(
-                        f"`negative_prompt` should be the same type to `prompt`, but got {type(negative_prompt)} !="
-                        f" {type(prompt)}."
-                    )
+                    raise TypeError(f"`negative_prompt` should be the same type to `prompt`, but got {type(negative_prompt)} !=" f" {type(prompt)}.")
                 elif isinstance(negative_prompt, str):
                     uncond_tokens = [negative_prompt]
                 elif batch_size != len(negative_prompt):
@@ -636,9 +609,7 @@ Build a pipeline
                 seq_len = negative_prompt_embeds.shape[1]
     
                 negative_prompt_embeds = negative_prompt_embeds.repeat(1, num_images_per_prompt, 1)
-                negative_prompt_embeds = negative_prompt_embeds.view(
-                    batch_size * num_images_per_prompt, seq_len, -1
-                )
+                negative_prompt_embeds = negative_prompt_embeds.view(batch_size * num_images_per_prompt, seq_len, -1)
     
                 # For classifier free guidance, we need to do two forward passes.
                 # Here we concatenate the unconditional and text embeddings into a single batch
@@ -684,28 +655,17 @@ Build a pipeline
             negative_prompt_embeds=None,
         ):
             if self.height % 8 != 0 or self.width % 8 != 0:
-                raise ValueError(
-                    f"`height` and `width` have to be divisible by 8 but are {self.height} and {self.width}."
-                )
+                raise ValueError(f"`height` and `width` have to be divisible by 8 but are {self.height} and {self.width}.")
     
-            if (callback_steps is None) or (
-                callback_steps is not None
-                and (not isinstance(callback_steps, int) or callback_steps <= 0)
-            ):
-                raise ValueError(
-                    f"`callback_steps` has to be a positive integer but is {callback_steps} of type"
-                    f" {type(callback_steps)}."
-                )
+            if (callback_steps is None) or (callback_steps is not None and (not isinstance(callback_steps, int) or callback_steps <= 0)):
+                raise ValueError(f"`callback_steps` has to be a positive integer but is {callback_steps} of type" f" {type(callback_steps)}.")
     
             if prompt is not None and prompt_embeds is not None:
                 raise ValueError(
-                    f"Cannot forward both `prompt`: {prompt} and `prompt_embeds`: {prompt_embeds}. Please make sure to"
-                    " only forward one of the two."
+                    f"Cannot forward both `prompt`: {prompt} and `prompt_embeds`: {prompt_embeds}. Please make sure to" " only forward one of the two."
                 )
             elif prompt is None and prompt_embeds is None:
-                raise ValueError(
-                    "Provide either `prompt` or `prompt_embeds`. Cannot leave both `prompt` and `prompt_embeds` undefined."
-                )
+                raise ValueError("Provide either `prompt` or `prompt_embeds`. Cannot leave both `prompt` and `prompt_embeds` undefined.")
             elif prompt is not None and (not isinstance(prompt, str) and not isinstance(prompt, list)):
                 raise ValueError(f"`prompt` has to be of type `str` or `list` but is {type(prompt)}")
     
@@ -728,9 +688,7 @@ Build a pipeline
             latents = 1 / scale_factor * latents
     
             batch_size, channels, num_frames, height, width = latents.shape
-            latents = latents.permute(0, 2, 1, 3, 4).reshape(
-                batch_size * num_frames, channels, height, width
-            )
+            latents = latents.permute(0, 2, 1, 3, 4).reshape(batch_size * num_frames, channels, height, width)
             image = self.vae_decoder(latents)[0]
             image = torch.tensor(image)
             video = (
@@ -752,7 +710,7 @@ Build a pipeline
 Inference with OpenVINO
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -761,7 +719,7 @@ Inference with OpenVINO
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -769,8 +727,8 @@ select device from dropdown list for running inference using OpenVINO
 
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -832,7 +790,7 @@ tokenizer and scheduler.
 Define a prompt
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -840,16 +798,16 @@ Define a prompt
 
 Let’s generate a video for our prompt. For full list of arguments, see
 ``__call__`` function definition of ``OVTextToVideoSDPipeline`` class in
-`Build a pipeline <#build-a-pipeline>`__ section.
+`Build a pipeline <#Build-a-pipeline>`__ section.
 
 Video generation
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    frames = ov_pipe(prompt, num_inference_steps=25)['frames']
+    frames = ov_pipe(prompt, num_inference_steps=25)["frames"]
 
 
 
@@ -863,8 +821,8 @@ Video generation
     images = [PIL.Image.fromarray(frame) for frame in frames]
     images[0].save("output.gif", save_all=True, append_images=images[1:], duration=125, loop=0)
     with open("output.gif", "rb") as gif_file:
-        b64 = f'data:image/gif;base64,{base64.b64encode(gif_file.read()).decode()}'
-    IPython.display.HTML(f"<img src=\"{b64}\" />")
+        b64 = f"data:image/gif;base64,{base64.b64encode(gif_file.read()).decode()}"
+    IPython.display.HTML(f'<img src="{b64}" />')
 
 
 
@@ -878,13 +836,11 @@ Video generation
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    def generate(
-        prompt, seed, num_inference_steps, _=gr.Progress(track_tqdm=True)
-    ):
+    def generate(prompt, seed, num_inference_steps, _=gr.Progress(track_tqdm=True)):
         generator = torch.Generator().manual_seed(seed)
         frames = ov_pipe(
             prompt,
@@ -893,9 +849,7 @@ Interactive demo
         )["frames"]
         out_file = tempfile.NamedTemporaryFile(suffix=".gif", delete=False)
         images = [PIL.Image.fromarray(frame) for frame in frames]
-        images[0].save(
-            out_file, save_all=True, append_images=images[1:], duration=125, loop=0
-        )
+        images[0].save(out_file, save_all=True, append_images=images[1:], duration=125, loop=0)
         return out_file.name
     
     
@@ -912,7 +866,7 @@ Interactive demo
             ["A panda eating bamboo on a rock.", 0, 25],
             ["Spiderman is surfing.", 0, 25],
         ],
-        allow_flagging="never"
+        allow_flagging="never",
     )
     
     try:
@@ -932,7 +886,7 @@ Interactive demo
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

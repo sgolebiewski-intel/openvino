@@ -16,18 +16,32 @@ tutorial.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
+-  `Imports <#Imports>`__
 -  `Download the Model and data
-   samples <#download-the-model-and-data-samples>`__
--  `Select inference device <#select-inference-device>`__
--  `Load the Model <#load-the-model>`__
--  `Load an Image <#load-an-image>`__
--  `Do Inference <#do-inference>`__
+   samples <#Download-the-Model-and-data-samples>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `Load the Model <#Load-the-Model>`__
+-  `Load an Image <#Load-an-Image>`__
+-  `Do Inference <#Do-Inference>`__
 
 .. code:: ipython3
 
+    import platform
+    
     # Install openvino package
-    %pip install -q "openvino>=2023.1.0"
+    %pip install -q "openvino>=2023.1.0" opencv-python tqdm
+    
+    if platform.system() != "Windows":
+        %pip install -q "matplotlib>=3.4"
+    else:
+        %pip install -q "matplotlib>=3.4,<3.7"
+    
+
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
 
 
 .. parsed-literal::
@@ -38,7 +52,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -50,36 +64,38 @@ Imports
     import openvino as ov
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     
     from notebook_utils import download_file
 
 Download the Model and data samples
 -----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    base_artifacts_dir = Path('./artifacts').expanduser()
+    base_artifacts_dir = Path("./artifacts").expanduser()
     
     model_name = "v3-small_224_1.0_float"
-    model_xml_name = f'{model_name}.xml'
-    model_bin_name = f'{model_name}.bin'
+    model_xml_name = f"{model_name}.xml"
+    model_bin_name = f"{model_name}.bin"
     
     model_xml_path = base_artifacts_dir / model_xml_name
     
-    base_url = 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/mobelinet-v3-tf/FP32/'
+    base_url = "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/mobelinet-v3-tf/FP32/"
     
     if not model_xml_path.exists():
         download_file(base_url + model_xml_name, model_xml_name, base_artifacts_dir)
         download_file(base_url + model_bin_name, model_bin_name, base_artifacts_dir)
     else:
-        print(f'{model_name} already downloaded to {base_artifacts_dir}')
+        print(f"{model_name} already downloaded to {base_artifacts_dir}")
 
 
 
@@ -97,7 +113,7 @@ Download the Model and data samples
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -108,8 +124,8 @@ select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -127,7 +143,7 @@ select device from dropdown list for running inference using OpenVINO
 Load the Model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -140,14 +156,14 @@ Load the Model
 Load an Image
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # Download the image from the openvino_notebooks storage
     image_filename = download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg",
-        directory="data"
+        directory="data",
     )
     
     # The MobileNet model expects images in RGB format.
@@ -174,7 +190,7 @@ Load an Image
 Do Inference
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -185,7 +201,7 @@ Do Inference
 
     imagenet_filename = download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/datasets/imagenet/imagenet_2012.txt",
-        directory="data"
+        directory="data",
     )
     
     imagenet_classes = imagenet_filename.read_text().splitlines()
@@ -201,7 +217,7 @@ Do Inference
 
     # The model description states that for this model, class 0 is a background.
     # Therefore, a background must be added at the beginning of imagenet_classes.
-    imagenet_classes = ['background'] + imagenet_classes
+    imagenet_classes = ["background"] + imagenet_classes
     
     imagenet_classes[result_index]
 

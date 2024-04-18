@@ -32,49 +32,49 @@ interactive demo.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Prepare an example audio <#prepare-an-example-audio>`__
--  `Language Identification (LID) <#language-identification-lid>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Prepare an example audio <#Prepare-an-example-audio>`__
+-  `Language Identification (LID) <#Language-Identification-(LID)>`__
 
    -  `Download pretrained model and
-      processor <#download-pretrained-model-and-processor>`__
+      processor <#Download-pretrained-model-and-processor>`__
    -  `Use the original model to run an
-      inference <#use-the-original-model-to-run-an-inference>`__
+      inference <#Use-the-original-model-to-run-an-inference>`__
    -  `Convert to OpenVINO IR model and run an
-      inference <#convert-to-openvino-ir-model-and-run-an-inference>`__
+      inference <#Convert-to-OpenVINO-IR-model-and-run-an-inference>`__
 
 -  `Automatic Speech Recognition
-   (ASR) <#automatic-speech-recognition-asr>`__
+   (ASR) <#Automatic-Speech-Recognition-(ASR)>`__
 
    -  `Download pretrained model and
-      processor <#download-pretrained-model-and-processor>`__
+      processor <#Download-pretrained-model-and-processor>`__
    -  `Use the original model for
-      inference <#use-the-original-model-for-inference>`__
+      inference <#Use-the-original-model-for-inference>`__
    -  `Convert to OpenVINO IR model and run
-      inference <#convert-to-openvino-ir-model-and-run-inference>`__
+      inference <#Convert-to-OpenVINO-IR-model-and-run-inference>`__
 
--  `Quantization <#quantization>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Preparing calibration dataset <#preparing-calibration-dataset>`__
+   -  `Preparing calibration dataset <#Preparing-calibration-dataset>`__
    -  `Language identification model
-      quantization <#language-identification-model-quantization>`__
+      quantization <#Language-identification-model-quantization>`__
    -  `Speech recognition model
-      quantization <#speech-recognition-model-quantization>`__
+      quantization <#Speech-recognition-model-quantization>`__
    -  `Compare model size, performance and
-      accuracy <#compare-model-size-performance-and-accuracy>`__
+      accuracy <#Compare-model-size,-performance-and-accuracy>`__
 
--  `Interactive demo with Gradio <#interactive-demo-with-gradio>`__
+-  `Interactive demo with Gradio <#Interactive-demo-with-Gradio>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     %pip install -q --upgrade pip
-    %pip install -q "transformers>=4.33.1" "torch>=2.1" "openvino>=2023.1.0" "numpy>=1.21.0" "nncf>=2.9.0" 
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu torch datasets accelerate soundfile librosa gradio jiwer
+    %pip install -q "transformers>=4.33.1" "torch>=2.1" "openvino>=2023.1.0" "numpy>=1.21.0" "nncf>=2.9.0"
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu torch "datasets>=2.14.6" accelerate soundfile librosa "gradio>=4.19" jiwer
 
 .. code:: ipython3
 
@@ -87,7 +87,7 @@ Prerequisites
 Prepare an example audio
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Read an audio file and process the audio data. Make sure that the audio
 data is sampled to 16000 kHz. For this example we will use `a streamable
@@ -103,9 +103,9 @@ Choose one of them.
     
     
     SAMPLE_LANG = widgets.Dropdown(
-        options=['german', 'dutch', 'french', 'spanish', 'italian', 'portuguese', 'polish'],
-        value='german',
-        description='Dataset language:',
+        options=["german", "dutch", "french", "spanish", "italian", "portuguese", "polish"],
+        value="german",
+        description="Dataset language:",
         disabled=False,
     )
     
@@ -150,8 +150,8 @@ transcription.
 
     import IPython.display as ipd
     
-    print(example['text'])
-    ipd.Audio(example['audio']['array'], rate=16_000)
+    print(example["text"])
+    ipd.Audio(example["audio"]["array"], rate=16_000)
 
 
 .. parsed-literal::
@@ -175,12 +175,12 @@ transcription.
 Language Identification (LID)
 -----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download pretrained model and processor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Different LID models are available based on the number of languages they
 can recognize - 126, 256, 512, 1024, 2048, 4017. We will use 126.
@@ -197,11 +197,11 @@ can recognize - 126, 256, 512, 1024, 2048, 4017. We will use 126.
 Use the original model to run an inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    inputs = lid_processor(example['audio']['array'], sampling_rate=16_000, return_tensors="pt")
+    inputs = lid_processor(example["audio"]["array"], sampling_rate=16_000, return_tensors="pt")
     
     with torch.no_grad():
         outputs = lid_model(**inputs).logits
@@ -219,7 +219,7 @@ Use the original model to run an inference
 Convert to OpenVINO IR model and run an inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select device from dropdown list for running inference using OpenVINO
 
@@ -229,8 +229,8 @@ Select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -251,20 +251,22 @@ Convert model to OpenVINO format and compile it
 
     MAX_SEQ_LENGTH = 30480
     
-    lid_model_xml_path = Path('models/ov_lid_model.xml')
+    lid_model_xml_path = Path("models/ov_lid_model.xml")
+    
     
     def get_lid_model(model_path, compiled=True):
         input_values = torch.zeros([1, MAX_SEQ_LENGTH], dtype=torch.float)
     
         if not model_path.exists() and model_path == lid_model_xml_path:
             lid_model_xml_path.parent.mkdir(parents=True, exist_ok=True)
-            converted_model = ov.convert_model(lid_model, example_input={'input_values': input_values})
+            converted_model = ov.convert_model(lid_model, example_input={"input_values": input_values})
             ov.save_model(converted_model, lid_model_xml_path)
             if not compiled:
                 return converted_model
         if compiled:
             return core.compile_model(model_path, device_name=device.value)
         return core.read_model(model_path)
+    
     
     compiled_lid_model = get_lid_model(lid_model_xml_path)
 
@@ -283,17 +285,17 @@ Now it is possible to run an inference.
 
     def detect_language(compiled_model, audio_data):
         inputs = lid_processor(audio_data, sampling_rate=16_000, return_tensors="pt")
-        
-        outputs = compiled_model(inputs['input_values'])[0]
-        
+    
+        outputs = compiled_model(inputs["input_values"])[0]
+    
         lang_id = torch.argmax(torch.from_numpy(outputs), dim=-1)[0].item()
         detected_lang = lid_model.config.id2label[lang_id]
-        
+    
         return detected_lang
 
 .. code:: ipython3
 
-    detect_language(compiled_lid_model, example['audio']['array'])
+    detect_language(compiled_lid_model, example["audio"]["array"])
 
 
 
@@ -309,9 +311,9 @@ Let’s check another language.
 .. code:: ipython3
 
     SAMPLE_LANG = widgets.Dropdown(
-        options=['german', 'dutch', 'french', 'spanish', 'italian', 'portuguese', 'polish'],
-        value='french',
-        description='Dataset language:',
+        options=["german", "dutch", "french", "spanish", "italian", "portuguese", "polish"],
+        value="french",
+        description="Dataset language:",
         disabled=False,
     )
     
@@ -332,8 +334,8 @@ Let’s check another language.
     mls_dataset = iter(mls_dataset)
     
     example = next(mls_dataset)
-    print(example['text'])
-    ipd.Audio(example['audio']['array'], rate=16_000)
+    print(example["text"])
+    ipd.Audio(example["audio"]["array"], rate=16_000)
 
 
 .. parsed-literal::
@@ -356,7 +358,7 @@ Let’s check another language.
 
 .. code:: ipython3
 
-    language_id = detect_language(compiled_lid_model, example['audio']['array'])
+    language_id = detect_language(compiled_lid_model, example["audio"]["array"])
     print(language_id)
 
 
@@ -368,12 +370,12 @@ Let’s check another language.
 Automatic Speech Recognition (ASR)
 ----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download pretrained model and processor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download pretrained model and processor. By default, MMS loads adapter
 weights for English. If you want to load adapter weights of another
@@ -388,6 +390,7 @@ language later.
 .. code:: ipython3
 
     from transformers import Wav2Vec2ForCTC, AutoProcessor
+    
     model_id = "facebook/mms-1b-all"
     
     asr_processor = AutoProcessor.from_pretrained(model_id)
@@ -430,11 +433,11 @@ detected in the previous step.
 Use the original model for inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    inputs = asr_processor(example['audio']['array'], sampling_rate=16_000, return_tensors="pt")
+    inputs = asr_processor(example["audio"]["array"], sampling_rate=16_000, return_tensors="pt")
     
     with torch.no_grad():
         outputs = asr_model(**inputs).logits
@@ -452,7 +455,7 @@ Use the original model for inference
 Convert to OpenVINO IR model and run inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Convert to OpenVINO IR model format with ``ov.convert_model`` function
 directly. Use ``ov.save_model`` function to serialize the result of
@@ -461,7 +464,7 @@ for these purposes.
 
 .. code:: ipython3
 
-    asr_model_xml_path_template = 'models/ov_asr_{}_model.xml'
+    asr_model_xml_path_template = "models/ov_asr_{}_model.xml"
     
     
     def get_asr_model(model_path_template, language_id, compiled=True):
@@ -471,9 +474,9 @@ for these purposes.
         asr_processor.tokenizer.set_target_lang(language_id)
         if not model_path.exists() and model_path_template == asr_model_xml_path_template:
             asr_model.load_adapter(language_id)
-            
+    
             model_path.parent.mkdir(parents=True, exist_ok=True)
-            converted_model = ov.convert_model(asr_model, example_input={'input_values': input_values})
+            converted_model = ov.convert_model(asr_model, example_input={"input_values": input_values})
             ov.save_model(converted_model, model_path)
             if not compiled:
                 return converted_model
@@ -500,16 +503,16 @@ Run inference.
 
     def recognize_audio(compiled_model, src_audio):
         inputs = asr_processor(src_audio, sampling_rate=16_000, return_tensors="pt")
-        outputs = compiled_model(inputs['input_values'])[0]
-        
+        outputs = compiled_model(inputs["input_values"])[0]
+    
         ids = torch.argmax(torch.from_numpy(outputs), dim=-1)[0]
         transcription = asr_processor.decode(ids)
     
         return transcription
     
     
-    transcription = recognize_audio(compiled_asr_model, example['audio']['array'])
-    print("Original text:", example['text'])
+    transcription = recognize_audio(compiled_asr_model, example["audio"]["array"])
+    print("Original text:", example["text"])
     print("Transcription:", transcription)
 
 
@@ -522,7 +525,7 @@ Run inference.
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -550,7 +553,7 @@ The optimization process contains the following steps:
     
     to_quantize = widgets.Checkbox(
         value=False,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -571,18 +574,19 @@ not selected
 .. code:: ipython3
 
     # Fetch `skip_kernel_extension` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     %load_ext skip_kernel_extension
 
 Preparing calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select the language to quantize the model for:
 
@@ -621,7 +625,7 @@ Create calibration dataset for quantization.
 Language identification model quantization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run LID model quantization.
 
@@ -686,7 +690,7 @@ Detect language with the quantized model.
 Speech recognition model quantization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run ASR model quantization.
 
@@ -762,7 +766,7 @@ produced by original model.
 Compare model size, performance and accuracy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First we compare model size.
 
@@ -875,7 +879,7 @@ speech recognition models.
 Interactive demo with Gradio
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In this demo you can try your own examples. Make sure that the audio
 data is sampled to 16000 kHz.
@@ -887,16 +891,18 @@ data is sampled to 16000 kHz.
     import time
     
     
-    title = 'MMS with Gradio'
-    description = 'Gradio Demo for MMS and OpenVINO™. Upload a source audio, then click the "Submit" button to detect a language ID and a transcription. ' \
-                  'Make sure that the audio data is sampled to 16000 kHz. If this language has not been used before, it may take some time to prepare the ASR model.' \
-                  '\n' \
-                  '> Note: In order to run quantized model to transcribe some language, first the quantized model for that specific language must be prepared.'
+    title = "MMS with Gradio"
+    description = (
+        'Gradio Demo for MMS and OpenVINO™. Upload a source audio, then click the "Submit" button to detect a language ID and a transcription. '
+        "Make sure that the audio data is sampled to 16000 kHz. If this language has not been used before, it may take some time to prepare the ASR model."
+        "\n"
+        "> Note: In order to run quantized model to transcribe some language, first the quantized model for that specific language must be prepared."
+    )
     
     
     current_state = {
         "fp32": {"model": None, "language": None},
-        "int8": {"model": None, "language": None}
+        "int8": {"model": None, "language": None},
     }
     
     
@@ -913,21 +919,24 @@ data is sampled to 16000 kHz.
         if detected_language_id != state["language"]:
             template_path = quantized_asr_model_xml_path_template if quantized else asr_model_xml_path_template
             try:
-                gr.Info(f"Loading {'quantized' if quantized else ''} ASR model for '{detected_language_id}' language. "
-                        "This will take some time.")
+                gr.Info(f"Loading {'quantized' if quantized else ''} ASR model for '{detected_language_id}' language. " "This will take some time.")
                 state["model"] = get_asr_model(template_path, detected_language_id)
                 state["language"] = detected_language_id
             except RuntimeError as e:
                 if "Unable to read the model:" in str(e) and quantized:
-                    raise gr.Error(f"There is no quantized ASR model for '{detected_language_id}' language. "
-                                   "Please run quantization for this language first.")
+                    raise gr.Error(f"There is no quantized ASR model for '{detected_language_id}' language. " "Please run quantization for this language first.")
     
         start_time = time.perf_counter()
         transcription = recognize_audio(state["model"], src_audio)
         end_time = time.perf_counter()
         transcription_delta_time = f"{end_time - start_time:.2f}"
     
-        return detected_language_id, transcription, identification_delta_time, transcription_delta_time
+        return (
+            detected_language_id,
+            transcription,
+            identification_delta_time,
+            transcription_delta_time,
+        )
     
     
     with gr.Blocks() as demo:
@@ -947,7 +956,7 @@ data is sampled to 16000 kHz.
             with gr.Row():
                 with gr.Column():
                     if not quantized:
-                        audio = gr.Audio(label="Source Audio", type='filepath')
+                        audio = gr.Audio(label="Source Audio", type="filepath")
                     run_button_name = "Run INT8" if quantized else "Run FP32" if to_quantize.value else "Run"
                     run_button[quantized] = gr.Button(value=run_button_name)
                 with gr.Column():
@@ -956,13 +965,27 @@ data is sampled to 16000 kHz.
                     identification_time[quantized] = gr.Textbox(label=f"Identification time{' (Quantized)' if quantized else ''}")
                     transcription_time[quantized] = gr.Textbox(label=f"Transcription time{' (Quantized)' if quantized else ''}")
     
-        run_button[False].click(infer,
-                                inputs=[audio, gr.Number(0, visible=False)],
-                                outputs=[detected_language[False], transcription[False], identification_time[False], transcription_time[False]])
+        run_button[False].click(
+            infer,
+            inputs=[audio, gr.Number(0, visible=False)],
+            outputs=[
+                detected_language[False],
+                transcription[False],
+                identification_time[False],
+                transcription_time[False],
+            ],
+        )
         if to_quantize.value:
-            run_button[True].click(infer,
-                                   inputs=[audio, gr.Number(1, visible=False)],
-                                   outputs=[detected_language[True], transcription[True], identification_time[True], transcription_time[True]])
+            run_button[True].click(
+                infer,
+                inputs=[audio, gr.Number(1, visible=False)],
+                outputs=[
+                    detected_language[True],
+                    transcription[True],
+                    identification_time[True],
+                    transcription_time[True],
+                ],
+            )
     
     
     try:
@@ -982,9 +1005,9 @@ data is sampled to 16000 kHz.
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 
 
 .. parsed-literal::

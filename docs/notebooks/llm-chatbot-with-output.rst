@@ -41,27 +41,25 @@ The tutorial consists of the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Select model for inference <#select-model-for-inference>`__
--  `login to huggingfacehub to get access to pretrained
-   model <#login-to-huggingfacehub-to-get-access-to-pretrained-model>`__
--  `Instantiate Model using Optimum
-   Intel <#instantiate-model-using-optimum-intel>`__
--  `Compress model weights <#compress-model-weights>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Select model for inference <#Select-model-for-inference>`__
+-  `Convert model using Optimum-CLI
+   tool <#Convert-model-using-Optimum-CLI-tool>`__
+-  `Compress model weights <#Compress-model-weights>`__
 
-   -  `Weights Compression using Optimum
-      Intel <#weights-compression-using-optimum-intel>`__
    -  `Weights Compression using
-      NNCF <#weights-compression-using-nncf>`__
+      Optimum-CLI <#Weights-Compression-using-Optimum-CLI>`__
 
 -  `Select device for inference and model
-   variant <#select-device-for-inference-and-model-variant>`__
--  `Run Chatbot <#run-chatbot>`__
+   variant <#Select-device-for-inference-and-model-variant>`__
+-  `Instantiate Model using Optimum
+   Intel <#Instantiate-Model-using-Optimum-Intel>`__
+-  `Run Chatbot <#Run-Chatbot>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install required dependencies
 
@@ -75,28 +73,32 @@ Install required dependencies
     "datasets" \
     "accelerate"\
     "openvino-nightly"\
-    "gradio"\
+    "gradio>=4.19"\
     "onnx" "einops" "transformers_stream_generator" "tiktoken" "transformers>=4.38.1" "bitsandbytes"
 
+.. code:: ipython3
 
-.. parsed-literal::
-
-    WARNING: Skipping openvino-dev as it is not installed.
-    WARNING: Skipping openvino as it is not installed.
-    WARNING: Skipping openvino-nightly as it is not installed.
-    WARNING: Skipping optimum as it is not installed.
-    WARNING: Skipping optimum-intel as it is not installed.
-    Note: you may need to restart the kernel to use updated packages.
+    import shutil
+    from pathlib import Path
+    import requests
     
-    [notice] A new release of pip is available: 23.1.2 -> 24.0
-    [notice] To update, run: pip install --upgrade pip
-    Note: you may need to restart the kernel to use updated packages.
-
+    # fetch model configuration
+    
+    config_shared_path = Path("../../utils/llm_config.py")
+    config_dst_path = Path("llm_config.py")
+    
+    if not config_dst_path.exists():
+        if config_shared_path.exists():
+            shutil.copy(config_shared_path, config_dst_path)
+        else:
+            r = requests.get(url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/llm_config.py")
+            with open("llm_config.py", "w") as f:
+                f.write(r.text)
 
 Select model for inference
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The tutorial supports different models, you can select one from the
 provided options to compare the quality of open source LLM solutions.
@@ -133,7 +135,7 @@ The available options are:
    model can be found in `model
    card <https://huggingface.co/google/gemma-2b-it>`__. >\ **Note**: run
    model with demo, you will need to accept license agreement. >You must
-   be a registered user in Hugging Face Hub. Please visit `HuggingFace
+   be a registered user in 🤗 Hugging Face Hub. Please visit `HuggingFace
    model card <https://huggingface.co/google/gemma-2b-it>`__, carefully
    read terms of usage and click accept button. You will need to use an
    access token for the code below to run. For more information on
@@ -171,7 +173,7 @@ The available options are:
    model can be found in `model
    card <https://huggingface.co/google/gemma-7b-it>`__. >\ **Note**: run
    model with demo, you will need to accept license agreement. >You must
-   be a registered user in Hugging Face Hub. Please visit `HuggingFace
+   be a registered user in 🤗 Hugging Face Hub. Please visit `HuggingFace
    model card <https://huggingface.co/google/gemma-7b-it>`__, carefully
    read terms of usage and click accept button. You will need to use an
    access token for the code below to run. For more information on
@@ -203,7 +205,7 @@ The available options are:
    `HuggingFace model
    card <https://huggingface.co/meta-llama/Llama-2-7b-chat-hf>`__.
    >\ **Note**: run model with demo, you will need to accept license
-   agreement. >You must be a registered user in Hugging Face Hub.
+   agreement. >You must be a registered user in 🤗 Hugging Face Hub.
    Please visit `HuggingFace model
    card <https://huggingface.co/meta-llama/Llama-2-7b-chat-hf>`__,
    carefully read terms of usage and click accept button. You will need
@@ -328,7 +330,7 @@ The available options are:
 
 .. code:: ipython3
 
-    from config import SUPPORTED_LLM_MODELS
+    from llm_config import SUPPORTED_LLM_MODELS
     import ipywidgets as widgets
 
 .. code:: ipython3
@@ -371,7 +373,7 @@ The available options are:
 
 .. parsed-literal::
 
-    Dropdown(description='Model:', options=('qwen1.5-0.5b-chat', 'qwen1.5-1.8b-chat', 'qwen1.5-7b-chat', 'qwen-7b-…
+    Dropdown(description='Model:', options=('tiny-llama-1b-chat', 'gemma-2b-it', 'red-pajama-3b-chat', 'gemma-7b-i…
 
 
 
@@ -383,142 +385,83 @@ The available options are:
 
 .. parsed-literal::
 
-    Selected model qwen-7b-chat
+    Selected model tiny-llama-1b-chat
 
 
-Instantiate Model using Optimum Intel
--------------------------------------
+Convert model using Optimum-CLI tool
+------------------------------------
 
+`back to top ⬆️ <#Table-of-contents:>`__
 
+🤗 `Optimum Intel <https://huggingface.co/docs/optimum/intel/index>`__ is
+the interface between the 🤗
+`Transformers <https://huggingface.co/docs/transformers/index>`__ and
+`Diffusers <https://huggingface.co/docs/diffusers/index>`__ libraries
+and OpenVINO to accelerate end-to-end pipelines on Intel architectures.
+It provides ease-to-use cli interface for exporting models to `OpenVINO
+Intermediate Representation
+(IR) <https://docs.openvino.ai/2024/documentation/openvino-ir-format.html>`__
+format.
 
-Optimum Intel can be used to load optimized models from the `Hugging
-Face Hub <https://huggingface.co/docs/optimum/intel/hf.co/models>`__ and
-create pipelines to run an inference with OpenVINO Runtime using Hugging
-Face APIs. The Optimum Inference models are API compatible with Hugging
-Face Transformers models. This means we just need to replace
-``AutoModelForXxx`` class with the corresponding ``OVModelForXxx``
-class.
+The command bellow demonstrates basic command for model export with
+``optimum-cli``
 
-Below is an example of the RedPajama model
+::
 
-.. code:: diff
+   optimum-cli export openvino --model <model_id_or_path> --task <task> <out_dir>
 
-   -from transformers import AutoModelForCausalLM
-   +from optimum.intel.openvino import OVModelForCausalLM
-   from transformers import AutoTokenizer, pipeline
-
-   model_id = "togethercomputer/RedPajama-INCITE-Chat-3B-v1"
-   -model = AutoModelForCausalLM.from_pretrained(model_id)
-   +model = OVModelForCausalLM.from_pretrained(model_id, export=True)
-
-Model class initialization starts with calling ``from_pretrained``
-method. When downloading and converting Transformers model, the
-parameter ``export=True`` should be added. We can save the converted
-model for the next usage with the ``save_pretrained`` method. Tokenizer
-class and pipelines API are compatible with Optimum models.
-
-To optimize the generation process and use memory more efficiently, the
-``use_cache=True`` option is enabled. Since the output side is
-auto-regressive, an output token hidden state remains the same once
-computed for every further generation step. Therefore, recomputing it
-every time you want to generate a new token seems wasteful. With the
-cache, the model saves the hidden state once it has been computed. The
-model only computes the one for the most recently generated output token
-at each time step, re-using the saved ones for hidden tokens. This
-reduces the generation complexity from :math:`O(n^3)` to :math:`O(n^2)`
-for a transformer model. More details about how it works can be found in
-this
-`article <https://scale.com/blog/pytorch-improvements#Text%20Translation>`__.
-With this option, the model gets the previous step’s hidden states
-(cached attention keys and values) as input and additionally provides
-hidden states for the current step as output. It means for all next
-iterations, it is enough to provide only a new token obtained from the
-previous step and cached key values to get the next token prediction.
-
-In our case, MPT, Qwen and ChatGLM model currently is not covered by
-Optimum Intel, we will convert it manually and create wrapper compatible
-with Optimum Intel.
-
-.. code:: ipython3
-
-    from transformers import AutoModelForCausalLM, AutoConfig
-    from optimum.intel.openvino import OVModelForCausalLM
-    import openvino as ov
-    from pathlib import Path
-    import shutil
-    import torch
-    import logging
-    import nncf
-    import gc
-    from converter import converters, register_configs
-    
-    register_configs()
-
-
-.. parsed-literal::
-
-    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, tensorflow, onnx, openvino
-
-
-.. parsed-literal::
-
-    2024-03-07 02:52:02.115283: I tensorflow/core/util/port.cc:111] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-03-07 02:52:02.118993: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
-    2024-03-07 02:52:02.161204: E tensorflow/compiler/xla/stream_executor/cuda/cuda_dnn.cc:9342] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
-    2024-03-07 02:52:02.161239: E tensorflow/compiler/xla/stream_executor/cuda/cuda_fft.cc:609] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
-    2024-03-07 02:52:02.161273: E tensorflow/compiler/xla/stream_executor/cuda/cuda_blas.cc:1518] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
-    2024-03-07 02:52:02.169740: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
-    2024-03-07 02:52:02.171079: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-03-07 02:52:03.108737: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-
+where ``--model`` argument is model id from HuggingFace Hub or local
+directory with model (saved using ``.save_pretrained`` method),
+``--task`` is one of `supported
+task <https://huggingface.co/docs/optimum/exporters/task_manager>`__
+that exported model should solve. For LLMs it will be
+``text-generation-with-past``. If model initialization requires to use
+remote code, ``--trust-remote-code`` flag additionally should be passed.
 
 Compress model weights
 ----------------------
 
+The `Weights
+Compression <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/weight-compression.html>`__
+algorithm is aimed at compressing the weights of the models and can be
+used to optimize the model footprint and performance of large models
+where the size of weights is relatively larger than the size of
+activations, for example, Large Language Models (LLM). Compared to INT8
+compression, INT4 compression improves performance even more, but
+introduces a minor drop in prediction quality.
 
+Weights Compression using Optimum-CLI
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Weights Compression algorithm is aimed at compressing the weights of
-the models and can be used to optimize the model footprint and
-performance of large models where the size of weights is relatively
-larger than the size of activations, for example, Large Language Models
-(LLM). Compared to INT8 compression, INT4 compression improves
-performance even more, but introduces a minor drop in prediction
-quality.
+`back to top ⬆️ <#Table-of-contents:>`__
 
-Weights Compression using Optimum Intel
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You can also apply fp16, 8-bit or 4-bit weight compression on the
+Linear, Convolutional and Embedding layers when exporting your model
+with the CLI by setting ``--weight-format`` to respectively fp16, int8
+or int4. This type of optimization allows to reduce the memory footprint
+and inference latency. By default the quantization scheme for int8/int4
+will be
+`asymmetric <https://github.com/openvinotoolkit/nncf/blob/develop/docs/compression_algorithms/Quantization.md#asymmetric-quantization>`__,
+to make it
+`symmetric <https://github.com/openvinotoolkit/nncf/blob/develop/docs/compression_algorithms/Quantization.md#symmetric-quantization>`__
+you can add ``--sym``.
 
+For INT4 quantization you can also specify the following arguments : -
+The ``--group-size`` parameter will define the group size to use for
+quantization, -1 it will results in per-column quantization. - The
+``--ratio`` parameter controls the ratio between 4-bit and 8-bit
+quantization. If set to 0.9, it means that 90% of the layers will be
+quantized to int4 while 10% will be quantized to int8.
 
-
-Optimum Intel supports weight compression via NNCF out of the box. For
-8-bit compression we pass ``load_in_8bit=True`` to ``from_pretrained()``
-method of ``OVModelForCausalLM``. For 4 bit compression we provide
-``quantization_config=OVWeightQuantizationConfig(bits=4, ...)`` argument
-containing number of bits and other compression parameters. We will
-consider how to do it on RedPajama, LLAMA and Zephyr examples.
+Smaller group_size and ratio values usually improve accuracy at the
+sacrifice of the model size and inference latency.
 
    **Note**: There may be no speedup for INT4/INT8 compressed models on
    dGPU.
 
-Weights Compression using NNCF
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-You also can perform weights compression for OpenVINO models using NNCF
-directly. ``nncf.compress_weights`` function accepts OpenVINO model
-instance and compresses its weights for Linear and Embedding layers. We
-will consider this variant based on MPT model.
-
-   **Note**: This tutorial involves conversion model for FP16 and
-   INT4/INT8 weights compression scenarios. It may be memory and
-   time-consuming in the first run. You can manually control the
-   compression precision below.
-
 .. code:: ipython3
 
-    from IPython.display import display
+    from IPython.display import Markdown, display
     
     prepare_int4_model = widgets.Checkbox(
         value=True,
@@ -563,13 +506,10 @@ We can now save floating point and compressed model variants
 
 .. code:: ipython3
 
-    from optimum.intel import OVWeightQuantizationConfig
-    
-    nncf.set_log_level(logging.ERROR)
+    from pathlib import Path
     
     pt_model_id = model_configuration["model_id"]
     pt_model_name = model_id.value.split("-")[0]
-    model_type = AutoConfig.from_pretrained(pt_model_id, trust_remote_code=True).model_type
     fp16_model_dir = Path(model_id.value) / "FP16"
     int8_model_dir = Path(model_id.value) / "INT8_compressed_weights"
     int4_model_dir = Path(model_id.value) / "INT4_compressed_weights"
@@ -578,66 +518,28 @@ We can now save floating point and compressed model variants
     def convert_to_fp16():
         if (fp16_model_dir / "openvino_model.xml").exists():
             return
-        if not model_configuration["remote"]:
-            remote_code = model_configuration.get("remote_code", False)
-            model_kwargs = {}
-            if remote_code:
-                model_kwargs = {
-                    "trust_remote_code": True,
-                    "config": AutoConfig.from_pretrained(pt_model_id, trust_remote_code=True)
-                }
-            ov_model = OVModelForCausalLM.from_pretrained(
-                pt_model_id, export=True, compile=False, load_in_8bit=False, **model_kwargs
-            )
-            ov_model.half()
-            ov_model.save_pretrained(fp16_model_dir)
-            del ov_model
-        else:
-            model_kwargs = {}
-            if "revision" in model_configuration:
-                model_kwargs["revision"] = model_configuration["revision"]
-            model = AutoModelForCausalLM.from_pretrained(
-                model_configuration["model_id"],
-                torch_dtype=torch.float32,
-                trust_remote_code=True,
-                **model_kwargs
-            )
-            converters[pt_model_name](model, fp16_model_dir)
-            del model
-        gc.collect()
+        remote_code = model_configuration.get("remote_code", False)
+        export_command_base = "optimum-cli export openvino --model {} --task text-generation-with-past --weight-format fp16".format(pt_model_id)
+        if remote_code:
+            export_command_base += " --trust-remote-code"
+        export_command = export_command_base + " " + str(fp16_model_dir)
+        display(Markdown("**Export command:**"))
+        display(Markdown(f"`{export_command}`"))
+        ! $export_command
     
     
     def convert_to_int8():
         if (int8_model_dir / "openvino_model.xml").exists():
             return
         int8_model_dir.mkdir(parents=True, exist_ok=True)
-        if not model_configuration["remote"]:
-            remote_code = model_configuration.get("remote_code", False)
-            model_kwargs = {}
-            if remote_code:
-                model_kwargs = {
-                    "trust_remote_code": True,
-                    "config": AutoConfig.from_pretrained(pt_model_id, trust_remote_code=True)
-                }
-            ov_model = OVModelForCausalLM.from_pretrained(
-                pt_model_id, export=True, compile=False, load_in_8bit=True, **model_kwargs
-            )
-            ov_model.save_pretrained(int8_model_dir)
-            del ov_model
-        else:
-            convert_to_fp16()
-            ov_model = ov.Core().read_model(fp16_model_dir / "openvino_model.xml")
-            shutil.copy(fp16_model_dir / "config.json", int8_model_dir / "config.json")
-            configuration_file = fp16_model_dir / f"configuration_{model_type}.py"
-            if configuration_file.exists():
-                shutil.copy(
-                    configuration_file, int8_model_dir / f"configuration_{model_type}.py"
-                )
-            compressed_model = nncf.compress_weights(ov_model)
-            ov.save_model(compressed_model, int8_model_dir / "openvino_model.xml")
-            del ov_model
-            del compressed_model
-        gc.collect()
+        remote_code = model_configuration.get("remote_code", False)
+        export_command_base = "optimum-cli export openvino --model {} --task text-generation-with-past --weight-format int8".format(pt_model_id)
+        if remote_code:
+            export_command_base += " --trust-remote-code"
+        export_command = export_command_base + " " + str(int8_model_dir)
+        display(Markdown("**Export command:**"))
+        display(Markdown(f"`{export_command}`"))
+        ! $export_command
     
     
     def convert_to_int4():
@@ -687,12 +589,8 @@ We can now save floating point and compressed model variants
                 "group_size": 128,
                 "ratio": 0.72,
             },
-            "qwen-7b-chat": {
-                "sym": True,
-                "group_size": 128, 
-                "ratio": 0.6
-            },
-            'red-pajama-3b-chat': {
+            "qwen-7b-chat": {"sym": True, "group_size": 128, "ratio": 0.6},
+            "red-pajama-3b-chat": {
                 "sym": False,
                 "group_size": 128,
                 "ratio": 0.5,
@@ -704,44 +602,21 @@ We can now save floating point and compressed model variants
             },
         }
     
-        model_compression_params = compression_configs.get(
-            model_id.value, compression_configs["default"]
-        )
+        model_compression_params = compression_configs.get(model_id.value, compression_configs["default"])
         if (int4_model_dir / "openvino_model.xml").exists():
             return
-        int4_model_dir.mkdir(parents=True, exist_ok=True)
-        if not model_configuration["remote"]:
-            remote_code = model_configuration.get("remote_code", False)
-            model_kwargs = {}
-            if remote_code:
-                model_kwargs = {
-                    "trust_remote_code" : True,
-                    "config": AutoConfig.from_pretrained(pt_model_id, trust_remote_code=True)
-                }
-            ov_model = OVModelForCausalLM.from_pretrained(
-                pt_model_id, export=True, compile=False,
-                quantization_config=OVWeightQuantizationConfig(bits=4, **model_compression_params),
-                **model_kwargs
-            )
-            ov_model.save_pretrained(int4_model_dir)
-            del ov_model
-        else:
-            convert_to_fp16()
-            ov_model = ov.Core().read_model(fp16_model_dir / "openvino_model.xml")
-            shutil.copy(fp16_model_dir / "config.json", int4_model_dir / "config.json")
-            configuration_file = fp16_model_dir / f"configuration_{model_type}.py"
-            if configuration_file.exists():
-                shutil.copy(
-                    configuration_file, int4_model_dir / f"configuration_{model_type}.py"
-                )
-            mode = nncf.CompressWeightsMode.INT4_SYM if model_compression_params["sym"] else \
-                nncf.CompressWeightsMode.INT4_ASYM
-            del model_compression_params["sym"]
-            compressed_model = nncf.compress_weights(ov_model, mode=mode, **model_compression_params)
-            ov.save_model(compressed_model, int4_model_dir / "openvino_model.xml")
-            del ov_model
-            del compressed_model
-        gc.collect()
+        remote_code = model_configuration.get("remote_code", False)
+        export_command_base = "optimum-cli export openvino --model {} --task text-generation-with-past --weight-format int4".format(pt_model_id)
+        int4_compression_args = " --group-size {} --ratio {}".format(model_compression_params["group_size"], model_compression_params["ratio"])
+        if model_compression_params["sym"]:
+            int4_compression_args += " --sym"
+        export_command_base += int4_compression_args
+        if remote_code:
+            export_command_base += " --trust-remote-code"
+        export_command = export_command_base + " " + str(int4_model_dir)
+        display(Markdown("**Export command:**"))
+        display(Markdown(f"`{export_command}`"))
+        ! $export_command
     
     
     if prepare_fp16_model.value:
@@ -753,61 +628,55 @@ We can now save floating point and compressed model variants
 
 
 
-.. parsed-literal::
-
-    modeling_qwen.py:   0%|          | 0.00/55.6k [00:00<?, ?B/s]
+**Export command:**
 
 
-.. parsed-literal::
 
-    A new version of the following files was downloaded from https://huggingface.co/Qwen/Qwen-7B-Chat:
-    - cpp_kernels.py
-    . Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
-    A new version of the following files was downloaded from https://huggingface.co/Qwen/Qwen-7B-Chat:
-    - qwen_generation_utils.py
-    . Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
-    A new version of the following files was downloaded from https://huggingface.co/Qwen/Qwen-7B-Chat:
-    - modeling_qwen.py
-    - cpp_kernels.py
-    - qwen_generation_utils.py
-    . Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
-
+``optimum-cli export openvino --model TinyLlama/TinyLlama-1.1B-Chat-v1.0 --task text-generation-with-past --weight-format int4 --group-size 128 --ratio 0.8 tiny-llama-1b-chat/INT4_compressed_weights``
 
 
 .. parsed-literal::
 
-    Downloading shards:   0%|          | 0/8 [00:00<?, ?it/s]
-
-
-
-.. parsed-literal::
-
-    Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]
-
-
-
-.. parsed-literal::
-
-    generation_config.json:   0%|          | 0.00/273 [00:00<?, ?B/s]
-
-
-.. parsed-literal::
-
-    /home/ethan/intel/openvino_notebooks/openvino_env/lib/python3.11/site-packages/transformers/modeling_utils.py:4193: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    2024-04-11 11:48:29.180963: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-11 11:48:29.182830: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+    2024-04-11 11:48:29.219152: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+    2024-04-11 11:48:29.219549: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+    2024-04-11 11:48:29.930190: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    /home/ea/work/my_optimum_intel/optimum_env/lib/python3.8/site-packages/bitsandbytes/cextension.py:34: UserWarning: The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+      warn("The installed version of bitsandbytes was compiled without GPU support. "
+    /home/ea/work/my_optimum_intel/optimum_env/lib/python3.8/site-packages/bitsandbytes/libbitsandbytes_cpu.so: undefined symbol: cadam32bit_grad_fp32
+    WARNING[XFORMERS]: xFormers can't load C++/CUDA extensions. xFormers was built for:
+        PyTorch 2.0.1+cu118 with CUDA 1108 (you have 2.1.2+cpu)
+        Python  3.8.18 (you have 3.8.10)
+      Please reinstall xformers (see https://github.com/facebookresearch/xformers#installing-xformers)
+      Memory-efficient attention, SwiGLU, sparse and more won't be available.
+      Set XFORMERS_MORE_DETAILS=1 for more details
+    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, tensorflow, onnx, openvino
+    No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
+    Framework not specified. Using pt to export the model.
+    Using the export variant default. Available variants are:
+        - default: The default ONNX variant.
+    Using framework PyTorch: 2.1.2+cpu
+    Overriding 1 configuration item(s)
+    	- use_cache -> True
+    /home/ea/work/my_optimum_intel/optimum_env/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
-    /home/ethan/.cache/huggingface/modules/transformers_modules/Qwen/Qwen-7B-Chat/8d24619bab456ea5abe2823c1d05fc5edec19174/modeling_qwen.py:811: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if batch_size <= 0:
-    /home/ethan/.cache/huggingface/modules/transformers_modules/Qwen/Qwen-7B-Chat/8d24619bab456ea5abe2823c1d05fc5edec19174/modeling_qwen.py:835: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      elif kv_seq_len != hidden_states.size()[1]:
-    /home/ethan/.cache/huggingface/modules/transformers_modules/Qwen/Qwen-7B-Chat/8d24619bab456ea5abe2823c1d05fc5edec19174/modeling_qwen.py:1288: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if seqlen > self._seq_len_cached or ntk_alpha != self._ntk_alpha_cached:
-    /home/ethan/.cache/huggingface/modules/transformers_modules/Qwen/Qwen-7B-Chat/8d24619bab456ea5abe2823c1d05fc5edec19174/modeling_qwen.py:482: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if key_size > self.seq_length and self.use_logn_attn and not self.training:
-    /home/ethan/.cache/huggingface/modules/transformers_modules/Qwen/Qwen-7B-Chat/8d24619bab456ea5abe2823c1d05fc5edec19174/modeling_qwen.py:502: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if query.size(1) == key_size:
-    /home/ethan/intel/openvino_notebooks/openvino_env/lib/python3.11/site-packages/torch/jit/_trace.py:160: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at aten/src/ATen/core/TensorBody.h:489.)
-      if a.grad is not None:
-
+    The cos_cached attribute will be removed in 4.39. Bear in mind that its contents changed in v4.38. Use the forward method of RoPE from now on instead. It is not used in the `LlamaAttention` class
+    The sin_cached attribute will be removed in 4.39. Bear in mind that its contents changed in v4.38. Use the forward method of RoPE from now on instead. It is not used in the `LlamaAttention` class
+    /home/ea/work/my_optimum_intel/optimum_env/lib/python3.8/site-packages/optimum/exporters/openvino/model_patcher.py:311: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+      if sequence_length != 1:
+    [2KMixed-Precision assignment ━━━━━━━━━━━━━━━━━━━━ 100% 154/154 • 0:00:11 • 0:00:00;0;104;181m0:00:01181m0:00:01
+    INFO:nncf:Statistics of the bitwidth distribution:
+    ┍━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┑
+    │   Num bits (N) │ % all parameters (layers)   │ % ratio-defining parameters (layers)   │
+    ┝━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+    │              8 │ 30% (42 / 156)              │ 20% (40 / 154)                         │
+    ├────────────────┼─────────────────────────────┼────────────────────────────────────────┤
+    │              4 │ 70% (114 / 156)             │ 80% (114 / 154)                        │
+    ┕━━━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┙
+    [2KApplying Weight Compression ━━━━━━━━━━━━━━━━━━━ 100% 156/156 • 0:00:26 • 0:00:00;0;104;181m0:00:01181m0:00:02
+    
 
 Let’s compare model size for different compression types
 
@@ -821,31 +690,30 @@ Let’s compare model size for different compression types
         print(f"Size of FP16 model is {fp16_weights.stat().st_size / 1024 / 1024:.2f} MB")
     for precision, compressed_weights in zip([8, 4], [int8_weights, int4_weights]):
         if compressed_weights.exists():
-            print(
-                f"Size of model with INT{precision} compressed weights is {compressed_weights.stat().st_size / 1024 / 1024:.2f} MB"
-            )
+            print(f"Size of model with INT{precision} compressed weights is {compressed_weights.stat().st_size / 1024 / 1024:.2f} MB")
         if compressed_weights.exists() and fp16_weights.exists():
-            print(
-                f"Compression rate for INT{precision} model: {fp16_weights.stat().st_size / compressed_weights.stat().st_size:.3f}"
-            )
+            print(f"Compression rate for INT{precision} model: {fp16_weights.stat().st_size / compressed_weights.stat().st_size:.3f}")
 
 
 .. parsed-literal::
 
-    Size of FP16 model is 14729.26 MB
+    Size of model with INT4 compressed weights is 696.19 MB
 
 
 Select device for inference and model variant
 ---------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
    **Note**: There may be no speedup for INT4/INT8 compressed models on
    dGPU.
 
 .. code:: ipython3
 
+    import openvino as ov
+    
     core = ov.Core()
+    
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
         value="CPU",
@@ -860,16 +728,9 @@ Select device for inference and model variant
 
 .. parsed-literal::
 
-    Dropdown(description='Device:', options=('CPU', 'AUTO'), value='CPU')
+    Dropdown(description='Device:', options=('CPU', 'GPU.0', 'GPU.1', 'AUTO'), value='CPU')
 
 
-
-The cell below create ``OVMPTModel`` and ``OVCHATGLM2Model`` wrapper
-based on ``OVModelForCausalLM`` model.
-
-.. code:: ipython3
-
-    from ov_llm_model import model_classes
 
 The cell below demonstrates how to instantiate model based on selected
 variant of model weights and inference device
@@ -898,13 +759,50 @@ variant of model weights and inference device
 
 .. parsed-literal::
 
-    Dropdown(description='Model to run:', options=('FP16',), value='FP16')
+    Dropdown(description='Model to run:', options=('INT4',), value='INT4')
 
 
+
+Instantiate Model using Optimum Intel
+-------------------------------------
+
+`back to top ⬆️ <#Table-of-contents:>`__
+
+Optimum Intel can be used to load optimized models from the `Hugging
+Face Hub <https://huggingface.co/docs/optimum/intel/hf.co/models>`__ and
+create pipelines to run an inference with OpenVINO Runtime using Hugging
+Face APIs. The Optimum Inference models are API compatible with Hugging
+Face Transformers models. This means we just need to replace
+``AutoModelForXxx`` class with the corresponding ``OVModelForXxx``
+class.
+
+Below is an example of the RedPajama model
+
+.. code:: diff
+
+   -from transformers import AutoModelForCausalLM
+   +from optimum.intel.openvino import OVModelForCausalLM
+   from transformers import AutoTokenizer, pipeline
+
+   model_id = "togethercomputer/RedPajama-INCITE-Chat-3B-v1"
+   -model = AutoModelForCausalLM.from_pretrained(model_id)
+   +model = OVModelForCausalLM.from_pretrained(model_id, export=True)
+
+Model class initialization starts with calling ``from_pretrained``
+method. When downloading and converting Transformers model, the
+parameter ``export=True`` should be added (as we already converted model
+before, we do not need to provide this parameter). We can save the
+converted model for the next usage with the ``save_pretrained`` method.
+Tokenizer class and pipelines API are compatible with Optimum models.
+
+You can find more details about OpenVINO LLM inference using HuggingFace
+Optimum API in `LLM inference
+guide <https://docs.openvino.ai/2024/learn-openvino/llm_inference_guide.html>`__.
 
 .. code:: ipython3
 
-    from transformers import AutoTokenizer
+    from transformers import AutoConfig, AutoTokenizer
+    from optimum.intel.openvino import OVModelForCausalLM
     
     if model_to_run.value == "INT4":
         model_dir = int4_model_dir
@@ -922,33 +820,15 @@ variant of model weights and inference device
         ov_config["INFERENCE_PRECISION_HINT"] = "f32"
     
     model_name = model_configuration["model_id"]
-    class_key = model_id.value.split("-")[0]
-    tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+    tok = AutoTokenizer.from_pretrained(model_dir, trust_remote_code=True)
     
-    model_class = (
-        OVModelForCausalLM
-        if not model_configuration["remote"]
-        else model_classes[class_key]
-    )
-    ov_model = model_class.from_pretrained(
+    ov_model = OVModelForCausalLM.from_pretrained(
         model_dir,
         device=device.value,
         ov_config=ov_config,
         config=AutoConfig.from_pretrained(model_dir, trust_remote_code=True),
         trust_remote_code=True,
     )
-
-
-.. parsed-literal::
-
-    Loading model from qwen-7b-chat/FP16
-
-
-.. parsed-literal::
-
-    The argument `trust_remote_code` is to be used along with export=True. It will be ignored.
-    Compiling the model to CPU ...
-
 
 .. code:: ipython3
 
@@ -961,13 +841,18 @@ variant of model weights and inference device
 
 .. parsed-literal::
 
-    2 + 2 = (1
+    Setting `pad_token_id` to `eos_token_id`:2 for open-end generation.
+
+
+.. parsed-literal::
+
+    2 + 2 = 4
 
 
 Run Chatbot
 -----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, when model created, we can setup Chatbot interface using
 `Gradio <https://www.gradio.app/>`__. The diagram below illustrates how
@@ -992,7 +877,7 @@ decoding methods in this
 generation updates conversation history for next conversation step. it
 makes stronger connection of next question with previously provided and
 allows user to make clarifications regarding previously provided
-answers.
+answers.https://docs.openvino.ai/2024/learn-openvino/llm_inference_guide.html
 
 | There are several parameters that can control text generation quality:
   \* ``Temperature`` is a parameter used to control the level of
@@ -1042,10 +927,12 @@ answers.
    A token that has already appeared five times is penalized more
    heavily than a token that has appeared only one time. A value of 1
    means that there is no penalty and values larger than 1 discourage
-   repeated tokens.
+   repeated
+   tokens.https://docs.openvino.ai/2024/learn-openvino/llm_inference_guide.html
 
 .. code:: ipython3
 
+    import torch
     from threading import Event, Thread
     from uuid import uuid4
     from typing import List, Tuple
@@ -1082,9 +969,7 @@ answers.
         ["Can you explain to me briefly what is Python programming language?"],
         ["Explain the plot of Cinderella in a sentence."],
         ["What are some common mistakes to avoid when writing code?"],
-        [
-            "Write a 100-word blog post on “Benefits of Artificial Intelligence and OpenVINO“"
-        ],
+        ["Write a 100-word blog post on “Benefits of Artificial Intelligence and OpenVINO“"],
     ]
     
     japanese_examples = [
@@ -1097,13 +982,7 @@ answers.
         ["人工知能と「OpenVINOの利点」について100語程度のブログ記事を書いてください。"],
     ]
     
-    examples = (
-        chinese_examples
-        if (model_language.value == "Chinese")
-        else japanese_examples
-        if (model_language.value == "Japanese")
-        else english_examples
-    )
+    examples = chinese_examples if (model_language.value == "Chinese") else japanese_examples if (model_language.value == "Japanese") else english_examples
     
     max_new_tokens = 256
     
@@ -1112,9 +991,7 @@ answers.
         def __init__(self, token_ids):
             self.token_ids = token_ids
     
-        def __call__(
-            self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
-        ) -> bool:
+        def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
             for stop_id in self.token_ids:
                 if input_ids[0][-1] == stop_id:
                     return True
@@ -1143,9 +1020,7 @@ answers.
         return partial_text
     
     
-    text_processor = model_configuration.get(
-        "partial_text_processor", default_partial_text_processor
-    )
+    text_processor = model_configuration.get("partial_text_processor", default_partial_text_processor)
     
     
     def convert_history_to_token(history: List[Tuple[str, str]]):
@@ -1159,7 +1034,7 @@ answers.
         if pt_model_name == "baichuan2":
             system_tokens = tok.encode(start_message)
             history_tokens = []
-            for (old_query, response) in history[:-1]:
+            for old_query, response in history[:-1]:
                 round_tokens = []
                 round_tokens.append(195)
                 round_tokens.extend(tok.encode(old_query))
@@ -1181,23 +1056,11 @@ answers.
                     messages.append({"role": "user", "content": user_msg})
                 if model_msg:
                     messages.append({"role": "assistant", "content": model_msg})
-                    
-            input_token = tok.apply_chat_template(messages,
-                                                  add_generation_prompt=True,
-                                                  tokenize=True,
-                                                  return_tensors="pt")
+    
+            input_token = tok.apply_chat_template(messages, add_generation_prompt=True, tokenize=True, return_tensors="pt")
         else:
             text = start_message + "".join(
-                [
-                    "".join(
-                        [
-                            history_template.format(
-                                num=round, user=item[0], assistant=item[1]
-                            )
-                        ]
-                    )
-                    for round, item in enumerate(history[:-1])
-                ]
+                ["".join([history_template.format(num=round, user=item[0], assistant=item[1])]) for round, item in enumerate(history[:-1])]
             )
             text += "".join(
                 [
@@ -1251,9 +1114,7 @@ answers.
         if input_ids.shape[1] > 2000:
             history = [history[-1]]
             input_ids = convert_history_to_token(history)
-        streamer = TextIteratorStreamer(
-            tok, timeout=30.0, skip_prompt=True, skip_special_tokens=True
-        )
+        streamer = TextIteratorStreamer(tok, timeout=30.0, skip_prompt=True, skip_special_tokens=True)
         generate_kwargs = dict(
             input_ids=input_ids,
             max_new_tokens=max_new_tokens,
@@ -1265,8 +1126,7 @@ answers.
             streamer=streamer,
         )
         if stop_tokens is not None:
-            generate_kwargs["stopping_criteria"] = StoppingCriteriaList(
-                stop_tokens)
+            generate_kwargs["stopping_criteria"] = StoppingCriteriaList(stop_tokens)
     
         stream_complete = Event()
     
@@ -1305,8 +1165,7 @@ answers.
         css=".disclaimer {font-variant-caps: all-small-caps;}",
     ) as demo:
         conversation_id = gr.State(get_uuid)
-        gr.Markdown(
-            f"""<h1><center>OpenVINO {model_id.value} Chatbot</center></h1>""")
+        gr.Markdown(f"""<h1><center>OpenVINO {model_id.value} Chatbot</center></h1>""")
         chatbot = gr.Chatbot(height=500)
         with gr.Row():
             with gr.Column():
@@ -1371,9 +1230,7 @@ answers.
                                 interactive=True,
                                 info="Penalize repetition — 1.0 to disable.",
                             )
-        gr.Examples(
-            examples, inputs=msg, label="Click on any example and press the 'Submit' button"
-        )
+        gr.Examples(examples, inputs=msg, label="Click on any example and press the 'Submit' button")
     
         submit_event = msg.submit(
             fn=user,
@@ -1432,8 +1289,11 @@ answers.
     # please uncomment and run this cell for stopping gradio interface
     # demo.close()
 
+Next Step
+~~~~~~~~~
 
-.. parsed-literal::
-
-    Closing server running on port: 5467
-
+Besides chatbot, we can use LangChain to augmenting LLM knowledge with
+additional data, which allow you to build AI applications that can
+reason about private data or data introduced after a model’s cutoff
+date. You can find this solution in `Retrieval-augmented generation
+(RAG) example <../llm-rag-langchain/>`__.

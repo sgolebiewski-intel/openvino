@@ -17,48 +17,48 @@ navigation.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Introduction <#introduction>`__
+-  `Introduction <#Introduction>`__
 
-   -  `Task <#task>`__
-   -  `Model <#model>`__
+   -  `Task <#Task>`__
+   -  `Model <#Model>`__
 
 -  `Part 1: Inference pipeline with
-   OpenVINO <#part-1-inference-pipeline-with-openvino>`__
+   OpenVINO <#Part-1:-Inference-pipeline-with-OpenVINO>`__
 
-   -  `Install prerequisites <#install-prerequisites>`__
-   -  `Imports <#imports>`__
-   -  `Setting up HuggingFace cache <#setting-up-huggingface-cache>`__
-   -  `Select inference device <#select-inference-device>`__
-   -  `Download resources <#download-resources>`__
-   -  `Create inference pipeline <#create-inference-pipeline>`__
-   -  `Inference on new input <#inference-on-new-input>`__
+   -  `Install prerequisites <#Install-prerequisites>`__
+   -  `Imports <#Imports>`__
+   -  `Setting up HuggingFace cache <#Setting-up-HuggingFace-cache>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Download resources <#Download-resources>`__
+   -  `Create inference pipeline <#Create-inference-pipeline>`__
+   -  `Inference on new input <#Inference-on-new-input>`__
 
 -  `Part 2: OpenVINO post-training quantization with HuggingFace
-   Optimum <#part-2-openvino-post-training-quantization-with-huggingface-optimum>`__
+   Optimum <#Part-2:-OpenVINO-post-training-quantization-with-HuggingFace-Optimum>`__
 
    -  `Define constants and
-      functions <#define-constants-and-functions>`__
-   -  `Load resources <#load-resources>`__
-   -  `Load calibration dataset <#load-calibration-dataset>`__
-   -  `Quantize model <#quantize-model>`__
-   -  `Load quantized model <#load-quantized-model>`__
+      functions <#Define-constants-and-functions>`__
+   -  `Load resources <#Load-resources>`__
+   -  `Load calibration dataset <#Load-calibration-dataset>`__
+   -  `Quantize model <#Quantize-model>`__
+   -  `Load quantized model <#Load-quantized-model>`__
    -  `Inference on new input using quantized
-      model <#inference-on-new-input-using-quantized-model>`__
-   -  `Load evaluation set <#load-evaluation-set>`__
-   -  `Evaluate model <#evaluate-model>`__
+      model <#Inference-on-new-input-using-quantized-model>`__
+   -  `Load evaluation set <#Load-evaluation-set>`__
+   -  `Evaluate model <#Evaluate-model>`__
 
--  `Additional resources <#additional-resources>`__
--  `Clean up <#clean-up>`__
+-  `Additional resources <#Additional-resources>`__
+-  `Clean up <#Clean-up>`__
 
 Introduction
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Task
 ~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 **Programming language classification** is the task of identifying which
 programming language is used in an arbitrary code snippet. This can be
@@ -86,15 +86,15 @@ used in Golang, but was later introduced in Python 3.8.
 Model
 ~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The classification model that will be used in this notebook is
-`CodeBERTa-language-id <https://huggingface.co/huggingface/CodeBERTa-language-id>`__
+```CodeBERTa-language-id`` <https://huggingface.co/huggingface/CodeBERTa-language-id>`__
 by HuggingFace. This model was fine-tuned from the masked language
 modeling model
-`CodeBERTa-small-v1 <https://huggingface.co/huggingface/CodeBERTa-small-v1>`__
+```CodeBERTa-small-v1`` <https://huggingface.co/huggingface/CodeBERTa-small-v1>`__
 trained on the
-`CodeSearchNet <https://huggingface.co/huggingface/CodeBERTa-small-v1>`__
+```CodeSearchNet`` <https://huggingface.co/huggingface/CodeBERTa-small-v1>`__
 dataset (Husain, 2019).
 
 It supports 6 programming languages: - Go - Java - JavaScript - PHP -
@@ -103,7 +103,7 @@ Python - Ruby
 Part 1: Inference pipeline with OpenVINO
 ----------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For this section, we will use the `HuggingFace
 Optimum <https://huggingface.co/docs/optimum/index>`__ library, which
@@ -115,7 +115,7 @@ will allow to automatically convert models to the OpenVINO™ IR format.
 Install prerequisites
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, complete the `repository installation steps <../../README.md>`__.
 
@@ -124,7 +124,7 @@ OpenVINO support - HuggingFace Evaluate to benchmark results
 
 .. code:: ipython3
 
-    %pip install -q "diffusers>=0.17.1" "openvino>=2023.1.0" "nncf>=2.5.0" "gradio" "onnx>=1.11.0" "transformers>=4.33.0" "torch>=2.1" "evaluate" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "diffusers>=0.17.1" "openvino>=2023.1.0" "nncf>=2.5.0" "gradio>=4.19" "onnx>=1.11.0" "transformers>=4.33.0" "torch>=2.1" "evaluate" --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "git+https://github.com/huggingface/optimum-intel.git"
 
 
@@ -146,7 +146,7 @@ OpenVINO support - HuggingFace Evaluate to benchmark results
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The import ``OVModelForSequenceClassification`` from Optimum is
 equivalent to ``AutoModelForSequenceClassification`` from Transformers
@@ -160,21 +160,21 @@ equivalent to ``AutoModelForSequenceClassification`` from Transformers
     from datasets import load_dataset, Dataset
     import evaluate
     from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
-    from optimum.intel import OVModelForSequenceClassification  
-    from optimum.intel.openvino import OVConfig, OVQuantizer
+    from optimum.intel import OVModelForSequenceClassification
+    from optimum.intel.openvino import OVConfig, OVQuantizer, OVWeightQuantizationConfig
     from huggingface_hub.utils import RepositoryNotFoundError
 
 
 .. parsed-literal::
 
-    2024-04-09 22:48:44.394944: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-09 22:48:44.428815: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-17 23:25:25.155476: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-17 23:25:25.190609: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-04-09 22:48:45.065699: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-17 23:25:25.785655: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 .. parsed-literal::
@@ -184,13 +184,14 @@ equivalent to ``AutoModelForSequenceClassification`` from Transformers
 
 .. parsed-literal::
 
-    No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/diffusers/utils/outputs.py:63: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
+      torch.utils._pytree._register_pytree_node(
 
 
 Setting up HuggingFace cache
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Resources from HuggingFace will be downloaded in the local folder
 ``./model`` (next to this notebook) instead of the device global cache
@@ -206,7 +207,7 @@ for easy cleanup. Learn more
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -219,8 +220,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -238,7 +239,7 @@ select device from dropdown list for running inference using OpenVINO
 Download resources
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -272,12 +273,6 @@ Download resources
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
-      return self.fget.__get__(instance, owner)()
-
-
-.. parsed-literal::
-
     Some weights of the model checkpoint at huggingface/CodeBERTa-language-id were not used when initializing RobertaForSequenceClassification: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
     - This IS expected if you are initializing RobertaForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
     - This IS NOT expected if you are initializing RobertaForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
@@ -285,13 +280,7 @@ Download resources
 
 .. parsed-literal::
 
-    Using the export variant default. Available variants are:
-        - default: The default ONNX variant.
-
-
-.. parsed-literal::
-
-    Using framework PyTorch: 2.1.0+cpu
+    Using framework PyTorch: 2.2.2+cpu
 
 
 .. parsed-literal::
@@ -316,7 +305,7 @@ Download resources
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
 
 
@@ -327,13 +316,13 @@ Download resources
 
 .. parsed-literal::
 
-    Ressources cached locally at: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/code-language-id/model/CodeBERTa-language-id
+    Ressources cached locally at: /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/code-language-id/model/CodeBERTa-language-id
 
 
 Create inference pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -342,7 +331,7 @@ Create inference pipeline
 Inference on new input
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -367,7 +356,7 @@ Inference on new input
 Part 2: OpenVINO post-training quantization with HuggingFace Optimum
 --------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In this section, we will quantize a trained model. At a high-level, this
 process consists of using lower precision numbers in the model, which
@@ -382,7 +371,7 @@ more <https://huggingface.co/docs/optimum/main/en/intel/index>`__.
 Define constants and functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -403,9 +392,16 @@ Define constants and functions
     
     def map_labels(example: dict) -> dict:
         """Convert string labels to integers"""
-        label_mapping = {"go": 0, "java": 1, "javascript": 2, "php": 3, "python": 4, "ruby": 5}
+        label_mapping = {
+            "go": 0,
+            "java": 1,
+            "javascript": 2,
+            "php": 3,
+            "python": 4,
+            "ruby": 5,
+        }
         example["language"] = label_mapping[example["language"]]
-        return example 
+        return example
     
     
     def get_dataset_sample(dataset_split: str, num_samples: int) -> Dataset:
@@ -418,13 +414,13 @@ Define constants and functions
             subset = load_dataset("code_search_net", split=dataset_split, name=label, streaming=True)
             subset = subset.map(map_labels)
             examples.extend([example for example in subset.shuffle().take(example_per_label)])
-        
+    
         return Dataset.from_list(examples)
 
 Load resources
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NOTE: the base model is loaded using
 ``AutoModelForSequenceClassification`` from ``Transformers``
@@ -435,7 +431,8 @@ NOTE: the base model is loaded using
     base_model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID)
     
     quantizer = OVQuantizer.from_pretrained(base_model)
-    quantization_config = OVConfig()
+    quantization_config = OVWeightQuantizationConfig()
+    ov_config = OVConfig(quantization_config=quantization_config)
 
 
 .. parsed-literal::
@@ -448,7 +445,7 @@ NOTE: the base model is loaded using
 Load calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``get_dataset_sample()`` function will sample up to ``num_samples``,
 with an equal number of examples across the 6 programming languages.
@@ -472,7 +469,7 @@ NOTE: Uncomment the method below to download and use the full dataset
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/datasets/load.py:1461: FutureWarning: The repository for code_search_net contains custom code which must be executed to correctly load the dataset. You can inspect the repository content at https://hf.co/datasets/code_search_net
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/datasets/load.py:1461: FutureWarning: The repository for code_search_net contains custom code which must be executed to correctly load the dataset. You can inspect the repository content at https://hf.co/datasets/code_search_net
     You can avoid this message in future by passing the argument `trust_remote_code=True`.
     Passing `trust_remote_code=True` will be mandatory to load this dataset from the next major release of `datasets`.
       warnings.warn(
@@ -487,7 +484,7 @@ NOTE: Uncomment the method below to download and use the full dataset
 Quantize model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Calling ``quantizer.quantize(...)`` will iterate through the calibration
 dataset to quantize and save the model
@@ -495,15 +492,10 @@ dataset to quantize and save the model
 .. code:: ipython3
 
     quantizer.quantize(
-        quantization_config=quantization_config,
+        ov_config=ov_config,
         calibration_dataset=calibration_sample,
         save_directory=QUANTIZED_MODEL_LOCAL_PATH,
     )
-
-
-.. parsed-literal::
-
-    The argument `quantization_config` is deprecated, and will be removed in optimum-intel v1.6.0, please use `ov_config` instead
 
 
 .. parsed-literal::
@@ -516,51 +508,15 @@ dataset to quantize and save the model
     Passing the argument `library_name` to `get_supported_tasks_for_model_type` is required, but got library_name=None. Defaulting to `transformers`. An error will be raised in a future version of Optimum if `library_name` is not provided.
 
 
-
 .. parsed-literal::
 
-    Output()
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
-
-
-
-
-.. parsed-literal::
-
-    Output()
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
-
-
-
-.. parsed-literal::
-
-    INFO:nncf:18 ignored nodes were found by name in the NNCFGraph
+    INFO:nncf:Statistics of the bitwidth distribution:
+    +--------------+---------------------------+-----------------------------------+
+    | Num bits (N) | % all parameters (layers) |    % ratio-defining parameters    |
+    |              |                           |             (layers)              |
+    +==============+===========================+===================================+
+    | 8            | 100% (41 / 41)            | 100% (41 / 41)                    |
+    +--------------+---------------------------+-----------------------------------+
 
 
 
@@ -586,53 +542,7 @@ dataset to quantize and save the model
 
 .. parsed-literal::
 
-    INFO:nncf:Compiling and loading torch extension: quantized_functions_cpu...
-
-
-.. parsed-literal::
-
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-
-
-.. parsed-literal::
-
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-
-
-.. parsed-literal::
-
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-
-
-.. parsed-literal::
-
-    INFO:nncf:Finished loading torch extension: quantized_functions_cpu
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
-
-
-
-.. parsed-literal::
-
-    Using framework PyTorch: 2.1.0+cpu
+    Using framework PyTorch: 2.2.2+cpu
 
 
 .. parsed-literal::
@@ -659,31 +569,6 @@ dataset to quantize and save the model
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
-      warnings.warn(
-
-
-.. parsed-literal::
-
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/torch/quantization/layers.py:337: TracerWarning: Converting a tensor to a Python number might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      return self._level_low.item()
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/torch/quantization/layers.py:345: TracerWarning: Converting a tensor to a Python number might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      return self._level_high.item()
-
-
-.. parsed-literal::
-
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:1093: TracerWarning: Output nr 1. of the traced function does not match the corresponding output of the Python function. Detailed error:
-    Tensor-likes are not close!
-    
-    Mismatched elements: 12 / 12 (100.0%)
-    Greatest absolute difference: 0.16776657104492188 at index (0, 1) (up to 1e-05 allowed)
-    Greatest relative difference: 0.13343121132375219 at index (0, 3) (up to 1e-05 allowed)
-      _check_trace(
-
-
-.. parsed-literal::
-
     WARNING:nncf:You are setting `forward` on an NNCF-processed model object.
     NNCF relies on custom-wrapping the `forward` call in order to function properly.
     Arbitrary adjustments to the forward function on an NNCFNetwork object have undefined behavior.
@@ -694,10 +579,15 @@ dataset to quantize and save the model
     if `fn` already had 0-th `self` argument bound or never had it in the first place.
 
 
+.. parsed-literal::
+
+    Configuration saved in model/CodeBERTa-language-id-quantized/openvino_config.json
+
+
 Load quantized model
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NOTE: the argument ``export=True`` is not required since the quantized
 model is already in the OpenVINO format.
@@ -716,7 +606,7 @@ model is already in the OpenVINO format.
 Inference on new input using quantized model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -740,7 +630,7 @@ Inference on new input using quantized model
 Load evaluation set
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NOTE: Uncomment the method below to download and use the full dataset
 (5+ Gb).
@@ -751,19 +641,10 @@ NOTE: Uncomment the method below to download and use the full dataset
     
     # validation_sample = load_dataset(DATASET_NAME, split="validation")
 
-
-.. parsed-literal::
-
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/datasets/load.py:1461: FutureWarning: The repository for code_search_net contains custom code which must be executed to correctly load the dataset. You can inspect the repository content at https://hf.co/datasets/code_search_net
-    You can avoid this message in future by passing the argument `trust_remote_code=True`.
-    Passing `trust_remote_code=True` will be mandatory to load this dataset from the next major release of `datasets`.
-      warnings.warn(
-
-
 Evaluate model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -774,10 +655,10 @@ Evaluate model
             self.metric = metric
             self.metric_args = metric_args
             self.metric_kwargs = metric_kwargs
-        
+    
         def add(self, *args, **kwargs):
             return self.metric.add(*args, **kwargs)
-        
+    
         def add_batch(self, *args, **kwargs):
             return self.metric.add_batch(*args, **kwargs)
     
@@ -802,9 +683,11 @@ displayed.
 
     code_classification_evaluator = evaluate.evaluator("text-classification")
     # instantiate an object that can contain multiple `evaluate` metrics
-    metrics = evaluate.combine([
-        ConfiguredMetric(evaluate.load('f1'), average='macro'),
-    ])
+    metrics = evaluate.combine(
+        [
+            ConfiguredMetric(evaluate.load("f1"), average="macro"),
+        ]
+    )
     
     base_results = code_classification_evaluator.compute(
         model_or_pipeline=code_classification_pipe,
@@ -860,16 +743,16 @@ displayed.
         <tr>
           <th>base</th>
           <td>1.0</td>
-          <td>1.984054</td>
-          <td>60.482212</td>
-          <td>0.016534</td>
+          <td>2.077464</td>
+          <td>57.762723</td>
+          <td>0.017312</td>
         </tr>
         <tr>
           <th>quantized</th>
           <td>1.0</td>
-          <td>2.788312</td>
-          <td>43.036797</td>
-          <td>0.023236</td>
+          <td>1.988597</td>
+          <td>60.344039</td>
+          <td>0.016572</td>
         </tr>
       </tbody>
     </table>
@@ -880,7 +763,7 @@ displayed.
 Additional resources
 --------------------
 
-- `Grammatical Error Correction
+`back to top ⬆️ <#Table-of-contents:>`__ - `Grammatical Error Correction
 with OpenVINO <grammar-correction-with-output.html>`__ -
 `Quantize a Hugging Face Question-Answering Model with
 OpenVINO <https://github.com/huggingface/optimum-intel/blob/main/notebooks/openvino/question_answering_quantization.ipynb>`__\ \*\*
@@ -888,7 +771,7 @@ OpenVINO <https://github.com/huggingface/optimum-intel/blob/main/notebooks/openv
 Clean up
 --------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Uncomment and run cell below to delete all resources cached locally in
 ./model

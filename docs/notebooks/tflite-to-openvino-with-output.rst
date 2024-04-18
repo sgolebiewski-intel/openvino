@@ -17,31 +17,31 @@ and do inference with a sample image.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Preparation <#preparation>`__
+-  `Preparation <#Preparation>`__
 
-   -  `Install requirements <#install-requirements>`__
-   -  `Imports <#imports>`__
+   -  `Install requirements <#Install-requirements>`__
+   -  `Imports <#Imports>`__
 
--  `Download TFLite model <#download-tflite-model>`__
+-  `Download TFLite model <#Download-TFLite-model>`__
 -  `Convert a Model to OpenVINO IR
-   Format <#convert-a-model-to-openvino-ir-format>`__
+   Format <#Convert-a-Model-to-OpenVINO-IR-Format>`__
 -  `Load model using OpenVINO TensorFlow Lite
-   Frontend <#load-model-using-openvino-tensorflow-lite-frontend>`__
--  `Run OpenVINO model inference <#run-openvino-model-inference>`__
+   Frontend <#Load-model-using-OpenVINO-TensorFlow-Lite-Frontend>`__
+-  `Run OpenVINO model inference <#Run-OpenVINO-model-inference>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
--  `Estimate Model Performance <#estimate-model-performance>`__
+-  `Estimate Model Performance <#Estimate-Model-Performance>`__
 
 Preparation
 -----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -49,11 +49,13 @@ Install requirements
     %pip install -q opencv-python requests tqdm
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
-    );
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
+    )
+    
+    open("notebook_utils.py", "w").write(r.text)
 
 
 .. parsed-literal::
@@ -74,12 +76,20 @@ Install requirements
 .. parsed-literal::
 
     Note: you may need to restart the kernel to use updated packages.
+
+
+
+
+.. parsed-literal::
+
+    21503
+
 
 
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -93,7 +103,7 @@ Imports
 Download TFLite model
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -116,14 +126,14 @@ Download TFLite model
 
 .. parsed-literal::
 
-    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/tflite-to-openvino/model/efficientnet_lite0_fp32_2.tflite')
+    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/tflite-to-openvino/model/efficientnet_lite0_fp32_2.tflite')
 
 
 
 Convert a Model to OpenVINO IR Format
 -------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To convert the TFLite model to OpenVINO IR, model conversion Python API
 can be used. ``ov.convert_model`` function accepts the path to the
@@ -153,7 +163,7 @@ For TensorFlow Lite models support, refer to this
 Load model using OpenVINO TensorFlow Lite Frontend
 --------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 TensorFlow Lite models are supported via ``FrontEnd`` API. You may skip
 conversion to IR and read models directly by OpenVINO runtime API. For
@@ -169,7 +179,7 @@ this `tutorial <../openvino-api>`__.
 Run OpenVINO model inference
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We can find information about model input preprocessing in its
 `description <https://tfhub.dev/tensorflow/lite-model/efficientnet/lite0/fp32/2>`__
@@ -179,14 +189,14 @@ on `TensorFlow Hub <https://tfhub.dev/>`__.
 
     image = load_image("https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco_bricks.png")
     # load_image reads the image in BGR format, [:,:,::-1] reshape transfroms it to RGB
-    image = Image.fromarray(image[:,:,::-1])
+    image = Image.fromarray(image[:, :, ::-1])
     resized_image = image.resize((224, 224))
     input_tensor = np.expand_dims((np.array(resized_image).astype(np.float32) - 127) / 128, 0)
 
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -196,8 +206,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -248,7 +258,7 @@ select device from dropdown list for running inference using OpenVINO
 Estimate Model Performance
 --------------------------
 
-`Benchmark
+`back to top ⬆️ <#Table-of-contents:>`__ `Benchmark
 Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
 is used to measure the inference performance of the model on CPU and
 GPU.
@@ -288,7 +298,11 @@ GPU.
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
     [ INFO ] Loading model files
-    [ INFO ] Read model took 9.48 ms
+
+
+.. parsed-literal::
+
+    [ INFO ] Read model took 9.44 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     images (node: images) : f32 / [...] / [1,224,224,3]
@@ -306,7 +320,7 @@ GPU.
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 182.72 ms
+    [ INFO ] Compile model took 190.96 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
     [ INFO ]   NETWORK_NAME: TensorFlow_Lite_Frontend_IR
@@ -314,6 +328,10 @@ GPU.
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
     [ INFO ]   OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
     [ INFO ]   MULTI_DEVICE_PRIORITIES: CPU
+
+
+.. parsed-literal::
+
     [ INFO ]   CPU:
     [ INFO ]     AFFINITY: Affinity.CORE
     [ INFO ]     CPU_DENORMALS_OPTIMIZATION: False
@@ -341,19 +359,19 @@ GPU.
     [ INFO ] Fill input 'images' with random values 
     [Step 10/11] Measuring performance (Start inference asynchronously, 6 inference requests, limits: 15000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-    [ INFO ] First inference took 7.41 ms
+    [ INFO ] First inference took 7.52 ms
 
 
 .. parsed-literal::
 
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            17526 iterations
-    [ INFO ] Duration:         15004.29 ms
+    [ INFO ] Count:            17502 iterations
+    [ INFO ] Duration:         15008.50 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        5.00 ms
-    [ INFO ]    Average:       5.00 ms
-    [ INFO ]    Min:           2.91 ms
-    [ INFO ]    Max:           15.38 ms
-    [ INFO ] Throughput:   1168.07 FPS
+    [ INFO ]    Median:        5.01 ms
+    [ INFO ]    Average:       5.01 ms
+    [ INFO ]    Min:           3.20 ms
+    [ INFO ]    Max:           15.09 ms
+    [ INFO ] Throughput:   1166.14 FPS
 

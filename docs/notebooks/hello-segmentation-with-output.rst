@@ -13,19 +13,31 @@ recognizes four classes: background, road, curb and mark.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Download model weights <#download-model-weights>`__
--  `Select inference device <#select-inference-device>`__
--  `Load the Model <#load-the-model>`__
--  `Load an Image <#load-an-image>`__
--  `Do Inference <#do-inference>`__
--  `Prepare Data for Visualization <#prepare-data-for-visualization>`__
--  `Visualize data <#visualize-data>`__
+-  `Imports <#Imports>`__
+-  `Download model weights <#Download-model-weights>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `Load the Model <#Load-the-Model>`__
+-  `Load an Image <#Load-an-Image>`__
+-  `Do Inference <#Do-Inference>`__
+-  `Prepare Data for Visualization <#Prepare-Data-for-Visualization>`__
+-  `Visualize data <#Visualize-data>`__
 
 .. code:: ipython3
 
-    # Install openvino package
-    %pip install -q "openvino>=2023.1.0"
+    import platform
+    
+    # Install required packages
+    %pip install -q "openvino>=2023.1.0" opencv-python tqdm
+    
+    if platform.system() != "Windows":
+        %pip install -q "matplotlib>=3.4"
+    else:
+        %pip install -q "matplotlib>=3.4,<3.7"
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
 
 
 .. parsed-literal::
@@ -36,7 +48,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -46,18 +58,20 @@ Imports
     import openvino as ov
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     
     from notebook_utils import segmentation_map_to_image, download_file
 
 Download model weights
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -66,19 +80,23 @@ Download model weights
     base_model_dir = Path("./model").expanduser()
     
     model_name = "road-segmentation-adas-0001"
-    model_xml_name = f'{model_name}.xml'
-    model_bin_name = f'{model_name}.bin'
+    model_xml_name = f"{model_name}.xml"
+    model_bin_name = f"{model_name}.bin"
     
     model_xml_path = base_model_dir / model_xml_name
     
     if not model_xml_path.exists():
-        model_xml_url = "https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/road-segmentation-adas-0001/FP32/road-segmentation-adas-0001.xml"
-        model_bin_url = "https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/road-segmentation-adas-0001/FP32/road-segmentation-adas-0001.bin"
+        model_xml_url = (
+            "https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/road-segmentation-adas-0001/FP32/road-segmentation-adas-0001.xml"
+        )
+        model_bin_url = (
+            "https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/road-segmentation-adas-0001/FP32/road-segmentation-adas-0001.bin"
+        )
     
         download_file(model_xml_url, model_xml_name, base_model_dir)
         download_file(model_bin_url, model_bin_name, base_model_dir)
     else:
-        print(f'{model_name} already downloaded to {base_model_dir}')
+        print(f"{model_name} already downloaded to {base_model_dir}")
 
 
 
@@ -96,7 +114,7 @@ Download model weights
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -107,8 +125,8 @@ select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -126,7 +144,7 @@ select device from dropdown list for running inference using OpenVINO
 Load the Model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -141,7 +159,7 @@ Load the Model
 Load an Image
 -------------
 
-A sample image from the
+`back to top ⬆️ <#Table-of-contents:>`__ A sample image from the
 `Mapillary Vistas <https://www.mapillary.com/dataset/vistas>`__ dataset
 is provided.
 
@@ -150,7 +168,7 @@ is provided.
     # Download the image from the openvino_notebooks storage
     image_filename = download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/empty_road_mapillary.jpg",
-        directory="data"
+        directory="data",
     )
     
     # The segmentation network expects images in BGR format.
@@ -166,9 +184,7 @@ is provided.
     resized_image = cv2.resize(image, (W, H))
     
     # Reshape to the network input shape.
-    input_image = np.expand_dims(
-        resized_image.transpose(2, 0, 1), 0
-    )  
+    input_image = np.expand_dims(resized_image.transpose(2, 0, 1), 0)
     plt.imshow(rgb_image)
 
 
@@ -182,7 +198,7 @@ is provided.
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7f90484cefa0>
+    <matplotlib.image.AxesImage at 0x7fcde9549940>
 
 
 
@@ -193,7 +209,7 @@ is provided.
 Do Inference
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -209,7 +225,7 @@ Do Inference
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7f9048137a90>
+    <matplotlib.image.AxesImage at 0x7fcd9050b400>
 
 
 
@@ -220,7 +236,7 @@ Do Inference
 Prepare Data for Visualization
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -240,7 +256,7 @@ Prepare Data for Visualization
 Visualize data
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -252,7 +268,7 @@ Visualize data
     
     # Fill the subplot.
     for ax, (name, image) in zip(axs, data.items()):
-        ax.axis('off')
+        ax.axis("off")
         ax.set_title(name)
         ax.imshow(image)
     

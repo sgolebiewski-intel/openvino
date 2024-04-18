@@ -40,29 +40,29 @@ This tutorial consists of the following steps
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prepare PyTorch Model <#prepare-pytorch-model>`__
+-  `Prepare PyTorch Model <#Prepare-PyTorch-Model>`__
 
-   -  `Install necessary packages <#install-necessary-packages>`__
-   -  `Imports and Settings <#imports-and-settings>`__
+   -  `Install necessary packages <#Install-necessary-packages>`__
+   -  `Imports and Settings <#Imports-and-Settings>`__
 
 -  `Convert model to OpenVINO Intermediate
-   Representation <#convert-model-to-openvino-intermediate-representation>`__
--  `Select inference device <#select-inference-device>`__
--  `Verify Model Inference <#verify-model-inference>`__
+   Representation <#Convert-model-to-OpenVINO-Intermediate-Representation>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `Verify Model Inference <#Verify-Model-Inference>`__
 
 Prepare PyTorch Model
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install necessary packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q "openvino>=2023.3.0" fvcore --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "openvino>=2023.3.0" torch opencv-python fvcore tqdm --extra-index-url https://download.pytorch.org/whl/cpu
 
 
 .. parsed-literal::
@@ -78,7 +78,7 @@ Install necessary packages
 Imports and Settings
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -93,11 +93,13 @@ Imports and Settings
     import openvino as ov
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     from notebook_utils import download_file
 
 .. code:: ipython3
@@ -123,7 +125,10 @@ each action. Read more about the dataset and the paper
     
     # load the pretrained model from the repository
     model = torch.hub.load(
-        repo_or_dir=MODEL_REPOSITORY, model=MODEL_NAME, pretrained=True, skip_validation=True
+        repo_or_dir=MODEL_REPOSITORY,
+        model=MODEL_NAME,
+        pretrained=True,
+        skip_validation=True,
     )
     
     # set the device to allocate tensors to. for example, "cpu" or "cuda"
@@ -476,9 +481,7 @@ mapping to a dict for later use.
 
 .. code:: ipython3
 
-    CLASSNAMES_SOURCE = (
-        "https://dl.fbaipublicfiles.com/pyslowfast/dataset/class_names/kinetics_classnames.json"
-    )
+    CLASSNAMES_SOURCE = "https://dl.fbaipublicfiles.com/pyslowfast/dataset/class_names/kinetics_classnames.json"
     CLASSNAMES_FILE = "kinetics_classnames.json"
     
     download_file(url=CLASSNAMES_SOURCE, directory=DATA_DIR, show_progress=True)
@@ -569,7 +572,7 @@ helper functions to implement the preprocessing steps.
         width = frame.shape[1]
         y_offset = int(math.ceil((height - size) / 2))
         x_offset = int(math.ceil((width - size) / 2))
-        cropped = frame[y_offset:y_offset + size, x_offset:x_offset + size, :]
+        cropped = frame[y_offset : y_offset + size, x_offset : x_offset + size, :]
         assert cropped.shape[0] == size, "Image height not cropped properly"
         assert cropped.shape[1] == size, "Image width not cropped properly"
         return cropped
@@ -599,7 +602,7 @@ helper functions to implement the preprocessing steps.
         slow_pathway = np.take(
             frames,
             indices=np.linspace(0, frames.shape[1] - 1, frames.shape[1] // alpha).astype(np.int_),
-            axis=1
+            axis=1,
         )
         frame_list = [slow_pathway, fast_pathway]
         return frame_list
@@ -667,9 +670,7 @@ model.
             ret, frame = video_cap.read()
             frames.append(frame)
         # prepare the inputs
-        inputs = process_inputs(
-            frames=frames, num_frames=num_frames, crop_size=crop_size, mean=mean, std=std
-        )
+        inputs = process_inputs(frames=frames, num_frames=num_frames, crop_size=crop_size, mean=mean, std=std)
     
         if isinstance(model, ov.CompiledModel):
             # openvino compiled model
@@ -681,7 +682,7 @@ model.
             predictions = predictions.detach().cpu().numpy()
     
         def softmax(x):
-            return (np.exp(x) / np.exp(x).sum(axis=None))
+            return np.exp(x) / np.exp(x).sum(axis=None)
     
         # apply activation
         predictions = softmax(predictions)
@@ -729,7 +730,7 @@ inference using the same. The top 5 predictions can be seen below.
 Convert model to OpenVINO Intermediate Representation
 -----------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now that we have obtained our trained model and checked inference with
 it, we export the PyTorch model to OpenVINO IR format. In this format,
@@ -757,7 +758,6 @@ either be compiled and inferred or serialized.
     IR_PATH = MODEL_DIR / "slowfast-r50.xml"
     
     
-    
     # serialize model for saving IR
     ov.save_model(model=model, output_model=str(IR_PATH), compress_to_fp16=False)
 
@@ -777,7 +777,7 @@ using the ``weights`` parameter.
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -787,8 +787,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -811,7 +811,7 @@ select device from dropdown list for running inference using OpenVINO
 Verify Model Inference
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Using the compiled model, we run inference on the same sample video and
 print the top 5 predictions again.

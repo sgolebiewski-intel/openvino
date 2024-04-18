@@ -31,34 +31,34 @@ Additionally, you can also upload a video file.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Preparation <#preparation>`__
+-  `Preparation <#Preparation>`__
 
-   -  `Install requirements <#install-requirements>`__
-   -  `Imports <#imports>`__
+   -  `Install requirements <#Install-requirements>`__
+   -  `Imports <#Imports>`__
 
--  `The Model <#the-model>`__
+-  `The Model <#The-Model>`__
 
-   -  `Download the Model <#download-the-model>`__
+   -  `Download the Model <#Download-the-Model>`__
    -  `Convert ONNX Model to OpenVINO IR
-      Format <#convert-onnx-model-to-openvino-ir-format>`__
-   -  `Load the Model <#load-the-model>`__
-   -  `Preprocess the image <#preprocess-the-image>`__
+      Format <#Convert-ONNX-Model-to-OpenVINO-IR-Format>`__
+   -  `Load the Model <#Load-the-Model>`__
+   -  `Preprocess the image <#Preprocess-the-image>`__
    -  `Helper function to postprocess the stylized
-      image <#helper-function-to-postprocess-the-stylized-image>`__
-   -  `Main Processing Function <#main-processing-function>`__
-   -  `Run Style Transfer <#run-style-transfer>`__
+      image <#Helper-function-to-postprocess-the-stylized-image>`__
+   -  `Main Processing Function <#Main-Processing-Function>`__
+   -  `Run Style Transfer <#Run-Style-Transfer>`__
 
--  `References <#references>`__
+-  `References <#References>`__
 
 Preparation
 -----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -66,16 +66,18 @@ Install requirements
     %pip install -q opencv-python requests tqdm
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
 
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -96,24 +98,25 @@ Pointilism to do the style transfer.
 
 .. code:: ipython3
 
-    # Option to select different styles    
+    # Option to select different styles
     styleButtons = ToggleButtons(
-        options=['MOSAIC', 'RAIN-PRINCESS', 'CANDY', 'UDNIE', 'POINTILISM'],
+        options=["MOSAIC", "RAIN-PRINCESS", "CANDY", "UDNIE", "POINTILISM"],
         description="Click one of the styles you want to use for the style transfer",
         disabled=False,
-        style={'description_width': '300px'})
-       
+        style={"description_width": "300px"},
+    )
+    
     interactive(lambda option: print(option), option=styleButtons)
 
 The Model
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the Model
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The style transfer model, selected in the previous step, will be
 downloaded to ``model_path`` if you have not already downloaded it. The
@@ -137,7 +140,7 @@ OpenVINO Intermediate Representation (IR) with ``FP16`` precision.
 Convert ONNX Model to OpenVINO IR Format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In the next step, you will convert the ONNX model to OpenVINO IR format
 with ``FP16`` precision. While ONNX models are directly supported by
@@ -166,7 +169,7 @@ this step.
 Load the Model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Both the ONNX model(s) and converted IR model(s) are stored in the
 ``model`` directory.
@@ -205,8 +208,8 @@ results.
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -239,7 +242,7 @@ respectively. For *fast-neural-style-mosaic-onnx*, there is 1 input and
 Preprocess the image
 ~~~~~~~~~~~~~~~~~~~~
 
-Preprocess the input image
+`back to top ⬆️ <#Table-of-contents:>`__ Preprocess the input image
 before running the model. Prepare the dimensions and channel order for
 the image to match the original image with the input tensor
 
@@ -254,12 +257,12 @@ the image to match the original image with the input tensor
         Preprocess input image to align with network size
     
         Parameters:
-            :param frame:  input frame 
+            :param frame:  input frame
             :param H:  height of the frame to style transfer model
             :param W:  width of the frame to style transfer model
             :returns: resized and transposed frame
         """
-        image = np.array(frame).astype('float32')
+        image = np.array(frame).astype("float32")
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         image = cv2.resize(src=image, dsize=(H, W), interpolation=cv2.INTER_AREA)
         image = np.transpose(image, [2, 0, 1])
@@ -269,7 +272,7 @@ the image to match the original image with the input tensor
 Helper function to postprocess the stylized image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The converted IR model outputs a NumPy ``float32`` array of the `(1, 3,
 224,
@@ -278,13 +281,13 @@ shape .
 
 .. code:: ipython3
 
-    # Postprocess the result        
+    # Postprocess the result
     def convert_result_to_image(frame, stylized_image) -> np.ndarray:
         """
         Postprocess stylized image for visualization
     
         Parameters:
-            :param frame:  input frame 
+            :param frame:  input frame
             :param stylized_image:  stylized image with specific style applied
             :returns: resized stylized image for visualization
         """
@@ -298,7 +301,7 @@ shape .
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The style transfer function can be run in different operating modes,
 either using a webcam or a video file.
@@ -313,10 +316,10 @@ either using a webcam or a video file.
         3. Run AI inference for style transfer.
         4. Visualize the results.
         Parameters:
-            source: The webcam number to feed the video stream with primary webcam set to "0", or the video path.  
+            source: The webcam number to feed the video stream with primary webcam set to "0", or the video path.
             flip: To be used by VideoPlayer function for flipping capture image.
             use_popup: False for showing encoded frames over this notebook, True for creating a popup window.
-            skip_first_frames: Number of frames to skip at the beginning of the video. 
+            skip_first_frames: Number of frames to skip at the beginning of the video.
         """
         # Create a video player to play with target fps.
         player = None
@@ -338,12 +341,17 @@ either using a webcam or a video file.
                 # If the frame is larger than full HD, reduce size to improve the performance.
                 scale = 720 / max(frame.shape)
                 if scale < 1:
-                    frame = cv2.resize(src=frame, dsize=None, fx=scale, fy=scale,
-                                       interpolation=cv2.INTER_AREA)
+                    frame = cv2.resize(
+                        src=frame,
+                        dsize=None,
+                        fx=scale,
+                        fy=scale,
+                        interpolation=cv2.INTER_AREA,
+                    )
                 # Preprocess the input image.
     
                 image = preprocess_images(frame, H, W)
-               
+    
                 # Measure processing time for the input image.
                 start_time = time.time()
                 # Perform the inference step.
@@ -362,10 +370,17 @@ either using a webcam or a video file.
                 # Visualize the results.
                 f_height, f_width = frame.shape[:2]
                 fps = 1000 / processing_time_det
-                cv2.putText(result_image, text=f"Inference time: {processing_time_det:.1f}ms ({fps:.1f} FPS)", 
-                            org=(20, 40),fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=f_width / 1000,
-                            color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
-                
+                cv2.putText(
+                    result_image,
+                    text=f"Inference time: {processing_time_det:.1f}ms ({fps:.1f} FPS)",
+                    org=(20, 40),
+                    fontFace=cv2.FONT_HERSHEY_COMPLEX,
+                    fontScale=f_width / 1000,
+                    color=(0, 0, 255),
+                    thickness=1,
+                    lineType=cv2.LINE_AA,
+                )
+    
                 # Use this workaround if there is flickering.
                 if use_popup:
                     cv2.imshow(title, result_image)
@@ -397,7 +412,7 @@ either using a webcam or a video file.
 Run Style Transfer
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, try to apply the style transfer model using video from your webcam
 or video file. By default, the primary webcam is set with ``source=0``.
@@ -429,7 +444,7 @@ OpenCV <https://docs.opencv.org/4.5.1/dd/d43/tutorial_py_video_display.html>`__
 References
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 1. `ONNX Model Zoo <https://github.com/onnx/models>`__
 2. `Fast Neural Style

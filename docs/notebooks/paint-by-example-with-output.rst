@@ -5,27 +5,27 @@ Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
 -  `Stable Diffusion in Diffusers
-   library <#stable-diffusion-in-diffusers-library>`__
--  `Download default images <#download-default-images>`__
+   library <#Stable-Diffusion-in-Diffusers-library>`__
+-  `Download default images <#Download-default-images>`__
 -  `Convert models to OpenVINO Intermediate representation (IR)
-   format <#convert-models-to-openvino-intermediate-representation-ir-format>`__
--  `Prepare Inference pipeline <#prepare-inference-pipeline>`__
--  `Select inference device <#select-inference-device>`__
--  `Configure Inference Pipeline <#configure-inference-pipeline>`__
--  `Quantization <#quantization>`__
+   format <#Convert-models-to-OpenVINO-Intermediate-representation-(IR)-format>`__
+-  `Prepare Inference pipeline <#Prepare-Inference-pipeline>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `Configure Inference Pipeline <#Configure-Inference-Pipeline>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Prepare Inference pipeline <#prepare-inference-pipeline>`__
-   -  `Run quantization <#run-quantization>`__
+   -  `Prepare Inference pipeline <#Prepare-Inference-pipeline>`__
+   -  `Run quantization <#Run-quantization>`__
    -  `Run inference and compare inference
-      time <#run-inference-and-compare-inference-time>`__
-   -  `Compare UNet file size <#compare-unet-file-size>`__
+      time <#Run-inference-and-compare-inference-time>`__
+   -  `Compare UNet file size <#Compare-UNet-file-size>`__
 
--  `Interactive inference <#interactive-inference>`__
+-  `Interactive inference <#Interactive-inference>`__
 
 Stable Diffusion in Diffusers library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To work with Stable Diffusion,
+`back to top ⬆️ <#Table-of-contents:>`__ To work with Stable Diffusion,
 we will use the Hugging Face
 `Diffusers <https://github.com/huggingface/diffusers>`__ library. To
 experiment with in-painting we can use Diffusers which exposes the
@@ -37,17 +37,17 @@ The code below demonstrates how to create
 ``stable-diffusion-2-inpainting``. To create the drawing tool we will
 install Gradio for handling user interaction.
 
-This is the overall flow of the application: |Flow Diagram|
+This is the overall flow of the application:
 
-This is the detailed flowchart for the pipeline: |pipeline-flowchart|
+.. figure:: https://user-images.githubusercontent.com/103226580/236954918-f364b227-293c-4f78-a9bf-9dcebcb1034a.png
+   :alt: Flow Diagram
 
-.. |Flow Diagram| image:: https://user-images.githubusercontent.com/103226580/236954918-f364b227-293c-4f78-a9bf-9dcebcb1034a.png
-.. |pipeline-flowchart| image:: https://github.com/openvinotoolkit/openvino_notebooks/assets/103226580/cde2d5c4-2540-4a45-ad9c-339f7a69459d
+   Flow Diagram
 
 .. code:: ipython3
 
     %pip install -q "torch>=2.1" torchvision --extra-index-url "https://download.pytorch.org/whl/cpu"
-    %pip install -q "diffusers>=0.25.0" "peft==0.6.2" "openvino>=2023.2.0" "transformers>=4.25.1" ipywidgets opencv_python pillow "nncf>=2.7.0" "gradio==3.44.1"
+    %pip install -q "diffusers>=0.25.0" "peft==0.6.2" "openvino>=2023.2.0" "transformers>=4.25.1" ipywidgets opencv-python pillow "nncf>=2.7.0" "gradio==3.44.1" tqdm
 
 
 .. parsed-literal::
@@ -88,38 +88,63 @@ This might take several minutes because it is over 5GB
 Download default images
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download default images.
 
 .. code:: ipython3
 
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     
     from notebook_utils import download_file
     
-    download_file("https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377210-edc98e97-0e43-4796-b771-dacd074c39ea.png", "0.png", "data/image")
+    download_file(
+        "https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377210-edc98e97-0e43-4796-b771-dacd074c39ea.png",
+        "0.png",
+        "data/image",
+    )
     
-    download_file("https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377233-b2c2d902-d379-415a-8183-5bdd37c52429.png", "1.png", "data/image")
+    download_file(
+        "https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377233-b2c2d902-d379-415a-8183-5bdd37c52429.png",
+        "1.png",
+        "data/image",
+    )
     
-    download_file("https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377248-da1db61e-3521-4cdb-85c8-1386d360ce22.png", "2.png", "data/image")
+    download_file(
+        "https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377248-da1db61e-3521-4cdb-85c8-1386d360ce22.png",
+        "2.png",
+        "data/image",
+    )
     
-    download_file("https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377279-fa496f17-e850-4351-87c5-2552dfbc4633.jpg", "bird.jpg", "data/reference")
+    download_file(
+        "https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377279-fa496f17-e850-4351-87c5-2552dfbc4633.jpg",
+        "bird.jpg",
+        "data/reference",
+    )
     
-    download_file("https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377298-06a25ff2-84d8-4d46-95cd-8c25efa690d8.jpg", "car.jpg", "data/reference")
+    download_file(
+        "https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377298-06a25ff2-84d8-4d46-95cd-8c25efa690d8.jpg",
+        "car.jpg",
+        "data/reference",
+    )
     
-    download_file("https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377318-8841a801-1933-4523-a433-7d2fb64c47e6.jpg", "dog.jpg", "data/reference")
-
+    download_file(
+        "https://github-production-user-asset-6210df.s3.amazonaws.com/103226580/286377318-8841a801-1933-4523-a433-7d2fb64c47e6.jpg",
+        "dog.jpg",
+        "data/reference",
+    )
 
 Convert models to OpenVINO Intermediate representation (IR) format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Adapted from `Stable Diffusion v2 Infinite Zoom
 notebook <stable-diffusion-v2-with-output.html>`__
@@ -149,16 +174,17 @@ Functions to convert to OpenVINO IR format
         torch.jit._state._clear_class_state()
     
     
-    def convert_image_encoder(image_encoder: torch.nn.Module, ir_path:Path):
+    def convert_image_encoder(image_encoder: torch.nn.Module, ir_path: Path):
         """
-        Convert Image Encoder model to IR. 
+        Convert Image Encoder model to IR.
         Function accepts pipeline, prepares example inputs for conversion
-        Parameters: 
+        Parameters:
             image_encoder (torch.nn.Module): image encoder PyTorch model
             ir_path (Path): File for storing model
         Returns:
             None
         """
+    
         class ImageEncoderWrapper(torch.nn.Module):
             def __init__(self, image_encoder):
                 super().__init__()
@@ -171,27 +197,29 @@ Functions to convert to OpenVINO IR format
         if not ir_path.exists():
             image_encoder = ImageEncoderWrapper(image_encoder)
             image_encoder.eval()
-            input_ids = torch.randn((1,3,224,224))
+            input_ids = torch.randn((1, 3, 224, 224))
             # switch model to inference mode
     
             # disable gradients calculation for reducing memory consumption
             with torch.no_grad():
-                ov_model = ov.convert_model(
-                    image_encoder,
-                    example_input=input_ids,
-                    input=([1,3,224,224],)
-                )
+                ov_model = ov.convert_model(image_encoder, example_input=input_ids, input=([1, 3, 224, 224],))
                 ov.save_model(ov_model, ir_path)
                 del ov_model
                 cleanup_torchscript_cache()
-            print('Image Encoder successfully converted to IR')
+            print("Image Encoder successfully converted to IR")
     
-            
-    def convert_unet(unet:torch.nn.Module, ir_path:Path, num_channels:int = 4, width:int = 64, height:int = 64):
+    
+    def convert_unet(
+        unet: torch.nn.Module,
+        ir_path: Path,
+        num_channels: int = 4,
+        width: int = 64,
+        height: int = 64,
+    ):
         """
-        Convert Unet model to IR format. 
-        Function accepts pipeline, prepares example inputs for conversion 
-        Parameters: 
+        Convert Unet model to IR format.
+        Function accepts pipeline, prepares example inputs for conversion
+        Parameters:
             unet (torch.nn.Module): UNet PyTorch model
             ir_path (Path): File for storing model
             num_channels (int, optional, 4): number of input channels
@@ -200,10 +228,7 @@ Functions to convert to OpenVINO IR format
         Returns:
             None
         """
-        dtype_mapping = {
-            torch.float32: ov.Type.f32,
-            torch.float64: ov.Type.f64
-        }
+        dtype_mapping = {torch.float32: ov.Type.f32, torch.float64: ov.Type.f64}
         if not ir_path.exists():
             # prepare inputs
             encoder_hidden_state = torch.ones((2, 1, 768))
@@ -219,23 +244,19 @@ Functions to convert to OpenVINO IR format
                 input_info.append((shape, element_type))
     
             with torch.no_grad():
-                ov_model = ov.convert_model(
-                    unet, 
-                    example_input=dummy_inputs,
-                    input=input_info
-                )
+                ov_model = ov.convert_model(unet, example_input=dummy_inputs, input=input_info)
                 ov.save_model(ov_model, ir_path)
                 del ov_model
                 cleanup_torchscript_cache()
-            print('U-Net successfully converted to IR')
+            print("U-Net successfully converted to IR")
     
     
-    def convert_vae_encoder(vae: torch.nn.Module, ir_path: Path, width:int = 512, height:int = 512):
+    def convert_vae_encoder(vae: torch.nn.Module, ir_path: Path, width: int = 512, height: int = 512):
         """
-        Convert VAE model to IR format. 
-        Function accepts VAE model, creates wrapper class for export only necessary for inference part, 
-        prepares example inputs for conversion, 
-        Parameters: 
+        Convert VAE model to IR format.
+        Function accepts VAE model, creates wrapper class for export only necessary for inference part,
+        prepares example inputs for conversion,
+        Parameters:
             vae (torch.nn.Module): VAE PyTorch model
             ir_path (Path): File for storing model
             width (int, optional, 512): input width
@@ -243,6 +264,7 @@ Functions to convert to OpenVINO IR format
         Returns:
             None
         """
+    
         class VAEEncoderWrapper(torch.nn.Module):
             def __init__(self, vae):
                 super().__init__()
@@ -257,26 +279,27 @@ Functions to convert to OpenVINO IR format
             vae_encoder.eval()
             image = torch.zeros((1, 3, width, height))
             with torch.no_grad():
-                ov_model = ov.convert_model(vae_encoder, example_input=image, input=([1,3, width, height],))
+                ov_model = ov.convert_model(vae_encoder, example_input=image, input=([1, 3, width, height],))
             ov.save_model(ov_model, ir_path)
             del ov_model
             cleanup_torchscript_cache()
-            print('VAE encoder successfully converted to IR')
+            print("VAE encoder successfully converted to IR")
     
     
-    def convert_vae_decoder(vae: torch.nn.Module, ir_path: Path, width:int = 64, height:int = 64):
+    def convert_vae_decoder(vae: torch.nn.Module, ir_path: Path, width: int = 64, height: int = 64):
         """
-        Convert VAE decoder model to IR format. 
-        Function accepts VAE model, creates wrapper class for export only necessary for inference part, 
-        prepares example inputs for conversion, 
-        Parameters: 
-            vae (torch.nn.Module): VAE model 
+        Convert VAE decoder model to IR format.
+        Function accepts VAE model, creates wrapper class for export only necessary for inference part,
+        prepares example inputs for conversion,
+        Parameters:
+            vae (torch.nn.Module): VAE model
             ir_path (Path): File for storing model
             width (int, optional, 64): input width
             height (int, optional, 64): input height
         Returns:
             None
         """
+    
         class VAEDecoderWrapper(torch.nn.Module):
             def __init__(self, vae):
                 super().__init__()
@@ -296,7 +319,7 @@ Functions to convert to OpenVINO IR format
             ov.save_model(ov_model, ir_path)
             del ov_model
             cleanup_torchscript_cache()
-            print('VAE decoder successfully converted to ')
+            print("VAE decoder successfully converted to ")
 
 Do the conversion of the in-painting model:
 
@@ -316,7 +339,7 @@ Do the conversion of the Unet model
 
 .. code:: ipython3
 
-    UNET_OV_PATH_INPAINT = sd2_inpainting_model_dir / 'unet.xml'
+    UNET_OV_PATH_INPAINT = sd2_inpainting_model_dir / "unet.xml"
     if not UNET_OV_PATH_INPAINT.exists():
         convert_unet(unet_inpaint, UNET_OV_PATH_INPAINT, num_channels=9, width=64, height=64)
         del unet_inpaint
@@ -330,14 +353,14 @@ Do the conversion of the VAE Encoder model
 
 .. code:: ipython3
 
-    VAE_ENCODER_OV_PATH_INPAINT = sd2_inpainting_model_dir / 'vae_encoder.xml'
+    VAE_ENCODER_OV_PATH_INPAINT = sd2_inpainting_model_dir / "vae_encoder.xml"
     
     if not VAE_ENCODER_OV_PATH_INPAINT.exists():
         convert_vae_encoder(vae_inpaint, VAE_ENCODER_OV_PATH_INPAINT, 512, 512)
     else:
         print(f"VAE encoder will be loaded from {VAE_ENCODER_OV_PATH_INPAINT}")
     
-    VAE_DECODER_OV_PATH_INPAINT = sd2_inpainting_model_dir / 'vae_decoder.xml'
+    VAE_DECODER_OV_PATH_INPAINT = sd2_inpainting_model_dir / "vae_decoder.xml"
     if not VAE_DECODER_OV_PATH_INPAINT.exists():
         convert_vae_decoder(vae_inpaint, VAE_DECODER_OV_PATH_INPAINT, 64, 64)
     else:
@@ -349,7 +372,7 @@ Do the conversion of the VAE Encoder model
 Prepare Inference pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Function to prepare the mask and masked image.
 
@@ -358,6 +381,13 @@ notebook <stable-diffusion-v2-with-output.html>`__
 
 The main difference is that instead of encoding a text prompt it will
 now encode an image as the prompt.
+
+This is the detailed flowchart for the pipeline:
+
+.. figure:: https://github.com/openvinotoolkit/openvino_notebooks/assets/103226580/cde2d5c4-2540-4a45-ad9c-339f7a69459d
+   :alt: pipeline-flowchart
+
+   pipeline-flowchart
 
 .. code:: ipython3
 
@@ -372,7 +402,7 @@ now encode an image as the prompt.
     from openvino.runtime import Model
     
     
-    def prepare_mask_and_masked_image(image:PIL.Image.Image, mask:PIL.Image.Image):
+    def prepare_mask_and_masked_image(image: PIL.Image.Image, mask: PIL.Image.Image):
         """
         Prepares a pair (image, mask) to be consumed by the Stable Diffusion pipeline. This means that those inputs will be
         converted to ``np.array`` with shapes ``batch x channels x height x width`` where ``channels`` is ``3`` for the
@@ -496,11 +526,7 @@ decode –> image encode –> tokenizer –> Unet –> VAE model –> scheduler
             masked_image_latents = 0.18215 * masked_image_latents
     
             mask = np.concatenate([mask] * 2) if do_classifier_free_guidance else mask
-            masked_image_latents = (
-                np.concatenate([masked_image_latents] * 2)
-                if do_classifier_free_guidance
-                else masked_image_latents
-            )
+            masked_image_latents = np.concatenate([masked_image_latents] * 2) if do_classifier_free_guidance else masked_image_latents
             return mask, masked_image_latents
     
         def __call__(
@@ -556,9 +582,7 @@ decode –> image encode –> tokenizer –> Unet –> VAE model –> scheduler
             # prepare mask
             mask, masked_image = prepare_mask_and_masked_image(image, mask_image)
             # set timesteps
-            accepts_offset = "offset" in set(
-                inspect.signature(self.scheduler.set_timesteps).parameters.keys()
-            )
+            accepts_offset = "offset" in set(inspect.signature(self.scheduler.set_timesteps).parameters.keys())
             extra_set_kwargs = {}
             if accepts_offset:
                 extra_set_kwargs["offset"] = 1
@@ -579,34 +603,22 @@ decode –> image encode –> tokenizer –> Unet –> VAE model –> scheduler
             # eta (η) is only used with the DDIMScheduler, it will be ignored for other schedulers.
             # eta corresponds to η in DDIM paper: https://arxiv.org/abs/2010.02502
             # and should be between [0, 1]
-            accepts_eta = "eta" in set(
-                inspect.signature(self.scheduler.step).parameters.keys()
-            )
+            accepts_eta = "eta" in set(inspect.signature(self.scheduler.step).parameters.keys())
             extra_step_kwargs = {}
             if accepts_eta:
                 extra_step_kwargs["eta"] = eta
     
             for t in self.progress_bar(timesteps):
                 # expand the latents if we are doing classifier free guidance
-                latent_model_input = (
-                    np.concatenate([latents] * 2)
-                    if do_classifier_free_guidance
-                    else latents
-                )
+                latent_model_input = np.concatenate([latents] * 2) if do_classifier_free_guidance else latents
                 latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
-                latent_model_input = np.concatenate(
-                    [latent_model_input, masked_image_latents, mask], axis=1
-                )
+                latent_model_input = np.concatenate([latent_model_input, masked_image_latents, mask], axis=1)
                 # predict the noise residual
-                noise_pred = self.unet(
-                    [latent_model_input, np.array(t, dtype=np.float32), image_embeddings]
-                )[self._unet_output]
+                noise_pred = self.unet([latent_model_input, np.array(t, dtype=np.float32), image_embeddings])[self._unet_output]
                 # perform guidance
                 if do_classifier_free_guidance:
                     noise_pred_uncond, noise_pred_text = noise_pred[0], noise_pred[1]
-                    noise_pred = noise_pred_uncond + guidance_scale * (
-                        noise_pred_text - noise_pred_uncond
-                    )
+                    noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
     
                 # compute the previous noisy sample x_t -> x_t-1
                 latents = self.scheduler.step(
@@ -621,7 +633,7 @@ decode –> image encode –> tokenizer –> Unet –> VAE model –> scheduler
             image = self.postprocess_image(image, meta, output_type)
             return {"sample": image}
     
-        def _encode_image(self, image:PIL.Image.Image, do_classifier_free_guidance:bool = True):
+        def _encode_image(self, image: PIL.Image.Image, do_classifier_free_guidance: bool = True):
             """
             Encodes the image into image encoder hidden states.
     
@@ -632,7 +644,7 @@ decode –> image encode –> tokenizer –> Unet –> VAE model –> scheduler
                 image_embeddings (np.ndarray): image encoder hidden states
             """
             processed_image = self.image_processor(image)
-            processed_image = processed_image['pixel_values'][0]
+            processed_image = processed_image["pixel_values"][0]
             processed_image = np.expand_dims(processed_image, axis=0)
     
             output = self.image_encoder(processed_image)
@@ -643,10 +655,10 @@ decode –> image encode –> tokenizer –> Unet –> VAE model –> scheduler
     
             return image_embeddings
     
-        def prepare_latents(self, latent_timestep:torch.Tensor = None):
+        def prepare_latents(self, latent_timestep: torch.Tensor = None):
             """
             Function for getting initial latents for starting generation
-            
+    
             Parameters:
                 latent_timestep (torch.Tensor, *optional*, None):
                     Predicted by scheduler initial step for image generation, required for latent image mixing with nosie
@@ -661,11 +673,11 @@ decode –> image encode –> tokenizer –> Unet –> VAE model –> scheduler
                 noise = noise * self.scheduler.sigmas[0].numpy()
             return noise, {}
     
-        def postprocess_image(self, image:np.ndarray, meta:Dict, output_type:str = "pil"):
+        def postprocess_image(self, image: np.ndarray, meta: Dict, output_type: str = "pil"):
             """
-            Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required), 
+            Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required),
             normalize and convert to [0, 255] pixels range. Optionally, convertes it from np.ndarray to PIL.Image format
-            
+    
             Parameters:
                 image (np.ndarray):
                     Generated image
@@ -691,25 +703,23 @@ decode –> image encode –> tokenizer –> Unet –> VAE model –> scheduler
                 image = self.numpy_to_pil(image)
                 if "src_height" in meta:
                     orig_height, orig_width = meta["src_height"], meta["src_width"]
-                    image = [img.resize((orig_width, orig_height),
-                                        PIL.Image.Resampling.LANCZOS) for img in image]
+                    image = [img.resize((orig_width, orig_height), PIL.Image.Resampling.LANCZOS) for img in image]
             else:
                 if "src_height" in meta:
                     orig_height, orig_width = meta["src_height"], meta["src_width"]
-                    image = [cv2.resize(img, (orig_width, orig_width))
-                             for img in image]
+                    image = [cv2.resize(img, (orig_width, orig_width)) for img in image]
             return image
     
-        def get_timesteps(self, num_inference_steps:int, strength:float):
+        def get_timesteps(self, num_inference_steps: int, strength: float):
             """
             Helper function for getting scheduler timesteps for generation
             In case of image-to-image generation, it updates number of steps according to strength
-            
+    
             Parameters:
                num_inference_steps (int):
                   number of inference steps for generation
                strength (float):
-                   value between 0.0 and 1.0, that controls the amount of noise that is added to the input image. 
+                   value between 0.0 and 1.0, that controls the amount of noise that is added to the input image.
                    Values that approach 1.0 allow for lots of variations but will also produce images that are not semantically consistent with the input.
             """
             # get the original timestep using init_timestep
@@ -718,12 +728,12 @@ decode –> image encode –> tokenizer –> Unet –> VAE model –> scheduler
             t_start = max(num_inference_steps - init_timestep, 0)
             timesteps = self.scheduler.timesteps[t_start:]
     
-            return timesteps, num_inference_steps - t_start 
+            return timesteps, num_inference_steps - t_start
 
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -736,8 +746,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -755,7 +765,7 @@ select device from dropdown list for running inference using OpenVINO
 Configure Inference Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Configuration steps: 1. Load models on device 2. Configure tokenizer and
 scheduler 3. Create instance of OvStableDiffusionInpaintingPipeline
@@ -769,12 +779,11 @@ This can take a while to run.
     
     
     def get_ov_pipeline():
-    
         image_encoder_inpaint = core.compile_model(IMAGE_ENCODER_OV_PATH_INPAINT, device.value)
         unet_model_inpaint = core.compile_model(UNET_OV_PATH_INPAINT, device.value)
         vae_decoder_inpaint = core.compile_model(VAE_DECODER_OV_PATH_INPAINT, device.value, ov_config)
         vae_encoder_inpaint = core.compile_model(VAE_ENCODER_OV_PATH_INPAINT, device.value, ov_config)
-        
+    
         ov_pipe_inpaint = OVStableDiffusionInpaintingPipeline(
             image_processor=extractor,
             image_encoder=image_encoder_inpaint,
@@ -792,7 +801,7 @@ This can take a while to run.
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -828,7 +837,7 @@ improve model inference speed.
     
     to_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -849,11 +858,10 @@ Let’s load ``skip magic`` extension to skip quantization if
 .. code:: ipython3
 
     # Fetch `skip_kernel_extension` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     if to_quantize.value and "GPU" in device.value:
         to_quantize.value = False
@@ -863,7 +871,7 @@ Let’s load ``skip magic`` extension to skip quantization if
 Prepare calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use 3 examples from
 `Paint-by-Example <https://github.com/Fantasy-Studio/Paint-by-Example>`__
@@ -881,9 +889,21 @@ to create a calibration dataset.
         return PIL.Image.open(BytesIO(response.content)).convert("RGB")
     
     
-    example1 = ['https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/image/example_1.png?raw=true', 'https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/mask/example_1.png?raw=true', 'https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/reference/example_1.jpg?raw=true']
-    example2 = ['https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/image/example_2.png?raw=true', 'https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/mask/example_2.png?raw=true', 'https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/reference/example_2.jpg?raw=true']
-    example3 = ['https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/image/example_3.png?raw=true', 'https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/mask/example_3.png?raw=true', 'https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/reference/example_3.jpg?raw=true']
+    example1 = [
+        "https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/image/example_1.png?raw=true",
+        "https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/mask/example_1.png?raw=true",
+        "https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/reference/example_1.jpg?raw=true",
+    ]
+    example2 = [
+        "https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/image/example_2.png?raw=true",
+        "https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/mask/example_2.png?raw=true",
+        "https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/reference/example_2.jpg?raw=true",
+    ]
+    example3 = [
+        "https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/image/example_3.png?raw=true",
+        "https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/mask/example_3.png?raw=true",
+        "https://github.com/Fantasy-Studio/Paint-by-Example/blob/main/examples/reference/example_3.jpg?raw=true",
+    ]
     examples = [example1, example2, example3]
     
     
@@ -954,7 +974,7 @@ To collect intermediate model inputs for calibration we should customize
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Create a quantized model from the pre-trained converted OpenVINO model.
 
@@ -1100,7 +1120,7 @@ Create a quantized model from the pre-trained converted OpenVINO model.
 Run inference and compare inference time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OV pipeline:
 
@@ -1173,7 +1193,7 @@ Quantized pipeline:
 Compare UNet file size
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1197,26 +1217,26 @@ Compare UNet file size
 Interactive inference
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Choose what model do you want to use in the interactive interface. You
 can choose both, FP16 and INT8.
 
 .. code:: ipython3
 
-    available_models = ['FP16']
+    available_models = ["FP16"]
     
     if UNET_INT8_OV_PATH.exists():
-        available_models.append('INT8')
+        available_models.append("INT8")
     
     model_to_use = widgets.Select(
         options=available_models,
-        value='FP16',
-        description='Select model:',
+        value="FP16",
+        description="Select model:",
         disabled=False,
     )
     
-    model_to_use   
+    model_to_use
 
 
 
@@ -1229,7 +1249,7 @@ can choose both, FP16 and INT8.
 
 .. code:: ipython3
 
-    if 'INT8' == model_to_use.value:
+    if "INT8" == model_to_use.value:
         chosen_pipeline = int8_ov_pipe_inpaint or get_quantized_pipeline()
         ov_pipe_inpaint = None
     else:
@@ -1252,25 +1272,25 @@ and push “Paint!”
     
     def predict(input_dict, reference, seed, steps):
         """
-            This function runs when the 'paint' button is pressed. It takes 3 input images. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required), 
-            normalize and convert to [0, 255] pixels range. Optionally, convertes it from np.ndarray to PIL.Image format
-            
-            Parameters:
-                input_dict (Dict):
-                    Contains two images in a dictionary
-                        'image' is the image that will be painted on
-                        'mask' is the black/white image specifying where to paint (white) and not to paint (black)
-                image (PIL.Image.Image):
-                    Reference image that will be used by the model to know what to paint in the specified area
-                seed (int):
-                    Used to initialize the random number generator state
-                steps (int):
-                    The number of denoising steps to run during inference. Low = fast/low quality, High = slow/higher quality
-                use_quantize_model (bool):
-                    Use fp16 or int8 model
-            Returns:
-                image (PIL.Image.Image):
-                    Postprocessed images
+        This function runs when the 'paint' button is pressed. It takes 3 input images. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required),
+        normalize and convert to [0, 255] pixels range. Optionally, convertes it from np.ndarray to PIL.Image format
+    
+        Parameters:
+            input_dict (Dict):
+                Contains two images in a dictionary
+                    'image' is the image that will be painted on
+                    'mask' is the black/white image specifying where to paint (white) and not to paint (black)
+            image (PIL.Image.Image):
+                Reference image that will be used by the model to know what to paint in the specified area
+            seed (int):
+                Used to initialize the random number generator state
+            steps (int):
+                The number of denoising steps to run during inference. Low = fast/low quality, High = slow/higher quality
+            use_quantize_model (bool):
+                Use fp16 or int8 model
+        Returns:
+            image (PIL.Image.Image):
+                Postprocessed images
         """
         width, height = input_dict["image"].size
     
@@ -1284,8 +1304,8 @@ and push “Paint!”
             height = 512
             width = int((width / factor) / 8.0) * 8
     
-        init_image = input_dict["image"].convert("RGB").resize((width,height))
-        mask = input_dict["mask"].convert("RGB").resize((width,height))
+        init_image = input_dict["image"].convert("RGB").resize((width, height))
+        mask = input_dict["mask"].convert("RGB").resize((width, height))
     
         # If the image is not a 512x512 square then crop
         if width > height:
@@ -1299,13 +1319,13 @@ and push “Paint!”
         else:
             input_image = init_image
     
-        if not os.path.exists('output'):
-            os.mkdir('output')
-        input_image.save('output/init.png')
-        mask.save('output/mask.png')
-        reference.save('output/ref.png')
+        if not os.path.exists("output"):
+            os.mkdir("output")
+        input_image.save("output/init.png")
+        mask.save("output/mask.png")
+        reference.save("output/ref.png")
     
-        mask = [mask]  
+        mask = [mask]
     
         result = chosen_pipeline(
             image=input_image,
@@ -1313,22 +1333,24 @@ and push “Paint!”
             reference_image=reference,
             seed=seed,
             num_inference_steps=steps,
-        )["sample"][0]
+        )[
+            "sample"
+        ][0]
     
         out_dir = Path("output")
         out_dir.mkdir(exist_ok=True)
-        result.save('output/result.png')
+        result.save("output/result.png")
     
         return result
     
     
     example = {}
-    title = f'# {model_to_use.value} pipeline'
-    ref_dir = 'data/reference'
-    image_dir = 'data/image'
-    ref_list = [os.path.join(ref_dir,file) for file in os.listdir(ref_dir) if file.endswith(".jpg")]
+    title = f"# {model_to_use.value} pipeline"
+    ref_dir = "data/reference"
+    image_dir = "data/image"
+    ref_list = [os.path.join(ref_dir, file) for file in os.listdir(ref_dir) if file.endswith(".jpg")]
     ref_list.sort()
-    image_list = [os.path.join(image_dir,file) for file in os.listdir(image_dir) if file.endswith(".png")]
+    image_list = [os.path.join(image_dir, file) for file in os.listdir(image_dir) if file.endswith(".png")]
     image_list.sort()
     
     
@@ -1338,24 +1360,56 @@ and push “Paint!”
         with gr.Group():
             with gr.Row():
                 with gr.Column():
-                    image = gr.Image(source='upload', tool='sketch', elem_id="image_upload", type="pil", label="Source Image")
-                    reference = gr.Image(source='upload', elem_id="image_upload", type="pil", label="Reference Image")
+                    image = gr.Image(
+                        source="upload",
+                        tool="sketch",
+                        elem_id="image_upload",
+                        type="pil",
+                        label="Source Image",
+                    )
+                    reference = gr.Image(
+                        source="upload",
+                        elem_id="image_upload",
+                        type="pil",
+                        label="Reference Image",
+                    )
     
                 with gr.Column():
                     image_out = gr.Image(label="Output", elem_id="output-img")
-                    steps = gr.Slider(label="Steps", value=15, minimum=2, maximum=75, step=1, interactive=True)
-                    seed = gr.Slider(0, 10000, label='Seed (0 = random)', value=0, step=1)
+                    steps = gr.Slider(
+                        label="Steps",
+                        value=15,
+                        minimum=2,
+                        maximum=75,
+                        step=1,
+                        interactive=True,
+                    )
+                    seed = gr.Slider(0, 10000, label="Seed (0 = random)", value=0, step=1)
     
                     with gr.Row(elem_id="prompt-container"):
                         btn = gr.Button("Paint!")
-                           
+    
             with gr.Row():
                 with gr.Column():
-                    gr.Examples(image_list, inputs=[image], label="Examples - Source Image", examples_per_page=12)
+                    gr.Examples(
+                        image_list,
+                        inputs=[image],
+                        label="Examples - Source Image",
+                        examples_per_page=12,
+                    )
                 with gr.Column():
-                    gr.Examples(ref_list, inputs=[reference], label="Examples - Reference Image", examples_per_page=12)
-            
-            btn.click(fn=predict, inputs=[image, reference, seed, steps], outputs=[image_out],)
+                    gr.Examples(
+                        ref_list,
+                        inputs=[reference],
+                        label="Examples - Reference Image",
+                        examples_per_page=12,
+                    )
+    
+            btn.click(
+                fn=predict,
+                inputs=[image, reference, seed, steps],
+                outputs=[image_out],
+            )
     
     # Launching the Gradio app
     try:

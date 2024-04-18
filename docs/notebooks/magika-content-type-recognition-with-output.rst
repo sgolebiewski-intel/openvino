@@ -42,26 +42,26 @@ post <https://opensource.googleblog.com/2024/02/magika-ai-powered-fast-and-effic
 In this tutorial we consider how to bring OpenVINO power into Magika.
 #### Table of contents:
 
--  `Prerequisites <#prerequisites>`__
--  `Define model loading class <#define-model-loading-class>`__
--  `Run OpenVINO model inference <#run-openvino-model-inference>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Define model loading class <#Define-model-loading-class>`__
+-  `Run OpenVINO model inference <#Run-OpenVINO-model-inference>`__
 
-   -  `Select device <#select-device>`__
-   -  `Create model <#create-model>`__
-   -  `Run inference on bytes input <#run-inference-on-bytes-input>`__
-   -  `Run inference on file input <#run-inference-on-file-input>`__
+   -  `Select device <#Select-device>`__
+   -  `Create model <#Create-model>`__
+   -  `Run inference on bytes input <#Run-inference-on-bytes-input>`__
+   -  `Run inference on file input <#Run-inference-on-file-input>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Prerequisites
 -------------
 
-## Prerequisites
+`back to top ⬆️ <#Table-of-contents:>`__ ## Prerequisites
 
 .. code:: ipython3
 
     %pip uninstall -q -y openvino-dev openvino openvino-nightly
-    %pip install -q magika openvino-nightly gradio
+    %pip install -q magika openvino-nightly "gradio>=4.19"
 
 
 .. parsed-literal::
@@ -93,7 +93,7 @@ Prerequisites
 Define model loading class
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 At inference time Magika uses ONNX as an inference engine to ensure
 files are identified in a matter of milliseconds, almost as fast as a
@@ -127,25 +127,21 @@ API <https://github.com/google/magika/blob/main/docs/python.md>`__.
             verbose: bool = False,
             debug: bool = False,
             use_colors: bool = False,
-            device="CPU"
+            device="CPU",
         ) -> None:
             self._device = device
             super().__init__(model_dir, prediction_mode, no_dereference, verbose, debug, use_colors)
-        
+    
         def _init_onnx_session(self):
             # overload model loading using OpenVINO
             start_time = time.time()
             core = ov.Core()
             ov_model = core.compile_model(self._model_path, self._device.upper())
             elapsed_time = 1000 * (time.time() - start_time)
-            self._log.debug(
-                f'ONNX DL model "{self._model_path}" loaded in {elapsed_time:.03f} ms on {self._device}'
-            )
+            self._log.debug(f'ONNX DL model "{self._model_path}" loaded in {elapsed_time:.03f} ms on {self._device}')
             return ov_model
     
-        def _get_raw_predictions(
-            self, features: List[Tuple[Path, ModelFeatures]]
-        ) -> npt.NDArray:
+        def _get_raw_predictions(self, features: List[Tuple[Path, ModelFeatures]]) -> npt.NDArray:
             """
             Given a list of (path, features), return a (files_num, features_size)
             matrix encoding the predictions.
@@ -178,9 +174,7 @@ API <https://github.com/google/magika/blob/main/docs/python.md>`__.
                 batches_num += 1
     
             for batch_idx in range(batches_num):
-                self._log.debug(
-                    f"Getting raw predictions for (internal) batch {batch_idx+1}/{batches_num}"
-                )
+                self._log.debug(f"Getting raw predictions for (internal) batch {batch_idx+1}/{batches_num}")
                 start_idx = batch_idx * max_internal_batch_size
                 end_idx = min((batch_idx + 1) * max_internal_batch_size, samples_num)
                 batch_raw_predictions = self._onnx_session({"bytes": X[start_idx:end_idx, :]})["target_label"]
@@ -188,16 +182,14 @@ API <https://github.com/google/magika/blob/main/docs/python.md>`__.
             elapsed_time = time.time() - start_time
             self._log.debug(f"DL raw prediction in {elapsed_time:.03f} seconds")
             return np.concatenate(raw_predictions_list)
-        
-        def _get_topk_model_outputs_from_features(
-            self, all_features: List[Tuple[Path, ModelFeatures]], k:int = 5
-        ) -> List[Tuple[Path, List[ModelOutput]]]:
+    
+        def _get_topk_model_outputs_from_features(self, all_features: List[Tuple[Path, ModelFeatures]], k: int = 5) -> List[Tuple[Path, List[ModelOutput]]]:
             """
-            Helper function for getting top k the highest ranked model results for each feature 
+            Helper function for getting top k the highest ranked model results for each feature
             """
             raw_preds = self._get_raw_predictions(all_features)
             top_preds_idxs = np.argsort(raw_preds, axis=1)[:, -k:][:, ::-1]
-            scores = [raw_preds[i,idx] for i, idx in enumerate(top_preds_idxs)]
+            scores = [raw_preds[i, idx] for i, idx in enumerate(top_preds_idxs)]
             results = []
             for (path, _), scores, top_idxes in zip(all_features, raw_preds, top_preds_idxs):
                 model_outputs_for_path = []
@@ -208,11 +200,9 @@ API <https://github.com/google/magika/blob/main/docs/python.md>`__.
                 results.append((path, model_outputs_for_path))
             return results
     
-        def _get_results_from_features_topk(
-            self, all_features: List[Tuple[Path, ModelFeatures]], top_k=5
-        ) -> Dict[str, MagikaResult]:
+        def _get_results_from_features_topk(self, all_features: List[Tuple[Path, ModelFeatures]], top_k=5) -> Dict[str, MagikaResult]:
             """
-            Helper function for getting top k the highest ranked model results for each feature 
+            Helper function for getting top k the highest ranked model results for each feature
             """
             # We now do inference for those files that need it.
     
@@ -232,20 +222,22 @@ API <https://github.com/google/magika/blob/main/docs/python.md>`__.
                 for out in model_output:
                     output_ct_label = self._get_output_ct_label_from_dl_result(out.ct_label, out.score)
     
-                    results.append(self._get_result_from_labels_and_score(
-                        path,
-                        dl_ct_label=out.ct_label,
-                        output_ct_label=output_ct_label,
-                        score=out.score,
-                    ))
+                    results.append(
+                        self._get_result_from_labels_and_score(
+                            path,
+                            dl_ct_label=out.ct_label,
+                            output_ct_label=output_ct_label,
+                            score=out.score,
+                        )
+                    )
                 outputs[str(path)] = results
     
             return outputs
-        
+    
         def identify_bytes_topk(self, content: bytes, top_k=5) -> MagikaResult:
             # Helper function for getting topk results from bytes
             _get_results_from_features = self._get_results_from_features
-            self. _get_results_from_features = partial(self._get_results_from_features_topk, top_k=top_k)
+            self._get_results_from_features = partial(self._get_results_from_features_topk, top_k=top_k)
             result = super().identify_bytes(content)
             self._get_results_from_features = _get_results_from_features
             return result
@@ -253,14 +245,14 @@ API <https://github.com/google/magika/blob/main/docs/python.md>`__.
 Run OpenVINO model inference
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now let’s check model inference result.
 
 Select device
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For starting work, please, select one of represented devices from
 dropdown list.
@@ -273,8 +265,8 @@ dropdown list.
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -292,7 +284,7 @@ dropdown list.
 Create model
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 As we discussed above, our OpenVINO extended ``OVMagika`` class has the
 same API like original one. Let’s try to create interface instance and
@@ -305,12 +297,12 @@ launch it on different input formats
 Run inference on bytes input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     result = ov_magika.identify_bytes(b"# Example\nThis is an example of markdown!")
-    print(f"Content type: {result.output.ct_label} - {result.output.score * 100:.4}%")  
+    print(f"Content type: {result.output.ct_label} - {result.output.score * 100:.4}%")
 
 
 .. parsed-literal::
@@ -321,17 +313,19 @@ Run inference on bytes input
 Run inference on file input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    import urllib.request
+    import requests
     
     input_file = Path("./README.md")
     if not input_file.exists():
-        urllib.request.urlretrieve("https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/README.md", filename="README.md")
+        r = requests.get("https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/README.md")
+        with open("README.md", "w") as f:
+            f.write(r.text)
     result = ov_magika.identify_path(input_file)
-    print(f"Content type: {result.output.ct_label} - {result.output.score * 100:.4}%")  
+    print(f"Content type: {result.output.ct_label} - {result.output.score * 100:.4}%")
 
 
 .. parsed-literal::
@@ -342,7 +336,7 @@ Run inference on file input
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, you can try model on own files. Upload file into input file window,
 click submit button and look on predicted file types.
@@ -390,7 +384,7 @@ click submit button and look on predicted file types.
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

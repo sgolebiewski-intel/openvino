@@ -24,23 +24,23 @@ consists of the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Imports <#imports>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Imports <#Imports>`__
 
    -  `Download, quantize and sparsify the model, using Hugging Face
       Optimum
-      API <#download-quantize-and-sparsify-the-model-using-hugging-face-optimum-api>`__
+      API <#Download,-quantize-and-sparsify-the-model,-using-Hugging-Face-Optimum-API>`__
 
 -  `Benchmark quantized dense inference
-   performance <#benchmark-quantized-dense-inference-performance>`__
+   performance <#Benchmark-quantized-dense-inference-performance>`__
 -  `Benchmark quantized sparse inference
-   performance <#benchmark-quantized-sparse-inference-performance>`__
--  `When this might be helpful <#when-this-might-be-helpful>`__
+   performance <#Benchmark-quantized-sparse-inference-performance>`__
+-  `When this might be helpful <#When-this-might-be-helpful>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -71,7 +71,7 @@ Prerequisites
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -95,25 +95,26 @@ Imports
 
 .. parsed-literal::
 
-    No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
-
-
-.. parsed-literal::
-
-    2024-04-10 00:14:48.451538: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-10 00:14:48.485853: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-18 00:51:56.238501: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-18 00:51:56.274301: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-04-10 00:14:49.055189: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-18 00:51:56.850457: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+
+
+.. parsed-literal::
+
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/diffusers/utils/outputs.py:63: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
+      torch.utils._pytree._register_pytree_node(
 
 
 Download, quantize and sparsify the model, using Hugging Face Optimum API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The first step is to download a quantized sparse transformers which has
 been translated to OpenVINO IR. Then, it will be put through a
@@ -160,13 +161,13 @@ the IRs into a single folder.
     quantized_sparse_dir = Path("bert_80pc_sparse_quantized_ir")
     quantized_sparse_dir.mkdir(parents=True, exist_ok=True)
     
-    # following return path to specified filename in cache folder (which we've with the 
+    # following return path to specified filename in cache folder (which we've with the
     ov_ir_xml_path = hf_hub_download(repo_id=model_id, filename="openvino_model.xml")
     ov_ir_bin_path = hf_hub_download(repo_id=model_id, filename="openvino_model.bin")
     
     # copy IRs to the folder
     shutil.copy(ov_ir_xml_path, quantized_sparse_dir)
-    shutil.copy(ov_ir_bin_path, quantized_sparse_dir)                                
+    shutil.copy(ov_ir_bin_path, quantized_sparse_dir)
 
 
 
@@ -180,7 +181,7 @@ the IRs into a single folder.
 Benchmark quantized dense inference performance
 -----------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Benchmark dense inference performance using parallel execution on four
 CPU cores to simulate a small instance in the cloud infrastructure.
@@ -238,7 +239,7 @@ as an example. It is recommended to tune based on your applications.
 
 .. parsed-literal::
 
-    [ INFO ] Read model took 67.17 ms
+    [ INFO ] Read model took 61.16 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     input_ids (node: input_ids) : i64 / [...] / [?,?]
@@ -253,7 +254,7 @@ as an example. It is recommended to tune based on your applications.
 
 .. parsed-literal::
 
-    [ INFO ] Reshape model took 23.15 ms
+    [ INFO ] Reshape model took 22.79 ms
     [Step 6/11] Configuring input of the model
     [ INFO ] Model inputs:
     [ INFO ]     input_ids (node: input_ids) : i64 / [...] / [1,64]
@@ -266,7 +267,7 @@ as an example. It is recommended to tune based on your applications.
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 1176.69 ms
+    [ INFO ] Compile model took 1249.77 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
     [ INFO ]   NETWORK_NAME: torch_jit
@@ -297,27 +298,31 @@ as an example. It is recommended to tune based on your applications.
     [ INFO ] Fill input 'token_type_ids' with random values 
     [Step 10/11] Measuring performance (Start inference asynchronously, 4 inference requests, limits: 60000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-    [ INFO ] First inference took 27.64 ms
+
+
+.. parsed-literal::
+
+    [ INFO ] First inference took 28.22 ms
 
 
 .. parsed-literal::
 
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            9024 iterations
-    [ INFO ] Duration:         60035.47 ms
+    [ INFO ] Count:            9052 iterations
+    [ INFO ] Duration:         60042.04 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        26.33 ms
-    [ INFO ]    Average:       26.37 ms
-    [ INFO ]    Min:           24.75 ms
-    [ INFO ]    Max:           39.69 ms
-    [ INFO ] Throughput:   150.31 FPS
+    [ INFO ]    Median:        26.38 ms
+    [ INFO ]    Average:       26.41 ms
+    [ INFO ]    Min:           24.29 ms
+    [ INFO ]    Max:           41.86 ms
+    [ INFO ] Throughput:   150.76 FPS
 
 
 Benchmark quantized sparse inference performance
 ------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To enable sparse weight decompression feature, users can add it to
 runtime config like below. ``CPU_SPARSE_WEIGHTS_DECOMPRESSION_RATE``
@@ -327,7 +332,7 @@ for which a layer will be enabled.
 .. code:: ipython3
 
     # Dump benchmarking config for dense inference
-    # "CPU_SPARSE_WEIGHTS_DECOMPRESSION_RATE" controls minimum sparsity rate for weights to consider 
+    # "CPU_SPARSE_WEIGHTS_DECOMPRESSION_RATE" controls minimum sparsity rate for weights to consider
     # for sparse optimization at the runtime.
     with (quantized_sparse_dir / "perf_config_sparse.json").open("w") as outfile:
         outfile.write(
@@ -376,7 +381,7 @@ for which a layer will be enabled.
 
 .. parsed-literal::
 
-    [ INFO ] Read model took 72.15 ms
+    [ INFO ] Read model took 68.00 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     input_ids (node: input_ids) : i64 / [...] / [?,?]
@@ -391,7 +396,7 @@ for which a layer will be enabled.
 
 .. parsed-literal::
 
-    [ INFO ] Reshape model took 23.29 ms
+    [ INFO ] Reshape model took 23.17 ms
     [Step 6/11] Configuring input of the model
     [ INFO ] Model inputs:
     [ INFO ]     input_ids (node: input_ids) : i64 / [...] / [1,64]
@@ -407,9 +412,9 @@ for which a layer will be enabled.
     
     
     Traceback (most recent call last):
-      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/tools/benchmark/main.py", line 408, in main
+      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/tools/benchmark/main.py", line 408, in main
         compiled_model = benchmark.core.compile_model(model, benchmark.device, device_config)
-      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/runtime/ie_api.py", line 515, in compile_model
+      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/runtime/ie_api.py", line 515, in compile_model
         super().compile_model(model, device_name, {} if config is None else config),
     RuntimeError: Exception from src/inference/src/cpp/core.cpp:106:
     Exception from src/inference/src/dev/plugin.cpp:54:
@@ -423,7 +428,7 @@ for which a layer will be enabled.
 When this might be helpful
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This feature can improve inference performance for models with sparse
 weights in the scenarios when the model is deployed to handle multiple

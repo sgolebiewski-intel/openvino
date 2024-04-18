@@ -11,10 +11,10 @@ running multiple times.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Showing Info Available Devices <#showing-info-available-devices>`__
--  `Configure Inference Pipeline <#configure-inference-pipeline>`__
+-  `Showing Info Available Devices <#Showing-Info-Available-Devices>`__
+-  `Configure Inference Pipeline <#Configure-Inference-Pipeline>`__
 -  `Using full precision model in choice device with
-   OVStableDiffusionPipeline <#using-full-precision-model-in-choice-device-with-ovstablediffusionpipeline>`__
+   OVStableDiffusionPipeline <#Using-full-precision-model-in-choice-device-with-OVStableDiffusionPipeline>`__
 
 .. |image0| image:: https://github.com/openvinotoolkit/openvino_notebooks/assets/10940214/1858dae4-72fd-401e-b055-66d503d82446
 
@@ -47,12 +47,13 @@ OpenVINO’s integration into Optimum.
 .. code:: ipython3
 
     import warnings
-    warnings.filterwarnings('ignore')
+    
+    warnings.filterwarnings("ignore")
 
 Showing Info Available Devices
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``available_devices`` property shows the available devices in your
 system. The “FULL_DEVICE_NAME” option to ``ie.get_property()`` shows the
@@ -64,13 +65,13 @@ If you just have either an iGPU or dGPU that will be assigned to
 
 .. code:: ipython3
 
-    from openvino.runtime import Core
+    import openvino as ov
     
-    ie = Core()
-    devices = ie.available_devices
+    core = ov.Core()
+    devices = core.available_devices
     
     for device in devices:
-        device_name = ie.get_property(device, "FULL_DEVICE_NAME")
+        device_name = core.get_property(device, "FULL_DEVICE_NAME")
         print(f"{device}: {device_name}")
 
 
@@ -84,7 +85,7 @@ If you just have either an iGPU or dGPU that will be assigned to
 Configure Inference Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select device from dropdown list for running inference using OpenVINO.
 
@@ -93,7 +94,7 @@ Select device from dropdown list for running inference using OpenVINO.
     import ipywidgets as widgets
     
     device = widgets.Dropdown(
-        options=ie.available_devices + ["AUTO"],
+        options=core.available_devices + ["AUTO"],
         value="CPU",
         description="Device:",
         disabled=False,
@@ -113,7 +114,7 @@ Select device from dropdown list for running inference using OpenVINO.
 Using full precision model in choice device with ``OVStableDiffusionPipeline``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -130,7 +131,7 @@ Using full precision model in choice device with ``OVStableDiffusionPipeline``
 
     import gc
     
-    # Generate an image. 
+    # Generate an image.
     prompt = "red car in snowy forest, epic vista, beautiful landscape, 4k, 8k"
     output_ov = ov_pipe(prompt, num_inference_steps=17, output_type="pil").images[0]
     output_ov.save("image.png")

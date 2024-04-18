@@ -27,34 +27,34 @@ and do inference with a sample image.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Imports <#imports>`__
--  `Settings <#settings>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Imports <#Imports>`__
+-  `Settings <#Settings>`__
 -  `Download Model from TensorFlow
-   Hub <#download-model-from-tensorflow-hub>`__
--  `Convert Model to OpenVINO IR <#convert-model-to-openvino-ir>`__
+   Hub <#Download-Model-from-TensorFlow-Hub>`__
+-  `Convert Model to OpenVINO IR <#Convert-Model-to-OpenVINO-IR>`__
 -  `Test Inference on the Converted
-   Model <#test-inference-on-the-converted-model>`__
--  `Select inference device <#select-inference-device>`__
+   Model <#Test-Inference-on-the-Converted-Model>`__
+-  `Select inference device <#Select-inference-device>`__
 
-   -  `Load the Model <#load-the-model>`__
-   -  `Get Model Information <#get-model-information>`__
+   -  `Load the Model <#Load-the-Model>`__
+   -  `Get Model Information <#Get-Model-Information>`__
    -  `Get an Image for Test
-      Inference <#get-an-image-for-test-inference>`__
-   -  `Perform Inference <#perform-inference>`__
+      Inference <#Get-an-Image-for-Test-Inference>`__
+   -  `Perform Inference <#Perform-Inference>`__
    -  `Inference Result
-      Visualization <#inference-result-visualization>`__
+      Visualization <#Inference-Result-Visualization>`__
 
--  `Next Steps <#next-steps>`__
+-  `Next Steps <#Next-Steps>`__
 
-   -  `Async inference pipeline <#async-inference-pipeline>`__
+   -  `Async inference pipeline <#Async-inference-pipeline>`__
    -  `Integration preprocessing to
-      model <#integration-preprocessing-to-model>`__
+      model <#Integration-preprocessing-to-model>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install required packages:
 
@@ -62,7 +62,7 @@ Install required packages:
 
     import platform
     
-    %pip install -q "openvino>=2023.1.0" "numpy>=1.21.0" "opencv-python"
+    %pip install -q "openvino>=2023.1.0" "numpy>=1.21.0" "opencv-python" "tqdm"
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -163,17 +163,27 @@ The notebook uses utility functions. The cell below will download the
 .. code:: ipython3
 
     # Fetch the notebook utils script from the openvino_notebooks repo
-    import urllib.request
+    import requests
     
-    urllib.request.urlretrieve(
+    r = requests.get(
         url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
-        filename="notebook_utils.py",
-    );
+    )
+    
+    open("notebook_utils.py", "w").write(r.text)
+
+
+
+
+.. parsed-literal::
+
+    21503
+
+
 
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -194,7 +204,7 @@ Imports
 Settings
 --------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Define model related variables and create corresponding directories:
 
@@ -216,14 +226,16 @@ Define model related variables and create corresponding directories:
     
     openvino_ir_path = ir_model_dir / f"{model_name}.xml"
     
-    tf_model_url = "https://www.kaggle.com/models/tensorflow/mask-rcnn-inception-resnet-v2/frameworks/tensorFlow2/variations/1024x1024/versions/1?tf-hub-format=compressed"
+    tf_model_url = (
+        "https://www.kaggle.com/models/tensorflow/mask-rcnn-inception-resnet-v2/frameworks/tensorFlow2/variations/1024x1024/versions/1?tf-hub-format=compressed"
+    )
     
     tf_model_archive_filename = f"{model_name}.tar.gz"
 
 Download Model from TensorFlow Hub
 ----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download archive with TensorFlow Instance Segmentation model
 (`mask_rcnn_inception_resnet_v2_1024x1024 <https://tfhub.dev/tensorflow/mask_rcnn/inception_resnet_v2_1024x1024/1>`__)
@@ -231,11 +243,7 @@ from TensorFlow Hub:
 
 .. code:: ipython3
 
-    download_file(
-        url=tf_model_url,
-        filename=tf_model_archive_filename,
-        directory=tf_model_dir
-    );
+    download_file(url=tf_model_url, filename=tf_model_archive_filename, directory=tf_model_dir);
 
 
 
@@ -257,7 +265,7 @@ archive:
 Convert Model to OpenVINO IR
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO Model Optimizer Python API can be used to convert the
 TensorFlow model to OpenVINO IR.
@@ -285,12 +293,12 @@ when the model is run in the future.
 Test Inference on the Converted Model
 -------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -301,8 +309,8 @@ select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -320,7 +328,7 @@ select device from dropdown list for running inference using OpenVINO
 Load the Model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -330,7 +338,7 @@ Load the Model
 Get Model Information
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Mask R-CNN with Inception ResNet V2 instance segmentation model has one
 input - a three-channel image of variable size. The input tensor shape
@@ -408,7 +416,7 @@ the first (and highest) detection score.
 Get an Image for Test Inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load and save an image:
 
@@ -453,7 +461,7 @@ Read the image, resize and convert it to the input shape of the network:
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7f2fd8f5af70>
+    <matplotlib.image.AxesImage at 0x7fda25e0dc10>
 
 
 
@@ -464,7 +472,7 @@ Read the image, resize and convert it to the input shape of the network:
 Perform Inference
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -513,7 +521,7 @@ be extracted from the result. For further model result visualization
 Inference Result Visualization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Define utility functions to visualize the inference results
 
@@ -523,9 +531,7 @@ Define utility functions to visualize the inference results
     from typing import Optional
     
     
-    def add_detection_box(
-        box: np.ndarray, image: np.ndarray, mask: np.ndarray, label: Optional[str] = None
-    ) -> np.ndarray:
+    def add_detection_box(box: np.ndarray, image: np.ndarray, mask: np.ndarray, label: Optional[str] = None) -> np.ndarray:
         """
         Helper function for adding single bounding box to the image
     
@@ -566,7 +572,10 @@ Define utility functions to visualize the inference results
             font_scale = line_thickness / 3
             font_color = (255, 255, 255)
             text_size = cv2.getTextSize(
-                text=label, fontFace=font_face, fontScale=font_scale, thickness=font_thickness
+                text=label,
+                fontFace=font_face,
+                fontScale=font_scale,
+                thickness=font_thickness,
             )[0]
             # Calculate rectangle coordinates
             rectangle_point1 = point1
@@ -616,18 +625,21 @@ Define utility functions to visualize the inference results
         x_max = frame.shape[1] * box[3]
         y_max = frame.shape[0] * box[2]
         rect_src = np.array(
-            [[0, 0], [mask.shape[1], 0], [mask.shape[1], mask.shape[0]], [0, mask.shape[0]]],
+            [
+                [0, 0],
+                [mask.shape[1], 0],
+                [mask.shape[1], mask.shape[0]],
+                [0, mask.shape[0]],
+            ],
             dtype=np.float32,
         )
         rect_dst = np.array(
-            [[x_min, y_min], [x_max, y_min], [x_max, y_max], [x_min, y_max]], dtype=np.float32
+            [[x_min, y_min], [x_max, y_min], [x_max, y_max], [x_min, y_max]],
+            dtype=np.float32,
         )
         M = cv2.getPerspectiveTransform(rect_src[:, :], rect_dst[:, :])
-        mask_frame = cv2.warpPerspective(
-            mask, M, (frame.shape[1], frame.shape[0]), flags=cv2.INTER_CUBIC
-        )
+        mask_frame = cv2.warpPerspective(mask, M, (frame.shape[1], frame.shape[0]), flags=cv2.INTER_CUBIC)
         return mask_frame
-
 
 .. code:: ipython3
 
@@ -662,11 +674,7 @@ Define utility functions to visualize the inference results
         num_detections = inference_result.get("num_detections")
         detection_masks = inference_result.get("detection_masks")
     
-        detections_limit = int(
-            min(detections_limit, num_detections[0])
-            if detections_limit is not None
-            else num_detections[0]
-        )
+        detections_limit = int(min(detections_limit, num_detections[0]) if detections_limit is not None else num_detections[0])
     
         # Normalize detection boxes coordinates to original image size
         original_image_height, original_image_width, _ = image.shape
@@ -685,7 +693,10 @@ Define utility functions to visualize the inference results
             mask_reframed = (mask_reframed > 0.5).astype(np.uint8)
             label = f"{detected_class_name} {score:.2f}"
             result = add_detection_box(
-                box=normalized_detection_boxes[i], image=result, mask=mask_reframed, label=label
+                box=normalized_detection_boxes[i],
+                image=result,
+                mask=mask_reframed,
+                label=label,
             )
     
         plt.imshow(result)
@@ -755,7 +766,7 @@ original test image:
 Next Steps
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This section contains suggestions on how to additionally improve the
 performance of your application using OpenVINO.
@@ -763,7 +774,7 @@ performance of your application using OpenVINO.
 Async inference pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The key advantage of the Async
+`back to top ⬆️ <#Table-of-contents:>`__ The key advantage of the Async
 API is that when a device is busy with inference, the application can
 perform other tasks in parallel (for example, populating inputs or
 scheduling other requests) rather than wait for the current inference to
@@ -774,7 +785,7 @@ tutorial <async-api-with-output.html>`__.
 Integration preprocessing to model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Preprocessing API enables making preprocessing a part of the model
 reducing application code and dependency on additional image processing

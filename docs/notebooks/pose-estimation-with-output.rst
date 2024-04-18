@@ -17,26 +17,26 @@ Additionally, you can also upload a video file.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `The model <#the-model>`__
+-  `Imports <#Imports>`__
+-  `The model <#The-model>`__
 
-   -  `Download the model <#download-the-model>`__
-   -  `Load the model <#load-the-model>`__
+   -  `Download the model <#Download-the-model>`__
+   -  `Load the model <#Load-the-model>`__
 
--  `Processing <#processing>`__
+-  `Processing <#Processing>`__
 
-   -  `OpenPose Decoder <#openpose-decoder>`__
-   -  `Process Results <#process-results>`__
-   -  `Draw Pose Overlays <#draw-pose-overlays>`__
-   -  `Main Processing Function <#main-processing-function>`__
+   -  `OpenPose Decoder <#OpenPose-Decoder>`__
+   -  `Process Results <#Process-Results>`__
+   -  `Draw Pose Overlays <#Draw-Pose-Overlays>`__
+   -  `Main Processing Function <#Main-Processing-Function>`__
 
--  `Run <#run>`__
+-  `Run <#Run>`__
 
-   -  `Run Live Pose Estimation <#run-live-pose-estimation>`__
+   -  `Run Live Pose Estimation <#Run-Live-Pose-Estimation>`__
 
 .. code:: ipython3
 
-    %pip install -q "openvino>=2023.1.0"
+    %pip install -q "openvino>=2023.1.0" opencv-python tqdm
 
 
 .. parsed-literal::
@@ -47,7 +47,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -64,22 +64,24 @@ Imports
     from decoder import OpenPoseDecoder
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     import notebook_utils as utils
 
 The model
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the model
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use the ``download_file``, a function from the ``notebook_utils`` file.
 It automatically creates a directory structure and downloads the
@@ -104,8 +106,12 @@ precision in the code below.
     
     if not model_path.exists():
         model_url_dir = f"https://storage.openvinotoolkit.org/repositories/open_model_zoo/2022.1/models_bin/3/{model_name}/{precision}/"
-        utils.download_file(model_url_dir + model_name + '.xml', model_path.name, model_path.parent)
-        utils.download_file(model_url_dir + model_name + '.bin', model_path.with_suffix('.bin').name, model_path.parent)
+        utils.download_file(model_url_dir + model_name + ".xml", model_path.name, model_path.parent)
+        utils.download_file(
+            model_url_dir + model_name + ".bin",
+            model_path.with_suffix(".bin").name,
+            model_path.parent,
+        )
 
 
 
@@ -123,7 +129,7 @@ precision in the code below.
 Load the model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Downloaded models are located in a fixed structure, which indicates a
 vendor, the name of the model and a precision.
@@ -142,8 +148,8 @@ using OpenVINO.
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -194,12 +200,12 @@ there is 1 input and 2 outputs: PAFs and keypoints heatmap.
 Processing
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenPose Decoder
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To transform the raw results from the neural network into pose
 estimations, you need OpenPose Decoder. It is provided in the `Open
@@ -220,7 +226,7 @@ of Open Model Zoo.
 Process Results
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 A bunch of useful functions to transform results into poses.
 
@@ -257,7 +263,7 @@ factor.
         A_w = as_strided(
             A,
             shape=output_shape + kernel_size,
-            strides=(stride * A.strides[0], stride * A.strides[1]) + A.strides
+            strides=(stride * A.strides[0], stride * A.strides[1]) + A.strides,
         )
         A_w = A_w.reshape(-1, *kernel_size)
     
@@ -277,15 +283,16 @@ factor.
     def process_results(img, pafs, heatmaps):
         # This processing comes from
         # https://github.com/openvinotoolkit/open_model_zoo/blob/master/demos/common/python/models/open_pose.py
-        pooled_heatmaps = np.array(
-            [[pool2d(h, kernel_size=3, stride=1, padding=1, pool_mode="max") for h in heatmaps[0]]]
-        )
+        pooled_heatmaps = np.array([[pool2d(h, kernel_size=3, stride=1, padding=1, pool_mode="max") for h in heatmaps[0]]])
         nms_heatmaps = heatmap_nms(heatmaps, pooled_heatmaps)
     
         # Decode poses.
         poses, scores = decoder(heatmaps, nms_heatmaps, pafs)
         output_shape = list(compiled_model.output(index=0).partial_shape)
-        output_scale = img.shape[1] / output_shape[3].get_length(), img.shape[0] / output_shape[2].get_length()
+        output_scale = (
+            img.shape[1] / output_shape[3].get_length(),
+            img.shape[0] / output_shape[2].get_length(),
+        )
         # Multiply coordinates by a scaling factor.
         poses[:, :, :2] *= output_scale
         return poses, scores
@@ -293,7 +300,7 @@ factor.
 Draw Pose Overlays
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Draw pose overlays on the image to visualize estimated poses. Joints are
 drawn as circles and limbs are drawn as lines. The code is based on the
@@ -303,12 +310,47 @@ from Open Model Zoo.
 
 .. code:: ipython3
 
-    colors = ((255, 0, 0), (255, 0, 255), (170, 0, 255), (255, 0, 85), (255, 0, 170), (85, 255, 0),
-              (255, 170, 0), (0, 255, 0), (255, 255, 0), (0, 255, 85), (170, 255, 0), (0, 85, 255),
-              (0, 255, 170), (0, 0, 255), (0, 255, 255), (85, 0, 255), (0, 170, 255))
+    colors = (
+        (255, 0, 0),
+        (255, 0, 255),
+        (170, 0, 255),
+        (255, 0, 85),
+        (255, 0, 170),
+        (85, 255, 0),
+        (255, 170, 0),
+        (0, 255, 0),
+        (255, 255, 0),
+        (0, 255, 85),
+        (170, 255, 0),
+        (0, 85, 255),
+        (0, 255, 170),
+        (0, 0, 255),
+        (0, 255, 255),
+        (85, 0, 255),
+        (0, 170, 255),
+    )
     
-    default_skeleton = ((15, 13), (13, 11), (16, 14), (14, 12), (11, 12), (5, 11), (6, 12), (5, 6), (5, 7),
-                        (6, 8), (7, 9), (8, 10), (1, 2), (0, 1), (0, 2), (1, 3), (2, 4), (3, 5), (4, 6))
+    default_skeleton = (
+        (15, 13),
+        (13, 11),
+        (16, 14),
+        (14, 12),
+        (11, 12),
+        (5, 11),
+        (6, 12),
+        (5, 6),
+        (5, 7),
+        (6, 8),
+        (7, 9),
+        (8, 10),
+        (1, 2),
+        (0, 1),
+        (0, 2),
+        (1, 3),
+        (2, 4),
+        (3, 5),
+        (4, 6),
+    )
     
     
     def draw_poses(img, poses, point_score_threshold, skeleton=default_skeleton):
@@ -326,14 +368,20 @@ from Open Model Zoo.
             # Draw limbs.
             for i, j in skeleton:
                 if points_scores[i] > point_score_threshold and points_scores[j] > point_score_threshold:
-                    cv2.line(img_limbs, tuple(points[i]), tuple(points[j]), color=colors[j], thickness=4)
+                    cv2.line(
+                        img_limbs,
+                        tuple(points[i]),
+                        tuple(points[j]),
+                        color=colors[j],
+                        thickness=4,
+                    )
         cv2.addWeighted(img, 0.4, img_limbs, 0.6, 0, dst=img)
         return img
 
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run pose estimation on the specified source. Either a webcam or a video
 file.
@@ -371,7 +419,7 @@ file.
                 # (see https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/human-pose-estimation-0001)
                 input_img = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
                 # Create a batch of images (size = 1).
-                input_img = input_img.transpose((2,0,1))[np.newaxis, ...]
+                input_img = input_img.transpose((2, 0, 1))[np.newaxis, ...]
     
                 # Measure processing time.
                 start_time = time.time()
@@ -396,8 +444,16 @@ file.
                 # mean processing time [ms]
                 processing_time = np.mean(processing_times) * 1000
                 fps = 1000 / processing_time
-                cv2.putText(frame, f"Inference time: {processing_time:.1f}ms ({fps:.1f} FPS)", (20, 40),
-                            cv2.FONT_HERSHEY_COMPLEX, f_width / 1000, (0, 0, 255), 1, cv2.LINE_AA)
+                cv2.putText(
+                    frame,
+                    f"Inference time: {processing_time:.1f}ms ({fps:.1f} FPS)",
+                    (20, 40),
+                    cv2.FONT_HERSHEY_COMPLEX,
+                    f_width / 1000,
+                    (0, 0, 255),
+                    1,
+                    cv2.LINE_AA,
+                )
     
                 # Use this workaround if there is flickering.
                 if use_popup:
@@ -430,12 +486,12 @@ file.
 Run
 ---
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run Live Pose Estimation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use a webcam as the video input. By default, the primary webcam is set
 with ``source=0``. If you have multiple webcams, each one will be

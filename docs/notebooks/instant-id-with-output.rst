@@ -48,41 +48,41 @@ repository <https://github.com/InstantID/InstantID>`__
 In this tutorial, we consider how to use InstantID with OpenVINO. An
 additional part demonstrates how to run optimization with
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ to speed up
-pipeline. #### Table of contents: - `Prerequisites <#prerequisites>`__ -
+pipeline. #### Table of contents: - `Prerequisites <#Prerequisites>`__ -
 `Convert and prepare Face
-IdentityNet <#convert-and-prepare-face-identitynet>`__ - `Select
+IdentityNet <#Convert-and-prepare-Face-IdentityNet>`__ - `Select
 Inference Device for Face
-Recognition <#select-inference-device-for-face-recognition>`__ -
-`Perform Face Identity extraction <#perform-face-identity-extraction>`__
-- `Prepare InstantID pipeline <#prepare-instantid-pipeline>`__ -
+Recognition <#Select-Inference-Device-for-Face-Recognition>`__ -
+`Perform Face Identity extraction <#Perform-Face-Identity-extraction>`__
+- `Prepare InstantID pipeline <#Prepare-InstantID-pipeline>`__ -
 `Convert InstantID pipeline components to OpenVINO Intermediate
 Representation
-format <#convert-instantid-pipeline-components-to-openvino-intermediate-representation-format>`__
-- `ControlNet <#controlnet>`__-`unet<#unet>`__ - `VAE
-Decoder <#vae-decoder>`__-`textencoders<#text-encoders>`__ - `Image
-Projection Model <#image-projection-model>`__ - `Prepare OpenVINO
-InstantID Pipeline <#prepare-openvino-instantid-pipeline>`__ - `Run
-OpenVINO pipeline inference <#run-openvino-pipeline-inference>`__ -
+format <#Convert-InstantID-pipeline-components-to-OpenVINO-Intermediate-Representation-format>`__
+- `ControlNet <#ControlNet>`__ - `Unet <#Unet>`__ - `VAE
+Decoder <#VAE-Decoder>`__ - `Text Encoders <#Text-Encoders>`__ - `Image
+Projection Model <#Image-Projection-Model>`__ - `Prepare OpenVINO
+InstantID Pipeline <#Prepare-OpenVINO-InstantID-Pipeline>`__ - `Run
+OpenVINO pipeline inference <#Run-OpenVINO-pipeline-inference>`__ -
 `Select inference device for
-InstantID <#select-inference-device-for-instantid>`__ - `Create
-pipeline <#create-pipeline>`__-`runinference<#run-inference>`__ -
-`Quantization <#quantization>`__ - `Prepare calibration
-datasets <#prepare-calibration-datasets>`__ - `Run
-quantization <#run-quantization>`__ - `Run ControlNet
-Quantization <#run-controlnet-quantization>`__ - `Run UNet Hybrid
-Quantization <#run-unet-hybrid-quantization>`__ - `Run Weights
-Compression <#run-weights-compression>`__ - `Compare model file
-sizes <#compare-model-file-sizes>`__ - `Compare inference time of the
+InstantID <#Select-inference-device-for-InstantID>`__ - `Create
+pipeline <#Create-pipeline>`__ - `Run inference <#Run-inference>`__ -
+`Quantization <#Quantization>`__ - `Prepare calibration
+datasets <#Prepare-calibration-datasets>`__ - `Run
+quantization <#Run-quantization>`__ - `Run ControlNet
+Quantization <#Run-ControlNet-Quantization>`__ - `Run UNet Hybrid
+Quantization <#Run-UNet-Hybrid-Quantization>`__ - `Run Weights
+Compression <#Run-Weights-Compression>`__ - `Compare model file
+sizes <#Compare-model-file-sizes>`__ - `Compare inference time of the
 FP16 and INT8
-pipelines <#compare-inference-time-of-the-fp16-and-int8-pipelines>`__ -
-`Interactive demo <#interactive-demo>`__
+pipelines <#Compare-inference-time-of-the-FP16-and-INT8-pipelines>`__ -
+`Interactive demo <#Interactive-demo>`__
 
 .. |applications.png| image:: https://github.com/InstantID/InstantID/blob/main/assets/applications.png?raw=true
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -98,12 +98,12 @@ Prerequisites
 
 .. code:: ipython3
 
-    %pip install -q "openvino>=2023.3.0" opencv-python transformers diffusers accelerate gdown scikit-image gradio nncf "datasets>=2.14.6"
+    %pip install -q "openvino>=2023.3.0" opencv-python transformers diffusers accelerate gdown "scikit-image>=0.19.2" "gradio>=4.19" "nncf>=2.9.0" "datasets>=2.14.6" "peft==0.6.2"
 
 Convert and prepare Face IdentityNet
 ------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For getting face embeddings and pose key points, InstantID uses
 `InsightFace <https://github.com/deepinsight/insightface>`__ face
@@ -287,14 +287,10 @@ recognition results.
                 if key in self.center_cache:
                     anchor_centers = self.center_cache[key]
                 else:
-                    anchor_centers = np.stack(
-                        np.mgrid[:height, :width][::-1], axis=-1
-                    ).astype(np.float32)
+                    anchor_centers = np.stack(np.mgrid[:height, :width][::-1], axis=-1).astype(np.float32)
                     anchor_centers = (anchor_centers * stride).reshape((-1, 2))
                     if self._num_anchors > 1:
-                        anchor_centers = np.stack(
-                            [anchor_centers] * self._num_anchors, axis=1
-                        ).reshape((-1, 2))
+                        anchor_centers = np.stack([anchor_centers] * self._num_anchors, axis=1).reshape((-1, 2))
                     if len(self.center_cache) < 100:
                         self.center_cache[key] = anchor_centers
     
@@ -359,9 +355,7 @@ recognition results.
                 if metric == "max":
                     values = area
                 else:
-                    values = (
-                        area - offset_dist_squared * 2.0
-                    )  # some extra weight on the centering
+                    values = area - offset_dist_squared * 2.0  # some extra weight on the centering
                 bindex = np.argsort(values)[::-1]  # some extra weight on the centering
                 bindex = bindex[0:max_num]
                 det = det[bindex, :]
@@ -456,14 +450,7 @@ recognition results.
             if not isinstance(imgs, list):
                 imgs = [imgs]
             input_size = self.input_size
-            blob = np.concatenate(
-                [
-                    prepare_input(
-                        cv2.resize(img, input_size), self.input_mean, self.input_std, True
-                    )
-                    for img in imgs
-                ]
-            )
+            blob = np.concatenate([prepare_input(cv2.resize(img, input_size), self.input_mean, self.input_std, True) for img in imgs])
     
             net_out = self.ov_model(blob)[0]
             return net_out
@@ -491,9 +478,7 @@ recognition results.
                 if kpss is not None:
                     kps = kpss[i]
                 embedding = self.embed_model.get(img, kps)
-                ret.append(
-                    {"bbox": bbox, "score": det_score, "kps": kps, "embedding": embedding}
-                )
+                ret.append({"bbox": bbox, "score": det_score, "kps": kps, "embedding": embedding})
             return ret
 
 Now, let’s see models inference result
@@ -501,7 +486,7 @@ Now, let’s see models inference result
 Select Inference Device for Face Recognition
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Select Inference Device for
+`back to top ⬆️ <#Table-of-contents:>`__ ### Select Inference Device for
 Face Recognition
 
 .. code:: ipython3
@@ -542,7 +527,7 @@ Face Recognition
 Perform Face Identity extraction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, we can apply our ``OVFaceAnalysis`` pipeline on an image for
 collection face embeddings and key points for reflection on the
@@ -552,6 +537,7 @@ generated image
 
     import PIL.Image
     from pipeline_stable_diffusion_xl_instantid import draw_kps
+    
     
     def get_face_info(face_image: PIL.Image.Image):
         r"""
@@ -573,7 +559,8 @@ generated image
         if len(face_info) == 0:
             raise RuntimeError("Couldn't find the face on the image")
         face_info = sorted(
-            face_info, key=lambda x: (x["bbox"][2] - x["bbox"][0]) * x["bbox"][3] - x["bbox"][1]
+            face_info,
+            key=lambda x: (x["bbox"][2] - x["bbox"][0]) * x["bbox"][3] - x["bbox"][1],
         )[
             -1
         ]  # only use the maximum face
@@ -585,9 +572,7 @@ generated image
 
     from diffusers.utils import load_image
     
-    face_image = load_image(
-        "https://huggingface.co/datasets/YiYiXu/testing-images/resolve/main/vermeer.jpg"
-    )
+    face_image = load_image("https://huggingface.co/datasets/YiYiXu/testing-images/resolve/main/vermeer.jpg")
     
     face_emb, face_kps = get_face_info(face_image)
 
@@ -616,7 +601,7 @@ generated image
 Prepare InstantID pipeline
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The code below downloads InstantID pipeline parts - ControlNet for face
 pose and IP-Adapter for adding face embeddings to prompt
@@ -635,14 +620,12 @@ pose and IP-Adapter for adding face embeddings to prompt
         filename="ControlNetModel/diffusion_pytorch_model.safetensors",
         local_dir="./checkpoints",
     )
-    hf_hub_download(
-        repo_id="InstantX/InstantID", filename="ip-adapter.bin", local_dir="./checkpoints"
-    );
+    hf_hub_download(repo_id="InstantX/InstantID", filename="ip-adapter.bin", local_dir="./checkpoints");
 
 As it was discussed in model description, InstantID does not required
 diffusion model fine-tuning and can be applied on existing Stable
 Diffusion pipeline. We will use
-`stable-diffusion-xl-bas-1-0 <https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0>`__
+```stable-diffusion-xl-bas-1-0`` <https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0>`__
 as basic text-to-image diffusion pipeline. We also apply `LCM
 LoRA <https://huggingface.co/latent-consistency/lcm-lora-sdxl>`__ to
 speedup the generation process. Previously, we already considered how to
@@ -688,9 +671,7 @@ OpenVINO Model Conversion API.
         # load IdentityNet
         controlnet = ControlNetModel.from_pretrained(controlnet_path)
     
-        pipe = StableDiffusionXLInstantIDPipeline.from_pretrained(
-            sdxl_id, controlnet=controlnet
-        )
+        pipe = StableDiffusionXLInstantIDPipeline.from_pretrained(sdxl_id, controlnet=controlnet)
     
         # load adapter
         pipe.load_ip_adapter_instantid(face_adapter)
@@ -756,7 +737,7 @@ OpenVINO Model Conversion API.
 Convert InstantID pipeline components to OpenVINO Intermediate Representation format
 ------------------------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Starting from 2023.0 release, OpenVINO supports PyTorch models
 conversion directly. We need to provide a model object, input data for
@@ -781,7 +762,7 @@ The pipeline consists of the following list of important parts:
 ControlNet
 ~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ControlNet was introduced in `Adding Conditional Control to
 Text-to-Image Diffusion Models <https://arxiv.org/abs/2302.05543>`__
@@ -825,9 +806,7 @@ XL remains without changes.
     if not ov_controlnet_path.exists():
         controlnet.forward = partial(controlnet.forward, return_dict=False)
         with torch.no_grad():
-            ov_controlnet = ov.convert_model(
-                controlnet, example_input=controlnet_example_input
-            )
+            ov_controlnet = ov.convert_model(controlnet, example_input=controlnet_example_input)
         ov_controlnet.inputs[-1].get_node().set_element_type(ov.Type.f32)
         ov_controlnet.inputs[-1].get_node().set_partial_shape(ov.PartialShape([-1, 6]))
         ov_controlnet.validate_nodes_and_infer_types()
@@ -837,9 +816,7 @@ XL remains without changes.
         gc.collect()
     
     if not ov_unet_path.exists():
-        down_block_res_samples, mid_block_res_sample = controlnet(
-            **controlnet_example_input
-        )
+        down_block_res_samples, mid_block_res_sample = controlnet(**controlnet_example_input)
     else:
         down_block_res_samples, mid_block_res_sample = None, None
     
@@ -849,7 +826,7 @@ XL remains without changes.
 Unet
 ~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Compared with Stable Diffusion, Stable Diffusion XL Unet has an
 additional input for the ``time_ids`` condition. As we use ControlNet
@@ -878,9 +855,7 @@ preparing model input for Unet.
             self.sample_dtype = sample_dtype
             self.timestep_dtype = timestep_dtype
             self.encoder_hidden_states_dtype = encoder_hidden_states_dtype
-            self.down_block_additional_residuals_dtype = (
-                down_block_additional_residuals_dtype
-            )
+            self.down_block_additional_residuals_dtype = down_block_additional_residuals_dtype
             self.mid_block_additional_residual_dtype = mid_block_additional_residual_dtype
             self.text_embeds_dtype = text_embeds_dtype
             self.time_ids_dtype = time_ids_dtype
@@ -898,10 +873,7 @@ preparing model input for Unet.
             sample.to(self.sample_dtype)
             timestep.to(self.timestep_dtype)
             encoder_hidden_states.to(self.encoder_hidden_states_dtype)
-            down_block_additional_residuals = [
-                res.to(self.down_block_additional_residuals_dtype)
-                for res in down_block_additional_residuals
-            ]
+            down_block_additional_residuals = [res.to(self.down_block_additional_residuals_dtype) for res in down_block_additional_residuals]
             mid_block_additional_residual.to(self.mid_block_additional_residual_dtype)
             added_cond_kwargs = {
                 "text_embeds": text_embeds.to(self.text_embeds_dtype),
@@ -946,7 +918,7 @@ preparing model input for Unet.
 VAE Decoder
 ~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The VAE model has two parts, an encoder and a decoder. The encoder is
 used to convert the image into a low dimensional latent representation,
@@ -970,9 +942,7 @@ image, it means that we can skip VAE encoder part conversion.
         vae_decoder = VAEDecoderWrapper(vae)
     
         with torch.no_grad():
-            ov_vae_decoder = ov.convert_model(
-                vae_decoder, example_input=torch.zeros((1, 4, 64, 64))
-            )
+            ov_vae_decoder = ov.convert_model(vae_decoder, example_input=torch.zeros((1, 4, 64, 64)))
         ov.save_model(ov_vae_decoder, ov_vae_decoder_path)
         del ov_vae_decoder
         cleanup_torchscript_cache()
@@ -985,7 +955,7 @@ image, it means that we can skip VAE encoder part conversion.
 Text Encoders
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The text-encoder is responsible for transforming the input prompt, for
 example, “a photo of an astronaut riding a horse” into an embedding
@@ -1026,7 +996,7 @@ sequence of latent text embeddings.
 Image Projection Model
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Image projection model is responsible to transforming face embeddings to
 image prompt embeddings
@@ -1035,9 +1005,7 @@ image prompt embeddings
 
     if not ov_image_proj_encoder_path.exists():
         with torch.no_grad():
-            ov_image_encoder = ov.convert_model(
-                image_proj_model, example_input=torch.zeros((2, 1, 512))
-            )
+            ov_image_encoder = ov.convert_model(image_proj_model, example_input=torch.zeros((2, 1, 512)))
         ov.save_model(ov_image_encoder, ov_image_proj_encoder_path)
         del ov_image_encoder
         cleanup_torchscript_cache()
@@ -1047,7 +1015,7 @@ image prompt embeddings
 Prepare OpenVINO InstantID Pipeline
 -----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1087,9 +1055,7 @@ Prepare OpenVINO InstantID Pipeline
             self.image_proj_model_in_features = 512
             self.vae_scale_factor = 8
             self.vae_scaling_factor = 0.13025
-            self.image_processor = VaeImageProcessor(
-                vae_scale_factor=self.vae_scale_factor, do_convert_rgb=True
-            )
+            self.image_processor = VaeImageProcessor(vae_scale_factor=self.vae_scale_factor, do_convert_rgb=True)
             self.control_image_processor = VaeImageProcessor(
                 vae_scale_factor=self.vae_scale_factor,
                 do_convert_rgb=True,
@@ -1097,33 +1063,24 @@ Prepare OpenVINO InstantID Pipeline
             )
             self._internal_dict = {}
             self._progress_bar_config = {}
-            
     
-        def _encode_prompt_image_emb(
-            self, prompt_image_emb, num_images_per_prompt, do_classifier_free_guidance
-        ):
+        def _encode_prompt_image_emb(self, prompt_image_emb, num_images_per_prompt, do_classifier_free_guidance):
             if isinstance(prompt_image_emb, torch.Tensor):
                 prompt_image_emb = prompt_image_emb.clone().detach()
             else:
                 prompt_image_emb = torch.tensor(prompt_image_emb)
     
-            prompt_image_emb = prompt_image_emb.reshape(
-                [1, -1, self.image_proj_model_in_features]
-            )
+            prompt_image_emb = prompt_image_emb.reshape([1, -1, self.image_proj_model_in_features])
     
             if do_classifier_free_guidance:
-                prompt_image_emb = torch.cat(
-                    [torch.zeros_like(prompt_image_emb), prompt_image_emb], dim=0
-                )
+                prompt_image_emb = torch.cat([torch.zeros_like(prompt_image_emb), prompt_image_emb], dim=0)
             else:
                 prompt_image_emb = torch.cat([prompt_image_emb], dim=0)
             prompt_image_emb = self.image_proj_model(prompt_image_emb)[0]
     
             bs_embed, seq_len, _ = prompt_image_emb.shape
             prompt_image_emb = np.tile(prompt_image_emb, (1, num_images_per_prompt, 1))
-            prompt_image_emb = prompt_image_emb.reshape(
-                bs_embed * num_images_per_prompt, seq_len, -1
-            )
+            prompt_image_emb = prompt_image_emb.reshape(bs_embed * num_images_per_prompt, seq_len, -1)
     
             return prompt_image_emb
     
@@ -1287,19 +1244,11 @@ Prepare OpenVINO InstantID Pipeline
     
             do_classifier_free_guidance = guidance_scale >= 1.0
             # align format for control guidance
-            if not isinstance(control_guidance_start, list) and isinstance(
-                control_guidance_end, list
-            ):
-                control_guidance_start = len(control_guidance_end) * [
-                    control_guidance_start
-                ]
-            elif not isinstance(control_guidance_end, list) and isinstance(
-                control_guidance_start, list
-            ):
+            if not isinstance(control_guidance_start, list) and isinstance(control_guidance_end, list):
+                control_guidance_start = len(control_guidance_end) * [control_guidance_start]
+            elif not isinstance(control_guidance_end, list) and isinstance(control_guidance_start, list):
                 control_guidance_end = len(control_guidance_start) * [control_guidance_end]
-            elif not isinstance(control_guidance_start, list) and not isinstance(
-                control_guidance_end, list
-            ):
+            elif not isinstance(control_guidance_start, list) and not isinstance(control_guidance_end, list):
                 control_guidance_start, control_guidance_end = (
                     [control_guidance_start],
                     [control_guidance_end],
@@ -1334,9 +1283,7 @@ Prepare OpenVINO InstantID Pipeline
             )
     
             # 3.2 Encode image prompt
-            prompt_image_emb = self._encode_prompt_image_emb(
-                image_embeds, num_images_per_prompt, do_classifier_free_guidance
-            )
+            prompt_image_emb = self._encode_prompt_image_emb(image_embeds, num_images_per_prompt, do_classifier_free_guidance)
     
             # 4. Prepare image
             image = self.prepare_image(
@@ -1372,10 +1319,7 @@ Prepare OpenVINO InstantID Pipeline
             # 7.1 Create tensor stating which controlnets to keep
             controlnet_keep = []
             for i in range(len(timesteps)):
-                keeps = [
-                    1.0 - float(i / len(timesteps) < s or (i + 1) / len(timesteps) > e)
-                    for s, e in zip(control_guidance_start, control_guidance_end)
-                ]
+                keeps = [1.0 - float(i / len(timesteps) < s or (i + 1) / len(timesteps) > e) for s, e in zip(control_guidance_start, control_guidance_end)]
                 controlnet_keep.append(keeps)
     
             # 7.2 Prepare added time ids & embeddings
@@ -1409,29 +1353,19 @@ Prepare OpenVINO InstantID Pipeline
                 negative_add_time_ids = add_time_ids
     
             if do_classifier_free_guidance:
-                prompt_embeds = np.concatenate(
-                    [negative_prompt_embeds, prompt_embeds], axis=0
-                )
-                add_text_embeds = np.concatenate(
-                    [negative_pooled_prompt_embeds, add_text_embeds], axis=0
-                )
+                prompt_embeds = np.concatenate([negative_prompt_embeds, prompt_embeds], axis=0)
+                add_text_embeds = np.concatenate([negative_pooled_prompt_embeds, add_text_embeds], axis=0)
                 add_time_ids = np.concatenate([negative_add_time_ids, add_time_ids], axis=0)
     
             add_time_ids = np.tile(add_time_ids, (batch_size * num_images_per_prompt, 1))
-            encoder_hidden_states = np.concatenate(
-                [prompt_embeds, prompt_image_emb], axis=1
-            )
+            encoder_hidden_states = np.concatenate([prompt_embeds, prompt_image_emb], axis=1)
     
             # 8. Denoising loop
             with self.progress_bar(total=num_inference_steps) as progress_bar:
                 for i, t in enumerate(timesteps):
                     # expand the latents if we are doing classifier free guidance
-                    latent_model_input = (
-                        torch.cat([latents] * 2) if do_classifier_free_guidance else latents
-                    )
-                    latent_model_input = self.scheduler.scale_model_input(
-                        latent_model_input, t
-                    )
+                    latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
+                    latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
     
                     # controlnet(s) inference
                     control_model_input = latent_model_input
@@ -1467,9 +1401,7 @@ Prepare OpenVINO InstantID Pipeline
                     # perform guidance
                     if do_classifier_free_guidance:
                         noise_pred_uncond, noise_pred_text = noise_pred[0], noise_pred[1]
-                        noise_pred = noise_pred_uncond + guidance_scale * (
-                            noise_pred_text - noise_pred_uncond
-                        )
+                        noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
     
                     # compute the previous noisy sample x_t -> x_t-1
                     latents = self.scheduler.step(
@@ -1487,9 +1419,7 @@ Prepare OpenVINO InstantID Pipeline
                 image = latents
     
             if not output_type == "latent":
-                image = self.image_processor.postprocess(
-                    torch.from_numpy(image), output_type=output_type
-                )
+                image = self.image_processor.postprocess(torch.from_numpy(image), output_type=output_type)
     
             if not return_dict:
                 return (image,)
@@ -1559,16 +1489,8 @@ Prepare OpenVINO InstantID Pipeline
                 batch_size = prompt_embeds.shape[0]
     
             # Define tokenizers and text encoders
-            tokenizers = (
-                [self.tokenizer, self.tokenizer_2]
-                if self.tokenizer is not None
-                else [self.tokenizer_2]
-            )
-            text_encoders = (
-                [self.text_encoder, self.text_encoder_2]
-                if self.text_encoder is not None
-                else [self.text_encoder_2]
-            )
+            tokenizers = [self.tokenizer, self.tokenizer_2] if self.tokenizer is not None else [self.tokenizer_2]
+            text_encoders = [self.text_encoder, self.text_encoder_2] if self.text_encoder is not None else [self.text_encoder_2]
     
             if prompt_embeds is None:
                 prompt_2 = prompt_2 or prompt
@@ -1577,9 +1499,7 @@ Prepare OpenVINO InstantID Pipeline
                 # textual inversion: procecss multi-vector tokens if necessary
                 prompt_embeds_list = []
                 prompts = [prompt, prompt_2]
-                for prompt, tokenizer, text_encoder in zip(
-                    prompts, tokenizers, text_encoders
-                ):
+                for prompt, tokenizer, text_encoder in zip(prompts, tokenizers, text_encoders):
                     text_inputs = tokenizer(
                         prompt,
                         padding="max_length",
@@ -1607,11 +1527,7 @@ Prepare OpenVINO InstantID Pipeline
     
             # get unconditional embeddings for classifier free guidance
             zero_out_negative_prompt = negative_prompt is None
-            if (
-                do_classifier_free_guidance
-                and negative_prompt_embeds is None
-                and zero_out_negative_prompt
-            ):
+            if do_classifier_free_guidance and negative_prompt_embeds is None and zero_out_negative_prompt:
                 negative_prompt_embeds = np.zeros_like(prompt_embeds)
                 negative_pooled_prompt_embeds = np.zeros_like(pooled_prompt_embeds)
             elif do_classifier_free_guidance and negative_prompt_embeds is None:
@@ -1619,23 +1535,12 @@ Prepare OpenVINO InstantID Pipeline
                 negative_prompt_2 = negative_prompt_2 or negative_prompt
     
                 # normalize str to list
-                negative_prompt = (
-                    batch_size * [negative_prompt]
-                    if isinstance(negative_prompt, str)
-                    else negative_prompt
-                )
-                negative_prompt_2 = (
-                    batch_size * [negative_prompt_2]
-                    if isinstance(negative_prompt_2, str)
-                    else negative_prompt_2
-                )
+                negative_prompt = batch_size * [negative_prompt] if isinstance(negative_prompt, str) else negative_prompt
+                negative_prompt_2 = batch_size * [negative_prompt_2] if isinstance(negative_prompt_2, str) else negative_prompt_2
     
                 uncond_tokens: List[str]
                 if prompt is not None and type(prompt) is not type(negative_prompt):
-                    raise TypeError(
-                        f"`negative_prompt` should be the same type to `prompt`, but got {type(negative_prompt)} !="
-                        f" {type(prompt)}."
-                    )
+                    raise TypeError(f"`negative_prompt` should be the same type to `prompt`, but got {type(negative_prompt)} !=" f" {type(prompt)}.")
                 elif batch_size != len(negative_prompt):
                     raise ValueError(
                         f"`negative_prompt`: {negative_prompt} has batch size {len(negative_prompt)}, but `prompt`:"
@@ -1646,9 +1551,7 @@ Prepare OpenVINO InstantID Pipeline
                     uncond_tokens = [negative_prompt, negative_prompt_2]
     
                 negative_prompt_embeds_list = []
-                for negative_prompt, tokenizer, text_encoder in zip(
-                    uncond_tokens, tokenizers, text_encoders
-                ):
+                for negative_prompt, tokenizer, text_encoder in zip(uncond_tokens, tokenizers, text_encoders):
                     max_length = prompt_embeds.shape[1]
                     uncond_input = tokenizer(
                         negative_prompt,
@@ -1666,34 +1569,22 @@ Prepare OpenVINO InstantID Pipeline
     
                     negative_prompt_embeds_list.append(negative_prompt_embeds)
     
-                negative_prompt_embeds = np.concatenate(
-                    negative_prompt_embeds_list, axis=-1
-                )
+                negative_prompt_embeds = np.concatenate(negative_prompt_embeds_list, axis=-1)
     
             bs_embed, seq_len, _ = prompt_embeds.shape
             # duplicate text embeddings for each generation per prompt, using mps friendly method
             prompt_embeds = np.tile(prompt_embeds, (1, num_images_per_prompt, 1))
-            prompt_embeds = prompt_embeds.reshape(
-                bs_embed * num_images_per_prompt, seq_len, -1
-            )
+            prompt_embeds = prompt_embeds.reshape(bs_embed * num_images_per_prompt, seq_len, -1)
     
             if do_classifier_free_guidance:
                 # duplicate unconditional embeddings for each generation per prompt, using mps friendly method
                 seq_len = negative_prompt_embeds.shape[1]
-                negative_prompt_embeds = np.tile(
-                    negative_prompt_embeds, (1, num_images_per_prompt, 1)
-                )
-                negative_prompt_embeds = negative_prompt_embeds.reshape(
-                    batch_size * num_images_per_prompt, seq_len, -1
-                )
+                negative_prompt_embeds = np.tile(negative_prompt_embeds, (1, num_images_per_prompt, 1))
+                negative_prompt_embeds = negative_prompt_embeds.reshape(batch_size * num_images_per_prompt, seq_len, -1)
     
-            pooled_prompt_embeds = np.tile(
-                pooled_prompt_embeds, (1, num_images_per_prompt)
-            ).reshape(bs_embed * num_images_per_prompt, -1)
+            pooled_prompt_embeds = np.tile(pooled_prompt_embeds, (1, num_images_per_prompt)).reshape(bs_embed * num_images_per_prompt, -1)
             if do_classifier_free_guidance:
-                negative_pooled_prompt_embeds = np.tile(
-                    negative_pooled_prompt_embeds, (1, num_images_per_prompt)
-                ).reshape(bs_embed * num_images_per_prompt, -1)
+                negative_pooled_prompt_embeds = np.tile(negative_pooled_prompt_embeds, (1, num_images_per_prompt)).reshape(bs_embed * num_images_per_prompt, -1)
     
             return (
                 prompt_embeds,
@@ -1712,9 +1603,7 @@ Prepare OpenVINO InstantID Pipeline
             do_classifier_free_guidance=False,
             guess_mode=False,
         ):
-            image = self.control_image_processor.preprocess(
-                image, height=height, width=width
-            ).to(dtype=torch.float32)
+            image = self.control_image_processor.preprocess(image, height=height, width=width).to(dtype=torch.float32)
             image_batch_size = image.shape[0]
     
             if image_batch_size == 1:
@@ -1741,16 +1630,15 @@ Prepare OpenVINO InstantID Pipeline
             add_time_ids = torch.tensor([add_time_ids])
             return add_time_ids
 
-
 Run OpenVINO pipeline inference
 -------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select inference device for InstantID
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1791,7 +1679,7 @@ Select inference device for InstantID
 Create pipeline
 ~~~~~~~~~~~~~~~
 
-### Create pipeline
+`back to top ⬆️ <#Table-of-contents:>`__ ### Create pipeline
 
 .. code:: ipython3
 
@@ -1810,7 +1698,7 @@ Create pipeline
 Run inference
 ~~~~~~~~~~~~~
 
-### Run inference
+`back to top ⬆️ <#Table-of-contents:>`__ ### Run inference
 
 .. code:: ipython3
 
@@ -1824,7 +1712,7 @@ Run inference
         num_inference_steps=4,
         negative_prompt=negative_prompt,
         guidance_scale=0.5,
-        generator=torch.Generator(device="cpu").manual_seed(1749781188)
+        generator=torch.Generator(device="cpu").manual_seed(1749781188),
     ).images[0]
 
 
@@ -1848,7 +1736,7 @@ Run inference
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -1872,10 +1760,7 @@ improve model inference speed.
 
 .. code:: ipython3
 
-    to_quantize = widgets.Checkbox(
-        value=True,
-        description='Quantization'
-    )
+    to_quantize = widgets.Checkbox(value=True, description="Quantization")
     
     to_quantize
 
@@ -1893,13 +1778,13 @@ Let’s load ``skip magic`` extension to skip quantization if
 
 .. code:: ipython3
 
-    import sys
     # Fetch `skip_kernel_extension` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     int8_pipe = None
     
@@ -1908,10 +1793,10 @@ Let’s load ``skip magic`` extension to skip quantization if
 Prepare calibration datasets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use a portion of
-`wider_face <https://huggingface.co/datasets/wider_face>`__ dataset
+```wider_face`` <https://huggingface.co/datasets/wider_face>`__ dataset
 from Hugging Face as calibration data. We use prompts below to guide
 image generation and to determine what not to include in the resulting
 image.
@@ -2061,12 +1946,12 @@ To collect intermediate model inputs for calibration we should customize
 Run Quantization
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run ControlNet Quantization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Quantization of the first ``Convolution`` layer impacts the generation
 results. We recommend using ``IgnoredScope`` to keep accuracy sensitive
@@ -2092,7 +1977,7 @@ layers in FP16 precision.
 Run UNet Hybrid Quantization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 On the one hand, post-training quantization of the UNet model requires
 more than ~100Gb and leads to accuracy drop. On the other hand, the
@@ -2180,7 +2065,7 @@ layers and (2) activations of other layers. The steps are the following:
 Run Weights Compression
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Quantizing of the ``Text Encoders`` and ``VAE Decoder`` does not
 significantly improve inference performance but can lead to a
@@ -2262,7 +2147,8 @@ pipelines.
     
     import matplotlib.pyplot as plt
     
-    def visualize_results(orig_img:Image, optimized_img:Image):
+    
+    def visualize_results(orig_img: Image, optimized_img: Image):
         """
         Helper function for results visualization
     
@@ -2275,7 +2161,7 @@ pipelines.
         orig_title = "FP16 pipeline"
         control_title = "INT8 pipeline"
         figsize = (20, 20)
-        fig, axs = plt.subplots(1, 2, figsize=figsize, sharex='all', sharey='all')
+        fig, axs = plt.subplots(1, 2, figsize=figsize, sharex="all", sharey="all")
         list_axes = list(axs.flat)
         for a in list_axes:
             a.set_xticklabels([])
@@ -2306,7 +2192,7 @@ pipelines.
 Compare model file sizes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -2333,7 +2219,7 @@ Compare model file sizes
 Compare inference time of the FP16 and INT8 pipelines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 pipelines, we use mean inference time on 5 samples.
@@ -2392,7 +2278,7 @@ pipelines, we use mean inference time on 5 samples.
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Please select below whether you would like to use the quantized models
 to launch the interactive demo.
@@ -2403,7 +2289,7 @@ to launch the interactive demo.
     
     use_quantized_models = widgets.Checkbox(
         value=quantized_models_present,
-        description='Use quantized models',
+        description="Use quantized models",
         disabled=not quantized_models_present,
     )
     
@@ -2432,7 +2318,7 @@ to launch the interactive demo.
         "https://huggingface.co/datasets/EnD-Diffusers/AI_Faces/resolve/main/images%207/00171-2728008415.png",
         "https://huggingface.co/datasets/EnD-Diffusers/AI_Faces/resolve/main/00003-3962843561.png",
         "https://huggingface.co/datasets/EnD-Diffusers/AI_Faces/resolve/main/00005-3104853215.png",
-        "https://huggingface.co/datasets/YiYiXu/testing-images/resolve/main/ai_face2.png"
+        "https://huggingface.co/datasets/YiYiXu/testing-images/resolve/main/ai_face2.png",
     ]
     
     examples_dir = Path("examples")
@@ -2442,7 +2328,7 @@ to launch the interactive demo.
         [examples_dir / "face_1.png", "photo of a business lady", "Vibrant Color", ""],
         [examples_dir / "face_2.png", "famous rock star poster", "(No style)", ""],
         [examples_dir / "face_3.png", "a person", "Neon", ""],
-        [examples_dir / "face_4.png", "a girl", "Snow", ""]
+        [examples_dir / "face_4.png", "a girl", "Snow", ""],
     ]
     
     pipeline = int8_pipe if use_quantized_models.value else ov_pipe
@@ -2493,9 +2379,7 @@ to launch the interactive demo.
             res = np.ones([max_side, max_side, 3], dtype=np.uint8) * 255
             offset_x = (max_side - w_resize_new) // 2
             offset_y = (max_side - h_resize_new) // 2
-            res[
-                offset_y : offset_y + h_resize_new, offset_x : offset_x + w_resize_new
-            ] = np.array(input_image)
+            res[offset_y : offset_y + h_resize_new, offset_x : offset_x + w_resize_new] = np.array(input_image)
             input_image = Image.fromarray(res)
         return input_image
     
@@ -2532,9 +2416,7 @@ to launch the interactive demo.
         face_info = app.get(face_image_cv2)
     
         if len(face_info) == 0:
-            raise gr.Error(
-                "Cannot find any face in the image! Please upload another person image"
-            )
+            raise gr.Error("Cannot find any face in the image! Please upload another person image")
     
         face_info = sorted(
             face_info,
@@ -2553,9 +2435,7 @@ to launch the interactive demo.
             face_info = app.get(pose_image_cv2)
     
             if len(face_info) == 0:
-                raise gr.Error(
-                    "Cannot find any face in the reference image! Please upload another person image"
-                )
+                raise gr.Error("Cannot find any face in the reference image! Please upload another person image")
     
             face_info = face_info[-1]
             face_kps = draw_kps(pose_image, face_info["kps"])
@@ -2612,9 +2492,7 @@ to launch the interactive demo.
                 face_file = gr.Image(label="Upload a photo of your face", type="pil")
     
                 # optional: upload a reference pose image
-                pose_file = gr.Image(
-                    label="Upload a reference pose image (optional)", type="pil"
-                )
+                pose_file = gr.Image(label="Upload a reference pose image (optional)", type="pil")
     
                 # prompt
                 prompt = gr.Textbox(
@@ -2625,9 +2503,7 @@ to launch the interactive demo.
                 )
     
                 submit = gr.Button("Submit", variant="primary")
-                style = gr.Dropdown(
-                    label="Style template", choices=STYLE_NAMES, value=DEFAULT_STYLE_NAME
-                )
+                style = gr.Dropdown(label="Style template", choices=STYLE_NAMES, value=DEFAULT_STYLE_NAME)
     
                 # strength
                 identitynet_strength_ratio = gr.Slider(
@@ -2651,9 +2527,7 @@ to launch the interactive demo.
                         step=1,
                         value=4,
                     )
-                    guidance_scale = gr.Slider(
-                        label="Guidance scale", minimum=0.1, maximum=10.0, step=0.1, value=0
-                    )
+                    guidance_scale = gr.Slider(label="Guidance scale", minimum=0.1, maximum=10.0, step=0.1, value=0)
                     seed = gr.Slider(
                         label="Seed",
                         minimum=0,
@@ -2693,7 +2567,7 @@ to launch the interactive demo.
 
 .. code:: ipython3
 
-    if __name__ == '__main__':
+    if __name__ == "__main__":
         try:
             demo.launch(debug=False)
         except Exception:

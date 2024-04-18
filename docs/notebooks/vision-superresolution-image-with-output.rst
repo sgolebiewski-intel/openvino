@@ -17,51 +17,51 @@ pp. 2777-2784, doi: 10.1109/ICPR.2018.8545760.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Preparation <#preparation>`__
+-  `Preparation <#Preparation>`__
 
-   -  `Install requirements <#install-requirements>`__
-   -  `Imports <#imports>`__
-   -  `Settings <#settings>`__
+   -  `Install requirements <#Install-requirements>`__
+   -  `Imports <#Imports>`__
+   -  `Settings <#Settings>`__
 
-      -  `Select inference device <#select-inference-device>`__
+      -  `Select inference device <#Select-inference-device>`__
 
-   -  `Functions <#functions>`__
+   -  `Functions <#Functions>`__
 
--  `Load the Superresolution Model <#load-the-superresolution-model>`__
--  `Load and Show the Input Image <#load-and-show-the-input-image>`__
+-  `Load the Superresolution Model <#Load-the-Superresolution-Model>`__
+-  `Load and Show the Input Image <#Load-and-Show-the-Input-Image>`__
 -  `Superresolution on a Crop of the
-   Image <#superresolution-on-a-crop-of-the-image>`__
+   Image <#Superresolution-on-a-Crop-of-the-Image>`__
 
-   -  `Crop the Input Image once. <#crop-the-input-image-once->`__
+   -  `Crop the Input Image once. <#Crop-the-Input-Image-once.>`__
    -  `Reshape/Resize Crop for Model
-      Input <#reshaperesize-crop-for-model-input>`__
-   -  `Do Inference <#do-inference>`__
-   -  `Show and Save Results <#show-and-save-results>`__
+      Input <#Reshape/Resize-Crop-for-Model-Input>`__
+   -  `Do Inference <#Do-Inference>`__
+   -  `Show and Save Results <#Show-and-Save-Results>`__
 
       -  `Save Superresolution and Bicubic Image
-         Crop <#save-superresolution-and-bicubic-image-crop>`__
+         Crop <#Save-Superresolution-and-Bicubic-Image-Crop>`__
       -  `Write Animated GIF with Bicubic/Superresolution
-         Comparison <#write-animated-gif-with-bicubicsuperresolution-comparison>`__
+         Comparison <#Write-Animated-GIF-with-Bicubic/Superresolution-Comparison>`__
       -  `Create a Video with Sliding Bicubic/Superresolution
-         Comparison <#create-a-video-with-sliding-bicubicsuperresolution-comparison>`__
+         Comparison <#Create-a-Video-with-Sliding-Bicubic/Superresolution-Comparison>`__
 
 -  `Superresolution on full input
-   image <#superresolution-on-full-input-image>`__
+   image <#Superresolution-on-full-input-image>`__
 
-   -  `Compute patches <#compute-patches>`__
-   -  `Do Inference <#do-inference>`__
+   -  `Compute patches <#Compute-patches>`__
+   -  `Do Inference <#Do-Inference>`__
    -  `Save superresolution image and the bicubic
-      image <#save-superresolution-image-and-the-bicubic-image>`__
+      image <#Save-superresolution-image-and-the-bicubic-image>`__
 
 Preparation
 -----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -69,7 +69,7 @@ Install requirements
     
     %pip install -q "openvino>=2023.1.0"
     %pip install -q opencv-python
-    %pip install -q pillow
+    %pip install -q pillow tqdm
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -120,7 +120,7 @@ Install requirements
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -142,19 +142,23 @@ Imports
     # Define a download file helper function
     def download_file(url: str, path: Path) -> None:
         """Download file."""
-        import urllib.request
+        import requests
+    
         path.parent.mkdir(parents=True, exist_ok=True)
-        urllib.request.urlretrieve(url, path)
+    
+        r = requests.get(url)
+        with path.open("wb") as f:
+            f.write(r.content)
 
 Settings
 ~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -165,8 +169,8 @@ select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -184,30 +188,30 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     # 1032: 4x superresolution, 1033: 3x superresolution
-    model_name = 'single-image-super-resolution-1032'
+    model_name = "single-image-super-resolution-1032"
     
     base_model_dir = Path("./model").expanduser()
     
-    model_xml_name = f'{model_name}.xml'
-    model_bin_name = f'{model_name}.bin'
+    model_xml_name = f"{model_name}.xml"
+    model_bin_name = f"{model_name}.bin"
     
     model_xml_path = base_model_dir / model_xml_name
     model_bin_path = base_model_dir / model_bin_name
     
     if not model_xml_path.exists():
-        base_url = f'https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/{model_name}/FP16/'
+        base_url = f"https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/{model_name}/FP16/"
         model_xml_url = base_url + model_xml_name
         model_bin_url = base_url + model_bin_name
     
         download_file(model_xml_url, model_xml_path)
         download_file(model_bin_url, model_bin_path)
     else:
-        print(f'{model_name} already downloaded to {base_model_dir}')
+        print(f"{model_name} already downloaded to {base_model_dir}")
 
 Functions
 ~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -270,7 +274,7 @@ Functions
 Load the Superresolution Model
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The Super Resolution model expects two inputs: the input image and a
 bicubic interpolation of the input image to the target size of
@@ -303,11 +307,7 @@ information about the network inputs and outputs.
     print(f"The network expects inputs with a width of {input_width}, " f"height of {input_height}")
     print(f"The network returns images with a width of {target_width}, " f"height of {target_height}")
     
-    print(
-        f"The image sides are upsampled by a factor of {upsample_factor}. "
-        f"The new image is {upsample_factor**2} times as large as the "
-        "original image"
-    )
+    print(f"The image sides are upsampled by a factor of {upsample_factor}. " f"The new image is {upsample_factor**2} times as large as the " "original image")
 
 
 .. parsed-literal::
@@ -320,7 +320,7 @@ information about the network inputs and outputs.
 Load and Show the Input Image
 -----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
    **NOTE**: For the best results, use raw images (like ``TIFF``,
    ``BMP`` or ``PNG``). Compressed images (like ``JPEG``) may appear
@@ -333,7 +333,10 @@ Load and Show the Input Image
     
     os.makedirs(str(OUTPUT_PATH), exist_ok=True)
     
-    download_file('https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/tower.jpg', IMAGE_PATH)
+    download_file(
+        "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/tower.jpg",
+        IMAGE_PATH,
+    )
     full_image = cv2.imread(str(IMAGE_PATH))
     
     # Uncomment these lines to load a raw image as BGR.
@@ -357,12 +360,12 @@ Load and Show the Input Image
 Superresolution on a Crop of the Image
 --------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Crop the Input Image once.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Crop the network input size. Give the X (width) and Y (height)
 coordinates for the top left corner of the crop. Set the ``CROP_FACTOR``
@@ -413,7 +416,7 @@ as the crop size.
 Reshape/Resize Crop for Model Input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The input image is resized to a network input size, and reshaped to
 (N,C,H,W) (N=number of images, C=number of channels, H=height, W=width).
@@ -423,9 +426,7 @@ interpolation. This bicubic image is the second input to the network.
 .. code:: ipython3
 
     # Resize the image to the target shape with bicubic interpolation.
-    bicubic_image = cv2.resize(
-        src=image_crop, dsize=(target_width, target_height), interpolation=cv2.INTER_CUBIC
-    )
+    bicubic_image = cv2.resize(src=image_crop, dsize=(target_width, target_height), interpolation=cv2.INTER_CUBIC)
     
     # If required, resize the image to the input image shape.
     if CROP_FACTOR > 1:
@@ -438,7 +439,7 @@ interpolation. This bicubic image is the second input to the network.
 Do Inference
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Do inference and convert the inference result to an ``RGB`` image.
 
@@ -457,7 +458,7 @@ Do inference and convert the inference result to an ``RGB`` image.
 Show and Save Results
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Show the bicubic image and the enhanced superresolution image.
 
@@ -485,7 +486,7 @@ Show the bicubic image and the enhanced superresolution image.
 Save Superresolution and Bicubic Image Crop
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -495,18 +496,22 @@ Save Superresolution and Bicubic Image Crop
     
     # Store the image and the results.
     crop_image_path = Path(f"{OUTPUT_PATH.stem}/{image_id}_{adjusted_upsample_factor}x_crop.png")
-    superres_image_path = Path(
-        f"{OUTPUT_PATH.stem}/{image_id}_{adjusted_upsample_factor}x_crop_superres.png"
-    )
-    bicubic_image_path = Path(
-        f"{OUTPUT_PATH.stem}/{image_id}_{adjusted_upsample_factor}x_crop_bicubic.png"
-    )
-    cv2.imwrite(filename=str(crop_image_path), img=image_crop, params=[cv2.IMWRITE_PNG_COMPRESSION, 0])
+    superres_image_path = Path(f"{OUTPUT_PATH.stem}/{image_id}_{adjusted_upsample_factor}x_crop_superres.png")
+    bicubic_image_path = Path(f"{OUTPUT_PATH.stem}/{image_id}_{adjusted_upsample_factor}x_crop_bicubic.png")
     cv2.imwrite(
-        filename=str(superres_image_path), img=image_super, params=[cv2.IMWRITE_PNG_COMPRESSION, 0]
+        filename=str(crop_image_path),
+        img=image_crop,
+        params=[cv2.IMWRITE_PNG_COMPRESSION, 0],
     )
     cv2.imwrite(
-        filename=str(bicubic_image_path), img=image_bicubic, params=[cv2.IMWRITE_PNG_COMPRESSION, 0]
+        filename=str(superres_image_path),
+        img=image_super,
+        params=[cv2.IMWRITE_PNG_COMPRESSION, 0],
+    )
+    cv2.imwrite(
+        filename=str(bicubic_image_path),
+        img=image_bicubic,
+        params=[cv2.IMWRITE_PNG_COMPRESSION, 0],
     )
     print(f"Images written to directory: {OUTPUT_PATH}")
 
@@ -519,7 +524,7 @@ Save Superresolution and Bicubic Image Crop
 Write Animated GIF with Bicubic/Superresolution Comparison
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -559,7 +564,7 @@ Write Animated GIF with Bicubic/Superresolution Comparison
 Create a Video with Sliding Bicubic/Superresolution Comparison
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This may take a while. For the video, the superresolution and bicubic
 image are resized by a factor of 2 to improve processing speed. This
@@ -573,9 +578,7 @@ the ``Files`` tool.
 
     FOURCC = cv2.VideoWriter_fourcc(*"MJPG")
     
-    result_video_path = Path(
-        f"{OUTPUT_PATH.stem}/{image_id}_crop_comparison_{adjusted_upsample_factor}x.avi"
-    )
+    result_video_path = Path(f"{OUTPUT_PATH.stem}/{image_id}_crop_comparison_{adjusted_upsample_factor}x.avi")
     video_target_height, video_target_width = (
         result_image.shape[0] // 2,
         result_image.shape[1] // 2,
@@ -589,9 +592,7 @@ the ``Files`` tool.
     )
     
     resized_result_image = cv2.resize(src=result_image, dsize=(video_target_width, video_target_height))
-    resized_bicubic_image = cv2.resize(
-        src=bicubic_image, dsize=(video_target_width, video_target_height)
-    )
+    resized_bicubic_image = cv2.resize(src=bicubic_image, dsize=(video_target_width, video_target_height))
     
     progress_bar = ProgressBar(total=video_target_width)
     progress_bar.display()
@@ -629,7 +630,7 @@ the ``Files`` tool.
 Superresolution on full input image
 -----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Superresolution on the full image is done by dividing the image into
 patches of equal size, doing superresolution on each path, and then
@@ -642,7 +643,7 @@ effects.
 Compute patches
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -668,16 +669,8 @@ Compute patches
     crop_height = y_coords[-1] + input_height * CROP_FACTOR
     
     # Compute the width and height of the target superresolution image.
-    new_width = (
-        x_coords[-1] * (upsample_factor // CROP_FACTOR)
-        + target_width
-        - CROPLINES * 2 * (upsample_factor // CROP_FACTOR)
-    )
-    new_height = (
-        y_coords[-1] * (upsample_factor // CROP_FACTOR)
-        + target_height
-        - CROPLINES * 2 * (upsample_factor // CROP_FACTOR)
-    )
+    new_width = x_coords[-1] * (upsample_factor // CROP_FACTOR) + target_width - CROPLINES * 2 * (upsample_factor // CROP_FACTOR)
+    new_height = y_coords[-1] * (upsample_factor // CROP_FACTOR) + target_height - CROPLINES * 2 * (upsample_factor // CROP_FACTOR)
     print(f"The output image will have a width of {new_width} " f"and a height of {new_height}")
 
 
@@ -689,7 +682,7 @@ Compute patches
 Do Inference
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The code below reads one patch of the image at a time. Each patch is
 reshaped to the network input shape and upsampled with bicubic
@@ -786,11 +779,7 @@ as total time to process each patch.
                 clear_output(wait=True)
                 progress_bar.display()
                 display(
-                    Pretty(
-                        f"Processed patch {patch_nr}/{num_patches}. "
-                        f"Inference time: {inference_duration:.2f} seconds "
-                        f"({1/inference_duration:.2f} FPS)"
-                    )
+                    Pretty(f"Processed patch {patch_nr}/{num_patches}. " f"Inference time: {inference_duration:.2f} seconds " f"({1/inference_duration:.2f} FPS)")
                 )
     
     end_time = time.perf_counter()
@@ -806,20 +795,18 @@ as total time to process each patch.
 
 .. parsed-literal::
 
-    Processed 42 patches in 4.63 seconds. Total patches per second (including processing): 9.08.
-    Inference patches per second: 18.03 
+    Processed 42 patches in 4.57 seconds. Total patches per second (including processing): 9.19.
+    Inference patches per second: 18.33 
 
 
 Save superresolution image and the bicubic image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    full_superresolution_image_path = Path(
-        f"{OUTPUT_PATH.stem}/full_superres_{adjusted_upsample_factor}x.jpg"
-    )
+    full_superresolution_image_path = Path(f"{OUTPUT_PATH.stem}/full_superres_{adjusted_upsample_factor}x.jpg")
     full_bicubic_image_path = Path(f"{OUTPUT_PATH.stem}/full_bicubic_{adjusted_upsample_factor}x.jpg")
     
     cv2.imwrite(str(full_superresolution_image_path), full_superresolution_image)

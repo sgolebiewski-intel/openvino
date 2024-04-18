@@ -14,31 +14,32 @@ and do inference with a sample image.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Settings <#settings>`__
--  `Download model <#download-model>`__
+-  `Imports <#Imports>`__
+-  `Settings <#Settings>`__
+-  `Download model <#Download-model>`__
 -  `Convert a Model to OpenVINO IR
-   Format <#convert-a-model-to-openvino-ir-format>`__
+   Format <#Convert-a-Model-to-OpenVINO-IR-Format>`__
 
    -  `Convert a TensorFlow Model to OpenVINO IR
-      Format <#convert-a-tensorflow-model-to-openvino-ir-format>`__
+      Format <#Convert-a-TensorFlow-Model-to-OpenVINO-IR-Format>`__
 
 -  `Test Inference on the Converted
-   Model <#test-inference-on-the-converted-model>`__
+   Model <#Test-Inference-on-the-Converted-Model>`__
 
-   -  `Load the Model <#load-the-model>`__
+   -  `Load the Model <#Load-the-Model>`__
 
--  `Select inference device <#select-inference-device>`__
+-  `Select inference device <#Select-inference-device>`__
 
-   -  `Get Model Information <#get-model-information>`__
-   -  `Load an Image <#load-an-image>`__
-   -  `Do Inference <#do-inference>`__
+   -  `Get Model Information <#Get-Model-Information>`__
+   -  `Load an Image <#Load-an-Image>`__
+   -  `Do Inference <#Do-Inference>`__
 
--  `Timing <#timing>`__
+-  `Timing <#Timing>`__
 
 .. code:: ipython3
 
     import platform
+    
     # Install openvino package
     %pip install -q "openvino>=2023.1.0" "opencv-python"
     if platform.system() != "Windows":
@@ -51,7 +52,7 @@ Table of contents:
     %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version <= '3.8'" # macOS x86
     %pip install -q "tensorflow>=2.5; sys_platform != 'darwin' and python_version > '3.8'"
     %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform != 'darwin' and python_version <= '3.8'"
-    %pip install -q tf_keras tensorflow_hub
+    %pip install -q tf_keras tensorflow_hub tqdm
 
 
 .. parsed-literal::
@@ -147,7 +148,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -165,18 +166,20 @@ Imports
     import tensorflow as tf
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     
     from notebook_utils import download_file
 
 Settings
 --------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -191,7 +194,7 @@ Settings
 Download model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load model using `tf.keras.applications
 api <https://www.tensorflow.org/api_docs/python/tf/keras/applications/MobileNetV3Small>`__
@@ -210,8 +213,8 @@ and save it to the disk.
 
 .. parsed-literal::
 
-    2024-04-10 00:26:29.865837: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
-    2024-04-10 00:26:29.866019: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
+    2024-04-18 01:05:25.005331: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
+    2024-04-18 01:05:25.005523: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
 
 
 .. parsed-literal::
@@ -237,12 +240,12 @@ and save it to the disk.
 Convert a Model to OpenVINO IR Format
 -------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Convert a TensorFlow Model to OpenVINO IR Format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use the model conversion Python API to convert the TensorFlow model to
 OpenVINO IR. The ``ov.convert_model`` function accept path to saved
@@ -273,12 +276,12 @@ models.
 Test Inference on the Converted Model
 -------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load the Model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -288,7 +291,7 @@ Load the Model
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -298,8 +301,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -321,18 +324,18 @@ select device from dropdown list for running inference using OpenVINO
 Get Model Information
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     input_key = compiled_model.input(0)
     output_key = compiled_model.output(0)
-    network_input_shape = input_key.shape 
+    network_input_shape = input_key.shape
 
 Load an Image
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load an image, resize it, and convert it to the input shape of the
 network.
@@ -342,7 +345,7 @@ network.
     # Download the image from the openvino_notebooks storage
     image_filename = download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg",
-        directory="data"
+        directory="data",
     )
     
     # The MobileNet network expects images in RGB format.
@@ -370,7 +373,7 @@ network.
 Do Inference
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -383,7 +386,7 @@ Do Inference
     # Download the datasets from the openvino_notebooks storage
     image_filename = download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/datasets/imagenet/imagenet_2012.txt",
-        directory="data"
+        directory="data",
     )
     
     # Convert the inference result to a class name.
@@ -409,7 +412,7 @@ Do Inference
 Timing
 ------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Measure the time it takes to do inference on thousand images. This gives
 an indication of performance. For more accurate benchmarking, use the
@@ -430,13 +433,10 @@ performance.
     end = time.perf_counter()
     time_ir = end - start
     
-    print(
-        f"IR model in OpenVINO Runtime/CPU: {time_ir/num_images:.4f} "
-        f"seconds per image, FPS: {num_images/time_ir:.2f}"
-    )
+    print(f"IR model in OpenVINO Runtime/CPU: {time_ir/num_images:.4f} " f"seconds per image, FPS: {num_images/time_ir:.2f}")
 
 
 .. parsed-literal::
 
-    IR model in OpenVINO Runtime/CPU: 0.0011 seconds per image, FPS: 930.30
+    IR model in OpenVINO Runtime/CPU: 0.0011 seconds per image, FPS: 917.77
 

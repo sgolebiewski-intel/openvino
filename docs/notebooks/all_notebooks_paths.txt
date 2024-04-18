@@ -58,9 +58,10 @@ notebooks/latent-consistency-models-image-generation/lcm-lora-controlnet.ipynb
 notebooks/llava-multimodal-chatbot/llava-multimodal-chatbot.ipynb
 notebooks/llava-multimodal-chatbot/videollava-multimodal-chatbot.ipynb
 notebooks/llava-next-multimodal-chatbot/llava-next-multimodal-chatbot.ipynb
+notebooks/llm-agent-langchain/llm-agent-langchain.ipynb
 notebooks/llm-chatbot/llm-chatbot.ipynb
-notebooks/llm-chatbot/rag-chatbot.ipynb
 notebooks/llm-question-answering/llm-question-answering.ipynb
+notebooks/llm-rag-langchain/llm-rag-langchain.ipynb
 notebooks/machine-translation/machine-translation.ipynb
 notebooks/magika-content-type-recognition/magika-content-type-recognition.ipynb
 notebooks/meter-reader/meter-reader.ipynb

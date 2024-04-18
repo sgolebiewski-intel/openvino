@@ -27,28 +27,28 @@ Whisper pipeline with OpenVINO models.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Instantiate model <#instantiate-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Instantiate model <#Instantiate-model>`__
 
    -  `Convert model to OpenVINO Intermediate Representation (IR)
-      format. <#convert-model-to-openvino-intermediate-representation-ir-format->`__
+      format. <#Convert-model-to-OpenVINO-Intermediate-Representation-(IR)-format.>`__
    -  `Convert Whisper Encoder to OpenVINO
-      IR <#convert-whisper-encoder-to-openvino-ir>`__
+      IR <#Convert-Whisper-Encoder-to-OpenVINO-IR>`__
    -  `Convert Whisper decoder to OpenVINO
-      IR <#convert-whisper-decoder-to-openvino-ir>`__
+      IR <#Convert-Whisper-decoder-to-OpenVINO-IR>`__
 
--  `Prepare inference pipeline <#prepare-inference-pipeline>`__
+-  `Prepare inference pipeline <#Prepare-inference-pipeline>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Run video transcription
-   pipeline <#run-video-transcription-pipeline>`__
--  `Interactive demo <#interactive-demo>`__
+   pipeline <#Run-video-transcription-pipeline>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install dependencies.
 
@@ -57,13 +57,13 @@ Install dependencies.
     %pip install -q "openvino>=2023.1.0"
     %pip install -q "python-ffmpeg<=1.0.16" moviepy transformers --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "git+https://github.com/garywu007/pytube.git"
-    %pip install -q  gradio
+    %pip install -q  "gradio>=4.19"
     %pip install -q "openai-whisper==20231117" --extra-index-url https://download.pytorch.org/whl/cpu
 
 Instantiate model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Whisper is a Transformer based encoder-decoder model, also referred to
 as a sequence-to-sequence model. It maps a sequence of audio spectrogram
@@ -93,8 +93,8 @@ Whisper family.
     
     model_id = widgets.Dropdown(
         options=list(_MODELS),
-        value='large-v2',
-        description='Model:',
+        value="large-v2",
+        description="Model:",
         disabled=False,
     )
     
@@ -120,7 +120,7 @@ Whisper family.
 Convert model to OpenVINO Intermediate Representation (IR) format.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For best results with OpenVINO, it is recommended to convert the model
 to OpenVINO IR format. We need to provide initialized model object and
@@ -133,7 +133,7 @@ making predictions. We can save it on disk for next usage with
 Convert Whisper Encoder to OpenVINO IR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -147,7 +147,7 @@ Convert Whisper Encoder to OpenVINO IR
     import torch
     import openvino as ov
     
-    mel = torch.zeros((1, 80 if 'v3' not in model_id.value else 128, 3000))
+    mel = torch.zeros((1, 80 if "v3" not in model_id.value else 128, 3000))
     audio_features = model.encoder(mel)
     if not WHISPER_ENCODER_OV.exists():
         encoder_model = ov.convert_model(model.encoder, example_input=mel)
@@ -156,7 +156,7 @@ Convert Whisper Encoder to OpenVINO IR
 Convert Whisper decoder to OpenVINO IR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To reduce computational complexity, the decoder uses cached key/value
 projections in attention modules from the previous steps. We need to
@@ -170,11 +170,11 @@ modify this process for correct tracing.
     
     
     def attention_forward(
-            attention_module,
-            x: torch.Tensor,
-            xa: Optional[torch.Tensor] = None,
-            mask: Optional[torch.Tensor] = None,
-            kv_cache: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+        attention_module,
+        x: torch.Tensor,
+        xa: Optional[torch.Tensor] = None,
+        mask: Optional[torch.Tensor] = None,
+        kv_cache: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
     ):
         """
         Override for forward method of decoder attention module with storing cache values explicitly.
@@ -230,16 +230,13 @@ modify this process for correct tracing.
             kv_cache: updated kv_cache
     
         """
-        x0, kv_cache = residual_block.attn(residual_block.attn_ln(
-            x), mask=mask, kv_cache=kv_cache)
+        x0, kv_cache = residual_block.attn(residual_block.attn_ln(x), mask=mask, kv_cache=kv_cache)
         x = x + x0
         if residual_block.cross_attn:
-            x1, _ = residual_block.cross_attn(
-                residual_block.cross_attn_ln(x), xa)
+            x1, _ = residual_block.cross_attn(residual_block.cross_attn_ln(x), xa)
             x = x + x1
         x = x + residual_block.mlp(residual_block.mlp_ln(x))
         return x, kv_cache
-    
     
     
     # update forward functions
@@ -250,22 +247,26 @@ modify this process for correct tracing.
             block.cross_attn.forward = partial(attention_forward, block.cross_attn)
     
     
-    def decoder_forward(decoder, x: torch.Tensor, xa: torch.Tensor, kv_cache: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor]]] = None):
+    def decoder_forward(
+        decoder,
+        x: torch.Tensor,
+        xa: torch.Tensor,
+        kv_cache: Optional[Tuple[Tuple[torch.Tensor, torch.Tensor]]] = None,
+    ):
         """
         Override for decoder forward method.
         Parameters:
           x: torch.LongTensor, shape = (batch_size, <= n_ctx) the text tokens
           xa: torch.Tensor, shape = (batch_size, n_mels, n_audio_ctx)
                the encoded audio features to be attended on
-          kv_cache: Dict[str, torch.Tensor], attention modules hidden states cache from previous steps 
+          kv_cache: Dict[str, torch.Tensor], attention modules hidden states cache from previous steps
         """
         if kv_cache is not None:
             offset = kv_cache[0][0].shape[1]
         else:
             offset = 0
             kv_cache = [None for _ in range(len(decoder.blocks))]
-        x = decoder.token_embedding(
-            x) + decoder.positional_embedding[offset: offset + x.shape[-1]]
+        x = decoder.token_embedding(x) + decoder.positional_embedding[offset : offset + x.shape[-1]]
         x = x.to(xa.dtype)
         kv_cache_upd = []
     
@@ -274,11 +275,9 @@ modify this process for correct tracing.
             kv_cache_upd.append(tuple(kv_block_cache_upd))
     
         x = decoder.ln(x)
-        logits = (
-            x @ torch.transpose(decoder.token_embedding.weight.to(x.dtype), 1, 0)).float()
+        logits = (x @ torch.transpose(decoder.token_embedding.weight.to(x.dtype), 1, 0)).float()
     
         return logits, tuple(kv_cache_upd)
-    
     
     
     # override decoder forward
@@ -305,7 +304,7 @@ input shapes.
 Prepare inference pipeline
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The image below illustrates the pipeline of video transcribing using the
 Whisper model.
@@ -320,7 +319,7 @@ To run the PyTorch Whisper model, we just need to call the
 original model pipeline for audio transcribing after replacing the
 original models with OpenVINO IR versions.
 
-### Select inference device 
+### Select inference device `back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -334,8 +333,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -352,7 +351,11 @@ select device from dropdown list for running inference using OpenVINO
 
 .. code:: ipython3
 
-    from utils import patch_whisper_for_ov_inference, OpenVINOAudioEncoder, OpenVINOTextDecoder
+    from utils import (
+        patch_whisper_for_ov_inference,
+        OpenVINOAudioEncoder,
+        OpenVINOTextDecoder,
+    )
     
     patch_whisper_for_ov_inference(model)
     
@@ -362,7 +365,7 @@ select device from dropdown list for running inference using OpenVINO
 Run video transcription pipeline
 --------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, we are ready to start transcription. We select a video from YouTube
 that we want to transcribe. Be patient, as downloading the video may
@@ -371,12 +374,13 @@ take some time.
 .. code:: ipython3
 
     import ipywidgets as widgets
+    
     VIDEO_LINK = "https://youtu.be/kgL5LBM-hFI"
     link = widgets.Text(
         value=VIDEO_LINK,
         placeholder="Type link for video",
         description="Video:",
-        disabled=False
+        disabled=False,
     )
     
     link
@@ -427,7 +431,7 @@ Select the task for the model:
         options=["transcribe", "translate"],
         value="translate",
         description="Select task:",
-        disabled=False
+        disabled=False,
     )
     task
 
@@ -519,7 +523,7 @@ Now let us see the results.
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -540,10 +544,13 @@ Interactive demo
     
     demo = gr.Interface(
         transcribe,
-        [gr.Textbox(label="YouTube URL"), gr.Radio(["Transcribe", "Translate"], value="Transcribe")],
+        [
+            gr.Textbox(label="YouTube URL"),
+            gr.Radio(["Transcribe", "Translate"], value="Transcribe"),
+        ],
         "video",
         examples=[["https://youtu.be/kgL5LBM-hFI", "Transcribe"]],
-        allow_flagging="never"
+        allow_flagging="never",
     )
     try:
         demo.launch(debug=False)
@@ -562,9 +569,9 @@ Interactive demo
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7862/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 
 
 .. parsed-literal::

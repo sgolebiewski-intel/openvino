@@ -36,37 +36,37 @@ more accurate, informational, and comprehensive answers.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Install requirements <#install-requirements>`__
--  `Original model inference <#original-model-inference>`__
+-  `Install requirements <#Install-requirements>`__
+-  `Original model inference <#Original-model-inference>`__
 -  `Convert models to OpenVINO Intermediate representation (IR)
-   format <#convert-models-to-openvino-intermediate-representation-ir-format>`__
+   format <#Convert-models-to-OpenVINO-Intermediate-representation-(IR)-format>`__
 
-   -  `Convert the vision model <#convert-the-vision-model>`__
+   -  `Convert the vision model <#Convert-the-vision-model>`__
    -  `Convert Image To Text Projection
-      model <#convert-image-to-text-projection-model>`__
-   -  `Convert Text model <#convert-text-model>`__
+      model <#Convert-Image-To-Text-Projection-model>`__
+   -  `Convert Text model <#Convert-Text-model>`__
 
 -  `Compiling models and prepare
-   pipeline <#compiling-models-and-prepare-pipeline>`__
--  `Inference <#inference>`__
--  `Interactive inference <#interactive-inference>`__
+   pipeline <#Compiling-models-and-prepare-pipeline>`__
+-  `Inference <#Inference>`__
+-  `Interactive inference <#Interactive-inference>`__
 
 Install requirements
 --------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     %pip install --upgrade pip
     %pip install -q "openvino>=2024.0.0"
-    %pip install -q "transformers>=4.35" Pillow gradio opencv-python
+    %pip install -q "transformers>=4.35" Pillow "gradio>=4.19" opencv-python
     %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu torch torchvision
 
 
 .. parsed-literal::
 
-    Requirement already satisfied: pip in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (24.0)
+    Requirement already satisfied: pip in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (24.0)
 
 
 .. parsed-literal::
@@ -97,7 +97,7 @@ Install requirements
 Original model inference
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let’s take the `original
 example <https://huggingface.co/microsoft/kosmos-2-patch14-224>`__
@@ -139,29 +139,29 @@ example <https://huggingface.co/microsoft/kosmos-2-patch14-224>`__
     
     # Specify `cleanup_and_extract=False` in order to see the raw model generation.
     processed_text = processor.post_process_generation(generated_text, cleanup_and_extract=False)
-    print(f'Raw model generation: {processed_text}')
+    print(f"Raw model generation: {processed_text}")
     # `<grounding> An image of<phrase> a snowman</phrase><object><patch_index_0044><patch_index_0863></object> warming himself by<phrase> a fire</phrase><object><patch_index_0005><patch_index_0911></object>.`
     
     # By default, the generated  text is cleanup and the entities are extracted.
     processed_text, entities = processor.post_process_generation(generated_text)
     
-    print(f'Cleaned up generated text: {processed_text=}')
+    print(f"Cleaned up generated text: {processed_text=}")
     # `An image of a snowman warming himself by a fire.`
     
-    print(f'Extracted entities: {entities}')
+    print(f"Extracted entities: {entities}")
     # `[('a snowman', (12, 21), [(0.390625, 0.046875, 0.984375, 0.828125)]), ('a fire', (41, 47), [(0.171875, 0.015625, 0.484375, 0.890625)])]`
 
 
 .. parsed-literal::
 
-    2024-04-09 23:23:43.785777: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-09 23:23:43.819154: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-18 00:01:02.253505: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-18 00:01:02.287838: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-04-09 23:23:44.406902: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-18 00:01:02.846922: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 .. parsed-literal::
@@ -222,8 +222,13 @@ draw their bounding bboxes on the image:
         text_spaces = 3
     
         for entity_name, (start, end), bboxes in entities:
-            for (x1_norm, y1_norm, x2_norm, y2_norm) in bboxes:
-                orig_x1, orig_y1, orig_x2, orig_y2 = int(x1_norm * image_w), int(y1_norm * image_h), int(x2_norm * image_w), int(y2_norm * image_h)
+            for x1_norm, y1_norm, x2_norm, y2_norm in bboxes:
+                orig_x1, orig_y1, orig_x2, orig_y2 = (
+                    int(x1_norm * image_w),
+                    int(y1_norm * image_h),
+                    int(x2_norm * image_w),
+                    int(y2_norm * image_h),
+                )
                 # draw bbox
                 # random color
                 color = tuple(np.random.randint(0, 255, size=3).tolist())
@@ -240,16 +245,24 @@ draw their bounding bboxes on the image:
     
                 # add text background
                 (text_width, text_height), _ = cv2.getTextSize(f"  {entity_name}", cv2.FONT_HERSHEY_COMPLEX, text_size, text_line)
-                text_bg_x1, text_bg_y1, text_bg_x2, text_bg_y2 = x1, y1 - (text_height + text_offset_original + 2 * text_spaces), x1 + text_width, y1
+                text_bg_x1, text_bg_y1, text_bg_x2, text_bg_y2 = (
+                    x1,
+                    y1 - (text_height + text_offset_original + 2 * text_spaces),
+                    x1 + text_width,
+                    y1,
+                )
     
                 for prev_bbox in previous_bboxes:
                     while is_overlapping((text_bg_x1, text_bg_y1, text_bg_x2, text_bg_y2), prev_bbox):
-                        text_bg_y1 += (text_height + text_offset_original + 2 * text_spaces)
-                        text_bg_y2 += (text_height + text_offset_original + 2 * text_spaces)
-                        y1 += (text_height + text_offset_original + 2 * text_spaces)
+                        text_bg_y1 += text_height + text_offset_original + 2 * text_spaces
+                        text_bg_y2 += text_height + text_offset_original + 2 * text_spaces
+                        y1 += text_height + text_offset_original + 2 * text_spaces
     
                         if text_bg_y2 >= image_h:
-                            text_bg_y1 = max(0, image_h - (text_height + text_offset_original + 2 * text_spaces))
+                            text_bg_y1 = max(
+                                0,
+                                image_h - (text_height + text_offset_original + 2 * text_spaces),
+                            )
                             text_bg_y2 = image_h
                             y1 = image_h
                             break
@@ -267,7 +280,14 @@ draw their bounding bboxes on the image:
                             new_image[i, j] = (alpha * new_image[i, j] + (1 - alpha) * np.array(bg_color)).astype(np.uint8)
     
                 cv2.putText(
-                    new_image, f"  {entity_name}", (x1, y1 - text_offset_original - 1 * text_spaces), cv2.FONT_HERSHEY_COMPLEX, text_size, (0, 0, 0), text_line, cv2.LINE_AA
+                    new_image,
+                    f"  {entity_name}",
+                    (x1, y1 - text_offset_original - 1 * text_spaces),
+                    cv2.FONT_HERSHEY_COMPLEX,
+                    text_size,
+                    (0, 0, 0),
+                    text_line,
+                    cv2.LINE_AA,
                 )
                 # previous_locations.append((x1, y1))
                 previous_bboxes.append((text_bg_x1, text_bg_y1, text_bg_x2, text_bg_y2))
@@ -290,7 +310,7 @@ draw their bounding bboxes on the image:
 Convert models to OpenVINO Intermediate representation (IR) format
 ------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The original model includes 3 models: vision model
 ``Kosmos2VisionModel``, ``Kosmos2ImageToTextProjection`` that is the
@@ -342,13 +362,13 @@ file.
             with torch.no_grad():
                 converted_model = ov.convert_model(model, example_input=example_input)
             ov.save_model(converted_model, xml_path, compress_to_fp16=False)
-            
+    
             cleanup_torchscript_cache()
 
 Convert the vision model
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Vision model accept ``pixel_values`` and returns ``image_embeds``.
 
@@ -369,22 +389,22 @@ Vision model accept ``pixel_values`` and returns ``image_embeds``.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:471: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:471: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attn_weights.size() != (bsz * self.num_heads, tgt_len, src_len):
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:511: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:511: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attn_output.size() != (bsz * self.num_heads, tgt_len, self.head_dim):
 
 
 Convert Image To Text Projection model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -405,14 +425,14 @@ Convert Image To Text Projection model
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:160: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at aten/src/ATen/core/TensorBody.h:489.)
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:165: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at aten/src/ATen/core/TensorBody.h:489.)
       if a.grad is not None:
 
 
 Convert Text model
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The Text Model performs in generation pipeline and we can separate it
 into two stage. In the first stage the model transforms ``image_embeds``
@@ -424,7 +444,9 @@ generated text by ``AutoProcessor``.
 
     from typing import Optional, List
     
-    from transformers.models.kosmos2.modeling_kosmos2 import create_position_ids_from_input_ids
+    from transformers.models.kosmos2.modeling_kosmos2 import (
+        create_position_ids_from_input_ids,
+    )
     
     
     def get_projecton_image_embeds(pixel_values):
@@ -451,7 +473,13 @@ generated text by ``AutoProcessor``.
         return flatten_inputs
     
     
-    def postprocess_converted_model(ov_model, example_input=None, input_names=None, output_names=None, dynamic_shapes=None):
+    def postprocess_converted_model(
+        ov_model,
+        example_input=None,
+        input_names=None,
+        output_names=None,
+        dynamic_shapes=None,
+    ):
         """
         Helper function for appling postprocessing on converted model with updating input names, shapes and output names
         acording to requested specification
@@ -461,7 +489,7 @@ generated text by ``AutoProcessor``.
         if input_names:
             for inp_name, m_input, input_data in zip(input_names, ov_model.inputs, flatten_example_inputs):
                 m_input.get_tensor().set_names({inp_name})
-        
+    
         if output_names:
             for out, out_name in zip(ov_model.outputs, output_names):
                 out.get_tensor().set_names({out_name})
@@ -474,15 +502,19 @@ generated text by ``AutoProcessor``.
         model.text_model.config.torchscript = True
         image_embeds = get_projecton_image_embeds(inputs["pixel_values"])
         conv_inputs = {
-            'input_ids': inputs["input_ids"],
-            'attention_mask': inputs["attention_mask"],
-            'image_embeds': image_embeds,
-            'image_embeds_position_mask': inputs["image_embeds_position_mask"],
+            "input_ids": inputs["input_ids"],
+            "attention_mask": inputs["attention_mask"],
+            "image_embeds": image_embeds,
+            "image_embeds_position_mask": inputs["image_embeds_position_mask"],
         }
         outs = model.text_model.model(**conv_inputs)
-        inputs_ = ["input_ids", 'attention_mask']
+        inputs_ = ["input_ids", "attention_mask"]
         outputs = ["logits"]
-        dynamic_shapes = {"input_ids": {1: "seq_len"}, "attention_mask": {1: "seq_len"}, "position_ids": {0: "seq_len"}}
+        dynamic_shapes = {
+            "input_ids": {1: "seq_len"},
+            "attention_mask": {1: "seq_len"},
+            "position_ids": {0: "seq_len"},
+        }
         for idx in range(len(outs[1])):
             inputs_.extend([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"])
             dynamic_shapes[inputs_[-1]] = {2: "past_sequence + sequence"}
@@ -506,46 +538,46 @@ generated text by ``AutoProcessor``.
             example_input_second_stage = {
                 "input_ids": inputs["input_ids"][:, -1:],
                 "attention_mask": inputs["input_ids"].new_ones(1, inputs["input_ids"].shape[1] + 1),
-                'position_ids': position_ids,
+                "position_ids": position_ids,
                 "past_key_values": outs[1],
             }
-            
+    
             ov_model = ov.convert_model(model.text_model.model, example_input=example_input_second_stage)
             ov_model = postprocess_converted_model(
-                ov_model, 
-                example_input=example_input_second_stage.values(), 
-                input_names=inputs_, 
-                output_names=outputs, 
-                dynamic_shapes=dynamic_shapes
+                ov_model,
+                example_input=example_input_second_stage.values(),
+                input_names=inputs_,
+                output_names=outputs,
+                dynamic_shapes=dynamic_shapes,
             )
             ov.save_model(ov_model, SECOND_STAGE_MODEL_PATH)
             del ov_model
             cleanup_torchscript_cache()
     
     
-    convert_text_model()     
+    convert_text_model()
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:810: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:810: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if max_pos > self.weights.size(0):
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:1119: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:1119: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if input_shape[-1] > 1:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:926: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:926: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attention_mask.size() != (batch_size, 1, seq_length, src_len):
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:1212: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/kosmos2/modeling_kosmos2.py:1212: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if past_key_values_length > 0:
 
 
 Compiling models and prepare pipeline
 -------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select device that will be used to do models inference using OpenVINO
 from the dropdown list:
@@ -558,8 +590,8 @@ from the dropdown list:
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -582,7 +614,7 @@ return ``torch.Tensor``\ s instead of ``np.array``\ s.
 
     class WraperInternalVisionModel:
         post_layernorm = model.vision_model.model.post_layernorm
-        
+    
     
     class VisionModelWrapper(torch.nn.Module):
         def __init__(self, model_ir_path):
@@ -594,7 +626,7 @@ return ``torch.Tensor``\ s instead of ``np.array``\ s.
             vision_model_output = self.vision_model(pixel_values)[0]
     
             return [torch.from_numpy(vision_model_output)]
-        
+    
     
     class ImageToTextProjectionModelWrapper(torch.nn.Module):
         def __init__(self, model_ir_path):
@@ -610,26 +642,19 @@ return ``torch.Tensor``\ s instead of ``np.array``\ s.
 .. code:: ipython3
 
     from transformers.generation import GenerationConfig, GenerationMixin
-    from transformers.models.kosmos2.modeling_kosmos2 import Kosmos2ForConditionalGenerationModelOutput
+    from transformers.models.kosmos2.modeling_kosmos2 import (
+        Kosmos2ForConditionalGenerationModelOutput,
+    )
     
     
     class KosmosForCausalLMWrapper(GenerationMixin):
         def __init__(self, first_stage_model_path, second_stage_model_path, device):
-            
             self.model_stage_1 = core.compile_model(first_stage_model_path, device.value)
             self.model_stage_2 = core.read_model(second_stage_model_path)
-            self.input_names = {
-                key.get_any_name(): idx for idx, key in enumerate(self.model_stage_2.inputs)
-            }
-            self.output_names = {
-                key.get_any_name(): idx for idx, key in enumerate(self.model_stage_2.outputs)
-            }
-            self.key_value_input_names = [
-                key for key in self.input_names if "key_values" in key
-            ]
-            self.key_value_output_names = [
-                key for key in self.output_names if "present" in key
-            ]
+            self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.model_stage_2.inputs)}
+            self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.model_stage_2.outputs)}
+            self.key_value_input_names = [key for key in self.input_names if "key_values" in key]
+            self.key_value_output_names = [key for key in self.output_names if "present" in key]
             self.model_stage_2 = core.compile_model(self.model_stage_2, device.value)
     
             self.request = self.model_stage_2.create_infer_request()
@@ -638,7 +663,11 @@ return ``torch.Tensor``\ s instead of ``np.array``\ s.
             self.main_input_name = "input_ids"
             self.device = torch.device("cpu")
             self.num_pkv = 2
-            self.lm_head = nn.Linear(in_features=model.text_model.config.embed_dim, out_features=model.text_model.config.vocab_size, bias=False)
+            self.lm_head = nn.Linear(
+                in_features=model.text_model.config.embed_dim,
+                out_features=model.text_model.config.vocab_size,
+                bias=False,
+            )
     
         def get_input_embeddings(self) -> nn.Module:
             return self.model.embed_tokens
@@ -667,7 +696,12 @@ return ``torch.Tensor``\ s instead of ``np.array``\ s.
             **kwargs,
         ):
             return self.forward(
-                input_ids, attention_mask, image_embeds, image_embeds_position_mask, position_ids, past_key_values
+                input_ids,
+                attention_mask,
+                image_embeds,
+                image_embeds_position_mask,
+                position_ids,
+                past_key_values,
             )
     
         def forward(
@@ -678,36 +712,30 @@ return ``torch.Tensor``\ s instead of ``np.array``\ s.
             image_embeds_position_mask: Optional[torch.Tensor] = None,
             position_ids=None,
             past_key_values: Optional[List[torch.FloatTensor]] = None,
-            
-            **kwargs
+            **kwargs,
         ):
             if past_key_values is None:
-                
                 outs = self.model_stage_1(
                     {
-                        'input_ids': input_ids,
-                        'attention_mask': attention_mask,
-                        'image_embeds': image_embeds,
-                        'image_embeds_position_mask': image_embeds_position_mask,
+                        "input_ids": input_ids,
+                        "attention_mask": attention_mask,
+                        "image_embeds": image_embeds,
+                        "image_embeds_position_mask": image_embeds_position_mask,
                     }
-                )            
+                )
                 lm_logits = model.text_model.lm_head(torch.from_numpy(outs[0]))
     
                 pkv = list(outs.values())[1:]
                 pkv = tuple(pkv[i : i + 2] for i in range(0, len(pkv), 2))
     
                 return Kosmos2ForConditionalGenerationModelOutput(logits=lm_logits, past_key_values=pkv)
-            
+    
             if past_key_values is not None:
-                past_key_values = tuple(
-                    past_key_value
-                    for pkv_per_layer in past_key_values
-                    for past_key_value in pkv_per_layer
-                )
+                past_key_values = tuple(past_key_value for pkv_per_layer in past_key_values for past_key_value in pkv_per_layer)
                 inputs_ = {
                     "input_ids": input_ids[:, -1].unsqueeze(-1),
                     "attention_mask": attention_mask,
-                    'position_ids': position_ids
+                    "position_ids": position_ids,
                 }
                 inputs_.update(dict(zip(self.key_value_input_names, past_key_values)))
     
@@ -719,18 +747,12 @@ return ``torch.Tensor``\ s instead of ``np.array``\ s.
             logits = model.text_model.lm_head(logits)
     
             # Tuple of length equal to : number of layer * number of past_key_value per decoder layer (2 corresponds to the self-attention layer)
-            past_key_values = tuple(
-                self.request.get_tensor(key).data for key in self.key_value_output_names
-            )
+            past_key_values = tuple(self.request.get_tensor(key).data for key in self.key_value_output_names)
             # Tuple of tuple of length `n_layers`, with each tuple of length equal to 2 (k/v of self-attention)
     
-            past_key_values = tuple(
-                past_key_values[i : i + self.num_pkv]
-                for i in range(0, len(past_key_values), self.num_pkv)
-            )
-            
-            return Kosmos2ForConditionalGenerationModelOutput(logits=logits, past_key_values=past_key_values)
+            past_key_values = tuple(past_key_values[i : i + self.num_pkv] for i in range(0, len(past_key_values), self.num_pkv))
     
+            return Kosmos2ForConditionalGenerationModelOutput(logits=logits, past_key_values=past_key_values)
     
         def prepare_inputs_for_generation(
             self,
@@ -766,7 +788,11 @@ return ``torch.Tensor``\ s instead of ``np.array``\ s.
                 image_embeds_position_mask = torch.cat(
                     (
                         image_embeds_position_mask,
-                        torch.zeros(size=(batch_size, seq_len - mask_len), dtype=torch.bool, device=input_ids.device),
+                        torch.zeros(
+                            size=(batch_size, seq_len - mask_len),
+                            dtype=torch.bool,
+                            device=input_ids.device,
+                        ),
                     ),
                     dim=1,
                 )
@@ -775,25 +801,29 @@ return ``torch.Tensor``\ s instead of ``np.array``\ s.
                 "input_ids": input_ids,
                 "image_embeds": image_embeds,
                 "image_embeds_position_mask": image_embeds_position_mask,
-                'position_ids': position_ids,
+                "position_ids": position_ids,
                 "past_key_values": past_key_values,
                 "attention_mask": attention_mask,
             }
-        
+    
         @staticmethod
         # Copied from transformers.models.umt5.modeling_umt5.UMT5ForConditionalGeneration._reorder_cache
         def _reorder_cache(past_key_values, beam_idx):
             reordered_past = ()
             for layer_past in past_key_values:
-                reordered_past += (
-                    tuple(past_state.index_select(0, beam_idx.to(past_state.device)) for past_state in layer_past),
-                )
+                reordered_past += (tuple(past_state.index_select(0, beam_idx.to(past_state.device)) for past_state in layer_past),)
             return reordered_past
     
     
     class Kosmos2ForConditionalGenerationWrapper:
-        
-        def __init__(self, vision_model_path, image_to_text_projection_model_path, first_stage_model_path, second_stage_model_path, device):
+        def __init__(
+            self,
+            vision_model_path,
+            image_to_text_projection_model_path,
+            first_stage_model_path,
+            second_stage_model_path,
+            device,
+        ):
             self.vision_model = VisionModelWrapper(vision_model_path)
             self.image_to_text_projection = ImageToTextProjectionModelWrapper(image_to_text_projection_model_path)
             self.text_model = KosmosForCausalLMWrapper(first_stage_model_path, second_stage_model_path, device)
@@ -825,12 +855,18 @@ return ``torch.Tensor``\ s instead of ``np.array``\ s.
 
 .. code:: ipython3
 
-    ov_model = Kosmos2ForConditionalGenerationWrapper(VISION_MODEL_IR_PATH, IMAGE_TO_TEXT_PROJECTION_MODEL_IR_PATH, FIRST_STAGE_MODEL_PATH, SECOND_STAGE_MODEL_PATH, device)
+    ov_model = Kosmos2ForConditionalGenerationWrapper(
+        VISION_MODEL_IR_PATH,
+        IMAGE_TO_TEXT_PROJECTION_MODEL_IR_PATH,
+        FIRST_STAGE_MODEL_PATH,
+        SECOND_STAGE_MODEL_PATH,
+        device,
+    )
 
 Inference
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -847,16 +883,16 @@ Inference
     
     # Specify `cleanup_and_extract=False` in order to see the raw model generation.
     processed_text = processor.post_process_generation(generated_text, cleanup_and_extract=False)
-    print(f'Raw model generation: {processed_text}')
+    print(f"Raw model generation: {processed_text}")
     # `<grounding> An image of<phrase> a snowman</phrase><object><patch_index_0044><patch_index_0863></object> warming himself by<phrase> a fire</phrase><object><patch_index_0005><patch_index_0911></object>.`
     
     # By default, the generated  text is cleanup and the entities are extracted.
     processed_text, entities = processor.post_process_generation(generated_text)
     
-    print(f'Cleaned up generated text: {processed_text=}')
+    print(f"Cleaned up generated text: {processed_text=}")
     # `An image of a snowman warming himself by a fire.`
     
-    print(f'Extracted entities: {entities}')
+    print(f"Extracted entities: {entities}")
     # `[('a snowman', (12, 21), [(0.390625, 0.046875, 0.984375, 0.828125)]), ('a fire', (41, 47), [(0.171875, 0.015625, 0.484375, 0.890625)])]`
 
 
@@ -880,7 +916,7 @@ Inference
 Interactive inference
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -890,7 +926,7 @@ Interactive inference
     images = {
         "snowman.png": "https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/snowman.png",
         "two_dogs.jpg": "https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/two_dogs.jpg",
-        "six_planes.png": "https://ydshieh-kosmos-2.hf.space/file=/home/user/app/images/six_planes.png"
+        "six_planes.png": "https://ydshieh-kosmos-2.hf.space/file=/home/user/app/images/six_planes.png",
     }
     for image_name, url in images.items():
         image = Image.open(requests.get(url, stream=True).raw)
@@ -913,7 +949,7 @@ Interactive inference
         processed_text, entities = processor.post_process_generation(generated_text)
     
         new_image = draw_entity_boxes_on_image(Image.fromarray(image), entities)
-        
+    
         return new_image, processed_text
     
     
@@ -922,13 +958,13 @@ Interactive inference
         [
             gr.Image(label="Input image"),
             gr.Textbox(label="Prompt"),
-            gr.Checkbox(label="Show bounding boxes", value=True)
+            gr.Checkbox(label="Show bounding boxes", value=True),
         ],
         ["image", "text"],
         examples=[
             ["snowman.png", "An image of"],
             ["two_dogs.jpg", "Describe this image in detail:"],
-            ["six_planes.png", "What is going on?"]
+            ["six_planes.png", "What is going on?"],
         ],
         allow_flagging="never",
     )
@@ -949,7 +985,7 @@ Interactive inference
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

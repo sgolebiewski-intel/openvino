@@ -22,23 +22,23 @@ The optimization process contains the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Create and initialize quantization
-    <#create-and-initialize-quantization-#0>`__
+   ⇑(#0) <#Create-and-initialize-quantization-⇑(#0)>`__
 
-   -  `Prepare calibration datasets <#prepare-calibration-datasets>`__
+   -  `Prepare calibration datasets <#Prepare-calibration-datasets>`__
    -  `Quantize Whisper encoder and decoder
-      models <#quantize-whisper-encoder-and-decoder-models>`__
+      models <#Quantize-Whisper-encoder-and-decoder-models>`__
 
 -  `Transcribe video with quantized OpenVINO
-   model <#transcribe-video-with-quantized-openvino-model>`__
+   model <#Transcribe-video-with-quantized-OpenVINO-model>`__
 -  `Compare performance and accuracy of the FP32 and INT8
-   IRs <#compare-performance-and-accuracy-of-the-fp32-and-int8-irs>`__
+   IRs <#Compare-performance-and-accuracy-of-the-FP32-and-INT8-IRs>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install dependencies.
 
@@ -56,10 +56,12 @@ Select model for quantization
     from pathlib import Path
     import ipywidgets as widgets
     
+    
     def get_model_id(model_path):
         return model_path.name.replace("whisper_", "").replace("encoder.xml", "").replace("_", "")
     
-    model_list = [get_model_id(model_path) for model_path in Path('.').glob("whisper_*encoder.xml")]
+    
+    model_list = [get_model_id(model_path) for model_path in Path(".").glob("whisper_*encoder.xml")]
     model_list = [model_name for model_name in model_list if model_name]
     
     if not model_list:
@@ -68,7 +70,7 @@ Select model for quantization
     model_id = widgets.Dropdown(
         options=model_list,
         value=model_list[0],
-        description='Model:',
+        description="Model:",
         disabled=False,
     )
     
@@ -90,12 +92,13 @@ Select device from dropdown list for running inference using OpenVINO.
     import ipywidgets as widgets
     
     from openvino import Core
+    
     core = Core()
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -123,7 +126,7 @@ Select the task for the model:
         options=["transcribe", "translate"],
         value="translate",
         description="Select task:",
-        disabled=False
+        disabled=False,
     )
     task
 
@@ -137,7 +140,7 @@ Select the task for the model:
 
 
 ## Create and initialize quantization `⇑ <#0>`__ `back to top
-⬆️ <#table-of-contents>`__
+⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding the quantization layers into the
@@ -173,7 +176,11 @@ Load FP32 model IR.
 .. code:: ipython3
 
     import whisper
-    from utils import patch_whisper_for_ov_inference, OpenVINOAudioEncoder, OpenVINOTextDecoder
+    from utils import (
+        patch_whisper_for_ov_inference,
+        OpenVINOAudioEncoder,
+        OpenVINOTextDecoder,
+    )
     
     model_fp32 = whisper.load_model(model_id.value, "cpu").eval()
     patch_whisper_for_ov_inference(model_fp32)
@@ -184,7 +191,7 @@ Load FP32 model IR.
 Prepare calibration datasets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Whisper consists of an encoder and a decoder models. We need to collect
 calibration data for both of them.
@@ -204,6 +211,7 @@ calibration samples.
     encoder_calibration_data = []
     decoder_calibration_data = []
     
+    
     @contextmanager
     def calibration_data_collection():
         global COLLECT_CALIBRATION_DATA
@@ -219,13 +227,15 @@ calibration samples.
             encoder_calibration_data.append(mel)
         return torch.from_numpy(self.compiled_model(mel)[self.output_blob])
     
+    
     def decoder_forward(self, x: torch.Tensor, xa: torch.Tensor, kv_cache: Optional[dict] = None):
-        feed_dict = {'x': ov.Tensor(x.numpy()), 'xa': ov.Tensor(xa.numpy())}
-        feed_dict = (self.preprocess_kv_cache_inputs(feed_dict, kv_cache))
+        feed_dict = {"x": ov.Tensor(x.numpy()), "xa": ov.Tensor(xa.numpy())}
+        feed_dict = self.preprocess_kv_cache_inputs(feed_dict, kv_cache)
         if COLLECT_CALIBRATION_DATA:
             decoder_calibration_data.append(feed_dict)
         res = self.compiled_model(feed_dict)
         return self.postprocess_outputs(res)
+    
     
     model_fp32.encoder.forward = partial(encoder_forward, model_fp32.encoder)
     model_fp32.decoder.forward = partial(decoder_forward, model_fp32.decoder)
@@ -244,7 +254,11 @@ dataset from Hugging Face as calibration data.
     calibration_dataset = load_dataset("librispeech_asr", "clean", split="validation", streaming=True).take(CALIBRATION_DATASET_SIZE)
     
     with calibration_data_collection():
-        for data_item in tqdm(calibration_dataset, desc="Collecting calibration data", total=CALIBRATION_DATASET_SIZE):
+        for data_item in tqdm(
+            calibration_dataset,
+            desc="Collecting calibration data",
+            total=CALIBRATION_DATASET_SIZE,
+        ):
             model_fp32.transcribe(data_item["audio"]["array"].astype("float32"), task=task.value)
 
 
@@ -257,7 +271,7 @@ dataset from Hugging Face as calibration data.
 Quantize Whisper encoder and decoder models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Quantize both encoder and decoder models using ``nncf.quantize()`` API
 and save the quantized IRs after that.
@@ -274,8 +288,8 @@ and save the quantized IRs after that.
         subset_size=len(encoder_calibration_data),
         model_type=nncf.ModelType.TRANSFORMER,
         advanced_parameters=nncf.AdvancedQuantizationParameters(
-            smooth_quant_alpha=0.5      # Smooth Quant algorithm reduces activation quantization error; optimal alpha value was obtained through grid search
-        )
+            smooth_quant_alpha=0.5  # Smooth Quant algorithm reduces activation quantization error; optimal alpha value was obtained through grid search
+        ),
     )
     serialize(quantized_encoder, WHISPER_ENCODER_OV_INT8)
     print(f"Saved quantized encoder at ./{WHISPER_ENCODER_OV_INT8}")
@@ -287,8 +301,8 @@ and save the quantized IRs after that.
         subset_size=len(decoder_calibration_data),
         model_type=nncf.ModelType.TRANSFORMER,
         advanced_parameters=nncf.AdvancedQuantizationParameters(
-            smooth_quant_alpha=0.95     # Smooth Quant algorithm reduces activation quantization error; optimal alpha value was obtained through grid search
-        )
+            smooth_quant_alpha=0.95  # Smooth Quant algorithm reduces activation quantization error; optimal alpha value was obtained through grid search
+        ),
     )
     serialize(quantized_decoder, WHISPER_DECODER_OV_INT8)
     print(f"Saved quantized decoder at ./{WHISPER_DECODER_OV_INT8}")
@@ -352,7 +366,7 @@ and save the quantized IRs after that.
 Transcribe video with quantized OpenVINO model
 ----------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load ``INT8`` models saved above into a new instance of Whisper model.
 
@@ -374,7 +388,7 @@ Select a video for transcription as in
         value=VIDEO_LINK,
         placeholder="Type link for video",
         description="Video:",
-        disabled=False
+        disabled=False,
     )
     link
 
@@ -492,7 +506,7 @@ As you can see the result is almost the same.
 Compare performance and accuracy of the FP32 and INT8 IRs
 ---------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Compare model file size.
 
@@ -505,6 +519,7 @@ Compare model file size.
         print(f"    * FP32 IR model size: {model_size_fp32:.2f} KB")
         print(f"    * INT8 IR model size: {model_size_int8:.2f} KB")
         print(f"    * Model compression rate: {model_size_fp32 / model_size_int8:.3f}")
+    
     
     calculate_compression_rate(WHISPER_ENCODER_OV, WHISPER_ENCODER_OV_INT8)
     calculate_compression_rate(WHISPER_DECODER_OV, WHISPER_DECODER_OV_INT8)
@@ -535,6 +550,7 @@ quantized models.
 
     import time
     import numpy as np
+    
     
     def calculate_call_inference_time(model, dataset):
         inference_time = []
@@ -613,6 +629,7 @@ accuracy as ``(1 - WER)``.
     TEST_DATASET_SIZE = 100
     test_dataset = load_dataset("librispeech_asr", "clean", split="test", streaming=True).take(TEST_DATASET_SIZE)
     
+    
     def calculate_transcription_time_and_accuracy(model, dataset):
         processor = WhisperProcessor.from_pretrained("openai/whisper-large")
     
@@ -636,6 +653,7 @@ accuracy as ``(1 - WER)``.
         word_accuracy = (1 - wer.compute(references=ground_truths, predictions=predictions)) * 100
         mean_inference_time = np.mean(inference_time)
         return mean_inference_time, word_accuracy
+    
     
     transcription_time_fp32, accuracy_fp32 = calculate_transcription_time_and_accuracy(model_fp32, test_dataset)
     transcription_time_int8, accuracy_int8 = calculate_transcription_time_and_accuracy(model_int8, test_dataset)

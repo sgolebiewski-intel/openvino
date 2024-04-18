@@ -18,7 +18,7 @@ two consecutive stages: all-instance segmentation and prompt-guided
 selection.
 
 In the first stage,
-`YOLOv8-seg <https://docs.ultralytics.com/tasks/segment/>`__ is used
+```YOLOv8-seg`` <https://docs.ultralytics.com/tasks/segment/>`__ is used
 to produce segmentation masks for all instances in the image. In the
 second stage, FastSAM outputs the region-of-interest corresponding to
 the prompt.
@@ -31,44 +31,44 @@ the prompt.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 
-   -  `Install requirements <#install-requirements>`__
-   -  `Imports <#imports>`__
+   -  `Install requirements <#Install-requirements>`__
+   -  `Imports <#Imports>`__
 
--  `FastSAM in Ultralytics <#fastsam-in-ultralytics>`__
+-  `FastSAM in Ultralytics <#FastSAM-in-Ultralytics>`__
 -  `Convert the model to OpenVINO Intermediate representation (IR)
-   format <#convert-the-model-to-openvino-intermediate-representation-ir-format>`__
+   format <#Convert-the-model-to-OpenVINO-Intermediate-representation-(IR)-format>`__
 -  `Embedding the converted models into the original
-   pipeline <#embedding-the-converted-models-into-the-original-pipeline>`__
+   pipeline <#Embedding-the-converted-models-into-the-original-pipeline>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
    -  `Adapt OpenVINO models to the original
-      pipeline <#adapt-openvino-models-to-the-original-pipeline>`__
+      pipeline <#Adapt-OpenVINO-models-to-the-original-pipeline>`__
 
 -  `Optimize the model using NNCF Post-training Quantization
-   API <#optimize-the-model-using-nncf-post-training-quantization-api>`__
+   API <#Optimize-the-model-using-NNCF-Post-training-Quantization-API>`__
 
    -  `Compare the performance of the Original and Quantized
-      Models <#compare-the-performance-of-the-original-and-quantized-models>`__
+      Models <#Compare-the-performance-of-the-Original-and-Quantized-Models>`__
 
--  `Try out the converted pipeline <#try-out-the-converted-pipeline>`__
+-  `Try out the converted pipeline <#Try-out-the-converted-pipeline>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q "ultralytics==8.0.200" onnx --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "ultralytics==8.1.42" onnx tqdm --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "openvino-dev>=2024.0.0"
-    %pip install -q "nncf>=2.6.0"
+    %pip install -q "nncf>=2.9.0"
     %pip install -q "gradio>=4.13"
 
 
@@ -100,7 +100,7 @@ Install requirements
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -112,24 +112,29 @@ Imports
     from PIL import Image, ImageDraw
     from ultralytics import FastSAM
     
-    import urllib.request
     # Fetch skip_kernel_extension module
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     # Fetch `notebook_utils` module
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     from notebook_utils import download_file
+    
     %load_ext skip_kernel_extension
 
 FastSAM in Ultralytics
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To work with `Fast Segment Anything
 Model <https://github.com/CASIA-IVA-Lab/FastSAM>`__ by
@@ -152,255 +157,78 @@ model and generate a segmentation map.
 
 .. parsed-literal::
 
-    Downloading https://github.com/ultralytics/assets/releases/download/v0.0.0/FastSAM-x.pt to 'FastSAM-x.pt'...
+    Downloading https://github.com/ultralytics/assets/releases/download/v8.1.0/FastSAM-x.pt to 'FastSAM-x.pt'...
 
 
 .. parsed-literal::
 
-    
-  0%|          | 0.00/138M [00:00<?, ?B/s]
+      0%|          | 0.00/138M [00:00<?, ?B/s]
 
 .. parsed-literal::
 
-    
-  0%|          | 256k/138M [00:00<00:55, 2.61MB/s]
+      0%|          | 296k/138M [00:00<00:47, 3.02MB/s]
 
 .. parsed-literal::
 
-    
-  2%|▏         | 2.20M/138M [00:00<00:10, 13.1MB/s]
+      2%|▏         | 2.45M/138M [00:00<00:10, 14.1MB/s]
 
 .. parsed-literal::
 
-    
-  7%|▋         | 10.2M/138M [00:00<00:02, 45.3MB/s]
+      5%|▍         | 6.62M/138M [00:00<00:05, 27.3MB/s]
 
 .. parsed-literal::
 
-    
- 13%|█▎        | 17.5M/138M [00:00<00:02, 57.8MB/s]
+     13%|█▎        | 17.4M/138M [00:00<00:02, 60.8MB/s]
 
 .. parsed-literal::
 
-    
- 17%|█▋        | 23.0M/138M [00:00<00:02, 41.4MB/s]
+     21%|██        | 28.6M/138M [00:00<00:01, 80.9MB/s]
 
 .. parsed-literal::
 
-    
- 20%|█▉        | 27.5M/138M [00:00<00:02, 40.6MB/s]
+     29%|██▉       | 39.8M/138M [00:00<00:01, 93.1MB/s]
 
 .. parsed-literal::
 
-    
- 23%|██▎       | 31.8M/138M [00:00<00:02, 41.6MB/s]
+     37%|███▋      | 50.9M/138M [00:00<00:00, 101MB/s] 
 
 .. parsed-literal::
 
-    
- 26%|██▌       | 36.0M/138M [00:00<00:02, 42.2MB/s]
+     45%|████▍     | 62.0M/138M [00:00<00:00, 106MB/s]
 
 .. parsed-literal::
 
-    
- 29%|██▉       | 40.2M/138M [00:01<00:03, 33.7MB/s]
+     53%|█████▎    | 73.2M/138M [00:00<00:00, 109MB/s]
 
 .. parsed-literal::
 
-    
- 32%|███▏      | 43.8M/138M [00:01<00:02, 34.5MB/s]
+     61%|██████    | 83.6M/138M [00:01<00:00, 109MB/s]
 
 .. parsed-literal::
 
-    
- 34%|███▍      | 47.3M/138M [00:01<00:02, 34.5MB/s]
+     68%|██████▊   | 94.1M/138M [00:01<00:00, 108MB/s]
 
 .. parsed-literal::
 
-    
- 37%|███▋      | 51.5M/138M [00:01<00:02, 37.0MB/s]
+     76%|███████▌  | 105M/138M [00:01<00:00, 109MB/s] 
 
 .. parsed-literal::
 
-    
- 40%|████      | 55.7M/138M [00:01<00:02, 38.8MB/s]
+     83%|████████▎ | 115M/138M [00:01<00:00, 107MB/s]
 
 .. parsed-literal::
 
-    
- 43%|████▎     | 59.5M/138M [00:01<00:02, 30.7MB/s]
+     91%|█████████ | 125M/138M [00:01<00:00, 96.6MB/s]
 
 .. parsed-literal::
 
-    
- 46%|████▌     | 63.5M/138M [00:01<00:02, 33.3MB/s]
+     97%|█████████▋| 135M/138M [00:01<00:00, 97.2MB/s]
 
 .. parsed-literal::
 
-    
- 48%|████▊     | 66.9M/138M [00:01<00:02, 32.0MB/s]
+    100%|██████████| 138M/138M [00:01<00:00, 90.6MB/s]
 
 .. parsed-literal::
-
-    
- 51%|█████     | 70.2M/138M [00:02<00:02, 30.7MB/s]
-
-.. parsed-literal::
-
-    
- 53%|█████▎    | 73.2M/138M [00:02<00:02, 31.0MB/s]
-
-.. parsed-literal::
-
-    
- 55%|█████▌    | 76.3M/138M [00:02<00:02, 31.2MB/s]
-
-.. parsed-literal::
-
-    
- 57%|█████▋    | 79.4M/138M [00:02<00:01, 31.4MB/s]
-
-.. parsed-literal::
-
-    
- 60%|█████▉    | 82.5M/138M [00:02<00:01, 31.8MB/s]
-
-.. parsed-literal::
-
-    
- 62%|██████▏   | 85.6M/138M [00:02<00:01, 31.6MB/s]
-
-.. parsed-literal::
-
-    
- 64%|██████▍   | 88.6M/138M [00:02<00:02, 24.6MB/s]
-
-.. parsed-literal::
-
-    
- 67%|██████▋   | 92.8M/138M [00:02<00:01, 29.2MB/s]
-
-.. parsed-literal::
-
-    
- 69%|██████▉   | 95.9M/138M [00:03<00:01, 26.7MB/s]
-
-.. parsed-literal::
-
-    
- 71%|███████▏  | 98.6M/138M [00:03<00:01, 22.6MB/s]
-
-.. parsed-literal::
-
-    
- 73%|███████▎  | 101M/138M [00:03<00:01, 20.4MB/s] 
-
-.. parsed-literal::
-
-    
- 75%|███████▍  | 103M/138M [00:03<00:01, 19.6MB/s]
-
-.. parsed-literal::
-
-    
- 76%|███████▌  | 105M/138M [00:03<00:01, 19.0MB/s]
-
-.. parsed-literal::
-
-    
- 77%|███████▋  | 107M/138M [00:03<00:01, 17.9MB/s]
-
-.. parsed-literal::
-
-    
- 79%|███████▊  | 109M/138M [00:03<00:01, 17.6MB/s]
-
-.. parsed-literal::
-
-    
- 80%|███████▉  | 110M/138M [00:03<00:01, 17.6MB/s]
-
-.. parsed-literal::
-
-    
- 81%|████████  | 112M/138M [00:04<00:01, 17.5MB/s]
-
-.. parsed-literal::
-
-    
- 82%|████████▏ | 114M/138M [00:04<00:01, 17.5MB/s]
-
-.. parsed-literal::
-
-    
- 84%|████████▎ | 116M/138M [00:04<00:01, 17.5MB/s]
-
-.. parsed-literal::
-
-    
- 85%|████████▍ | 117M/138M [00:04<00:01, 17.0MB/s]
-
-.. parsed-literal::
-
-    
- 86%|████████▌ | 119M/138M [00:04<00:01, 17.6MB/s]
-
-.. parsed-literal::
-
-    
- 87%|████████▋ | 121M/138M [00:04<00:01, 15.8MB/s]
-
-.. parsed-literal::
-
-    
- 89%|████████▉ | 123M/138M [00:04<00:00, 18.0MB/s]
-
-.. parsed-literal::
-
-    
- 90%|█████████ | 125M/138M [00:04<00:00, 18.0MB/s]
-
-.. parsed-literal::
-
-    
- 92%|█████████▏| 127M/138M [00:04<00:00, 17.9MB/s]
-
-.. parsed-literal::
-
-    
- 93%|█████████▎| 128M/138M [00:05<00:00, 18.0MB/s]
-
-.. parsed-literal::
-
-    
- 94%|█████████▍| 130M/138M [00:05<00:00, 18.0MB/s]
-
-.. parsed-literal::
-
-    
- 95%|█████████▌| 132M/138M [00:05<00:00, 18.2MB/s]
-
-.. parsed-literal::
-
-    
- 97%|█████████▋| 134M/138M [00:05<00:00, 18.2MB/s]
-
-.. parsed-literal::
-
-    
- 98%|█████████▊| 135M/138M [00:05<00:00, 18.2MB/s]
-
-.. parsed-literal::
-
-    
- 99%|█████████▉| 137M/138M [00:05<00:00, 15.2MB/s]
-
-.. parsed-literal::
-
-    
-100%|██████████| 138M/138M [00:05<00:00, 25.8MB/s]
-
-
 
     
 
@@ -411,19 +239,19 @@ model and generate a segmentation map.
     coco_bike.jpg:   0%|          | 0.00/182k [00:00<?, ?B/s]
 
 
-
+.. parsed-literal::
 
     
 
 
 .. parsed-literal::
 
-    image 1/1 /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/fast-segment-anything/coco_bike.jpg: 768x1024 37 objects, 604.4ms
+    image 1/1 /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/fast-segment-anything/coco_bike.jpg: 768x1024 37 objects, 624.0ms
 
 
 .. parsed-literal::
 
-    Speed: 3.0ms preprocess, 604.4ms inference, 25.5ms postprocess per image at shape (1, 3, 768, 1024)
+    Speed: 3.1ms preprocess, 624.0ms inference, 27.7ms postprocess per image at shape (1, 3, 768, 1024)
 
 
 The model returns segmentation maps for all the objects on the image.
@@ -443,7 +271,7 @@ Observe the results below.
 Convert the model to OpenVINO Intermediate representation (IR) format
 ---------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The Ultralytics Model export API enables conversion of PyTorch models to
 OpenVINO IR format. Under the hood it utilizes the
@@ -459,10 +287,9 @@ tracing. The FastSAM model itself is based on YOLOv8 model.
         ov_model = model.export(format="openvino", dynamic=False, half=False)
 
 
-
 .. parsed-literal::
 
-    Ultralytics YOLOv8.0.200 🚀 Python-3.8.10 torch-2.1.0+cpu CPU (Intel Core(TM) i9-10920X 3.50GHz)
+    Ultralytics YOLOv8.1.42 🚀 Python-3.8.10 torch-2.2.2+cpu CPU (Intel Core(TM) i9-10920X 3.50GHz)
 
 
 .. parsed-literal::
@@ -474,30 +301,19 @@ tracing. The FastSAM model itself is based on YOLOv8 model.
 .. parsed-literal::
 
     
-    ONNX: starting export with onnx 1.16.0 opset 17...
-
-
-.. parsed-literal::
-
-    ONNX: export success ✅ 3.3s, saved as 'FastSAM-x.onnx' (275.9 MB)
-
-
-.. parsed-literal::
-
-    
     OpenVINO: starting export with openvino 2024.0.0-14509-34caeefd078-releases/2024/0...
 
 
 .. parsed-literal::
 
-    OpenVINO: export success ✅ 1.0s, saved as 'FastSAM-x_openvino_model/' (276.0 MB)
+    OpenVINO: export success ✅ 6.1s, saved as 'FastSAM-x_openvino_model/' (276.1 MB)
 
 
 .. parsed-literal::
 
     
-    Export complete (7.2s)
-    Results saved to /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/fast-segment-anything
+    Export complete (9.0s)
+    Results saved to /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/fast-segment-anything
     Predict:         yolo predict task=segment model=FastSAM-x_openvino_model imgsz=1024  
     Validate:        yolo val task=segment model=FastSAM-x_openvino_model imgsz=1024 data=ultralytics/datasets/sa.yaml  
     Visualize:       https://netron.app
@@ -506,7 +322,7 @@ tracing. The FastSAM model itself is based on YOLOv8 model.
 Embedding the converted models into the original pipeline
 ---------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO™ Runtime Python API is used to compile the model in OpenVINO IR
 format. The
@@ -522,7 +338,7 @@ used to compile the model.
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select device that will be used to do models inference using OpenVINO
 from the dropdown list:
@@ -550,7 +366,7 @@ from the dropdown list:
 Adapt OpenVINO models to the original pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Here we create wrapper classes for the OpenVINO model that we want to
 embed in the original inference pipeline. Here are some of the things to
@@ -592,25 +408,30 @@ pipeline.
     if "GPU" in device.value or ("AUTO" in device.value and "GPU" in core.available_devices):
         ov_config = {"GPU_DISABLE_WINOGRAD_CONVOLUTION": "YES"}
     
-    wrapped_model = OVWrapper(ov_model_path, device=device.value, stride=model.predictor.model.stride, ov_config=ov_config)
+    wrapped_model = OVWrapper(
+        ov_model_path,
+        device=device.value,
+        stride=model.predictor.model.stride,
+        ov_config=ov_config,
+    )
     model.predictor.model = wrapped_model
     
     ov_results = model(image_uri, device=device.value, retina_masks=True, imgsz=1024, conf=0.6, iou=0.9)
 
 
-
+.. parsed-literal::
 
     
 
 
 .. parsed-literal::
 
-    image 1/1 /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/fast-segment-anything/coco_bike.jpg: 1024x1024 42 objects, 497.7ms
+    image 1/1 /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/fast-segment-anything/coco_bike.jpg: 1024x1024 42 objects, 504.2ms
 
 
 .. parsed-literal::
 
-    Speed: 9.3ms preprocess, 497.7ms inference, 30.0ms postprocess per image at shape (1, 3, 1024, 1024)
+    Speed: 6.5ms preprocess, 504.2ms inference, 31.9ms postprocess per image at shape (1, 3, 1024, 1024)
 
 
 One can observe the converted model outputs in the next cell, they is
@@ -630,7 +451,7 @@ the same as of the original model.
 Optimize the model using NNCF Post-training Quantization API
 ------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -648,7 +469,7 @@ The optimization process contains the following steps:
 
     do_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -789,10 +610,9 @@ repo <../yolov8-optimization/>`__.
             ignored_scope=nncf.IgnoredScope(
                 types=["Multiply", "Subtract", "Sigmoid"],  # ignore operations
                 names=[
-                    "/model.22/dfl/conv/Conv",  # in the post-processing subgraph
-                    "/model.22/Add",
-                    "/model.22/Add_1",
-                    "/model.22/Add_2",
+                    "__module.model.22.dfl.conv/aten::_convolution/Convolution",  # in the post-processing subgraph
+                    "__module.model.22/aten::add/Add",
+                    "__module.model.22/aten::add/Add_1"
                 ],
             )
         )
@@ -829,49 +649,49 @@ repo <../yolov8-optimization/>`__.
 
 .. parsed-literal::
 
-    INFO:nncf:4 ignored nodes were found by name in the NNCFGraph
+    INFO:nncf:3 ignored nodes were found by name in the NNCFGraph
 
 
 .. parsed-literal::
 
-    INFO:nncf:6 ignored nodes were found by types in the NNCFGraph
+    INFO:nncf:8 ignored nodes were found by types in the NNCFGraph
 
 
 .. parsed-literal::
 
-    INFO:nncf:Not adding activation input quantizer for operation: 268 /model.22/Sigmoid
+    INFO:nncf:Not adding activation input quantizer for operation: 275 __module.model.22/aten::sigmoid/Sigmoid
 
 
 .. parsed-literal::
 
-    INFO:nncf:Not adding activation input quantizer for operation: 305 /model.22/dfl/conv/Conv
+    INFO:nncf:Not adding activation input quantizer for operation: 325 __module.model.22.dfl.conv/aten::_convolution/Convolution
 
 
 .. parsed-literal::
 
-    INFO:nncf:Not adding activation input quantizer for operation: 337 /model.22/Sub
+    INFO:nncf:Not adding activation input quantizer for operation: 351 __module.model.22/aten::sub/Subtract
 
 
 .. parsed-literal::
 
-    INFO:nncf:Not adding activation input quantizer for operation: 338 /model.22/Add_1
+    INFO:nncf:Not adding activation input quantizer for operation: 352 __module.model.22/aten::add/Add
 
 
 .. parsed-literal::
 
-    INFO:nncf:Not adding activation input quantizer for operation: 348 /model.22/Add_2
-    358 /model.22/Div_1
+    INFO:nncf:Not adding activation input quantizer for operation: 365 __module.model.22/aten::add/Add_1
+    378 __module.model.22/aten::div/Divide
     
 
 
 .. parsed-literal::
 
-    INFO:nncf:Not adding activation input quantizer for operation: 349 /model.22/Sub_1
+    INFO:nncf:Not adding activation input quantizer for operation: 366 __module.model.22/aten::sub/Subtract_1
 
 
 .. parsed-literal::
 
-    INFO:nncf:Not adding activation input quantizer for operation: 369 /model.22/Mul_2
+    INFO:nncf:Not adding activation input quantizer for operation: 388 __module.model.22/aten::mul/Multiply
 
 
 
@@ -897,7 +717,7 @@ repo <../yolov8-optimization/>`__.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
       return Tensor(self.data * unwrap_tensor_data(other))
 
 
@@ -925,7 +745,7 @@ repo <../yolov8-optimization/>`__.
 Compare the performance of the Original and Quantized Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Finally, we iterate both the OV model and the quantized model over the
 calibration dataset to measure the performance.
@@ -958,8 +778,8 @@ calibration dataset to measure the performance.
 
 .. parsed-literal::
 
-    Segmented in 67 seconds.
-    Resulting in 1.91 fps
+    Segmented in 68 seconds.
+    Resulting in 1.88 fps
 
 
 .. code:: ipython3
@@ -986,15 +806,15 @@ calibration dataset to measure the performance.
 
 .. parsed-literal::
 
-    Segmented in 22 seconds
-    Resulting in 5.82 fps
-    That is 3.05 times faster!
+    Segmented in 23 seconds
+    Resulting in 5.57 fps
+    That is 2.96 times faster!
 
 
 Try out the converted pipeline
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The demo app below is created using `Gradio
 package <https://www.gradio.app/docs/interface>`__.
@@ -1009,6 +829,7 @@ bounding boxes on input image.
     import numpy as np
     import matplotlib.pyplot as plt
     
+    
     def fast_process(
         annotations,
         image,
@@ -1019,7 +840,6 @@ bounding boxes on input image.
         use_retina=True,
         with_contours=True,
     ):
-    
         original_h = image.height
         original_w = image.width
     
@@ -1080,7 +900,7 @@ bounding boxes on input image.
         mask_sum = annotation.shape[0]
         height = annotation.shape[1]
         weight = annotation.shape[2]
-        # 
+        #
         areas = np.sum(annotation, axis=(1, 2))
         sorted_indices = np.argsort(areas)[::1]
         annotation = annotation[sorted_indices]
@@ -1113,8 +933,11 @@ bounding boxes on input image.
 
     import gradio as gr
     
-    examples = [[image_uri], ["https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/empty_road_mapillary.jpg"],
-                ["https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/wall.jpg"]]
+    examples = [
+        [image_uri],
+        ["https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/empty_road_mapillary.jpg"],
+        ["https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/wall.jpg"],
+    ]
     
     object_points = []
     background_points = []
@@ -1127,21 +950,21 @@ based on user input.
 .. code:: ipython3
 
     def segment(
-            image,
-            model_type,
-            input_size=1024, 
-            iou_threshold=0.75,
-            conf_threshold=0.4,
-            better_quality=True,
-            with_contours=True,
-            use_retina=True,
-            mask_random_color=True,
+        image,
+        model_type,
+        input_size=1024,
+        iou_threshold=0.75,
+        conf_threshold=0.4,
+        better_quality=True,
+        with_contours=True,
+        use_retina=True,
+        mask_random_color=True,
     ):
-        if do_quantize.value and model_type == 'Quantized model':
+        if do_quantize.value and model_type == "Quantized model":
             model.predictor.model = quantized_wrapped_model
         else:
             model.predictor.model = wrapped_model
-        
+    
         input_size = int(input_size)
         w, h = image.size
         scale = input_size / max(w, h)
@@ -1149,11 +972,13 @@ based on user input.
         new_h = int(h * scale)
         image = image.resize((new_w, new_h))
     
-        results = model(image,
-                        retina_masks=use_retina,
-                        iou=iou_threshold,
-                        conf=conf_threshold,
-                        imgsz=input_size,)
+        results = model(
+            image,
+            retina_masks=use_retina,
+            iou=iou_threshold,
+            conf=conf_threshold,
+            imgsz=input_size,
+        )
     
         masks = results[0].masks.data
         # Calculate annotations
@@ -1187,7 +1012,7 @@ based on user input.
     
             for i in range(0, len(scaled_bbox_points) - 1, 2):
                 x0, y0, x1, y1 = *scaled_bbox_points[i], *scaled_bbox_points[i + 1]
-                
+    
                 intersection_area = torch.sum(masks[:, y0:y1, x0:x1], dim=(1, 2))
                 masks_area = torch.sum(masks, dim=(1, 2))
                 bbox_area = (y1 - y0) * (x1 - x0)
@@ -1206,7 +1031,7 @@ based on user input.
             mask_random_color=mask_random_color,
             bbox=None,
             use_retina=use_retina,
-            with_contours=with_contours
+            with_contours=with_contours,
         )
 
 .. code:: ipython3
@@ -1240,9 +1065,10 @@ based on user input.
         # Draw a point
         ImageDraw.Draw(img).ellipse(
             [(x - point_radius, y - point_radius), (x + point_radius, y + point_radius)],
-            fill=color
+            fill=color,
         )
         return img
+    
     
     def clear_points() -> (Image.Image, None):
         """Gradio clear points callback."""
@@ -1252,6 +1078,7 @@ based on user input.
         background_points = []
         bbox_points = []
         return last_image, None
+    
     
     def save_last_picked_image(img: Image.Image) -> None:
         """Gradio callback saves the last used image."""
@@ -1263,6 +1090,7 @@ based on user input.
         # Removes the segmentation map output
         return None
     
+    
     with gr.Blocks(title="Fast SAM") as demo:
         with gr.Row(variant="panel"):
             original_img = gr.Image(label="Input", value=examples[0][0], type="pil")
@@ -1270,23 +1098,27 @@ based on user input.
         with gr.Row():
             point_type = gr.Radio(
                 ["Object point", "Background point", "Bounding Box"],
-                value="Object point", label="Pixel selector type"
+                value="Object point",
+                label="Pixel selector type",
             )
             model_type = gr.Radio(
                 ["FP32 model", "Quantized model"] if do_quantize.value else ["FP32 model"],
-                value="FP32 model", label="Select model variant"
+                value="FP32 model",
+                label="Select model variant",
             )
         with gr.Row(variant="panel"):
             segment_button = gr.Button("Segment", variant="primary")
             clear_button = gr.Button("Clear points", variant="secondary")
-        gr.Examples(examples, inputs=original_img,
-                    fn=save_last_picked_image, run_on_click=True, outputs=segmented_img
+        gr.Examples(
+            examples,
+            inputs=original_img,
+            fn=save_last_picked_image,
+            run_on_click=True,
+            outputs=segmented_img,
         )
     
         # Callbacks
-        original_img.select(select_point,
-                            inputs=[original_img, point_type],
-                            outputs=original_img)
+        original_img.select(select_point, inputs=[original_img, point_type], outputs=original_img)
         original_img.upload(save_last_picked_image, inputs=original_img, outputs=segmented_img)
         clear_button.click(clear_points, outputs=[original_img, segmented_img])
         segment_button.click(segment, inputs=[original_img, model_type], outputs=segmented_img)
@@ -1309,7 +1141,7 @@ based on user input.
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

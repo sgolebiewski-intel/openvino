@@ -45,41 +45,53 @@ A similar notebook focused on the latency mode is available
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Data <#data>`__
--  `Model <#model>`__
--  `Hardware <#hardware>`__
--  `Helper functions <#helper-functions>`__
--  `Optimizations <#optimizations>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Data <#Data>`__
+-  `Model <#Model>`__
+-  `Hardware <#Hardware>`__
+-  `Helper functions <#Helper-functions>`__
+-  `Optimizations <#Optimizations>`__
 
-   -  `PyTorch model <#pytorch-model>`__
-   -  `OpenVINO IR model <#openvino-ir-model>`__
+   -  `PyTorch model <#PyTorch-model>`__
+   -  `OpenVINO IR model <#OpenVINO-IR-model>`__
    -  `OpenVINO IR model + bigger
-      batch <#openvino-ir-model--bigger-batch>`__
-   -  `Asynchronous processing <#asynchronous-processing>`__
+      batch <#OpenVINO-IR-model-+-bigger-batch>`__
+   -  `Asynchronous processing <#Asynchronous-processing>`__
    -  `OpenVINO IR model in throughput
-      mode <#openvino-ir-model-in-throughput-mode>`__
+      mode <#OpenVINO-IR-model-in-throughput-mode>`__
    -  `OpenVINO IR model in throughput mode on
-      GPU <#openvino-ir-model-in-throughput-mode-on-gpu>`__
+      GPU <#OpenVINO-IR-model-in-throughput-mode-on-GPU>`__
    -  `OpenVINO IR model in throughput mode on
-      AUTO <#openvino-ir-model-in-throughput-mode-on-auto>`__
+      AUTO <#OpenVINO-IR-model-in-throughput-mode-on-AUTO>`__
    -  `OpenVINO IR model in cumulative throughput mode on
-      AUTO <#openvino-ir-model-in-cumulative-throughput-mode-on-auto>`__
-   -  `Other tricks <#other-tricks>`__
+      AUTO <#OpenVINO-IR-model-in-cumulative-throughput-mode-on-AUTO>`__
+   -  `Other tricks <#Other-tricks>`__
 
--  `Performance comparison <#performance-comparison>`__
--  `Conclusions <#conclusions>`__
+-  `Performance comparison <#Performance-comparison>`__
+-  `Conclusions <#Conclusions>`__
 
 .. |image0| image:: https://github.com/openvinotoolkit/openvino_notebooks/assets/4547501/ac17148c-bee9-43aa-87fc-ead61ac75f1d
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q "openvino>=2023.1.0" "ultralytics<=8.0.178" seaborn onnx --extra-index-url https://download.pytorch.org/whl/cpu
+    import platform
+    
+    %pip install -q "openvino>=2023.1.0" "ultralytics<=8.0.178" seaborn onnx opencv-python --extra-index-url https://download.pytorch.org/whl/cpu
+    
+    if platform.system() != "Windows":
+        %pip install -q "matplotlib>=3.4"
+    else:
+        %pip install -q "matplotlib>=3.4,<3.7"
+
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
 
 
 .. parsed-literal::
@@ -94,17 +106,19 @@ Prerequisites
     from typing import Any, List, Tuple
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     import notebook_utils as utils
 
 Data
 ----
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We will use the same image of the dog sitting on a bicycle copied 1000
 times to simulate the video with 1000 frames (about 33s). The image is
@@ -145,14 +159,14 @@ object detection model.
 
 .. parsed-literal::
 
-    <DisplayHandle display_id=67546fa196f636ae849a1062f510b9b4>
+    <DisplayHandle display_id=4a326555bfa250e22b3eaeb8e54ac682>
 
 
 
 Model
 -----
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We decided to go with
 `YOLOv5n <https://github.com/ultralytics/yolov5>`__, one of the
@@ -184,18 +198,13 @@ PyTorch Hub and small enough to see the difference in performance.
 
 .. parsed-literal::
 
-    YOLOv5 🚀 2023-4-21 Python-3.8.10 torch-2.1.0+cpu CPU
+    YOLOv5 🚀 2023-4-21 Python-3.8.10 torch-2.2.2+cpu CPU
     
 
 
 .. parsed-literal::
 
     Fusing layers... 
-
-
-.. parsed-literal::
-
-    requirements: /opt/home/k8sworker/.cache/torch/hub/requirements.txt not found, check failed.
 
 
 .. parsed-literal::
@@ -208,10 +217,15 @@ PyTorch Hub and small enough to see the difference in performance.
     Adding AutoShape... 
 
 
+.. parsed-literal::
+
+    requirements: /opt/home/k8sworker/.cache/torch/hub/requirements.txt not found, check failed.
+
+
 Hardware
 --------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The code below lists the available hardware we will use in the
 benchmarking process.
@@ -240,7 +254,7 @@ benchmarking process.
 Helper functions
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We’re defining a benchmark model function to use for all optimizations
 below. It runs inference for 1000 frames and prints average frames per
@@ -248,10 +262,16 @@ second (FPS).
 
 .. code:: ipython3
 
-    from openvino.runtime import AsyncInferQueue
+    from openvino import AsyncInferQueue
     
     
-    def benchmark_model(model: Any, frames: np.ndarray, async_queue: AsyncInferQueue = None, benchmark_name: str = "OpenVINO model", device_name: str = "CPU") -> float:
+    def benchmark_model(
+        model: Any,
+        frames: np.ndarray,
+        async_queue: AsyncInferQueue = None,
+        benchmark_name: str = "OpenVINO model",
+        device_name: str = "CPU",
+    ) -> float:
         """
         Helper function for benchmarking the model. It measures the time and prints results.
         """
@@ -290,14 +310,86 @@ the image.
 
     # https://gist.github.com/AruniRC/7b3dadd004da04c80198557db5da4bda
     classes = [
-        "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light", "fire hydrant",
-        "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra",
-        "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite",
-        "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup", "fork",
-        "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut",
-        "cake", "chair", "couch", "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard",
-        "cell phone", "microwave", "oven", "oaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear",
-        "hair drier", "toothbrush"
+        "person",
+        "bicycle",
+        "car",
+        "motorcycle",
+        "airplane",
+        "bus",
+        "train",
+        "truck",
+        "boat",
+        "traffic light",
+        "fire hydrant",
+        "stop sign",
+        "parking meter",
+        "bench",
+        "bird",
+        "cat",
+        "dog",
+        "horse",
+        "sheep",
+        "cow",
+        "elephant",
+        "bear",
+        "zebra",
+        "giraffe",
+        "backpack",
+        "umbrella",
+        "handbag",
+        "tie",
+        "suitcase",
+        "frisbee",
+        "skis",
+        "snowboard",
+        "sports ball",
+        "kite",
+        "baseball bat",
+        "baseball glove",
+        "skateboard",
+        "surfboard",
+        "tennis racket",
+        "bottle",
+        "wine glass",
+        "cup",
+        "fork",
+        "knife",
+        "spoon",
+        "bowl",
+        "banana",
+        "apple",
+        "sandwich",
+        "orange",
+        "broccoli",
+        "carrot",
+        "hot dog",
+        "pizza",
+        "donut",
+        "cake",
+        "chair",
+        "couch",
+        "potted plant",
+        "bed",
+        "dining table",
+        "toilet",
+        "tv",
+        "laptop",
+        "mouse",
+        "remote",
+        "keyboard",
+        "cell phone",
+        "microwave",
+        "oven",
+        "oaster",
+        "sink",
+        "refrigerator",
+        "book",
+        "clock",
+        "vase",
+        "scissors",
+        "teddy bear",
+        "hair drier",
+        "toothbrush",
     ]
     
     # Colors for the classes above (Rainbow Color Map).
@@ -322,18 +414,14 @@ the image.
             score = obj[4]
             label = np.argmax(obj[5:])
             # Create a box with pixels coordinates from the box with normalized coordinates [0,1].
-            boxes.append(
-                tuple(map(int, (xmin - ww // 2, ymin - hh // 2, ww, hh)))
-            )
+            boxes.append(tuple(map(int, (xmin - ww // 2, ymin - hh // 2, ww, hh))))
             labels.append(int(label))
             scores.append(float(score))
     
         # Apply non-maximum suppression to get rid of many overlapping entities.
         # See https://paperswithcode.com/method/non-maximum-suppression
         # This algorithm returns indices of objects to keep.
-        indices = cv2.dnn.NMSBoxes(
-            bboxes=boxes, scores=scores, score_threshold=0.25, nms_threshold=0.5
-        )
+        indices = cv2.dnn.NMSBoxes(bboxes=boxes, scores=scores, score_threshold=0.25, nms_threshold=0.5)
     
         # If there are no boxes.
         if len(indices) == 0:
@@ -382,7 +470,7 @@ the image.
 Optimizations
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Below, we present the performance tricks for faster inference in the
 throughput mode. We release resources after every benchmarking to be
@@ -391,7 +479,7 @@ sure the same amount of resource is available for every experiment.
 PyTorch model
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, we’re benchmarking the original PyTorch model without any
 optimizations applied. We will treat it as our baseline.
@@ -403,7 +491,11 @@ optimizations applied. We will treat it as our baseline.
     with torch.no_grad():
         result = pytorch_model(torch.as_tensor(video_frames[0])).detach().numpy()[0]
         show_result(result)
-        pytorch_fps = benchmark_model(pytorch_model, frames=torch.as_tensor(video_frames).float(), benchmark_name="PyTorch model")
+        pytorch_fps = benchmark_model(
+            pytorch_model,
+            frames=torch.as_tensor(video_frames).float(),
+            benchmark_name="PyTorch model",
+        )
 
 
 
@@ -412,18 +504,18 @@ optimizations applied. We will treat it as our baseline.
 
 .. parsed-literal::
 
-    PyTorch model on CPU. First inference time: 0.0291 seconds
+    PyTorch model on CPU. First inference time: 0.0293 seconds
 
 
 .. parsed-literal::
 
-    PyTorch model on CPU: 0.0228 seconds per image (43.93 FPS)
+    PyTorch model on CPU: 0.0190 seconds per image (52.54 FPS)
 
 
 OpenVINO IR model
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The first optimization is exporting the PyTorch model to OpenVINO
 Intermediate Representation (IR) FP16 and running it. Reducing the
@@ -463,18 +555,18 @@ step in this notebook.
 
 .. parsed-literal::
 
-    OpenVINO model on CPU. First inference time: 0.0138 seconds
+    OpenVINO model on CPU. First inference time: 0.0114 seconds
 
 
 .. parsed-literal::
 
-    OpenVINO model on CPU: 0.0071 seconds per image (141.71 FPS)
+    OpenVINO model on CPU: 0.0071 seconds per image (141.35 FPS)
 
 
 OpenVINO IR model + bigger batch
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Batch processing often gives higher throughput as more inputs are
 processed at once. To use bigger batches (than 1), we must convert the
@@ -514,7 +606,11 @@ hardware and model.
     
     result = ov_cpu_batch_model(batched_video_frames[0])[ov_cpu_batch_model.output(0)][0]
     show_result(result)
-    ov_cpu_batch_fps = benchmark_model(model=ov_cpu_batch_model, frames=batched_video_frames, benchmark_name="OpenVINO model + bigger batch")
+    ov_cpu_batch_fps = benchmark_model(
+        model=ov_cpu_batch_model,
+        frames=batched_video_frames,
+        benchmark_name="OpenVINO model + bigger batch",
+    )
     
     del ov_cpu_batch_model  # release resources
 
@@ -525,18 +621,18 @@ hardware and model.
 
 .. parsed-literal::
 
-    OpenVINO model + bigger batch on CPU. First inference time: 0.0322 seconds
+    OpenVINO model + bigger batch on CPU. First inference time: 0.0369 seconds
 
 
 .. parsed-literal::
 
-    OpenVINO model + bigger batch on CPU: 0.0068 seconds per image (146.16 FPS)
+    OpenVINO model + bigger batch on CPU: 0.0069 seconds per image (144.00 FPS)
 
 
 Asynchronous processing
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Asynchronous mode means that OpenVINO immediately returns from an
 inference call and doesn’t wait for the result. It requires more
@@ -569,7 +665,13 @@ the pipeline.
     
         # don't show output for the remaining frames
         infer_queue.set_callback(lambda x, y: {})
-        fps = benchmark_model(model=infer_queue.start_async, frames=video_frames, async_queue=infer_queue, benchmark_name=benchmark_name, device_name=device_name)
+        fps = benchmark_model(
+            model=infer_queue.start_async,
+            frames=video_frames,
+            async_queue=infer_queue,
+            benchmark_name=benchmark_name,
+            device_name=device_name,
+        )
     
         del infer_queue  # release resources
         return fps
@@ -577,7 +679,7 @@ the pipeline.
 OpenVINO IR model in throughput mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO allows specifying a performance hint changing the internal
 configuration of the device. There are three different hints:
@@ -592,7 +694,11 @@ feature, which sets the batch size to the optimal level.
 
     ov_cpu_through_model = core.compile_model(ov_model, device_name="CPU", config={"PERFORMANCE_HINT": "THROUGHPUT"})
     
-    ov_cpu_through_fps = benchmark_async_mode(ov_cpu_through_model, benchmark_name="OpenVINO model", device_name="CPU (THROUGHPUT)")
+    ov_cpu_through_fps = benchmark_async_mode(
+        ov_cpu_through_model,
+        benchmark_name="OpenVINO model",
+        device_name="CPU (THROUGHPUT)",
+    )
     
     del ov_cpu_through_model  # release resources
 
@@ -603,18 +709,18 @@ feature, which sets the batch size to the optimal level.
 
 .. parsed-literal::
 
-    OpenVINO model on CPU (THROUGHPUT). First inference time: 0.0241 seconds
+    OpenVINO model on CPU (THROUGHPUT). First inference time: 0.0259 seconds
 
 
 .. parsed-literal::
 
-    OpenVINO model on CPU (THROUGHPUT): 0.0040 seconds per image (248.63 FPS)
+    OpenVINO model on CPU (THROUGHPUT): 0.0040 seconds per image (249.64 FPS)
 
 
 OpenVINO IR model in throughput mode on GPU
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Usually, a GPU device provides more frames per second than a CPU, so
 let’s run the above model on the GPU. Please note you need to have an
@@ -640,7 +746,7 @@ execution.
 OpenVINO IR model in throughput mode on AUTO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO offers a virtual device called
 `AUTO <https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes/auto-device-selection.html>`__,
@@ -662,18 +768,18 @@ performance hint.
 
 .. parsed-literal::
 
-    OpenVINO model on AUTO (THROUGHPUT). First inference time: 0.0220 seconds
+    OpenVINO model on AUTO (THROUGHPUT). First inference time: 0.0254 seconds
 
 
 .. parsed-literal::
 
-    OpenVINO model on AUTO (THROUGHPUT): 0.0040 seconds per image (249.32 FPS)
+    OpenVINO model on AUTO (THROUGHPUT): 0.0040 seconds per image (249.49 FPS)
 
 
 OpenVINO IR model in cumulative throughput mode on AUTO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The AUTO device in throughput mode will select the best, but one
 physical device to bring the highest throughput. However, if we have
@@ -685,7 +791,11 @@ activate all devices.
 
     ov_auto_cumulative_model = core.compile_model(ov_model, device_name="AUTO", config={"PERFORMANCE_HINT": "CUMULATIVE_THROUGHPUT"})
     
-    ov_auto_cumulative_fps = benchmark_async_mode(ov_auto_cumulative_model, benchmark_name="OpenVINO model", device_name="AUTO (CUMULATIVE THROUGHPUT)")
+    ov_auto_cumulative_fps = benchmark_async_mode(
+        ov_auto_cumulative_model,
+        benchmark_name="OpenVINO model",
+        device_name="AUTO (CUMULATIVE THROUGHPUT)",
+    )
 
 
 
@@ -694,18 +804,18 @@ activate all devices.
 
 .. parsed-literal::
 
-    OpenVINO model on AUTO (CUMULATIVE THROUGHPUT). First inference time: 0.0232 seconds
+    OpenVINO model on AUTO (CUMULATIVE THROUGHPUT). First inference time: 0.0224 seconds
 
 
 .. parsed-literal::
 
-    OpenVINO model on AUTO (CUMULATIVE THROUGHPUT): 0.0040 seconds per image (249.30 FPS)
+    OpenVINO model on AUTO (CUMULATIVE THROUGHPUT): 0.0040 seconds per image (250.82 FPS)
 
 
 Other tricks
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 There are other tricks for performance improvement, such as advanced
 options, quantization and pre-post-processing or dedicated to latency
@@ -718,7 +828,7 @@ options <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optim
 Performance comparison
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The following graphical comparison is valid for the selected model and
 hardware simultaneously. If you cannot see any improvement between some
@@ -732,10 +842,25 @@ steps, just skip them.
 
     from matplotlib import pyplot as plt
     
-    labels = ["PyTorch model", "OpenVINO IR model", "OpenVINO IR model + bigger batch", "OpenVINO IR model in throughput mode", "OpenVINO IR model in throughput mode on GPU",
-              "OpenVINO IR model in throughput mode on AUTO", "OpenVINO IR model in cumulative throughput mode on AUTO"]
+    labels = [
+        "PyTorch model",
+        "OpenVINO IR model",
+        "OpenVINO IR model + bigger batch",
+        "OpenVINO IR model in throughput mode",
+        "OpenVINO IR model in throughput mode on GPU",
+        "OpenVINO IR model in throughput mode on AUTO",
+        "OpenVINO IR model in cumulative throughput mode on AUTO",
+    ]
     
-    fps = [pytorch_fps, ov_cpu_fps, ov_cpu_batch_fps, ov_cpu_through_fps, ov_gpu_fps, ov_auto_fps, ov_auto_cumulative_fps]
+    fps = [
+        pytorch_fps,
+        ov_cpu_fps,
+        ov_cpu_batch_fps,
+        ov_cpu_through_fps,
+        ov_gpu_fps,
+        ov_auto_fps,
+        ov_auto_cumulative_fps,
+    ]
     
     bar_colors = colors[::10] / 255.0
     
@@ -745,7 +870,7 @@ steps, just skip them.
     ax.set_ylabel("Throughput [FPS]")
     ax.set_title("Performance difference")
     
-    plt.xticks(rotation='vertical')
+    plt.xticks(rotation="vertical")
     plt.show()
 
 
@@ -756,7 +881,7 @@ steps, just skip them.
 Conclusions
 -----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We already showed the steps needed to improve the throughput of an
 object detection model. Even if you experience much better performance

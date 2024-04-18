@@ -39,38 +39,38 @@ from `NNCF <https://github.com/openvinotoolkit/nncf/>`__ is applied.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Load PyTorch model <#load-pytorch-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Load PyTorch model <#Load-PyTorch-model>`__
 
-   -  `Prepare input sample <#prepare-input-sample>`__
-   -  `Run model inference <#run-model-inference>`__
+   -  `Prepare input sample <#Prepare-input-sample>`__
+   -  `Run model inference <#Run-model-inference>`__
 
 -  `Load OpenVINO model using Optimum
-   library <#load-openvino-model-using-optimum-library>`__
+   library <#Load-OpenVINO-model-using-Optimum-library>`__
 
-   -  `Select Inference device <#select-inference-device>`__
-   -  `Compile OpenVINO model <#compile-openvino-model>`__
-   -  `Run OpenVINO model inference <#run-openvino-model-inference>`__
+   -  `Select Inference device <#Select-Inference-device>`__
+   -  `Compile OpenVINO model <#Compile-OpenVINO-model>`__
+   -  `Run OpenVINO model inference <#Run-OpenVINO-model-inference>`__
 
 -  `Compare performance PyTorch vs
-   OpenVINO <#compare-performance-pytorch-vs-openvino>`__
+   OpenVINO <#Compare-performance-PyTorch-vs-OpenVINO>`__
 -  `Usage OpenVINO model with HuggingFace
-   pipelines <#usage-openvino-model-with-huggingface-pipelines>`__
--  `Quantization <#quantization>`__
+   pipelines <#Usage-OpenVINO-model-with-HuggingFace-pipelines>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Prepare calibration datasets <#prepare-calibration-datasets>`__
+   -  `Prepare calibration datasets <#Prepare-calibration-datasets>`__
    -  `Quantize Distil-Whisper encoder and decoder
-      models <#quantize-distil-whisper-encoder-and-decoder-models>`__
-   -  `Run quantized model inference <#run-quantized-model-inference>`__
+      models <#Quantize-Distil-Whisper-encoder-and-decoder-models>`__
+   -  `Run quantized model inference <#Run-quantized-model-inference>`__
    -  `Compare performance and accuracy of the original and quantized
-      models <#compare-performance-and-accuracy-of-the-original-and-quantized-models>`__
+      models <#Compare-performance-and-accuracy-of-the-original-and-quantized-models>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -81,7 +81,7 @@ Prerequisites
 Load PyTorch model
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``AutoModelForSpeechSeq2Seq.from_pretrained`` method is used for the
 initialization of PyTorch Whisper model using the transformers library.
@@ -110,7 +110,7 @@ using tokenizer.
         "Distil-Whisper": [
             "distil-whisper/distil-large-v2",
             "distil-whisper/distil-medium.en",
-            "distil-whisper/distil-small.en"
+            "distil-whisper/distil-small.en",
         ],
         "Whisper": [
             "openai/whisper-large-v3",
@@ -124,7 +124,7 @@ using tokenizer.
             "openai/whisper-small.en",
             "openai/whisper-base.en",
             "openai/whisper-tiny.en",
-        ]
+        ],
     }
     
     model_type = widgets.Dropdown(
@@ -165,7 +165,7 @@ using tokenizer.
 Prepare input sample
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The processor expects audio data in numpy array format and information
 about the audio sampling rate and returns the ``input_features`` tensor
@@ -176,6 +176,7 @@ by Hugging Face datasets implementation.
 
     from datasets import load_dataset
     
+    
     def extract_input_features(sample):
         input_features = processor(
             sample["audio"]["array"],
@@ -184,16 +185,15 @@ by Hugging Face datasets implementation.
         ).input_features
         return input_features
     
-    dataset = load_dataset(
-        "hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"
-    )
+    
+    dataset = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
     sample = dataset[0]
     input_features = extract_input_features(sample)
 
 Run model inference
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To perform speech recognition, one can use ``generate`` interface of the
 model. After generation is finished processor.batch_decode can be used
@@ -231,7 +231,7 @@ for decoding predicted token_ids into text transcription.
 Load OpenVINO model using Optimum library
 -----------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The Hugging Face Optimum API is a high-level API that enables us to
 convert and quantize models from the Hugging Face Transformers library
@@ -271,19 +271,21 @@ OpenVINO model. It means that we can reuse initialized early processor.
     from pathlib import Path
     from optimum.intel.openvino import OVModelForSpeechSeq2Seq
     
-    model_path = Path(model_id.value.replace('/', '_'))
+    model_path = Path(model_id.value.replace("/", "_"))
     ov_config = {"CACHE_DIR": ""}
     
     if not model_path.exists():
         ov_model = OVModelForSpeechSeq2Seq.from_pretrained(
-            model_id.value, ov_config=ov_config, export=True, compile=False, load_in_8bit=False
+            model_id.value,
+            ov_config=ov_config,
+            export=True,
+            compile=False,
+            load_in_8bit=False,
         )
         ov_model.half()
         ov_model.save_pretrained(model_path)
     else:
-        ov_model = OVModelForSpeechSeq2Seq.from_pretrained(
-            model_path, ov_config=ov_config, compile=False
-        )
+        ov_model = OVModelForSpeechSeq2Seq.from_pretrained(model_path, ov_config=ov_config, compile=False)
 
 
 .. parsed-literal::
@@ -294,7 +296,7 @@ OpenVINO model. It means that we can reuse initialized early processor.
 Select Inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -324,7 +326,7 @@ Select Inference device
 Compile OpenVINO model
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -342,7 +344,7 @@ Compile OpenVINO model
 Run OpenVINO model inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -382,7 +384,7 @@ Run OpenVINO model inference
 Compare performance PyTorch vs OpenVINO
 ---------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -434,12 +436,12 @@ Compare performance PyTorch vs OpenVINO
 
 
 load_in_8bit### Compare with OpenAI Whisper `back to top
-⬆️ <#table-of-contents>`__
+⬆️ <#Table-of-contents:>`__
 
 Usage OpenVINO model with HuggingFace pipelines
 -----------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Like the original PyTorch model, the OpenVINO model is also compatible
 with HuggingFace
@@ -496,9 +498,7 @@ seconds is optimal. To activate batching, pass the argument batch_size.
         seconds = milliseconds // 1_000
         milliseconds -= seconds * 1_000
     
-        return (
-            f"{hours}:" if hours > 0 else "00:"
-        ) + f"{minutes:02d}:{seconds:02d},{milliseconds:03d}"
+        return (f"{hours}:" if hours > 0 else "00:") + f"{minutes:02d}:{seconds:02d},{milliseconds:03d}"
     
     
     def prepare_srt(transcription):
@@ -530,9 +530,7 @@ popular subtitles format.
 
     srt_lines = prepare_srt(result)
     
-    display(
-        ipd.Audio(sample_long["audio"]["array"], rate=sample_long["audio"]["sampling_rate"])
-    )
+    display(ipd.Audio(sample_long["audio"]["array"], rate=sample_long["audio"]["sampling_rate"]))
     print("".join(srt_lines))
 
 
@@ -607,7 +605,7 @@ popular subtitles format.
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding the quantization layers into the
@@ -634,7 +632,7 @@ quantization.
 
     to_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -652,19 +650,19 @@ quantization.
 .. code:: ipython3
 
     # Fetch `skip_kernel_extension` module
-    import urllib.request
+    import requests
     
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     %load_ext skip_kernel_extension
 
 Prepare calibration datasets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First step is to prepare calibration datasets for quantization. Since we
 quantize whisper encoder and decoder separately, we need to prepare a
@@ -706,7 +704,7 @@ improves quantization quality.
 Quantize Distil-Whisper encoder and decoder models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Below we run the ``quantize`` function which calls ``nncf.quantize`` on
 Distil-Whisper encoder and decoder-with-past models. We don’t quantize
@@ -828,7 +826,7 @@ negligible.
 Run quantized model inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let’s compare the transcription results for original and quantized
 models.
@@ -876,7 +874,7 @@ Results are the same!
 Compare performance and accuracy of the original and quantized models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Finally, we compare original and quantized Distil-Whisper models from
 accuracy and performance stand-points.
@@ -913,9 +911,9 @@ decoder-with-past model forwards, and for the whole model inference too.
     
         def wrapper(*args, **kwargs):
             if not MEASURE_TIME:
-                return original_fn(\*args, \*\*kwargs)
+                return original_fn(*args, **kwargs)
             start_time = time.perf_counter()
-            result = original_fn(\*args, \*\*kwargs)
+            result = original_fn(*args, **kwargs)
             end_time = time.perf_counter()
             time_list.append(end_time - start_time)
             return result
@@ -995,7 +993,7 @@ without major accuracy drop!
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We are also providing an interactive demo using the Gradio interface,
 where you can test model capabilities on your own audio data (using the
@@ -1007,12 +1005,12 @@ recognition. Multilingual support will be provided later.
 
     from transformers.pipelines.audio_utils import ffmpeg_read
     import gradio as gr
-    import urllib.request
     
-    urllib.request.urlretrieve(
-        url="https://huggingface.co/spaces/distil-whisper/whisper-vs-distil-whisper/resolve/main/assets/example_1.wav",
-        filename="example_1.wav",
-    )
+    r = requests.get("https://huggingface.co/spaces/distil-whisper/whisper-vs-distil-whisper/resolve/main/assets/example_1.wav")
+    
+    with open("example_1.wav", "wb") as f:
+        f.write(r.content)
+    
     
     BATCH_SIZE = 16
     MAX_AUDIO_MINS = 30  # maximum audio input in minutes
@@ -1049,9 +1047,7 @@ recognition. Multilingual support will be provided later.
         pipe_forward = ov_quantized_pipe_forward if quantized else ov_pipe_forward
     
         if inputs is None:
-            raise gr.Error(
-                "No audio file submitted! Please record or upload an audio file before submitting your request."
-            )
+            raise gr.Error("No audio file submitted! Please record or upload an audio file before submitting your request.")
     
         with open(inputs, "rb") as f:
             inputs = f.read()
@@ -1102,20 +1098,15 @@ recognition. Multilingual support will be provided later.
             if to_quantize.value:
                 button_q = gr.Button("Transcribe quantized")
         with gr.Row():
-            infer_time = gr.components.Textbox(
-                label="OpenVINO Distil-Whisper Transcription Time (s)"
-            )
+            infer_time = gr.components.Textbox(label="OpenVINO Distil-Whisper Transcription Time (s)")
             if to_quantize.value:
-                infer_time_q = gr.components.Textbox(
-                    label="OpenVINO Quantized Distil-Whisper Transcription Time (s)"
-                )
+                infer_time_q = gr.components.Textbox(label="OpenVINO Quantized Distil-Whisper Transcription Time (s)")
         with gr.Row():
-            transcription = gr.components.Textbox(
-                label="OpenVINO Distil-Whisper Transcription", show_copy_button=True
-            )
+            transcription = gr.components.Textbox(label="OpenVINO Distil-Whisper Transcription", show_copy_button=True)
             if to_quantize.value:
                 transcription_q = gr.components.Textbox(
-                    label="OpenVINO Quantized Distil-Whisper Transcription", show_copy_button=True
+                    label="OpenVINO Quantized Distil-Whisper Transcription",
+                    show_copy_button=True,
                 )
         button.click(
             fn=transcribe,

@@ -68,45 +68,45 @@ The tutorial consists of the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Install prerequisites <#install-prerequisites>`__
--  `SDXL Base model <#sdxl-base-model>`__
+-  `Install prerequisites <#Install-prerequisites>`__
+-  `SDXL Base model <#SDXL-Base-model>`__
 
    -  `Select inference device SDXL Base
-      model <#select-inference-device-sdxl-base-model>`__
+      model <#Select-inference-device-SDXL-Base-model>`__
    -  `Run Text2Image generation
-      pipeline <#run-text2image-generation-pipeline>`__
+      pipeline <#Run-Text2Image-generation-pipeline>`__
    -  `Text2image Generation Interactive
-      Demo <#text2image-generation-interactive-demo>`__
+      Demo <#Text2image-Generation-Interactive-Demo>`__
    -  `Run Image2Image generation
-      pipeline <#run-image2image-generation-pipeline>`__
+      pipeline <#Run-Image2Image-generation-pipeline>`__
 
       -  `Select inference device SDXL Refiner
-         model <#select-inference-device-sdxl-refiner-model>`__
+         model <#Select-inference-device-SDXL-Refiner-model>`__
 
    -  `Image2Image Generation Interactive
-      Demo <#image2image-generation-interactive-demo>`__
+      Demo <#Image2Image-Generation-Interactive-Demo>`__
 
--  `SDXL Refiner model <#sdxl-refiner-model>`__
+-  `SDXL Refiner model <#SDXL-Refiner-model>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
    -  `Run Text2Image generation with
-      Refinement <#run-text2image-generation-with-refinement>`__
+      Refinement <#Run-Text2Image-generation-with-Refinement>`__
 
 Install prerequisites
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "torch>=2.1" "diffusers>=0.18.0" "invisible-watermark>=0.2.0" "transformers>=4.33.0" "accelerate" "onnx" "peft==0.6.2"
     %pip install -q "git+https://github.com/huggingface/optimum-intel.git"
-    %pip install -q "openvino>=2023.1.0" gradio
+    %pip install -q "openvino>=2023.1.0" "gradio>=4.19" "nncf>=2.9.0"
 
 SDXL Base model
 ---------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We will start with the base model part, which is responsible for the
 generation of images of the desired output size.
@@ -133,27 +133,10 @@ You can save the model on disk using the ``save_pretrained`` method.
     model_id = "stabilityai/stable-diffusion-xl-base-1.0"
     model_dir = Path("openvino-sd-xl-base-1.0")
 
-
-.. parsed-literal::
-
-    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, tensorflow, onnx, openvino
-
-
-.. parsed-literal::
-
-    No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
-    2023-09-19 18:52:15.570335: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2023-09-19 18:52:15.609718: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2023-09-19 18:52:16.242994: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/transformers/deepspeed.py:23: FutureWarning: transformers.deepspeed module is deprecated and will be removed in a future version. Please import deepspeed modules directly from transformers.integrations
-      warnings.warn(
-
-
 Select inference device SDXL Base model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -166,8 +149,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -178,14 +161,54 @@ select device from dropdown list for running inference using OpenVINO
 
 .. parsed-literal::
 
-    Dropdown(description='Device:', index=2, options=('CPU', 'GPU', 'AUTO'), value='AUTO')
+    Dropdown(description='Device:', index=4, options=('CPU', 'GPU.0', 'GPU.1', 'GPU.2', 'AUTO'), value='AUTO')
+
+
+
+Please select below whether you would like to use weight compression to
+reduce memory footprint. `Optimum
+Intel <https://huggingface.co/docs/optimum/en/intel/optimization_ov#weight-only-quantization>`__
+supports weight compression via NNCF out of the box. For 8-bit
+compression we provide
+``quantization_config=OVWeightQuantizationConfig(bits=8, ...)`` argument
+to ``from_pretrained()`` method containing number of bits and other
+compression parameters.
+
+.. code:: ipython3
+
+    compress_weights = widgets.Checkbox(
+        description="Apply weight compression",
+        value=True,
+    )
+    
+    compress_weights
+
+
+
+
+.. parsed-literal::
+
+    Checkbox(value=True, description='Apply weight compression')
 
 
 
 .. code:: ipython3
 
+    def get_quantization_config(compress_weights):
+        quantization_config = None
+        if compress_weights.value:
+            from optimum.intel import OVWeightQuantizationConfig
+    
+            quantization_config = OVWeightQuantizationConfig(bits=8)
+        return quantization_config
+    
+    
+    quantization_config = get_quantization_config(compress_weights)
+
+.. code:: ipython3
+
     if not model_dir.exists():
-        text2image_pipe = OVStableDiffusionXLPipeline.from_pretrained(model_id, compile=False, device=device.value)
+        text2image_pipe = OVStableDiffusionXLPipeline.from_pretrained(model_id, compile=False, device=device.value, quantization_config=quantization_config)
         text2image_pipe.half()
         text2image_pipe.save_pretrained(model_dir)
         text2image_pipe.compile()
@@ -195,17 +218,177 @@ select device from dropdown list for running inference using OpenVINO
 
 .. parsed-literal::
 
-    Compiling the vae_decoder...
-    Compiling the unet...
-    Compiling the text_encoder...
-    Compiling the vae_encoder...
-    Compiling the text_encoder_2...
+    INFO:nncf:Statistics of the bitwidth distribution:
+    +--------------+---------------------------+-----------------------------------+
+    | Num bits (N) | % all parameters (layers) |    % ratio-defining parameters    |
+    |              |                           |             (layers)              |
+    +==============+===========================+===================================+
+    | 8            | 100% (794 / 794)          | 100% (794 / 794)                  |
+    +--------------+---------------------------+-----------------------------------+
+
+
+
+.. parsed-literal::
+
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
+
+
+.. parsed-literal::
+
+    INFO:nncf:Statistics of the bitwidth distribution:
+    +--------------+---------------------------+-----------------------------------+
+    | Num bits (N) | % all parameters (layers) |    % ratio-defining parameters    |
+    |              |                           |             (layers)              |
+    +==============+===========================+===================================+
+    | 8            | 100% (32 / 32)            | 100% (32 / 32)                    |
+    +--------------+---------------------------+-----------------------------------+
+
+
+
+.. parsed-literal::
+
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
+
+
+.. parsed-literal::
+
+    INFO:nncf:Statistics of the bitwidth distribution:
+    +--------------+---------------------------+-----------------------------------+
+    | Num bits (N) | % all parameters (layers) |    % ratio-defining parameters    |
+    |              |                           |             (layers)              |
+    +==============+===========================+===================================+
+    | 8            | 100% (40 / 40)            | 100% (40 / 40)                    |
+    +--------------+---------------------------+-----------------------------------+
+
+
+
+.. parsed-literal::
+
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
+
+
+.. parsed-literal::
+
+    INFO:nncf:Statistics of the bitwidth distribution:
+    +--------------+---------------------------+-----------------------------------+
+    | Num bits (N) | % all parameters (layers) |    % ratio-defining parameters    |
+    |              |                           |             (layers)              |
+    +==============+===========================+===================================+
+    | 8            | 100% (74 / 74)            | 100% (74 / 74)                    |
+    +--------------+---------------------------+-----------------------------------+
+
+
+
+.. parsed-literal::
+
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
+
+
+.. parsed-literal::
+
+    INFO:nncf:Statistics of the bitwidth distribution:
+    +--------------+---------------------------+-----------------------------------+
+    | Num bits (N) | % all parameters (layers) |    % ratio-defining parameters    |
+    |              |                           |             (layers)              |
+    +==============+===========================+===================================+
+    | 8            | 100% (195 / 195)          | 100% (195 / 195)                  |
+    +--------------+---------------------------+-----------------------------------+
+
+
+
+.. parsed-literal::
+
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
+
+
+.. parsed-literal::
+
+    Compiling the vae_decoder to AUTO ...
+    Compiling the unet to AUTO ...
+    Compiling the vae_encoder to AUTO ...
+    Compiling the text_encoder to AUTO ...
+    Compiling the text_encoder_2 to AUTO ...
 
 
 Run Text2Image generation pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, we can run the model for the generation of images using text
 prompts. To speed up evaluation and reduce the required memory we
@@ -219,15 +402,15 @@ numpy random state with a specific seed for results reproducibility.
     import numpy as np
     
     prompt = "cute cat 4k, high-res, masterpiece, best quality, soft lighting, dynamic angle"
-    image = text2image_pipe(prompt, num_inference_steps=15, height=512, width=512, generator=np.random.RandomState(314)).images[0]
+    image = text2image_pipe(
+        prompt,
+        num_inference_steps=15,
+        height=512,
+        width=512,
+        generator=np.random.RandomState(314),
+    ).images[0]
     image.save("cat.png")
     image
-
-
-.. parsed-literal::
-
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/optimum/intel/openvino/modeling_diffusion.py:559: FutureWarning: `shared_memory` is deprecated and will be removed in 2024.0. Value of `shared_memory` is going to override `share_inputs` value. Please use only `share_inputs` explicitly.
-      outputs = self.request(inputs, shared_memory=True)
 
 
 
@@ -236,24 +419,16 @@ numpy random state with a specific seed for results reproducibility.
       0%|          | 0/15 [00:00<?, ?it/s]
 
 
-.. parsed-literal::
-
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/optimum/intel/openvino/modeling_diffusion.py:590: FutureWarning: `shared_memory` is deprecated and will be removed in 2024.0. Value of `shared_memory` is going to override `share_inputs` value. Please use only `share_inputs` explicitly.
-      outputs = self.request(inputs, shared_memory=True)
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/optimum/intel/openvino/modeling_diffusion.py:606: FutureWarning: `shared_memory` is deprecated and will be removed in 2024.0. Value of `shared_memory` is going to override `share_inputs` value. Please use only `share_inputs` explicitly.
-      outputs = self.request(inputs, shared_memory=True)
 
 
-
-
-.. image:: stable-diffusion-xl-with-output_files/stable-diffusion-xl-with-output_10_3.png
+.. image:: stable-diffusion-xl-with-output_files/stable-diffusion-xl-with-output_13_1.png
 
 
 
 Text2image Generation Interactive Demo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -264,8 +439,15 @@ Text2image Generation Interactive Demo
     
     prompt = "cute cat 4k, high-res, masterpiece, best quality, soft lighting, dynamic angle"
     
+    
     def generate_from_text(text, seed, num_steps):
-        result = text2image_pipe(text, num_inference_steps=num_steps, generator=np.random.RandomState(seed), height=512, width=512).images[0]
+        result = text2image_pipe(
+            text,
+            num_inference_steps=num_steps,
+            generator=np.random.RandomState(seed),
+            height=512,
+            width=512,
+        ).images[0]
         return result
     
     
@@ -278,13 +460,32 @@ Text2image Generation Interactive Demo
                 btn = gr.Button()
             out = gr.Image(label="Result", type="pil", width=512)
             btn.click(generate_from_text, [positive_input, seed_input, steps_input], out)
-            gr.Examples([
-                [prompt, 999, 20], 
-                ["underwater world coral reef, colorful jellyfish, 35mm, cinematic lighting, shallow depth of field,  ultra quality, masterpiece, realistic", 89, 20],
-                ["a photo realistic happy white poodle dog ​​playing in the grass, extremely detailed, high res, 8k, masterpiece, dynamic angle", 1569, 15],
-                ["Astronaut on Mars watching sunset, best quality, cinematic effects,", 65245, 12],
-                ["Black and white street photography of a rainy night in New York, reflections on wet pavement", 48199, 10]
-            ], [positive_input, seed_input, steps_input])
+            gr.Examples(
+                [
+                    [prompt, 999, 20],
+                    [
+                        "underwater world coral reef, colorful jellyfish, 35mm, cinematic lighting, shallow depth of field,  ultra quality, masterpiece, realistic",
+                        89,
+                        20,
+                    ],
+                    [
+                        "a photo realistic happy white poodle dog ​​playing in the grass, extremely detailed, high res, 8k, masterpiece, dynamic angle",
+                        1569,
+                        15,
+                    ],
+                    [
+                        "Astronaut on Mars watching sunset, best quality, cinematic effects,",
+                        65245,
+                        12,
+                    ],
+                    [
+                        "Black and white street photography of a rainy night in New York, reflections on wet pavement",
+                        48199,
+                        10,
+                    ],
+                ],
+                [positive_input, seed_input, steps_input],
+            )
     
     # if you are launching remotely, specify server_name and server_port
     # demo.launch(server_name='your server name', server_port='server port in int')
@@ -292,44 +493,16 @@ Text2image Generation Interactive Demo
     # if you want create public link for sharing demo, please add share=True
     demo.launch()
 
-
-.. parsed-literal::
-
-    Running on local URL:  http://127.0.0.1:7860
-    
-    To create a public link, set `share=True` in `launch()`.
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
 .. code:: ipython3
 
     demo.close()
     text2image_pipe = None
     gc.collect();
 
-
-.. parsed-literal::
-
-    Closing server running on port: 7860
-
-
 Run Image2Image generation pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We can reuse the already converted model for running the Image2Image
 generation pipeline. For that, we should replace
@@ -339,7 +512,7 @@ generation pipeline. For that, we should replace
 Select inference device SDXL Refiner model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -352,7 +525,7 @@ select device from dropdown list for running inference using OpenVINO
 
 .. parsed-literal::
 
-    Dropdown(description='Device:', index=2, options=('CPU', 'GPU', 'AUTO'), value='AUTO')
+    Dropdown(description='Device:', index=4, options=('CPU', 'GPU.0', 'GPU.1', 'GPU.2', 'AUTO'), value='AUTO')
 
 
 
@@ -365,27 +538,24 @@ select device from dropdown list for running inference using OpenVINO
 
 .. parsed-literal::
 
-    Compiling the vae_decoder...
-    Compiling the unet...
-    Compiling the text_encoder_2...
-    Compiling the vae_encoder...
-    Compiling the text_encoder...
+    Compiling the vae_decoder to AUTO ...
+    Compiling the unet to AUTO ...
+    Compiling the vae_encoder to AUTO ...
+    Compiling the text_encoder_2 to AUTO ...
+    Compiling the text_encoder to AUTO ...
 
 
 .. code:: ipython3
 
     photo_prompt = "professional photo of a cat, extremely detailed, hyper realistic, best quality, full hd"
-    photo_image = image2image_pipe(photo_prompt, image=image, num_inference_steps=25, generator=np.random.RandomState(356)).images[0]
+    photo_image = image2image_pipe(
+        photo_prompt,
+        image=image,
+        num_inference_steps=25,
+        generator=np.random.RandomState(356),
+    ).images[0]
     photo_image.save("photo_cat.png")
     photo_image
-
-
-.. parsed-literal::
-
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/optimum/intel/openvino/modeling_diffusion.py:559: FutureWarning: `shared_memory` is deprecated and will be removed in 2024.0. Value of `shared_memory` is going to override `share_inputs` value. Please use only `share_inputs` explicitly.
-      outputs = self.request(inputs, shared_memory=True)
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/optimum/intel/openvino/modeling_diffusion.py:622: FutureWarning: `shared_memory` is deprecated and will be removed in 2024.0. Value of `shared_memory` is going to override `share_inputs` value. Please use only `share_inputs` explicitly.
-      outputs = self.request(inputs, shared_memory=True)
 
 
 
@@ -394,24 +564,16 @@ select device from dropdown list for running inference using OpenVINO
       0%|          | 0/7 [00:00<?, ?it/s]
 
 
-.. parsed-literal::
-
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/optimum/intel/openvino/modeling_diffusion.py:590: FutureWarning: `shared_memory` is deprecated and will be removed in 2024.0. Value of `shared_memory` is going to override `share_inputs` value. Please use only `share_inputs` explicitly.
-      outputs = self.request(inputs, shared_memory=True)
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/optimum/intel/openvino/modeling_diffusion.py:606: FutureWarning: `shared_memory` is deprecated and will be removed in 2024.0. Value of `shared_memory` is going to override `share_inputs` value. Please use only `share_inputs` explicitly.
-      outputs = self.request(inputs, shared_memory=True)
 
 
-
-
-.. image:: stable-diffusion-xl-with-output_files/stable-diffusion-xl-with-output_18_3.png
+.. image:: stable-diffusion-xl-with-output_files/stable-diffusion-xl-with-output_21_1.png
 
 
 
 Image2Image Generation Interactive Demo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -420,16 +582,22 @@ Image2Image Generation Interactive Demo
     import numpy as np
     
     
-    load_image(
-        "https://huggingface.co/datasets/optimum/documentation-images/resolve/main/intel/openvino/sd_xl/castle_friedrich.png"
-    ).resize((512, 512)).save("castle_friedrich.png")
+    load_image("https://huggingface.co/datasets/optimum/documentation-images/resolve/main/intel/openvino/sd_xl/castle_friedrich.png").resize((512, 512)).save(
+        "castle_friedrich.png"
+    )
     
     
     if image2image_pipe is None:
         image2image_pipe = OVStableDiffusionXLImg2ImgPipeline.from_pretrained(model_dir)
     
+    
     def generate_from_image(text, image, seed, num_steps):
-        result = image2image_pipe(text, image=image, num_inference_steps=num_steps, generator=np.random.RandomState(seed)).images[0]
+        result = image2image_pipe(
+            text,
+            image=image,
+            num_inference_steps=num_steps,
+            generator=np.random.RandomState(seed),
+        ).images[0]
         return result
     
     
@@ -443,11 +611,23 @@ Image2Image Generation Interactive Demo
             with gr.Row():
                 i2i_input = gr.Image(label="Input image", type="pil")
                 out = gr.Image(label="Result", type="pil", width=512)
-            btn.click(generate_from_image, [positive_input, i2i_input, seed_input, steps_input], out)
-            gr.Examples([
-                ["amazing landscape from legends", "castle_friedrich.png", 971, 60],
-                ["Masterpiece of watercolor painting in Van Gogh style", "cat.png", 37890, 40]
-            ], [positive_input, i2i_input, seed_input, steps_input])
+            btn.click(
+                generate_from_image,
+                [positive_input, i2i_input, seed_input, steps_input],
+                out,
+            )
+            gr.Examples(
+                [
+                    ["amazing landscape from legends", "castle_friedrich.png", 971, 60],
+                    [
+                        "Masterpiece of watercolor painting in Van Gogh style",
+                        "cat.png",
+                        37890,
+                        40,
+                    ],
+                ],
+                [positive_input, i2i_input, seed_input, steps_input],
+            )
     
     # if you are launching remotely, specify server_name and server_port
     # demo.launch(server_name='your server name', server_port='server port in int')
@@ -455,52 +635,16 @@ Image2Image Generation Interactive Demo
     # if you want create public link for sharing demo, please add share=True
     demo.launch()
 
-
-.. parsed-literal::
-
-    Running on local URL:  http://127.0.0.1:7860
-    
-    To create a public link, set `share=True` in `launch()`.
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
 .. code:: ipython3
 
     demo.close()
     del image2image_pipe
     gc.collect()
 
-
-.. parsed-literal::
-
-    Closing server running on port: 7860
-
-
-
-
-.. parsed-literal::
-
-    280
-
-
-
 SDXL Refiner model
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 As we discussed above, Stable Diffusion XL can be used in a 2-stages
 approach: first, the base model is used to generate latents of the
@@ -513,9 +657,23 @@ quality of image generation after the Stable Diffusion XL Base. The
 refiner model accepts latents produced by the SDXL base model and text
 prompt for improving generated image.
 
+select whether you would like to use weight compression to reduce memory
+footprint
+
 .. code:: ipython3
 
-    from optimum.intel import OVStableDiffusionXLImg2ImgPipeline, OVStableDiffusionXLPipeline
+    compress_weights
+
+.. code:: ipython3
+
+    quantization_config = get_quantization_config(compress_weights)
+
+.. code:: ipython3
+
+    from optimum.intel import (
+        OVStableDiffusionXLImg2ImgPipeline,
+        OVStableDiffusionXLPipeline,
+    )
     from pathlib import Path
     
     refiner_model_id = "stabilityai/stable-diffusion-xl-refiner-1.0"
@@ -523,7 +681,7 @@ prompt for improving generated image.
     
     
     if not refiner_model_dir.exists():
-        refiner = OVStableDiffusionXLImg2ImgPipeline.from_pretrained(refiner_model_id, export=True, compile=False)
+        refiner = OVStableDiffusionXLImg2ImgPipeline.from_pretrained(refiner_model_id, export=True, compile=False, quantization_config=quantization_config)
         refiner.half()
         refiner.save_pretrained(refiner_model_dir)
         del refiner
@@ -532,7 +690,7 @@ prompt for improving generated image.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -545,23 +703,31 @@ select device from dropdown list for running inference using OpenVINO
 
 .. parsed-literal::
 
-    Dropdown(description='Device:', index=2, options=('CPU', 'GPU', 'AUTO'), value='AUTO')
+    Dropdown(description='Device:', index=4, options=('CPU', 'GPU.0', 'GPU.1', 'GPU.2', 'AUTO'), value='AUTO')
 
 
 
 Run Text2Image generation with Refinement
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import numpy as np
     import gc
+    
     model_dir = Path("openvino-sd-xl-base-1.0")
     base = OVStableDiffusionXLPipeline.from_pretrained(model_dir, device=device.value)
     prompt = "cute cat 4k, high-res, masterpiece, best quality, soft lighting, dynamic angle"
-    latents = base(prompt, num_inference_steps=15, height=512, width=512, generator=np.random.RandomState(314), output_type="latent").images[0]
+    latents = base(
+        prompt,
+        num_inference_steps=15,
+        height=512,
+        width=512,
+        generator=np.random.RandomState(314),
+        output_type="latent",
+    ).images[0]
     
     del base
     gc.collect()
@@ -569,13 +735,11 @@ Run Text2Image generation with Refinement
 
 .. parsed-literal::
 
-    Compiling the vae_decoder...
-    Compiling the unet...
-    Compiling the text_encoder_2...
-    Compiling the text_encoder...
-    Compiling the vae_encoder...
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/optimum/intel/openvino/modeling_diffusion.py:559: FutureWarning: `shared_memory` is deprecated and will be removed in 2024.0. Value of `shared_memory` is going to override `share_inputs` value. Please use only `share_inputs` explicitly.
-      outputs = self.request(inputs, shared_memory=True)
+    Compiling the vae_decoder to AUTO ...
+    Compiling the unet to AUTO ...
+    Compiling the text_encoder to AUTO ...
+    Compiling the text_encoder_2 to AUTO ...
+    Compiling the vae_encoder to AUTO ...
 
 
 
@@ -584,17 +748,11 @@ Run Text2Image generation with Refinement
       0%|          | 0/15 [00:00<?, ?it/s]
 
 
-.. parsed-literal::
-
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/optimum/intel/openvino/modeling_diffusion.py:590: FutureWarning: `shared_memory` is deprecated and will be removed in 2024.0. Value of `shared_memory` is going to override `share_inputs` value. Please use only `share_inputs` explicitly.
-      outputs = self.request(inputs, shared_memory=True)
-
-
 
 
 .. parsed-literal::
 
-    240
+    294
 
 
 
@@ -603,18 +761,22 @@ Run Text2Image generation with Refinement
     refiner = OVStableDiffusionXLImg2ImgPipeline.from_pretrained(refiner_model_dir, device=device.value)
 
 
-
 .. parsed-literal::
 
-    Compiling the vae_decoder...
-    Compiling the unet...
-    Compiling the text_encoder_2...
-    Compiling the vae_encoder...
+    Compiling the vae_decoder to AUTO ...
+    Compiling the unet to AUTO ...
+    Compiling the text_encoder_2 to AUTO ...
+    Compiling the vae_encoder to AUTO ...
 
 
 .. code:: ipython3
 
-    image = refiner(prompt=prompt, image=np.transpose(latents[None, :], (0, 2, 3, 1)), num_inference_steps=15, generator=np.random.RandomState(314)).images[0]
+    image = refiner(
+        prompt=prompt,
+        image=np.transpose(latents[None, :], (0, 2, 3, 1)),
+        num_inference_steps=15,
+        generator=np.random.RandomState(314),
+    ).images[0]
     image.save("cat_refined.png")
     
     image
@@ -626,14 +788,8 @@ Run Text2Image generation with Refinement
       0%|          | 0/4 [00:00<?, ?it/s]
 
 
-.. parsed-literal::
-
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/optimum/intel/openvino/modeling_diffusion.py:606: FutureWarning: `shared_memory` is deprecated and will be removed in 2024.0. Value of `shared_memory` is going to override `share_inputs` value. Please use only `share_inputs` explicitly.
-      outputs = self.request(inputs, shared_memory=True)
 
 
-
-
-.. image:: stable-diffusion-xl-with-output_files/stable-diffusion-xl-with-output_29_2.png
+.. image:: stable-diffusion-xl-with-output_files/stable-diffusion-xl-with-output_35_1.png
 
 

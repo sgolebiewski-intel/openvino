@@ -36,27 +36,27 @@ available at openvino.ai
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Create autoregressive and speculative forms of sampling with KV
    Cache
-   support <#create-autoregressive-and-speculative-forms-of-sampling-with-kv-cache-support>`__
+   support <#Create-autoregressive-and-speculative-forms-of-sampling-with-KV-Cache-support>`__
 
-   -  `Setup imports <#setup-imports>`__
+   -  `Setup imports <#Setup-imports>`__
    -  `Prepare autoregressive
-      sampling <#prepare-autoregressive-sampling>`__
-   -  `Prepare speculative sampling <#prepare-speculative-sampling>`__
+      sampling <#Prepare-autoregressive-sampling>`__
+   -  `Prepare speculative sampling <#Prepare-speculative-sampling>`__
 
--  `Main generation function <#main-generation-function>`__
+-  `Main generation function <#Main-generation-function>`__
 
-   -  `Download and Convert Model <#download-and-convert-model>`__
+   -  `Download and Convert Model <#Download-and-Convert-Model>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, we should install the `Hugging Face
 Optimum <https://huggingface.co/docs/optimum/installation>`__ library
@@ -72,13 +72,14 @@ useful modules.
 .. code:: ipython3
 
     %pip install -q --upgrade pip
-    %pip install -q --upgrade transformers "torch>=2.1" gradio openvino accelerate onnx ipywidgets "peft==0.6.2" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip uninstall -q -y openvino-dev openvino openvino-nightly
+    %pip install -q --upgrade transformers "torch>=2.1" "gradio>=4.19" openvino-nightly accelerate onnx ipywidgets "peft==0.6.2" --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "git+https://github.com/huggingface/optimum-intel.git"
 
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select the device from dropdown list for running inference using
 OpenVINO.
@@ -86,14 +87,14 @@ OpenVINO.
 .. code:: ipython3
 
     import ipywidgets as widgets
-    from openvino.runtime import Core
+    import openvino as ov
     
-    core = Core()
+    core = ov.Core()
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='CPU',
-        description='Device:',
+        value="CPU",
+        description="Device:",
         disabled=False,
     )
     
@@ -104,14 +105,14 @@ OpenVINO.
 
 .. parsed-literal::
 
-    Dropdown(description='Device:', options=('CPU', 'GPU', 'AUTO'), value='CPU')
+    Dropdown(description='Device:', options=('CPU', 'GPU.0', 'GPU.1', 'AUTO'), value='CPU')
 
 
 
 Create autoregressive and speculative forms of sampling with KV Cache support
 -----------------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Text generation is often done in an autoregressive fashion. We will all
 support a KV cache (aka Past Value Cache) in the code. Note that we are
@@ -122,19 +123,18 @@ simple and understandable as possible.
 Setup imports
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import time
     import numpy as np
     import gradio as gr
-    import openvino as ov
 
 Prepare autoregressive sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -143,11 +143,11 @@ Prepare autoregressive sampling
         seq_len = input_ids.shape[-1]
         position_ids = np.arange(0, seq_len, dtype=np.int64).reshape([-1, seq_len])
     
-        # in all subsequent inferences we feed tokens one by one, 
+        # in all subsequent inferences we feed tokens one by one,
         # but for the first one we feed the whole encoded prompt
         request = model.create_infer_request()
         request.infer((input_ids, attention_mask, position_ids, np.array([0])))
-        next_token = np.argmax(request.results['logits'][:, -1]).reshape([1])
+        next_token = np.argmax(request.results["logits"][:, -1]).reshape([1])
     
         all_tokens = []
         all_tokens.extend(input_ids[0])
@@ -159,16 +159,16 @@ Prepare autoregressive sampling
             position_ids = np.array([attention_mask.shape[1]]).reshape([1, 1])
     
             request.infer((input_ids, attention_mask, position_ids, np.array([0])))
-            next_token = np.argmax(request.results['logits'][:, -1])
+            next_token = np.argmax(request.results["logits"][:, -1])
             all_tokens.append(next_token)
             seq_len += 1
-            
+    
         return all_tokens
 
 Prepare speculative sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 -  Step 1: With speculative sampling, we first generate K samples from
    the draft model (in an autoregressive manner).
@@ -191,6 +191,7 @@ Prepare speculative sampling
             # trim the KV cache to match the new sequence length.
             state.state = ov.Tensor(state.state.data[:, :, :seq_len])
     
+    
     def speculative_sampling_with_pkv(input, draft_model, main_model, K, N=30, **kwargs):
         input_ids, attention_mask = input.input_ids, input.attention_mask
         # seq_len number of key/values or number of already processed input tokens
@@ -202,7 +203,7 @@ Prepare speculative sampling
     
         main_request = main_model.create_infer_request()
         main_request.infer((input_ids, attention_mask, position_ids, np.array([0])))
-        first_token = np.argmax(main_request.results['logits'][:, -1]).reshape([1])
+        first_token = np.argmax(main_request.results["logits"][:, -1]).reshape([1])
     
         all_tokens = []
         all_tokens.extend(input_ids[0])
@@ -217,7 +218,7 @@ Prepare speculative sampling
                 position_ids = np.array([attention_mask.shape[1]]).reshape([1, 1])
     
                 draft_request.infer((input_ids, attention_mask, position_ids, np.array([0])))
-                next_token = np.argmax(draft_request.results['logits'][:, -1])
+                next_token = np.argmax(draft_request.results["logits"][:, -1])
                 accum_draft_tokens.append(next_token)
     
             # main model will give also K out tokens
@@ -225,24 +226,24 @@ Prepare speculative sampling
             input_ids = np.concatenate((first_token.reshape([1]), accum_draft_tokens[:-1])).reshape([1, -1])
             attention_mask = np.ones((1, seq_len + K))
             position_ids = np.arange(seq_len, seq_len + K, dtype=np.int64).reshape([1, -1])
-            
+    
             main_request.infer((input_ids, attention_mask, position_ids, np.array([0])))
-            next_tokens = np.argmax(main_request.results['logits'], axis=-1)[0]
+            next_tokens = np.argmax(main_request.results["logits"], axis=-1)[0]
     
             # if disagrees from the very beggining then context will be expanded only for one element
             # all elements match then context will be expanded to K elements
             for disagree_idx, (t1, t2) in enumerate(zip(accum_draft_tokens, next_tokens)):
                 if t1 != t2:
                     break
-            
+    
             first_token = next_tokens[disagree_idx]
-            all_tokens.extend(next_tokens[:disagree_idx + 1])
+            all_tokens.extend(next_tokens[: disagree_idx + 1])
             seq_len += disagree_idx + 1
     
             # cut key/values depending on the position where disagreement starts
             update_state(draft_request, seq_len)
             update_state(main_request, seq_len)
-            
+    
             attention_mask = np.ones((1, seq_len))
             accum_draft_tokens = []
         all_tokens.extend(accum_draft_tokens)
@@ -251,12 +252,12 @@ Prepare speculative sampling
 Main generation function
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download and Convert Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Optimum Intel can be used to load optimized models from the `Hugging
 Face Hub <https://huggingface.co/docs/optimum/intel/hf.co/models>`__ and
@@ -264,7 +265,7 @@ create pipelines to run an inference with OpenVINO Runtime using Hugging
 Face APIs. For speculative decoding we need to manually update states,
 therefore we will use directly openvino inference api, and optimum only
 for model conversion. >To download Llama-2-7b-chat-hf, you will need to
-accept license agreement. You must be a registered user in Hugging
+accept license agreement. You must be a registered user in 🤗 Hugging
 Face Hub. Please visit HuggingFace model
 `card <https://huggingface.co/meta-llama/Llama-2-7b-chat-hf>`__,
 carefully read terms of usage and click accept button. You will need to
@@ -281,6 +282,7 @@ access tokens, refer to this section of the documentation.
     draft_model_path = Path("TinyLlama-1.1B-Chat-v1.0")
     
     from transformers import AutoTokenizer
+    
     main_tokenizer = AutoTokenizer.from_pretrained(main_model_id)
     draft_tokenizer = AutoTokenizer.from_pretrained(draft_model_id)
 
@@ -305,11 +307,11 @@ Infer directly using OpenVINO Inference Pipeline
 .. code:: ipython3
 
     core = ov.Core()
-    draft_ov_model = core.read_model(draft_model_path / 'openvino_model.xml')
-    draft_model = core.compile_model(draft_ov_model, device_name='CPU')
+    draft_ov_model = core.read_model(draft_model_path / "openvino_model.xml")
+    draft_model = core.compile_model(draft_ov_model, device_name="CPU")
     
-    main_ov_model = core.read_model(main_model_path / 'openvino_model.xml')
-    main_model = core.compile_model(main_ov_model, device_name='CPU')
+    main_ov_model = core.read_model(main_model_path / "openvino_model.xml")
+    main_model = core.compile_model(main_ov_model, device_name="CPU")
 
 .. code:: ipython3
 
@@ -346,7 +348,7 @@ Infer directly using OpenVINO Inference Pipeline
     
         speculative_text, speculative_time = run_speculative_sampling_fn(
             speculative_sampling_with_pkv,
-            tokenized,  
+            tokenized,
             main_model=main_model,
             draft_model=draft_model,
             N=n_tokens_to_generate,
@@ -368,17 +370,30 @@ Infer directly using OpenVINO Inference Pipeline
 
 .. parsed-literal::
 
+    2024-04-17 10:21:41.642283: I tensorflow/core/util/port.cc:111] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-17 10:21:41.644834: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+    2024-04-17 10:21:41.677055: E tensorflow/compiler/xla/stream_executor/cuda/cuda_dnn.cc:9342] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+    2024-04-17 10:21:41.677093: E tensorflow/compiler/xla/stream_executor/cuda/cuda_fft.cc:609] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+    2024-04-17 10:21:41.677119: E tensorflow/compiler/xla/stream_executor/cuda/cuda_blas.cc:1518] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+    2024-04-17 10:21:41.683198: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+    2024-04-17 10:21:41.683977: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+    2024-04-17 10:21:42.477656: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+
+
+.. parsed-literal::
+
     
     Autoregressive Decode
     ---------------------
-    Time = 38.34s
+    Time = 44.39s
     Text = Alan Turing was a British mathematician, computer scientist, and codebreaker who played a pivotal role in cracking the German Enigma code during World War II. He was also a pioneer in the field of artificial intelligence and made significant contributions to the development of computer science.
     
     Turing was born on June 23, 1912, in London, England. He was educated at Cambridge University, where he earned a degree in mathematics in 
     
     Speculative Decode
     ------------------
-    Time = 21.17s
+    Time = 22.96s
     Text = Alan Turing was a British mathematician, computer scientist, and codebreaker who played a pivotal role in cracking the German Enigma code during World War II. He was also a pioneer in the field of artificial intelligence and made significant contributions to the development of computer science.
     
     Turing was born on June 23, 1912, in London, England. He was educated at Cambridge University, where he earned a degree in mathematics in 1
@@ -394,9 +409,14 @@ Infer directly using OpenVINO Inference Pipeline
             - Main Model: {main_model_id}
             - Draft Model: {draft_model_id}
             - K = 5
-            """)
+            """
+        )
         with gr.Row():
-            inp = gr.Textbox("Alan Turing was a", placeholder="THIS CANNOT BE EMPTY", label="Input Prompt")
+            inp = gr.Textbox(
+                "Alan Turing was a",
+                placeholder="THIS CANNOT BE EMPTY",
+                label="Input Prompt",
+            )
             out = gr.Textbox(label="Output")
         btn = gr.Button("Run")
         btn.click(fn=main, inputs=inp, outputs=out)

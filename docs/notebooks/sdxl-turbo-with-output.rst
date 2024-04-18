@@ -32,41 +32,41 @@ used to convert the models to OpenVINO™ IR format.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Convert model to OpenVINO
-   format <#convert-model-to-openvino-format>`__
--  `Text-to-image generation <#text-to-image-generation>`__
+   format <#Convert-model-to-OpenVINO-format>`__
+-  `Text-to-image generation <#Text-to-image-generation>`__
 
    -  `Select inference device for text-to-image
-      generation <#select-inference-device-for-text-to-image-generation>`__
+      generation <#Select-inference-device-for-text-to-image-generation>`__
 
--  `Image-to-Image generation <#image-to-image-generation>`__
--  `Quantization <#quantization>`__
+-  `Image-to-Image generation <#Image-to-Image-generation>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Prepare calibration dataset <#prepare-calibration-dataset>`__
-   -  `Run quantization <#run-quantization>`__
+   -  `Prepare calibration dataset <#Prepare-calibration-dataset>`__
+   -  `Run quantization <#Run-quantization>`__
 
-      -  `Compare UNet file size <#compare-unet-file-size>`__
+      -  `Compare UNet file size <#Compare-UNet-file-size>`__
 
    -  `Compare inference time of the FP16 and INT8
-      models <#compare-inference-time-of-the-fp16-and-int8-models>`__
+      models <#Compare-inference-time-of-the-FP16-and-INT8-models>`__
 
--  `Interactive Demo <#interactive-demo>`__
+-  `Interactive Demo <#Interactive-Demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu\
-    "torch>=2.1" transformers diffusers "git+https://github.com/huggingface/optimum-intel.git" gradio "peft==0.6.2" "openvino>=2023.3.0"
+    "torch>=2.1" transformers diffusers "git+https://github.com/huggingface/optimum-intel.git" "gradio>=4.19" "peft==0.6.2" "openvino>=2023.3.0"
 
 Convert model to OpenVINO format
 --------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `sdxl-turbo <https://huggingface.co/stabilityai/sdxl-turbo>`__ is
 available for downloading via the `HuggingFace
@@ -120,6 +120,7 @@ back to image format.
     from diffusers import AutoencoderTiny
     import gc
     
+    
     class VAEEncoder(torch.nn.Module):
         def __init__(self, vae):
             super().__init__()
@@ -127,7 +128,8 @@ back to image format.
     
         def forward(self, sample):
             return self.vae.encode(sample)
-        
+    
+    
     class VAEDecoder(torch.nn.Module):
         def __init__(self, vae):
             super().__init__()
@@ -136,18 +138,19 @@ back to image format.
         def forward(self, latent_sample):
             return self.vae.decode(latent_sample)
     
+    
     def convert_tiny_vae(model_id, output_path):
         tiny_vae = AutoencoderTiny.from_pretrained(model_id)
         tiny_vae.eval()
         vae_encoder = VAEEncoder(tiny_vae)
-        ov_model = ov.convert_model(vae_encoder, example_input=torch.zeros((1,3,512,512)))
+        ov_model = ov.convert_model(vae_encoder, example_input=torch.zeros((1, 3, 512, 512)))
         ov.save_model(ov_model, output_path / "vae_encoder/openvino_model.xml")
         tiny_vae.save_config(output_path / "vae_encoder")
         vae_decoder = VAEDecoder(tiny_vae)
-        ov_model = ov.convert_model(vae_decoder, example_input=torch.zeros((1,4,64,64)))
+        ov_model = ov.convert_model(vae_decoder, example_input=torch.zeros((1, 4, 64, 64)))
         ov.save_model(ov_model, output_path / "vae_decoder/openvino_model.xml")
-        tiny_vae.save_config(output_path / "vae_decoder")    
-        
+        tiny_vae.save_config(output_path / "vae_decoder")
+    
     
     if not skip_convert_model:
         !optimum-cli export openvino --model $sdxl_model_id --task stable-diffusion-xl $model_dir --fp16
@@ -156,7 +159,7 @@ back to image format.
 Text-to-image generation
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Text-to-image generation lets you create images using text description.
 To start generating images, we need to load models first. To load an
@@ -169,7 +172,7 @@ should be passed. Additionally, you can specify an inference device.
 Select inference device for text-to-image generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -179,8 +182,8 @@ Select inference device for text-to-image generation
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -198,6 +201,7 @@ Select inference device for text-to-image generation
 .. code:: ipython3
 
     from optimum.intel.openvino import OVStableDiffusionXLPipeline
+    
     text2image_pipe = OVStableDiffusionXLPipeline.from_pretrained(model_dir, device=device.value)
 
 
@@ -230,7 +234,14 @@ disabled using ``guidance_scale = 0``
     import numpy as np
     
     prompt = "cute cat"
-    image = text2image_pipe(prompt, num_inference_steps=1, height=512, width=512, guidance_scale=0.0, generator=np.random.RandomState(987)).images[0]
+    image = text2image_pipe(
+        prompt,
+        num_inference_steps=1,
+        height=512,
+        width=512,
+        guidance_scale=0.0,
+        generator=np.random.RandomState(987),
+    ).images[0]
     image.save("cat.png")
     image
 
@@ -255,7 +266,7 @@ disabled using ``guidance_scale = 0``
 Image-to-Image generation
 -------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Image-to-image generation lets you transform images to match the
 characteristics provided in the text description. We can reuse the
@@ -301,7 +312,14 @@ finally, we get 0.5 \* 2.0 = 1 step in our pipeline.
 
 .. code:: ipython3
 
-    photo_image = image2image_pipe(photo_prompt, image=image, num_inference_steps=2, generator=np.random.RandomState(511), guidance_scale=0.0, strength=0.5).images[0]
+    photo_image = image2image_pipe(
+        photo_prompt,
+        image=image,
+        num_inference_steps=2,
+        generator=np.random.RandomState(511),
+        guidance_scale=0.0,
+        strength=0.5,
+    ).images[0]
     photo_image.save("cat_tie.png")
     photo_image
 
@@ -326,7 +344,7 @@ finally, we get 0.5 \* 2.0 = 1 step in our pipeline.
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -356,7 +374,7 @@ improve model inference speed.
 
     to_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -374,11 +392,12 @@ improve model inference speed.
 .. code:: ipython3
 
     # Fetch `skip_kernel_extension` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     int8_pipe = None
     
@@ -390,7 +409,7 @@ improve model inference speed.
 Prepare calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use a portion of
 `conceptual_captions <https://huggingface.co/datasets/conceptual_captions>`__
@@ -401,11 +420,12 @@ model inputs for calibration we should customize ``CompiledModel``.
 
     UNET_INT8_OV_PATH = model_dir / "optimized_unet" / "openvino_model.xml"
     
+    
     def disable_progress_bar(pipeline, disable=True):
         if not hasattr(pipeline, "_progress_bar_config"):
-            pipeline._progress_bar_config = {'disable': disable}
+            pipeline._progress_bar_config = {"disable": disable}
         else:
-            pipeline._progress_bar_config['disable'] = disable
+            pipeline._progress_bar_config["disable"] = disable
 
 .. code:: ipython3
 
@@ -473,7 +493,7 @@ model inputs for calibration we should customize ``CompiledModel``.
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Create a quantized model from the pre-trained converted OpenVINO model.
 Quantization of the first and last ``Convolution`` layers impacts the
@@ -586,7 +606,7 @@ data.
 Compare UNet file size
 ^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -610,7 +630,7 @@ Compare UNet file size
 Compare inference time of the FP16 and INT8 models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 pipelines, we use median inference time on calibration subset.
@@ -683,7 +703,7 @@ pipelines, we use median inference time on calibration subset.
 Interactive Demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, you can check model work using own text descriptions. Provide text
 prompt in the text box and launch generation using Run button.
@@ -704,7 +724,7 @@ launch the interactive demo.
     
     use_quantized_model = widgets.Checkbox(
         value=True if quantized_model_present else False,
-        description='Use quantized model',
+        description="Use quantized model",
         disabled=False,
     )
     
@@ -732,7 +752,14 @@ launch the interactive demo.
     
     
     def generate_from_text(text, seed, num_steps, height, width):
-        result = text2image_pipe(text, num_inference_steps=num_steps, guidance_scale=0.0, generator=np.random.RandomState(seed), height=height, width=width).images[0]
+        result = text2image_pipe(
+            text,
+            num_inference_steps=num_steps,
+            guidance_scale=0.0,
+            generator=np.random.RandomState(seed),
+            height=height,
+            width=width,
+        ).images[0]
         return result
     
     
@@ -745,15 +772,38 @@ launch the interactive demo.
                 height_input = gr.Slider(label="Height", value=512, minimum=256, maximum=1024, step=32)
                 width_input = gr.Slider(label="Width", value=512, minimum=256, maximum=1024, step=32)
                 btn = gr.Button()
-            out = gr.Image(label="Result (Quantized)" if use_quantized_model.value else "Result (Original)", type="pil", width=512)
-            btn.click(generate_from_text, [positive_input, seed_input, steps_input, height_input, width_input], out)
-            gr.Examples([
-                ["cute cat", 999], 
-                ["underwater world coral reef, colorful jellyfish, 35mm, cinematic lighting, shallow depth of field,  ultra quality, masterpiece, realistic", 89],
-                ["a photo realistic happy white poodle dog ​​playing in the grass, extremely detailed, high res, 8k, masterpiece, dynamic angle", 1569],
-                ["Astronaut on Mars watching sunset, best quality, cinematic effects,", 65245],
-                ["Black and white street photography of a rainy night in New York, reflections on wet pavement", 48199]
-            ], [positive_input, seed_input])
+            out = gr.Image(
+                label=("Result (Quantized)" if use_quantized_model.value else "Result (Original)"),
+                type="pil",
+                width=512,
+            )
+            btn.click(
+                generate_from_text,
+                [positive_input, seed_input, steps_input, height_input, width_input],
+                out,
+            )
+            gr.Examples(
+                [
+                    ["cute cat", 999],
+                    [
+                        "underwater world coral reef, colorful jellyfish, 35mm, cinematic lighting, shallow depth of field,  ultra quality, masterpiece, realistic",
+                        89,
+                    ],
+                    [
+                        "a photo realistic happy white poodle dog ​​playing in the grass, extremely detailed, high res, 8k, masterpiece, dynamic angle",
+                        1569,
+                    ],
+                    [
+                        "Astronaut on Mars watching sunset, best quality, cinematic effects,",
+                        65245,
+                    ],
+                    [
+                        "Black and white street photography of a rainy night in New York, reflections on wet pavement",
+                        48199,
+                    ],
+                ],
+                [positive_input, seed_input],
+            )
     
     # if you are launching remotely, specify server_name and server_port
     # demo.launch(server_name='your server name', server_port='server port in int')

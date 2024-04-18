@@ -4,62 +4,62 @@ Working with GPUs in OpenVINO™
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Introduction <#introduction>`__
+-  `Introduction <#Introduction>`__
 
-   -  `Install required packages <#install-required-packages>`__
+   -  `Install required packages <#Install-required-packages>`__
 
 -  `Checking GPUs with Query
-   Device <#checking-gpus-with-query-device>`__
+   Device <#Checking-GPUs-with-Query-Device>`__
 
    -  `List GPUs with
-      core.available_devices <#list-gpus-with-core-available_devices>`__
+      core.available_devices <#List-GPUs-with-core.available_devices>`__
    -  `Check Properties with
-      core.get_property <#check-properties-with-core-get_property>`__
+      core.get_property <#Check-Properties-with-core.get_property>`__
    -  `Brief Descriptions of Key
-      Properties <#brief-descriptions-of-key-properties>`__
+      Properties <#Brief-Descriptions-of-Key-Properties>`__
 
--  `Compiling a Model on GPU <#compiling-a-model-on-gpu>`__
+-  `Compiling a Model on GPU <#Compiling-a-Model-on-GPU>`__
 
-   -  `Download and Convert a Model <#download-and-convert-a-model>`__
+   -  `Download and Convert a Model <#Download-and-Convert-a-Model>`__
 
       -  `Download and unpack the
-         Model <#download-and-unpack-the-model>`__
+         Model <#Download-and-unpack-the-Model>`__
       -  `Convert the Model to OpenVINO IR
-         format <#convert-the-model-to-openvino-ir-format>`__
+         format <#Convert-the-Model-to-OpenVINO-IR-format>`__
 
    -  `Compile with Default
-      Configuration <#compile-with-default-configuration>`__
+      Configuration <#Compile-with-Default-Configuration>`__
    -  `Reduce Compile Time through Model
-      Caching <#reduce-compile-time-through-model-caching>`__
+      Caching <#Reduce-Compile-Time-through-Model-Caching>`__
    -  `Throughput and Latency Performance
-      Hints <#throughput-and-latency-performance-hints>`__
+      Hints <#Throughput-and-Latency-Performance-Hints>`__
    -  `Using Multiple GPUs with Multi-Device and Cumulative
-      Throughput <#using-multiple-gpus-with-multi-device-and-cumulative-throughput>`__
+      Throughput <#Using-Multiple-GPUs-with-Multi-Device-and-Cumulative-Throughput>`__
 
 -  `Performance Comparison with
-   benchmark_app <#performance-comparison-with-benchmark_app>`__
+   benchmark_app <#Performance-Comparison-with-benchmark_app>`__
 
-   -  `CPU vs GPU with Latency Hint <#cpu-vs-gpu-with-latency-hint>`__
+   -  `CPU vs GPU with Latency Hint <#CPU-vs-GPU-with-Latency-Hint>`__
    -  `CPU vs GPU with Throughput
-      Hint <#cpu-vs-gpu-with-throughput-hint>`__
-   -  `Single GPU vs Multiple GPUs <#single-gpu-vs-multiple-gpus>`__
+      Hint <#CPU-vs-GPU-with-Throughput-Hint>`__
+   -  `Single GPU vs Multiple GPUs <#Single-GPU-vs-Multiple-GPUs>`__
 
--  `Basic Application Using GPUs <#basic-application-using-gpus>`__
+-  `Basic Application Using GPUs <#Basic-Application-Using-GPUs>`__
 
-   -  `Import Necessary Packages <#import-necessary-packages>`__
-   -  `Compile the Model <#compile-the-model>`__
+   -  `Import Necessary Packages <#Import-Necessary-Packages>`__
+   -  `Compile the Model <#Compile-the-Model>`__
    -  `Load and Preprocess Video
-      Frames <#load-and-preprocess-video-frames>`__
-   -  `Define Model Output Classes <#define-model-output-classes>`__
-   -  `Set up Asynchronous Pipeline <#set-up-asynchronous-pipeline>`__
+      Frames <#Load-and-Preprocess-Video-Frames>`__
+   -  `Define Model Output Classes <#Define-Model-Output-Classes>`__
+   -  `Set up Asynchronous Pipeline <#Set-up-Asynchronous-Pipeline>`__
 
-      -  `Callback Definition <#callback-definition>`__
-      -  `Create Async Pipeline <#create-async-pipeline>`__
+      -  `Callback Definition <#Callback-Definition>`__
+      -  `Create Async Pipeline <#Create-Async-Pipeline>`__
 
-   -  `Perform Inference <#perform-inference>`__
-   -  `Process Results <#process-results>`__
+   -  `Perform Inference <#Perform-Inference>`__
+   -  `Process Results <#Process-Results>`__
 
--  `Conclusion <#conclusion>`__
+-  `Conclusion <#Conclusion>`__
 
 This tutorial provides a high-level overview of working with Intel GPUs
 in OpenVINO. It shows how to use Query Device to list system GPUs and
@@ -75,7 +75,7 @@ model on GPU and uses it to run inference.
 Introduction
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Originally, graphic processing units (GPUs) began as specialized chips,
 developed to accelerate the rendering of computer graphics. In contrast
@@ -104,17 +104,22 @@ to accelerate inference with GPUs in OpenVINO!
 Install required packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q "openvino-dev>=2024.0.0"
-    %pip install -q tensorflow
+    %pip install -q "openvino-dev>=2024.0.0" "opencv-python" "tqdm"
+    %pip install -q "tensorflow-macos>=2.5; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version > '3.8'" # macOS M1 and M2
+    %pip install -q "tensorflow-macos>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version <= '3.8'" # macOS M1 and M2
+    %pip install -q "tensorflow>=2.5; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version > '3.8'" # macOS x86
+    %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version <= '3.8'" # macOS x86
+    %pip install -q "tensorflow>=2.5; sys_platform != 'darwin' and python_version > '3.8'"
+    %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform != 'darwin' and python_version <= '3.8'"
 
 Checking GPUs with Query Device
 -------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In this section, we will see how to list the available GPUs and check
 their properties. Some of the key properties will also be defined.
@@ -122,7 +127,7 @@ their properties. Some of the key properties will also be defined.
 List GPUs with core.available_devices
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO Runtime provides the ``available_devices`` method for checking
 which devices are available for inference. The following code will
@@ -163,7 +168,7 @@ GPUs working with OpenVINO, we can proceed with the next sections.
 Check Properties with core.get_property
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To get information about the GPUs, we can use device properties. In
 OpenVINO, devices have properties that describe their characteristics
@@ -202,11 +207,15 @@ for that property.
     indent = len(max(supported_properties, key=len))
     
     for property_key in supported_properties:
-        if property_key not in ('SUPPORTED_METRICS', 'SUPPORTED_CONFIG_KEYS', 'SUPPORTED_PROPERTIES'):
+        if property_key not in (
+            "SUPPORTED_METRICS",
+            "SUPPORTED_CONFIG_KEYS",
+            "SUPPORTED_PROPERTIES",
+        ):
             try:
                 property_val = core.get_property(device, property_key)
             except TypeError:
-                property_val = 'UNSUPPORTED TYPE'
+                property_val = "UNSUPPORTED TYPE"
             print(f"{property_key:<{indent}}: {property_val}")
 
 
@@ -248,7 +257,7 @@ for that property.
 Brief Descriptions of Key Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Each device has several properties as seen in the last command. Some of
 the key properties are:
@@ -278,7 +287,7 @@ page.
 Compiling a Model on GPU
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, we know how to list the GPUs in the system and check their
 properties. We can easily use one for compiling and running models with
@@ -288,7 +297,7 @@ plugin <https://docs.openvino.ai/2024/openvino-workflow/running-inference/infere
 Download and Convert a Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This tutorial uses the ``ssdlite_mobilenet_v2`` model. The
 ``ssdlite_mobilenet_v2`` model is used for object detection. The model
@@ -300,7 +309,7 @@ categories of object. For details, see the
 Download and unpack the Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use the ``download_file`` function from the ``notebook_utils`` to
 download an archive with the model. It automatically creates a directory
@@ -313,11 +322,13 @@ package is already downloaded.
     from pathlib import Path
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     from notebook_utils import download_file
     
     # A directory where the model will be downloaded.
@@ -362,7 +373,7 @@ package is already downloaded.
 Convert the Model to OpenVINO IR format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To convert the model to OpenVINO IR with ``FP16`` precision, use model
 conversion API. The models are saved to the ``model/ir_model/``
@@ -373,22 +384,24 @@ directory. For more details about model conversion, see this
 
     from openvino.tools.mo.front import tf as ov_tf_front
     
-    precision = 'FP16'
+    precision = "FP16"
     
     # The output path for the conversion.
-    model_path = base_model_dir / 'ir_model' / f'{model_name}_{precision.lower()}.xml'
+    model_path = base_model_dir / "ir_model" / f"{model_name}_{precision.lower()}.xml"
     
     trans_config_path = Path(ov_tf_front.__file__).parent / "ssd_v2_support.json"
     pipeline_config = base_model_dir / archive_name.with_suffix("").stem / "pipeline.config"
     
     model = None
     if not model_path.exists():
-        model = ov.tools.mo.convert_model(input_model=tf_model_path,
-                                          input_shape=[1, 300, 300, 3],
-                                          layout='NHWC',
-                                          transformations_config=trans_config_path,
-                                          tensorflow_object_detection_api_pipeline_config=pipeline_config,
-                                          reverse_input_channels=True)
+        model = ov.tools.mo.convert_model(
+            input_model=tf_model_path,
+            input_shape=[1, 300, 300, 3],
+            layout="NHWC",
+            transformations_config=trans_config_path,
+            tensorflow_object_detection_api_pipeline_config=pipeline_config,
+            reverse_input_channels=True,
+        )
         ov.save_model(model, model_path, compress_to_fp16=(precision == "FP16"))
         print("IR model saved to {}".format(model_path))
     else:
@@ -409,7 +422,7 @@ directory. For more details about model conversion, see this
 Compile with Default Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 When the model is ready, first we need to read it, using the
 ``read_model`` method. Then, we can use the ``compile_model`` method and
@@ -433,7 +446,7 @@ tutorial <auto-device-with-output.html>`__.
 Reduce Compile Time through Model Caching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Depending on the model used, device-specific optimizations and network
 compilations can cause the compile step to be time-consuming, especially
@@ -457,7 +470,7 @@ following:
     core = ov.Core()
     
     # Set cache folder
-    core.set_property({'CACHE_DIR': cache_folder})
+    core.set_property({"CACHE_DIR": cache_folder})
     
     # Compile the model as before
     model = core.read_model(model=model_path)
@@ -477,7 +490,7 @@ compile times with caching enabled and disabled as follows:
 
     start = time.time()
     core = ov.Core()
-    core.set_property({'CACHE_DIR': 'cache'})
+    core.set_property({"CACHE_DIR": "cache"})
     model = core.read_model(model=model_path)
     compiled_model = core.compile_model(model, device)
     print(f"Cache enabled  - compile time: {time.time() - start}s")
@@ -504,7 +517,7 @@ docs.
 Throughput and Latency Performance Hints
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To simplify device and pipeline configuration, OpenVINO provides
 high-level performance hints that automatically set the batch size and
@@ -536,7 +549,7 @@ available memory.
 Using Multiple GPUs with Multi-Device and Cumulative Throughput
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The latency and throughput hints mentioned above are great and can make
 a difference when used adequately but they usually use just one device,
@@ -580,7 +593,7 @@ manually specify devices to use. Below is an example showing how to use
 Performance Comparison with benchmark_app
 -----------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Given all the different options available when compiling a model, it may
 be difficult to know which settings work best for a certain application.
@@ -682,7 +695,7 @@ single GPU as long as there is enough work for each of them.
 CPU vs GPU with Latency Hint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -821,7 +834,7 @@ CPU vs GPU with Latency Hint
 CPU vs GPU with Throughput Hint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -960,7 +973,7 @@ CPU vs GPU with Throughput Hint
 Single GPU vs Multiple GPUs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1088,7 +1101,7 @@ Single GPU vs Multiple GPUs
 Basic Application Using GPUs
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We will now show an end-to-end object detection example using GPUs in
 OpenVINO. The application compiles a model on GPU with the “THROUGHPUT”
@@ -1102,7 +1115,7 @@ of the application.
 Import Necessary Packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1130,7 +1143,7 @@ Import Necessary Packages
 Compile the Model
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1145,7 +1158,7 @@ Compile the Model
     
     # Get the input size
     num, height, width, channels = input_layer.shape
-    print('Model input shape:', num, height, width, channels)
+    print("Model input shape:", num, height, width, channels)
 
 
 .. parsed-literal::
@@ -1156,7 +1169,7 @@ Compile the Model
 Load and Preprocess Video Frames
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1166,24 +1179,24 @@ Load and Preprocess Video Frames
     framebuf = []
     
     # Go through every frame of video and resize it
-    print('Loading video...')
+    print("Loading video...")
     while video.isOpened():
         ret, frame = video.read()
         if not ret:
-            print('Video loaded!')
+            print("Video loaded!")
             video.release()
             break
-        
+    
         # Preprocess frames - convert them to shape expected by model
         input_frame = cv2.resize(src=frame, dsize=(width, height), interpolation=cv2.INTER_AREA)
         input_frame = np.expand_dims(input_frame, axis=0)
     
         # Append frame to framebuffer
         framebuf.append(input_frame)
-        
     
-    print('Frame shape: ', framebuf[0].shape)
-    print('Number of frames: ', len(framebuf))
+    
+    print("Frame shape: ", framebuf[0].shape)
+    print("Number of frames: ", len(framebuf))
     
     # Show original video file
     # If the video does not display correctly inside the notebook, please open it with your favorite media player
@@ -1201,35 +1214,115 @@ Load and Preprocess Video Frames
 Define Model Output Classes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # Define the model's labelmap (this model uses COCO classes)
     classes = [
-        "background", "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train",
-        "truck", "boat", "traffic light", "fire hydrant", "street sign", "stop sign",
-        "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant",
-        "bear", "zebra", "giraffe", "hat", "backpack", "umbrella", "shoe", "eye glasses",
-        "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite",
-        "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle",
-        "plate", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
-        "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair",
-        "couch", "potted plant", "bed", "mirror", "dining table", "window", "desk", "toilet",
-        "door", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven",
-        "toaster", "sink", "refrigerator", "blender", "book", "clock", "vase", "scissors",
-        "teddy bear", "hair drier", "toothbrush", "hair brush"
+        "background",
+        "person",
+        "bicycle",
+        "car",
+        "motorcycle",
+        "airplane",
+        "bus",
+        "train",
+        "truck",
+        "boat",
+        "traffic light",
+        "fire hydrant",
+        "street sign",
+        "stop sign",
+        "parking meter",
+        "bench",
+        "bird",
+        "cat",
+        "dog",
+        "horse",
+        "sheep",
+        "cow",
+        "elephant",
+        "bear",
+        "zebra",
+        "giraffe",
+        "hat",
+        "backpack",
+        "umbrella",
+        "shoe",
+        "eye glasses",
+        "handbag",
+        "tie",
+        "suitcase",
+        "frisbee",
+        "skis",
+        "snowboard",
+        "sports ball",
+        "kite",
+        "baseball bat",
+        "baseball glove",
+        "skateboard",
+        "surfboard",
+        "tennis racket",
+        "bottle",
+        "plate",
+        "wine glass",
+        "cup",
+        "fork",
+        "knife",
+        "spoon",
+        "bowl",
+        "banana",
+        "apple",
+        "sandwich",
+        "orange",
+        "broccoli",
+        "carrot",
+        "hot dog",
+        "pizza",
+        "donut",
+        "cake",
+        "chair",
+        "couch",
+        "potted plant",
+        "bed",
+        "mirror",
+        "dining table",
+        "window",
+        "desk",
+        "toilet",
+        "door",
+        "tv",
+        "laptop",
+        "mouse",
+        "remote",
+        "keyboard",
+        "cell phone",
+        "microwave",
+        "oven",
+        "toaster",
+        "sink",
+        "refrigerator",
+        "blender",
+        "book",
+        "clock",
+        "vase",
+        "scissors",
+        "teddy bear",
+        "hair drier",
+        "toothbrush",
+        "hair brush",
     ]
 
 Set up Asynchronous Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Callback Definition
 ^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1241,14 +1334,14 @@ Callback Definition
     
         predictions = next(iter(infer_request.results.values()))
         results[frame_id] = predictions[:10]  # Grab first 10 predictions for this frame
-        
+    
         total_time = stop_time - start_time
         frame_fps[frame_id] = frame_number / total_time
 
 Create Async Pipeline
 ^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1259,7 +1352,7 @@ Create Async Pipeline
 Perform Inference
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1277,9 +1370,9 @@ Perform Inference
     # Calculate total inference time and FPS
     total_time = stop_time - start_time
     fps = len(framebuf) / total_time
-    time_per_frame = 1 / fps 
-    print(f'Total time to infer all frames: {total_time:.3f}s')
-    print(f'Time per frame: {time_per_frame:.6f}s ({fps:.3f} FPS)')
+    time_per_frame = 1 / fps
+    print(f"Total time to infer all frames: {total_time:.3f}s")
+    print(f"Time per frame: {time_per_frame:.6f}s ({fps:.3f} FPS)")
 
 
 .. parsed-literal::
@@ -1291,12 +1384,12 @@ Perform Inference
 Process Results
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # Set minimum detection threshold
-    min_thresh = .6
+    min_thresh = 0.6
     
     # Load video
     video = cv2.VideoCapture(video_file)
@@ -1308,23 +1401,50 @@ Process Results
     fourcc = int(video.get(cv2.CAP_PROP_FOURCC))
     
     # Create folder and VideoWriter to save output video
-    Path('./output').mkdir(exist_ok=True)
-    output = cv2.VideoWriter('output/output.mp4', fourcc, fps, (frame_width, frame_height))
+    Path("./output").mkdir(exist_ok=True)
+    output = cv2.VideoWriter("output/output.mp4", fourcc, fps, (frame_width, frame_height))
     
     # Draw detection results on every frame of video and save as a new video file
     while video.isOpened():
         current_frame = int(video.get(cv2.CAP_PROP_POS_FRAMES))
         ret, frame = video.read()
         if not ret:
-            print('Video loaded!')
+            print("Video loaded!")
             output.release()
             video.release()
             break
-            
+    
         # Draw info at the top left such as current fps, the devices and the performance hint being used
-        cv2.putText(frame, f"fps {str(round(frame_fps[current_frame], 2))}", (5, 20), cv2.FONT_ITALIC, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
-        cv2.putText(frame, f"device {device_name}", (5, 40), cv2.FONT_ITALIC, 0.6, (0, 0, 0), 1, cv2.LINE_AA) 
-        cv2.putText(frame, f"hint {compiled_model.get_property('PERFORMANCE_HINT')}", (5, 60), cv2.FONT_ITALIC, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
+        cv2.putText(
+            frame,
+            f"fps {str(round(frame_fps[current_frame], 2))}",
+            (5, 20),
+            cv2.FONT_ITALIC,
+            0.6,
+            (0, 0, 0),
+            1,
+            cv2.LINE_AA,
+        )
+        cv2.putText(
+            frame,
+            f"device {device_name}",
+            (5, 40),
+            cv2.FONT_ITALIC,
+            0.6,
+            (0, 0, 0),
+            1,
+            cv2.LINE_AA,
+        )
+        cv2.putText(
+            frame,
+            f"hint {compiled_model.get_property('PERFORMANCE_HINT')}",
+            (5, 60),
+            cv2.FONT_ITALIC,
+            0.6,
+            (0, 0, 0),
+            1,
+            cv2.LINE_AA,
+        )
     
         # prediction contains [image_id, label, conf, x_min, y_min, x_max, y_max] according to model
         for prediction in np.squeeze(results[current_frame]):
@@ -1334,10 +1454,19 @@ Process Results
                 x_max = int(prediction[5] * frame_width)
                 y_max = int(prediction[6] * frame_height)
                 label = classes[int(prediction[1])]
-                
+    
                 # Draw a bounding box with its label above it
                 cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (0, 255, 0), 1, cv2.LINE_AA)
-                cv2.putText(frame, label, (x_min, y_min - 10), cv2.FONT_ITALIC, 1, (255, 0, 0), 1, cv2.LINE_AA)
+                cv2.putText(
+                    frame,
+                    label,
+                    (x_min, y_min - 10),
+                    cv2.FONT_ITALIC,
+                    1,
+                    (255, 0, 0),
+                    1,
+                    cv2.LINE_AA,
+                )
     
         output.write(frame)
     
@@ -1365,7 +1494,7 @@ Process Results
 Conclusion
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This tutorial demonstrates how easy it is to use one or more GPUs in
 OpenVINO, check their properties, and even tailor the model performance

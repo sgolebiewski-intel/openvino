@@ -83,21 +83,21 @@ Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
 -  `Initial Implementation with Transformers and
-   Pytorch <#initial-implementation-with-transformers-and-pytorch>`__
+   Pytorch <#Initial-Implementation-with-Transformers-and-Pytorch>`__
 -  `Separate Text and Visual
-   Processing <#separate-text-and-visual-processing>`__
+   Processing <#Separate-Text-and-Visual-Processing>`__
 -  `Convert to OpenVINO™ Intermediate Representation (IR)
-   Format <#convert-to-openvino-intermediate-representation-ir-format>`__
--  `Inference with OpenVINO™ <#inference-with-openvino>`__
+   Format <#Convert-to-OpenVINO™-Intermediate-Representation-(IR)-Format>`__
+-  `Inference with OpenVINO™ <#Inference-with-OpenVINO™>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Accelerate Inference with
-   AsyncInferQueue <#accelerate-inference-with-asyncinferqueue>`__
+   ``AsyncInferQueue`` <#Accelerate-Inference-with-AsyncInferQueue>`__
 -  `Pack the Pipeline into a
-   Function <#pack-the-pipeline-into-a-function>`__
--  `Interactive demo with Gradio <#interactive-demo-with-gradio>`__
--  `What To Do Next <#what-to-do-next>`__
+   Function <#Pack-the-Pipeline-into-a-Function>`__
+-  `Interactive demo with Gradio <#Interactive-demo-with-Gradio>`__
+-  `What To Do Next <#What-To-Do-Next>`__
 
 .. |image0| image:: https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG
 .. |image1| image:: https://openaiassets.blob.core.windows.net/$web/clip/draft/20210104b/overview-a.svg
@@ -105,24 +105,23 @@ Table of contents:
 Initial Implementation with Transformers and Pytorch
 ----------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # Install requirements
     %pip install -q "openvino>=2023.1.0"
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu transformers "torch>=2.1" gradio
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu transformers "torch>=2.1" "gradio>=4.19"
 
 .. code:: ipython3
 
     from pathlib import Path
     from typing import Tuple, Union, Optional
-    from urllib.request import urlretrieve
+    import requests
     
     from matplotlib import colors
     import matplotlib.pyplot as plt
     import numpy as np
-    import requests
     import torch
     import tqdm
     from PIL import Image
@@ -164,37 +163,25 @@ formula above.
 
 .. code:: ipython3
 
-    def get_random_crop_params(
-        image_height: int, image_width: int, min_crop_size: int
-    ) -> Tuple[int, int, int, int]:
+    def get_random_crop_params(image_height: int, image_width: int, min_crop_size: int) -> Tuple[int, int, int, int]:
         crop_size = np.random.randint(min_crop_size, min(image_height, image_width))
         x = np.random.randint(image_width - crop_size + 1)
         y = np.random.randint(image_height - crop_size + 1)
         return x, y, crop_size
     
     
-    def get_cropped_image(
-        im_tensor: np.array, x: int, y: int, crop_size: int
-    ) -> np.array:
-        return im_tensor[
-            y : y + crop_size,
-            x : x + crop_size,
-            ...
-        ]
+    def get_cropped_image(im_tensor: np.array, x: int, y: int, crop_size: int) -> np.array:
+        return im_tensor[y : y + crop_size, x : x + crop_size, ...]
     
     
-    def update_saliency_map(
-        saliency_map: np.array, similarity: float, x: int, y: int, crop_size: int
-    ) -> None:
+    def update_saliency_map(saliency_map: np.array, similarity: float, x: int, y: int, crop_size: int) -> None:
         saliency_map[
             y : y + crop_size,
             x : x + crop_size,
         ] += similarity
     
     
-    def cosine_similarity(
-        one: Union[np.ndarray, torch.Tensor], other: Union[np.ndarray, torch.Tensor]
-    ) -> Union[np.ndarray, torch.Tensor]:
+    def cosine_similarity(one: Union[np.ndarray, torch.Tensor], other: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
         return one @ other.T / (np.linalg.norm(one) * np.linalg.norm(other))
 
 Parameters to be defined:
@@ -220,7 +207,11 @@ parameters at the end, when you get an optimized model.
     
     query = "Who developed the Theory of General Relativity?"
     image_path = Path("example.jpg")
-    urlretrieve("https://www.storypick.com/wp-content/uploads/2016/01/AE-2.jpg", image_path)
+    
+    r = requests.get("https://www.storypick.com/wp-content/uploads/2016/01/AE-2.jpg")
+    
+    with image_path.open("wb") as f:
+        f.write(r.content)
     image = Image.open(image_path)
     im_tensor = np.array(image)
     
@@ -258,7 +249,7 @@ items in the “How To Build a Saliency Map With CLIP?” list above.
     initial_similarity = cosine_similarity(results.text_embeds, results.image_embeds).item()  # 1. Computing query and image similarity
     saliency_map = np.zeros((y_dim, x_dim))
     
-    for _ in tqdm.notebook.tqdm(range(n_iters)):  # 6. Setting number of the procedure iterations 
+    for _ in tqdm.notebook.tqdm(range(n_iters)):  # 6. Setting number of the procedure iterations
         x, y, crop_size = get_random_crop_params(y_dim, x_dim, min_crop_size)
         im_crop = get_cropped_image(im_tensor, x, y, crop_size)  # 2. Getting a random crop of the image
     
@@ -266,7 +257,9 @@ items in the “How To Build a Saliency Map With CLIP?” list above.
         with torch.no_grad():
             results = model(**inputs)  # 3. Computing crop and query similarity
     
-        similarity = cosine_similarity(results.text_embeds, results.image_embeds).item() - initial_similarity  # 4. Subtracting query and image similarity from crop and query similarity
+        similarity = (
+            cosine_similarity(results.text_embeds, results.image_embeds).item() - initial_similarity
+        )  # 4. Subtracting query and image similarity from crop and query similarity
         update_saliency_map(saliency_map, similarity, x, y, crop_size)  # 5. Updating the region on the saliency map
 
 
@@ -281,9 +274,9 @@ To visualize the resulting saliency map, you can use ``matplotlib``:
 .. code:: ipython3
 
     plt.figure(dpi=150)
-    plt.imshow(saliency_map, norm=colors.TwoSlopeNorm(vcenter=0), cmap='jet')
+    plt.imshow(saliency_map, norm=colors.TwoSlopeNorm(vcenter=0), cmap="jet")
     plt.colorbar(location="bottom")
-    plt.title(f'Query: \"{query}\"')
+    plt.title(f'Query: "{query}"')
     plt.axis("off")
     plt.show()
 
@@ -304,16 +297,15 @@ Let us overlay the saliency map on the image:
         fig = plt.figure(dpi=150)
         plt.imshow(image_tensor)
         plt.imshow(
-            saliency_map, 
-            norm=colors.TwoSlopeNorm(vcenter=0), 
-            cmap="jet", 
+            saliency_map,
+            norm=colors.TwoSlopeNorm(vcenter=0),
+            cmap="jet",
             alpha=0.5,  # make saliency map trasparent to see original picture
         )
         if query:
             plt.title(f'Query: "{query}"')
         plt.axis("off")
         return fig
-        
     
     
     plot_saliency_map(im_tensor, saliency_map, query);
@@ -326,7 +318,7 @@ Let us overlay the saliency map on the image:
 Separate Text and Visual Processing
 -----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The code above is functional, but there are some repeated computations
 that can be avoided. The text embedding can be computed once because it
@@ -376,7 +368,7 @@ build a saliency map.
 Convert to OpenVINO™ Intermediate Representation (IR) Format
 ------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The process of building a saliency map can be quite time-consuming. To
 speed it up, you will use OpenVINO. OpenVINO is an inference framework
@@ -406,17 +398,20 @@ details about that can be found in HuggingFace Transformers
     model.config.torchscript = True
     model.forward = model.get_text_features
     text_ov_model = ov.convert_model(
-        model, 
-        example_input={"input_ids": inputs.input_ids, "attention_mask": inputs.attention_mask}
+        model,
+        example_input={
+            "input_ids": inputs.input_ids,
+            "attention_mask": inputs.attention_mask,
+        },
     )
     
     # get image size after preprocessing from the processor
     crops_info = processor.image_processor.crop_size.values() if hasattr(processor, "image_processor") else processor.feature_extractor.crop_size.values()
     model.forward = model.get_image_features
     image_ov_model = ov.convert_model(
-        model, 
+        model,
         example_input={"pixel_values": inputs.pixel_values},
-        input=[1,3, *crops_info],
+        input=[1, 3, *crops_info],
     )
     
     ov_dir = Path("ir")
@@ -475,7 +470,7 @@ and ready to be loaded and inferred with OpenVINO™.
 Inference with OpenVINO™
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 1. Create an instance of the ``Core`` object that will handle any
    interaction with OpenVINO runtime for you.
@@ -494,7 +489,7 @@ Inference with OpenVINO™
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -504,8 +499,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -537,9 +532,7 @@ the inference process is mostly similar.
 
 .. code:: ipython3
 
-    text_inputs = dict(
-        processor(text=[query], images=[im_tensor], return_tensors="np")
-    )
+    text_inputs = dict(processor(text=[query], images=[im_tensor], return_tensors="np"))
     image_inputs = text_inputs.pop("pixel_values")
     
     text_embeds = text_model(text_inputs)[0]
@@ -574,7 +567,7 @@ the inference process is mostly similar.
 Accelerate Inference with ``AsyncInferQueue``
 ---------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Up until now, the pipeline was synchronous, which means that the data
 preparation, model input population, model inference, and output
@@ -610,16 +603,14 @@ performance hint.
     image_model = core.read_model(image_model_path)
     
     image_model = core.compile_model(
-        model=image_model, 
-        device_name=device.value, 
-        config={"PERFORMANCE_HINT":"THROUGHPUT"},
+        model=image_model,
+        device_name=device.value,
+        config={"PERFORMANCE_HINT": "THROUGHPUT"},
     )
 
 .. code:: ipython3
 
-    text_inputs = dict(
-        processor(text=[query], images=[im_tensor], return_tensors="np")
-    )
+    text_inputs = dict(processor(text=[query], images=[im_tensor], return_tensors="np"))
     image_inputs = text_inputs.pop("pixel_values")
     
     text_embeds = text_model(text_inputs)[text_model.output()]
@@ -647,13 +638,11 @@ should pass a progress bar object and call ``update`` method after
         user_data: Dict[str, Any],  # data that you passed along with input pixel values
     ) -> None:
         pbar = user_data.pop("pbar")
-        
+    
         image_embeds = infer_request.get_output_tensor().data
-        similarity = (
-            cosine_similarity(user_data.pop("text_embeds"), image_embeds) - user_data.pop("initial_similarity")
-        )
+        similarity = cosine_similarity(user_data.pop("text_embeds"), image_embeds) - user_data.pop("initial_similarity")
         update_saliency_map(**user_data, similarity=similarity)
-        
+    
         pbar.update(1)  # update the progress bar
     
     
@@ -662,35 +651,63 @@ should pass a progress bar object and call ``update`` method after
 
 .. code:: ipython3
 
-    def infer(im_tensor, x_dim, y_dim, text_embeds, image_embeds, initial_similarity, saliency_map, query, n_iters, min_crop_size, _tqdm=tqdm.notebook.tqdm, include_query=True):
+    def infer(
+        im_tensor,
+        x_dim,
+        y_dim,
+        text_embeds,
+        image_embeds,
+        initial_similarity,
+        saliency_map,
+        query,
+        n_iters,
+        min_crop_size,
+        _tqdm=tqdm.notebook.tqdm,
+        include_query=True,
+    ):
         with _tqdm(total=n_iters) as pbar:
-            for _ in range(n_iters):    
+            for _ in range(n_iters):
                 x, y, crop_size = get_random_crop_params(y_dim, x_dim, min_crop_size)
                 im_crop = get_cropped_image(im_tensor, x, y, crop_size)
-        
+    
                 image_inputs = processor(images=[im_crop], return_tensors="np")
-                
+    
                 # push data to the queue
                 infer_queue.start_async(
                     # pass inference data as usual
                     image_inputs.pixel_values,
                     # the data that will be passed to the callback after the inference complete
                     {
-                        "text_embeds": text_embeds, 
+                        "text_embeds": text_embeds,
                         "saliency_map": saliency_map,
                         "initial_similarity": initial_similarity,
-                        "x": x, 
-                        "y": y, 
+                        "x": x,
+                        "y": y,
                         "crop_size": crop_size,
                         "pbar": pbar,
-                    }
+                    },
                 )
-            
+    
             # after you pushed all data to the queue you wait until all callbacks finished
             infer_queue.wait_all()
-        
+    
         return plot_saliency_map(im_tensor, saliency_map, query if include_query else None)
-    infer(im_tensor, x_dim, y_dim, text_embeds, image_embeds, initial_similarity, saliency_map, query, n_iters, min_crop_size, _tqdm=tqdm.notebook.tqdm, include_query=True);
+    
+    
+    infer(
+        im_tensor,
+        x_dim,
+        y_dim,
+        text_embeds,
+        image_embeds,
+        initial_similarity,
+        saliency_map,
+        query,
+        n_iters,
+        min_crop_size,
+        _tqdm=tqdm.notebook.tqdm,
+        include_query=True,
+    );
 
 
 
@@ -706,7 +723,7 @@ should pass a progress bar object and call ``update`` method after
 Pack the Pipeline into a Function
 ---------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let us wrap all code in the function and add a user interface to it.
 
@@ -715,13 +732,18 @@ Let us wrap all code in the function and add a user interface to it.
     import ipywidgets as widgets
     
     
-    def build_saliency_map(image: Image, query: str, n_iters: int = n_iters, min_crop_size=min_crop_size, _tqdm=tqdm.notebook.tqdm, include_query=True):
+    def build_saliency_map(
+        image: Image,
+        query: str,
+        n_iters: int = n_iters,
+        min_crop_size=min_crop_size,
+        _tqdm=tqdm.notebook.tqdm,
+        include_query=True,
+    ):
         x_dim, y_dim = image.size
         im_tensor = np.array(image)
     
-        text_inputs = dict(
-            processor(text=[query], images=[im_tensor], return_tensors="np")
-        )
+        text_inputs = dict(processor(text=[query], images=[im_tensor], return_tensors="np"))
         image_inputs = text_inputs.pop("pixel_values")
     
         text_embeds = text_model(text_inputs)[text_model.output()]
@@ -730,7 +752,20 @@ Let us wrap all code in the function and add a user interface to it.
         initial_similarity = cosine_similarity(text_embeds, image_embeds)
         saliency_map = np.zeros((y_dim, x_dim))
     
-        return infer(im_tensor, x_dim, y_dim, text_embeds, image_embeds, initial_similarity, saliency_map, query, n_iters, min_crop_size, _tqdm=_tqdm, include_query=include_query)
+        return infer(
+            im_tensor,
+            x_dim,
+            y_dim,
+            text_embeds,
+            image_embeds,
+            initial_similarity,
+            saliency_map,
+            query,
+            n_iters,
+            min_crop_size,
+            _tqdm=_tqdm,
+            include_query=include_query,
+        )
 
 The first version will enable passing a link to the image, as you have
 done so far in the notebook.
@@ -763,10 +798,10 @@ done so far in the notebook.
         except requests.RequestException as e:
             print(f"Cannot load image from link: {image_link}\nException: {e}")
             return
-        
+    
         image = Image.open(image_bytes)
         image = image.convert("RGB")  # remove transparency channel or convert grayscale 1 channel to 3 channels
-        
+    
         build_saliency_map(image, query, n_iters, min_crop_size)
 
 
@@ -784,11 +819,18 @@ The second version will enable loading the image from your computer.
     
     
     load_file_widget = widgets.FileUpload(
-        accept="image/*", multiple=False, description="Image file",
+        accept="image/*",
+        multiple=False,
+        description="Image file",
     )
     
     
-    @widgets.interact_manual(file=load_file_widget, query="", n_iters=n_iters_widget, min_crop_size=min_crop_size_widget)
+    @widgets.interact_manual(
+        file=load_file_widget,
+        query="",
+        n_iters=n_iters_widget,
+        min_crop_size=min_crop_size_widget,
+    )
     def build_saliency_map_from_file(
         file: Path,
         query: str = "",
@@ -801,9 +843,9 @@ The second version will enable loading the image from your computer.
         except Exception as e:
             print(f"Cannot load the image: {e}")
             return
-        
+    
         image = image.convert("RGB")
-        
+    
         build_saliency_map(image, query, n_iters, min_crop_size)
 
 
@@ -816,7 +858,7 @@ The second version will enable loading the image from your computer.
 Interactive demo with Gradio
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -857,15 +899,15 @@ Interactive demo with Gradio
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 
 
 What To Do Next
 ---------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now that you have a convenient interface and accelerated inference, you
 can explore the CLIP capabilities further. For example:

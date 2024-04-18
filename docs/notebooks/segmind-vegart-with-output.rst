@@ -52,36 +52,36 @@ model using `NNCF <https://github.com/openvinotoolkit/nncf>`__.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Prepare PyTorch model <#prepare-pytorch-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Prepare PyTorch model <#Prepare-PyTorch-model>`__
 -  `Convert model to OpenVINO
-   format <#convert-model-to-openvino-format>`__
--  `Text-to-image generation <#text-to-image-generation>`__
+   format <#Convert-model-to-OpenVINO-format>`__
+-  `Text-to-image generation <#Text-to-image-generation>`__
 
    -  `Select inference device for text-to-image
-      generation <#select-inference-device-for-text-to-image-generation>`__
+      generation <#Select-inference-device-for-text-to-image-generation>`__
 
--  `Quantization <#quantization>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Prepare calibration dataset <#prepare-calibration-dataset>`__
-   -  `Run quantization <#run-quantization>`__
+   -  `Prepare calibration dataset <#Prepare-calibration-dataset>`__
+   -  `Run quantization <#Run-quantization>`__
 
-      -  `Compare UNet file size <#compare-unet-file-size>`__
+      -  `Compare UNet file size <#Compare-UNet-file-size>`__
 
    -  `Compare the inference time of the FP16 and INT8
-      models <#compare-the-inference-time-of-the-fp16-and-int8-models>`__
+      models <#Compare-the-inference-time-of-the-FP16-and-INT8-models>`__
 
--  `Interactive Demo <#interactive-demo>`__
+-  `Interactive Demo <#Interactive-Demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu\
-    "torch>=2.1" transformers diffusers "git+https://github.com/huggingface/optimum-intel.git" gradio "openvino>=2023.3.0" "peft==0.6.2"
+    "torch>=2.1" transformers diffusers "git+https://github.com/huggingface/optimum-intel.git" "gradio>=4.19" "openvino>=2023.3.0" "peft==0.6.2"
 
 
 .. parsed-literal::
@@ -95,7 +95,7 @@ Prerequisites
 Prepare PyTorch model
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For preparing Segmind-VegaRT model for inference, we should create
 Segmind-Vega pipeline first. After that, for enabling Latent Consistency
@@ -113,7 +113,7 @@ pipeline on disk.
     
     model_id = "segmind/Segmind-Vega"
     adapter_id = "segmind/Segmind-VegaRT"
-    pt_model_dir = Path('segmind-vegart')
+    pt_model_dir = Path("segmind-vegart")
     
     if not pt_model_dir.exists():
         pipe = AutoPipelineForText2Image.from_pretrained(model_id, torch_dtype=torch.float16, variant="fp16")
@@ -121,7 +121,7 @@ pipeline on disk.
         pipe.load_lora_weights(adapter_id)
         pipe.fuse_lora()
     
-        pipe.save_pretrained('segmind-vegart')
+        pipe.save_pretrained("segmind-vegart")
         del pipe
         gc.collect()
 
@@ -137,7 +137,7 @@ pipeline on disk.
 Convert model to OpenVINO format
 --------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We will use optimum-cli interface for exporting it into OpenVINO
 Intermediate Representation (IR) format.
@@ -189,6 +189,7 @@ back to image format.
     from diffusers import AutoencoderTiny
     import gc
     
+    
     class VAEEncoder(torch.nn.Module):
         def __init__(self, vae):
             super().__init__()
@@ -196,7 +197,8 @@ back to image format.
     
         def forward(self, sample):
             return self.vae.encode(sample)
-        
+    
+    
     class VAEDecoder(torch.nn.Module):
         def __init__(self, vae):
             super().__init__()
@@ -205,21 +207,22 @@ back to image format.
         def forward(self, latent_sample):
             return self.vae.decode(latent_sample)
     
+    
     def convert_tiny_vae(model_id, output_path):
         tiny_vae = AutoencoderTiny.from_pretrained(model_id)
         tiny_vae.eval()
         vae_encoder = VAEEncoder(tiny_vae)
-        ov_model = ov.convert_model(vae_encoder, example_input=torch.zeros((1,3,512,512)))
+        ov_model = ov.convert_model(vae_encoder, example_input=torch.zeros((1, 3, 512, 512)))
         ov.save_model(ov_model, output_path / "vae_encoder/openvino_model.xml")
         tiny_vae.save_config(output_path / "vae_encoder")
         vae_decoder = VAEDecoder(tiny_vae)
-        ov_model = ov.convert_model(vae_decoder, example_input=torch.zeros((1,4,64,64)))
+        ov_model = ov.convert_model(vae_decoder, example_input=torch.zeros((1, 4, 64, 64)))
         ov.save_model(ov_model, output_path / "vae_decoder/openvino_model.xml")
         tiny_vae.save_config(output_path / "vae_decoder")
         del tiny_vae
         del ov_model
         gc.collect()
-        
+    
     
     if not skip_convert_model:
         !optimum-cli export openvino --model $sdxl_model_id --task stable-diffusion-xl $model_dir --fp16
@@ -228,7 +231,7 @@ back to image format.
 Text-to-image generation
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Text-to-image generation lets you create images using text description.
 To start generating images, we need to load models first. To load an
@@ -247,7 +250,7 @@ XL inference for image-to-image task were discussed in this
 Select inference device for text-to-image generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -257,8 +260,8 @@ Select inference device for text-to-image generation
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -327,7 +330,7 @@ Select inference device for text-to-image generation
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -357,7 +360,7 @@ improve model inference speed.
 
     to_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -375,11 +378,12 @@ improve model inference speed.
 .. code:: ipython3
 
     # Fetch `skip_kernel_extension` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     int8_pipe = None
     
@@ -391,7 +395,7 @@ improve model inference speed.
 Prepare calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use a portion of
 `conceptual_captions <https://huggingface.co/datasets/conceptual_captions>`__
@@ -402,11 +406,12 @@ model inputs for calibration we should customize ``CompiledModel``.
 
     UNET_INT8_OV_PATH = model_dir / "optimized_unet" / "openvino_model.xml"
     
+    
     def disable_progress_bar(pipeline, disable=True):
         if not hasattr(pipeline, "_progress_bar_config"):
-            pipeline._progress_bar_config = {'disable': disable}
+            pipeline._progress_bar_config = {"disable": disable}
         else:
-            pipeline._progress_bar_config['disable'] = disable
+            pipeline._progress_bar_config["disable"] = disable
 
 .. code:: ipython3
 
@@ -474,7 +479,7 @@ model inputs for calibration we should customize ``CompiledModel``.
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Create a quantized model from the pre-trained converted OpenVINO model.
 Quantization of the first and last ``Convolution`` layers impacts the
@@ -553,7 +558,7 @@ sensitive ``Convolution`` layers in FP16 precision.
 Compare UNet file size
 ^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -577,7 +582,7 @@ Compare UNet file size
 Compare the inference time of the FP16 and INT8 models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 pipelines, we use median inference time on the calibration subset.
@@ -665,7 +670,7 @@ pipelines, we use median inference time on the calibration subset.
 Interactive Demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, you can check model work using own text descriptions. Provide text
 prompt in the text box and launch generation using Run button.
@@ -682,7 +687,7 @@ launch the interactive demo.
     
     use_quantized_model = widgets.Checkbox(
         value=quantized_model_present,
-        description='Use quantized model',
+        description="Use quantized model",
         disabled=not quantized_model_present,
     )
     
@@ -712,7 +717,13 @@ launch the interactive demo.
     
     def generate_from_text(text, seed, num_steps, height, width):
         set_seed(seed)
-        result = text2image_pipe(text, num_inference_steps=num_steps, guidance_scale=1.0, height=height, width=width).images[0]
+        result = text2image_pipe(
+            text,
+            num_inference_steps=num_steps,
+            guidance_scale=1.0,
+            height=height,
+            width=width,
+        ).images[0]
         return result
     
     
@@ -725,16 +736,42 @@ launch the interactive demo.
                 height_input = gr.Slider(label="Height", value=512, minimum=256, maximum=1024, step=32)
                 width_input = gr.Slider(label="Width", value=512, minimum=256, maximum=1024, step=32)
                 btn = gr.Button()
-            out = gr.Image(label="Result (Quantized)" if use_quantized_model.value else "Result (Original)", type="pil", width=512)
-            btn.click(generate_from_text, [positive_input, seed_input, steps_input, height_input, width_input], out)
-            gr.Examples([
-                ["cute cat", 999], 
-                ["underwater world coral reef, colorful jellyfish, 35mm, cinematic lighting, shallow depth of field,  ultra quality, masterpiece, realistic", 89],
-                ["a photo realistic happy white poodle dog ​​playing in the grass, extremely detailed, high res, 8k, masterpiece, dynamic angle", 1569],
-                ["Astronaut on Mars watching sunset, best quality, cinematic effects,", 65245],
-                ["Black and white street photography of a rainy night in New York, reflections on wet pavement", 48199],
-                ["cinematic photo detailed closeup portraid of a Beautiful cyberpunk woman, robotic parts, cables, lights, text; , high quality photography, 3 point lighting, flash with softbox, 4k, Canon EOS R3, hdr, smooth, sharp focus, high resolution, award winning photo, 80mm, f2.8, bokeh . 35mm photograph, film, bokeh, professional, 4k, highly detailed, high quality photography, 3 point lighting, flash with softbox, 4k, Canon EOS R3, hdr, smooth, sharp focus, high resolution, award winning photo, 80mm, f2.8, bokeh", 48199]
-            ], [positive_input, seed_input])
+            out = gr.Image(
+                label=("Result (Quantized)" if use_quantized_model.value else "Result (Original)"),
+                type="pil",
+                width=512,
+            )
+            btn.click(
+                generate_from_text,
+                [positive_input, seed_input, steps_input, height_input, width_input],
+                out,
+            )
+            gr.Examples(
+                [
+                    ["cute cat", 999],
+                    [
+                        "underwater world coral reef, colorful jellyfish, 35mm, cinematic lighting, shallow depth of field,  ultra quality, masterpiece, realistic",
+                        89,
+                    ],
+                    [
+                        "a photo realistic happy white poodle dog ​​playing in the grass, extremely detailed, high res, 8k, masterpiece, dynamic angle",
+                        1569,
+                    ],
+                    [
+                        "Astronaut on Mars watching sunset, best quality, cinematic effects,",
+                        65245,
+                    ],
+                    [
+                        "Black and white street photography of a rainy night in New York, reflections on wet pavement",
+                        48199,
+                    ],
+                    [
+                        "cinematic photo detailed closeup portraid of a Beautiful cyberpunk woman, robotic parts, cables, lights, text; , high quality photography, 3 point lighting, flash with softbox, 4k, Canon EOS R3, hdr, smooth, sharp focus, high resolution, award winning photo, 80mm, f2.8, bokeh . 35mm photograph, film, bokeh, professional, 4k, highly detailed, high quality photography, 3 point lighting, flash with softbox, 4k, Canon EOS R3, hdr, smooth, sharp focus, high resolution, award winning photo, 80mm, f2.8, bokeh",
+                        48199,
+                    ],
+                ],
+                [positive_input, seed_input],
+            )
     
     # if you are launching remotely, specify server_name and server_port
     # demo.launch(server_name='your server name', server_port='server port in int')

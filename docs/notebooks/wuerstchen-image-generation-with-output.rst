@@ -29,34 +29,34 @@ Hub <https://huggingface.co/warp-ai/wuerstchen>`__.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Load the original model <#load-the-original-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Load the original model <#Load-the-original-model>`__
 
-   -  `Infer the original model <#infer-the-original-model>`__
+   -  `Infer the original model <#Infer-the-original-model>`__
 
 -  `Convert the model to OpenVINO
-   IR <#convert-the-model-to-openvino-ir>`__
+   IR <#Convert-the-model-to-OpenVINO-IR>`__
 
-   -  `Prior pipeline <#prior-pipeline>`__
-   -  `Decoder pipeline <#decoder-pipeline>`__
+   -  `Prior pipeline <#Prior-pipeline>`__
+   -  `Decoder pipeline <#Decoder-pipeline>`__
 
--  `Compiling models <#compiling-models>`__
--  `Building the pipeline <#building-the-pipeline>`__
--  `Inference <#inference>`__
--  `Quantization <#quantization>`__
+-  `Compiling models <#Compiling-models>`__
+-  `Building the pipeline <#Building-the-pipeline>`__
+-  `Inference <#Inference>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Prepare calibration datasets <#prepare-calibration-datasets>`__
-   -  `Run quantization <#run-quantization>`__
-   -  `Compare model file sizes <#compare-model-file-sizes>`__
+   -  `Prepare calibration datasets <#Prepare-calibration-datasets>`__
+   -  `Run quantization <#Run-quantization>`__
+   -  `Compare model file sizes <#Compare-model-file-sizes>`__
    -  `Compare inference time of the FP16 and INT8
-      pipelines <#compare-inference-time-of-the-fp16-and-int8-pipelines>`__
+      pipelines <#Compare-inference-time-of-the-FP16-and-INT8-pipelines>`__
 
--  `Interactive inference <#interactive-inference>`__
+-  `Interactive inference <#Interactive-inference>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -67,7 +67,7 @@ Prerequisites
     else:
         %pip install -q "matplotlib>=3.4,<3.7"
     
-    %pip install -q  "diffusers>=0.21.0" "torch>=2.1" transformers accelerate gradio "openvino>=2023.2.0" "peft==0.6.2" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q  "diffusers>=0.21.0" "torch>=2.1" transformers accelerate "gradio>=4.19" "openvino>=2023.2.0" "peft==0.6.2" --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q datasets "nncf>=2.7.0"
 
 
@@ -109,7 +109,7 @@ Prerequisites
 Load the original model
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use ``from_pretrained`` method of
 ``diffusers.AutoPipelineForText2Image`` to load the pipeline.
@@ -124,7 +124,7 @@ parts: prior and decoder.
 Infer the original model
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -158,7 +158,7 @@ Infer the original model
 Convert the model to OpenVINO IR
 --------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Main model components: - Prior stage: create low-dimensional latent
 space representation of the image using text-conditional LDM - Decoder
@@ -205,7 +205,7 @@ file.
 Prior pipeline
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This pipeline consists of text encoder and prior diffusion model. From
 here, we always use fixed shapes in conversion by using an ``input``
@@ -249,7 +249,11 @@ timestep and encoder hidden states.
     convert(
         pipeline.prior_prior,
         PRIOR_PRIOR_PATH,
-        example_input=[torch.zeros(2, 16, 24, 24), torch.zeros(2), torch.zeros(2, 77, 1280)],
+        example_input=[
+            torch.zeros(2, 16, 24, 24),
+            torch.zeros(2),
+            torch.zeros(2, 77, 1280),
+        ],
         input=[((2, 16, 24, 24),), ((2),), ((2, 77, 1280),)],
     )
     del pipeline.prior_prior
@@ -268,7 +272,7 @@ timestep and encoder hidden states.
 Decoder pipeline
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Decoder pipeline consists of 3 parts: decoder, text encoder and VQGAN.
 
@@ -308,7 +312,7 @@ Decoder model is the WuerstchenDiffNeXt UNet decoder. Inputs are: -
 
 
 The main text encoder has the same input parameters and shapes as text
-encoder in `prior pipeline <#prior-pipeline>`__.
+encoder in `prior pipeline <#Prior-pipeline>`__.
 
 .. code:: ipython3
 
@@ -371,7 +375,7 @@ decoder takes as input 4x256x256 latent image.
 Compiling models
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -385,8 +389,8 @@ Select device from dropdown list for running inference using OpenVINO.
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -424,7 +428,7 @@ Select device from dropdown list for running inference using OpenVINO.
 Building the pipeline
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let’s create callable wrapper classes for compiled models to allow
 interaction with original ``WuerstchenCombinedPipeline`` class. Note
@@ -440,9 +444,7 @@ that all of wrapper classes return ``torch.Tensor``\ s instead of
             self.text_encoder = text_encoder
     
         def __call__(self, input_ids, attention_mask):
-            output = self.text_encoder({"input_ids": input_ids, "attention_mask": attention_mask})[
-                "last_hidden_state"
-            ]
+            output = self.text_encoder({"input_ids": input_ids, "attention_mask": attention_mask})["last_hidden_state"]
             output = torch.tensor(output)
             return BaseModelOutputWithPooling(output)
 
@@ -498,7 +500,7 @@ And insert wrappers instances in the pipeline:
 Inference
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -533,7 +535,7 @@ Inference
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -564,7 +566,7 @@ improve model inference speed.
 
     to_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -576,11 +578,12 @@ Let’s load ``skip magic`` extension to skip quantization if
 .. code:: ipython3
 
     # Fetch `skip_kernel_extension` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     int8_pipeline = None
     
@@ -589,7 +592,7 @@ Let’s load ``skip magic`` extension to skip quantization if
 Prepare calibration datasets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use a portion of
 `conceptual_captions <https://huggingface.co/datasets/conceptual_captions>`__
@@ -671,7 +674,7 @@ model inputs for calibration we should customize ``CompiledModel``.
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Create a quantized model from the pre-trained converted OpenVINO model.
 ``BiasCorrection`` algorithm is disabled due to minimal accuracy
@@ -819,7 +822,7 @@ pipelines.
 Compare model file sizes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -862,7 +865,7 @@ Compare model file sizes
 Compare inference time of the FP16 and INT8 pipelines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 pipelines, we use mean inference time on 3 samples.
@@ -918,7 +921,7 @@ pipelines, we use mean inference time on 3 samples.
 Interactive inference
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Please select below whether you would like to use the quantized model to
 launch the interactive demo.
@@ -929,7 +932,7 @@ launch the interactive demo.
     
     use_quantized_model = widgets.Checkbox(
         value=quantized_model_present,
-        description='Use quantized model',
+        description="Use quantized model",
         disabled=not quantized_model_present,
     )
     
@@ -938,6 +941,7 @@ launch the interactive demo.
 .. code:: ipython3
 
     pipe = int8_pipeline if use_quantized_model.value else pipeline
+    
     
     def generate(caption, negative_prompt, prior_guidance_scale, seed):
         generator = torch.Generator().manual_seed(seed)
@@ -961,7 +965,7 @@ launch the interactive demo.
             gr.Textbox(label="Caption"),
             gr.Textbox(label="Negative prompt"),
             gr.Slider(2, 20, step=1, label="Prior guidance scale"),
-            gr.Slider(0, np.iinfo(np.int32).max, label="Seed")
+            gr.Slider(0, np.iinfo(np.int32).max, label="Seed"),
         ],
         "image",
         examples=[["Anthropomorphic cat dressed as a firefighter", "", 4, 0]],

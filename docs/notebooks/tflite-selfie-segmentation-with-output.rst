@@ -37,43 +37,43 @@ The tutorial consists of following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 
-   -  `Install required dependencies <#install-required-dependencies>`__
+   -  `Install required dependencies <#Install-required-dependencies>`__
    -  `Download pretrained model and test
-      image <#download-pretrained-model-and-test-image>`__
+      image <#Download-pretrained-model-and-test-image>`__
 
 -  `Convert Tensorflow Lite model to OpenVINO IR
-   format <#convert-tensorflow-lite-model-to-openvino-ir-format>`__
+   format <#Convert-Tensorflow-Lite-model-to-OpenVINO-IR-format>`__
 -  `Run OpenVINO model inference on
-   image <#run-openvino-model-inference-on-image>`__
+   image <#Run-OpenVINO-model-inference-on-image>`__
 
-   -  `Load model <#load-model>`__
-   -  `Prepare input image <#prepare-input-image>`__
-   -  `Run model inference <#run-model-inference>`__
+   -  `Load model <#Load-model>`__
+   -  `Prepare input image <#Prepare-input-image>`__
+   -  `Run model inference <#Run-model-inference>`__
    -  `Postprocess and visualize inference
-      results <#postprocess-and-visualize-inference-results>`__
+      results <#Postprocess-and-visualize-inference-results>`__
 
 -  `Interactive background blurring demo on
-   video <#interactive-background-blurring-demo-on-video>`__
+   video <#Interactive-background-blurring-demo-on-video>`__
 
-   -  `Run Live Background Blurring <#run-live-background-blurring>`__
+   -  `Run Live Background Blurring <#Run-Live-Background-Blurring>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install required dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import platform
     
-    %pip install -q "openvino>=2023.1.0" "opencv-python"
+    %pip install -q "openvino>=2023.1.0" "opencv-python" "tqdm"
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -103,16 +103,27 @@ Install required dependencies
 
 .. code:: ipython3
 
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
-    );
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
+    )
+    
+    open("notebook_utils.py", "w").write(r.text)
+
+
+
+
+.. parsed-literal::
+
+    21503
+
+
 
 Download pretrained model and test image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -135,14 +146,14 @@ Download pretrained model and test image
 
 .. parsed-literal::
 
-    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/tflite-selfie-segmentation/selfie_multiclass_256x256.tflite')
+    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/tflite-selfie-segmentation/selfie_multiclass_256x256.tflite')
 
 
 
 Convert Tensorflow Lite model to OpenVINO IR format
 ---------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Starting from the 2023.0.0 release, OpenVINO supports TFLite model
 conversion. However TFLite model format can be directly passed in
@@ -219,7 +230,7 @@ operation to get the label with the highest probability for each pixel.
 Run OpenVINO model inference on image
 -------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let’s see the model in action. For running the inference model with
 OpenVINO we should load the model on the device first. Please use the
@@ -228,7 +239,7 @@ next dropdown list for the selection inference device.
 Load model
 ~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -236,8 +247,8 @@ Load model
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -259,7 +270,7 @@ Load model
 Prepare input image
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The model accepts an image with size 256x256, we need to resize our
 input image to fit it in the model input tensor. Usually, segmentation
@@ -280,13 +291,14 @@ Additionally, the input image is represented as an RGB image in UINT8
     img = load_image(test_image_url)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
+    
     # Preprocessing helper function
-    def resize_and_pad(image:np.ndarray, height:int = 256, width:int = 256):
+    def resize_and_pad(image: np.ndarray, height: int = 256, width: int = 256):
         """
-        Input preprocessing function, takes input image in np.ndarray format, 
-        resizes it to fit specified height and width with preserving aspect ratio 
+        Input preprocessing function, takes input image in np.ndarray format,
+        resizes it to fit specified height and width with preserving aspect ratio
         and adds padding on bottom or right side to complete target height x width rectangle.
-        
+    
         Parameters:
           image (np.ndarray): input image in np.ndarray format
           height (int, *optional*, 256): target height
@@ -300,12 +312,13 @@ Additionally, the input image is represented as an RGB image in UINT8
             img = cv2.resize(image, (width, np.floor(h / (w / width)).astype(int)))
         else:
             img = cv2.resize(image, (np.floor(w / (h / height)).astype(int), height))
-        
+    
         r_h, r_w = img.shape[:2]
         right_padding = width - r_w
         bottom_padding = height - r_h
         padded_img = cv2.copyMakeBorder(img, 0, bottom_padding, 0, right_padding, cv2.BORDER_CONSTANT)
         return padded_img, (bottom_padding, right_padding)
+    
     
     # Apply preprocessig step - resize and pad input image
     padded_img, pad_info = resize_and_pad(np.array(img))
@@ -316,7 +329,7 @@ Additionally, the input image is represented as an RGB image in UINT8
 Run model inference
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -325,7 +338,7 @@ Run model inference
 Postprocess and visualize inference results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The model predicts segmentation probabilities mask with the size 256 x
 256, we need to apply postprocessing to get labels with the highest
@@ -352,13 +365,14 @@ makeup).
     ]
     SegmentationLabels = SegmentationMap(labels)
     
+    
     # helper for postprocessing output mask
-    def postprocess_mask(out:np.ndarray, pad_info:Tuple[int, int], orig_img_size:Tuple[int, int]):
+    def postprocess_mask(out: np.ndarray, pad_info: Tuple[int, int], orig_img_size: Tuple[int, int]):
         """
-        Posptprocessing function for segmentation mask, accepts model output tensor, 
+        Posptprocessing function for segmentation mask, accepts model output tensor,
         gets labels for each pixel using argmax,
         unpads segmentation mask and resizes it to original image size.
-        
+    
         Parameters:
           out (np.ndarray): model output tensor
           pad_info (Tuple[int, int]): information about padding size from preprocessing step
@@ -374,6 +388,7 @@ makeup).
         orig_h, orig_w = orig_img_size
         label_mask_resized = cv2.resize(label_mask_unpadded, (orig_w, orig_h), interpolation=cv2.INTER_NEAREST)
         return label_mask_resized
+    
     
     # Get info about original image
     image_data = np.array(img)
@@ -411,8 +426,8 @@ Visualize obtained result
     titles = ["Original image", "Portrait mask", "Removed background", "Blurred background"]
     images = [image_data, output_mask, output_image, output_blurred_image]
     figsize = (16, 16)
-    fig, axs = plt.subplots(2, 2, figsize=figsize, sharex='all', sharey='all')
-    fig.patch.set_facecolor('white')
+    fig, axs = plt.subplots(2, 2, figsize=figsize, sharex="all", sharey="all")
+    fig.patch.set_facecolor("white")
     list_axes = list(axs.flat)
     for i, a in enumerate(list_axes):
         a.set_xticklabels([])
@@ -433,7 +448,7 @@ Visualize obtained result
 Interactive background blurring demo on video
 ---------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The following code runs model inference on a video:
 
@@ -448,7 +463,14 @@ The following code runs model inference on a video:
     
     
     # Main processing function to run background blurring
-    def run_background_blurring(source:Union[str, int] = 0, flip:bool = False, use_popup:bool = False, skip_first_frames:int = 0, model:ov.Model = ov_model, device:str = "CPU"):
+    def run_background_blurring(
+        source: Union[str, int] = 0,
+        flip: bool = False,
+        use_popup: bool = False,
+        skip_first_frames: int = 0,
+        model: ov.Model = ov_model,
+        device: str = "CPU",
+    ):
         """
         Function for running background blurring inference on video
         Parameters:
@@ -465,16 +487,12 @@ The following code runs model inference on a video:
         compiled_model = core.compile_model(model, device)
         try:
             # Create a video player to play with target fps.
-            player = VideoPlayer(
-                source=source, flip=flip, fps=30, skip_first_frames=skip_first_frames
-            )
+            player = VideoPlayer(source=source, flip=flip, fps=30, skip_first_frames=skip_first_frames)
             # Start capturing.
             player.start()
             if use_popup:
                 title = "Press ESC to Exit"
-                cv2.namedWindow(
-                    winname=title, flags=cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE
-                )
+                cv2.namedWindow(winname=title, flags=cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE)
     
             processing_times = collections.deque()
             while True:
@@ -496,7 +514,7 @@ The following code runs model inference on a video:
                 # Get the results.
                 input_image, pad_info = resize_and_pad(frame, 256, 256)
                 normalized_img = np.expand_dims(input_image.astype(np.float32) / 255, 0)
-               
+    
                 start_time = time.time()
                 # model expects RGB image, while video capturing in BGR
                 segmentation_mask = compiled_model(normalized_img[:, :, :, ::-1])[0]
@@ -522,7 +540,7 @@ The following code runs model inference on a video:
                     fontScale=f_width / 1000,
                     color=(255, 0, 0),
                     thickness=1,
-                    lineType=cv2.LINE_AA
+                    lineType=cv2.LINE_AA,
                 )
                 # Use this workaround if there is flickering.
                 if use_popup:
@@ -533,9 +551,7 @@ The following code runs model inference on a video:
                         break
                 else:
                     # Encode numpy array to jpg.
-                    _, encoded_img = cv2.imencode(
-                        ext=".jpg", img=frame, params=[cv2.IMWRITE_JPEG_QUALITY, 100]
-                    )
+                    _, encoded_img = cv2.imencode(ext=".jpg", img=frame, params=[cv2.IMWRITE_JPEG_QUALITY, 100])
                     # Create an IPython image.
                     i = display.Image(data=encoded_img)
                     # Display the image in this notebook.
@@ -557,7 +573,7 @@ The following code runs model inference on a video:
 Run Live Background Blurring
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use a webcam as the video input. By default, the primary webcam is set
 with \ ``source=0``. If you have multiple webcams, each one will be

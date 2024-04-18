@@ -78,44 +78,44 @@ vector in embedded space.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 
-   -  `Authentication <#authentication>`__
+   -  `Authentication <#Authentication>`__
 
 -  `DeepFloyd IF in Diffusers
-   library <#deepfloyd-if-in-diffusers-library>`__
+   library <#DeepFloyd-IF-in-Diffusers-library>`__
 -  `Convert models to OpenVINO Intermediate representation (IR)
-   format <#convert-models-to-openvino-intermediate-representation-ir-format>`__
--  `1. Convert Text Encoder <#1--convert-text-encoder>`__
+   format <#Convert-models-to-OpenVINO-Intermediate-representation-(IR)-format>`__
+-  `1. Convert Text Encoder <#1.-Convert-Text-Encoder>`__
 -  `Convert the first Pixel Diffusion module’s
-   UNet <#convert-the-first-pixel-diffusion-modules-unet>`__
+   UNet <#Convert-the-first-Pixel-Diffusion-module's-UNet>`__
 -  `Convert the second pixel diffusion
-   module <#convert-the-second-pixel-diffusion-module>`__
--  `Prepare Inference pipeline <#prepare-inference-pipeline>`__
+   module <#Convert-the-second-pixel-diffusion-module>`__
+-  `Prepare Inference pipeline <#Prepare-Inference-pipeline>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
--  `Run Text-to-Image generation <#run-text-to-image-generation>`__
+-  `Run Text-to-Image generation <#Run-Text-to-Image-generation>`__
 
-   -  `Text Encoder inference <#text-encoder-inference>`__
+   -  `Text Encoder inference <#Text-Encoder-inference>`__
    -  `First Stage diffusion block
-      inference <#first-stage-diffusion-block-inference>`__
+      inference <#First-Stage-diffusion-block-inference>`__
    -  `Second Stage diffusion block
-      inference <#second-stage-diffusion-block-inference>`__
-   -  `Third Stage diffusion block <#third-stage-diffusion-block>`__
+      inference <#Second-Stage-diffusion-block-inference>`__
+   -  `Third Stage diffusion block <#Third-Stage-diffusion-block>`__
    -  `Upscale the generated image using a Super Resolution
-      network <#upscale-the-generated-image-using-a-super-resolution-network>`__
+      network <#Upscale-the-generated-image-using-a-Super-Resolution-network>`__
 
       -  `Download the Super Resolution model
-         weights <#download-the-super-resolution-model-weights>`__
-      -  `Reshape the model’s inputs <#reshape-the-models-inputs>`__
+         weights <#Download-the-Super-Resolution-model-weights>`__
+      -  `Reshape the model’s inputs <#Reshape-the-model's-inputs>`__
       -  `Prepare the input images and run the
-         model <#prepare-the-input-images-and-run-the-model>`__
-      -  `Display the result <#display-the-result>`__
+         model <#Prepare-the-input-images-and-run-the-model>`__
+      -  `Display the result <#Display-the-result>`__
 
 -  `Try out the converted pipeline with
-   Gradio <#try-out-the-converted-pipeline-with-gradio>`__
--  `Next steps <#next-steps>`__
+   Gradio <#Try-out-the-converted-pipeline-with-Gradio>`__
+-  `Next steps <#Next-steps>`__
 
    **NOTE**:
 
@@ -135,7 +135,7 @@ Table of contents:
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install required packages.
 
@@ -145,8 +145,8 @@ Install required packages.
     
     %pip install -q --upgrade pip
     %pip install -q "torch>2.1" transformers "diffusers>=0.16.1" accelerate safetensors sentencepiece huggingface_hub  --extra-index-url https://download.pytorch.org/whl/cpu
-    %pip install -q "openvino>=2023.3.0" opencv-python
-    %pip install -q gradio
+    %pip install -q "openvino>=2023.3.0" opencv-python tqdm
+    %pip install -q "gradio>=4.19"
 
 
 .. parsed-literal::
@@ -172,21 +172,28 @@ Install required packages.
     from diffusers import DiffusionPipeline
     import openvino as ov
     import torch
-    from utils import TextEncoder, UnetFirstStage, UnetSecondStage, convert_result_to_image, download_omz_model
+    from utils import (
+        TextEncoder,
+        UnetFirstStage,
+        UnetSecondStage,
+        convert_result_to_image,
+        download_omz_model,
+    )
 
 .. code:: ipython3
 
-    checkpoint_variant = 'fp16'
+    checkpoint_variant = "fp16"
     model_dtype = torch.float32
     ir_input_type = ov.Type.f32
     compress_to_fp16 = True
     
-    models_dir = Path('./models')
+    models_dir = Path("./models")
     models_dir.mkdir(exist_ok=True)
     
-    encoder_ir_path = models_dir / 'encoder_ir.xml'
-    first_stage_unet_ir_path = models_dir / 'unet_ir_I.xml'
-    second_stage_unet_ir_path = models_dir / 'unet_ir_II.xml'
+    encoder_ir_path = models_dir / "encoder_ir.xml"
+    first_stage_unet_ir_path = models_dir / "unet_ir_I.xml"
+    second_stage_unet_ir_path = models_dir / "unet_ir_II.xml"
+    
     
     def pt_to_pil(images):
         """
@@ -216,7 +223,7 @@ Install required packages.
 Authentication
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In order to access IF checkpoints, users need to provide an
 authentication token.
@@ -251,7 +258,7 @@ Uncheck the ``Add token as git credential?`` box.
 DeepFloyd IF in Diffusers library
 ---------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To work with IF by DeepFloyd Lab, we will use `Hugging Face Diffusers
 package <https://github.com/huggingface/diffusers>`__. Diffusers package
@@ -262,17 +269,13 @@ diffusion models. The code below demonstrates how to create a
 .. code:: ipython3
 
     # Downloading the model weights may take some time. The approximate total checkpoints size is 27GB.
-    stage_1 = DiffusionPipeline.from_pretrained(
-        "DeepFloyd/IF-I-M-v1.0",
-        variant=checkpoint_variant,
-        torch_dtype=model_dtype
-    )
+    stage_1 = DiffusionPipeline.from_pretrained("DeepFloyd/IF-I-M-v1.0", variant=checkpoint_variant, torch_dtype=model_dtype)
     
     stage_2 = DiffusionPipeline.from_pretrained(
         "DeepFloyd/IF-II-M-v1.0",
         text_encoder=None,
         variant=checkpoint_variant,
-        torch_dtype=model_dtype
+        torch_dtype=model_dtype,
     )
 
 
@@ -423,7 +426,7 @@ diffusion models. The code below demonstrates how to create a
 Convert models to OpenVINO Intermediate representation (IR) format
 ------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model conversion API enables direct conversion of PyTorch models. We
 will utilize the ``ov.convert_model`` method to acquire OpenVINO IR
@@ -444,7 +447,7 @@ Let us convert each part.
 1. Convert Text Encoder
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The text encoder is responsible for converting the input prompt, such as
 “ultra close-up color photo portrait of rainbow owl with deer horns in
@@ -485,7 +488,7 @@ providing greater flexibility.
 Convert the first Pixel Diffusion module’s UNet
 -----------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 U-Net model gradually denoises latent image representation guided by
 text encoder hidden state.
@@ -505,8 +508,16 @@ resolution images.
     if not first_stage_unet_ir_path.exists():
         unet_1_ir = ov.convert_model(
             stage_1.unet,
-            example_input=(torch.ones(2, 3, 64, 64), torch.tensor(1).int(), torch.ones(2, 77, 4096)),
-            input=[((2, 3, 64, 64), ir_input_type), ((), ov.Type.i32), ((2, 77, 4096), ir_input_type)],
+            example_input=(
+                torch.ones(2, 3, 64, 64),
+                torch.tensor(1).int(),
+                torch.ones(2, 77, 4096),
+            ),
+            input=[
+                ((2, 3, 64, 64), ir_input_type),
+                ((), ov.Type.i32),
+                ((2, 77, 4096), ir_input_type),
+            ],
         )
     
         ov.save_model(unet_1_ir, first_stage_unet_ir_path, compress_to_fp16=compress_to_fp16)
@@ -538,7 +549,7 @@ resolution images.
 Convert the second pixel diffusion module
 -----------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The second Diffusion module in the cascade generates 256x256 pixel
 images.
@@ -579,7 +590,7 @@ encoded user prompt.
 Prepare Inference pipeline
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The original pipeline from the source repository will be reused in this
 example. In order to achieve this, adapter classes were created to
@@ -593,7 +604,7 @@ seamlessly into the pipeline.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -603,8 +614,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -622,7 +633,7 @@ select device from dropdown list for running inference using OpenVINO
 Run Text-to-Image generation
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, we can set a text prompt for image generation and execute the
 inference pipeline. Optionally, you can also modify the random generator
@@ -632,7 +643,7 @@ be generated for the given prompt.
 Text Encoder inference
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Inferring model in FP16 on GPU significantly increases performance and
 reduces required memory, but it may lead to lesser accuracy on some
@@ -646,35 +657,44 @@ remains comparable with full FP16.
 .. code:: ipython3
 
     # Fetch `model_upcast_utils` which helps to restore accuracy when inferred on GPU
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/model_upcast_utils.py',
-        filename='model_upcast_utils.py'
+    import requests
+    
+    r = requests.get(url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/model_upcast_utils.py")
+    open("model_upcast_utils.py", "w").write(r.text)
+    
+    from model_upcast_utils import (
+        is_model_partially_upcasted,
+        partially_upcast_nodes_to_fp32,
     )
-    from model_upcast_utils import is_model_partially_upcasted, partially_upcast_nodes_to_fp32
     
     encoder_ov_model = core.read_model(encoder_ir_path)
-    if 'GPU' in core.available_devices and not is_model_partially_upcasted(encoder_ov_model):
-        example_input_prompt = 'ultra close color photo portrait of rainbow owl with deer horns in the woods'
+    if "GPU" in core.available_devices and not is_model_partially_upcasted(encoder_ov_model):
+        example_input_prompt = "ultra close color photo portrait of rainbow owl with deer horns in the woods"
         text_inputs = stage_1.tokenizer(example_input_prompt, max_length=77, padding="max_length", return_tensors="np")
-        upcasted_ov_model = partially_upcast_nodes_to_fp32(encoder_ov_model, text_inputs.input_ids, upcast_ratio=0.05,
-                                                           operation_types=["MatMul"], batch_size=10)
+        upcasted_ov_model = partially_upcast_nodes_to_fp32(
+            encoder_ov_model,
+            text_inputs.input_ids,
+            upcast_ratio=0.05,
+            operation_types=["MatMul"],
+            batch_size=10,
+        )
         del encoder_ov_model
         gc.collect()
     
         import os
+    
         os.remove(encoder_ir_path)
-        os.remove(str(encoder_ir_path).replace('.xml', '.bin'))
+        os.remove(str(encoder_ir_path).replace(".xml", ".bin"))
         ov.save_model(upcasted_ov_model, encoder_ir_path, compress_to_fp16=compress_to_fp16)
 
 .. code:: ipython3
 
-    prompt = 'ultra close color photo portrait of rainbow owl with deer horns in the woods'
-    negative_prompt = 'blurred unreal uncentered occluded'
+    prompt = "ultra close color photo portrait of rainbow owl with deer horns in the woods"
+    negative_prompt = "blurred unreal uncentered occluded"
     
     # Initialize TextEncoder wrapper class
     stage_1.text_encoder = TextEncoder(encoder_ir_path, dtype=model_dtype, device=device.value)
-    print('The model has been loaded')
+    print("The model has been loaded")
     
     # Generate text embeddings
     prompt_embeds, negative_embeds = stage_1.encode_prompt(prompt, negative_prompt=negative_prompt)
@@ -712,7 +732,7 @@ remains comparable with full FP16.
 First Stage diffusion block inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -722,20 +742,20 @@ First Stage diffusion block inference
     N_DIFFUSION_STEPS = 50
     
     # Initialize the First Stage UNet wrapper class
-    stage_1.unet = UnetFirstStage(
-        first_stage_unet_ir_path,
-        stage_1_config,
-        dtype=model_dtype,
-        device=device.value
-    )
-    print('The model has been loaded')
+    stage_1.unet = UnetFirstStage(first_stage_unet_ir_path, stage_1_config, dtype=model_dtype, device=device.value)
+    print("The model has been loaded")
     
     # Fix PRNG seed
     generator = torch.manual_seed(RANDOM_SEED)
     
     # Inference
-    image = stage_1(prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
-                    generator=generator, output_type="pt", num_inference_steps=N_DIFFUSION_STEPS).images
+    image = stage_1(
+        prompt_embeds=prompt_embeds,
+        negative_prompt_embeds=negative_embeds,
+        generator=generator,
+        output_type="pt",
+        num_inference_steps=N_DIFFUSION_STEPS,
+    ).images
     
     # Delete the model to free up memory
     del stage_1.unet.unet_openvino
@@ -771,22 +791,22 @@ First Stage diffusion block inference
 Second Stage diffusion block inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # Initialize the Second Stage UNet wrapper class
-    stage_2.unet = UnetSecondStage(
-        second_stage_unet_ir_path,
-        stage_2_config,
-        dtype=model_dtype,
-        device=device.value
-    )
-    print('The model has been loaded')
+    stage_2.unet = UnetSecondStage(second_stage_unet_ir_path, stage_2_config, dtype=model_dtype, device=device.value)
+    print("The model has been loaded")
     
     image = stage_2(
-        image=image, prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
-        generator=generator, output_type="pt", num_inference_steps=20).images
+        image=image,
+        prompt_embeds=prompt_embeds,
+        negative_prompt_embeds=negative_embeds,
+        generator=generator,
+        output_type="pt",
+        num_inference_steps=20,
+    ).images
     
     # Delete the model to free up memory
     del stage_2.unet.unet_openvino
@@ -823,7 +843,7 @@ Second Stage diffusion block inference
 Third Stage diffusion block
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The final block, which upscales images to a higher resolution (1024x1024
 px), has not been released by DeepFloyd yet. Stay tuned!
@@ -831,7 +851,7 @@ px), has not been released by DeepFloyd yet. Stay tuned!
 Upscale the generated image using a Super Resolution network
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Though the third stage has not been officially released, we’ll employ
 the Super Resolution network from `Example
@@ -861,7 +881,7 @@ release!
 Download the Super Resolution model weights
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -869,10 +889,10 @@ Download the Super Resolution model weights
     import numpy as np
     
     # 1032: 4x superresolution, 1033: 3x superresolution
-    model_name = 'single-image-super-resolution-1032'
+    model_name = "single-image-super-resolution-1032"
     download_omz_model(model_name, models_dir)
     
-    sr_model_xml_path = models_dir / f'{model_name}.xml'
+    sr_model_xml_path = models_dir / f"{model_name}.xml"
 
 
 
@@ -890,7 +910,7 @@ Download the Super Resolution model weights
 Reshape the model’s inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We need to reshape the inputs for the model. This is necessary because
 the IR model was converted with a different target input resolution. The
@@ -900,37 +920,30 @@ Resolution model makes our target image size 1024x1024 pixel.
 .. code:: ipython3
 
     model = core.read_model(model=sr_model_xml_path)
-    model.reshape({
-        0: [1, 3, 256, 256],
-        1: [1, 3, 1024, 1024]
-    })
+    model.reshape({0: [1, 3, 256, 256], 1: [1, 3, 1024, 1024]})
     compiled_sr_model = core.compile_model(model=model, device_name=device.value)
 
 Prepare the input images and run the model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     original_image = np.array(pil_image)
-    bicubic_image = cv2.resize(
-        src=original_image, dsize=(1024, 1024), interpolation=cv2.INTER_CUBIC
-    )
+    bicubic_image = cv2.resize(src=original_image, dsize=(1024, 1024), interpolation=cv2.INTER_CUBIC)
     
     # Reshape the images from (H,W,C) to (N,C,H,W) as expected by the model.
     input_image_original = np.expand_dims(original_image.transpose(2, 0, 1), axis=0)
     input_image_bicubic = np.expand_dims(bicubic_image.transpose(2, 0, 1), axis=0)
     
     # Model Inference
-    result = compiled_sr_model(
-        [input_image_original, input_image_bicubic]
-    )[compiled_sr_model.output(0)]
+    result = compiled_sr_model([input_image_original, input_image_bicubic])[compiled_sr_model.output(0)]
 
 Display the result
 ^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -947,7 +960,7 @@ Display the result
 Try out the converted pipeline with Gradio
 ------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The demo app below is created using `Gradio
 package <https://www.gradio.app/docs/interface>`__
@@ -956,25 +969,16 @@ package <https://www.gradio.app/docs/interface>`__
 
     # Build up the pipeline
     stage_1.text_encoder = TextEncoder(encoder_ir_path, dtype=model_dtype, device=device.value)
-    print('The model has been loaded')
+    print("The model has been loaded")
     
-    stage_1.unet = UnetFirstStage(
-        first_stage_unet_ir_path,
-        stage_1_config,
-        dtype=model_dtype,
-        device=device.value
-    )
-    print('The Stage-1 UNet has been loaded')
+    stage_1.unet = UnetFirstStage(first_stage_unet_ir_path, stage_1_config, dtype=model_dtype, device=device.value)
+    print("The Stage-1 UNet has been loaded")
     
-    stage_2.unet = UnetSecondStage(
-        second_stage_unet_ir_path,
-        stage_2_config,
-        dtype=model_dtype,
-        device=device.value
-    )
-    print('The Stage-2 UNet has been loaded')
+    stage_2.unet = UnetSecondStage(second_stage_unet_ir_path, stage_2_config, dtype=model_dtype, device=device.value)
+    print("The Stage-2 UNet has been loaded")
     
     generator = torch.manual_seed(RANDOM_SEED)
+    
     
     # Combine the models' calls into a single `_generate` function
     def _generate(prompt, negative_prompt):
@@ -982,26 +986,29 @@ package <https://www.gradio.app/docs/interface>`__
         prompt_embeds, negative_embeds = stage_1.encode_prompt(prompt, negative_prompt=negative_prompt)
         # Stage-1 UNet Inference
         image = stage_1(
-            prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
-            generator=generator, output_type="pt", num_inference_steps=N_DIFFUSION_STEPS
+            prompt_embeds=prompt_embeds,
+            negative_prompt_embeds=negative_embeds,
+            generator=generator,
+            output_type="pt",
+            num_inference_steps=N_DIFFUSION_STEPS,
         ).images
         # Stage-2 UNet Inference
         image = stage_2(
-            image=image, prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
-            generator=generator, output_type="pt", num_inference_steps=20
+            image=image,
+            prompt_embeds=prompt_embeds,
+            negative_prompt_embeds=negative_embeds,
+            generator=generator,
+            output_type="pt",
+            num_inference_steps=20,
         ).images
         # Infer Super Resolution model
         original_image = np.array(pt_to_pil(image)[0])
-        bicubic_image = cv2.resize(
-            src=original_image, dsize=(1024, 1024), interpolation=cv2.INTER_CUBIC
-        )
+        bicubic_image = cv2.resize(src=original_image, dsize=(1024, 1024), interpolation=cv2.INTER_CUBIC)
         # Reshape the images from (H,W,C) to (N,C,H,W) as expected by the model.
         input_image_original = np.expand_dims(original_image.transpose(2, 0, 1), axis=0)
         input_image_bicubic = np.expand_dims(bicubic_image.transpose(2, 0, 1), axis=0)
         # Model Inference
-        result = compiled_sr_model(
-            [input_image_original, input_image_bicubic]
-        )[compiled_sr_model.output(0)]
+        result = compiled_sr_model([input_image_original, input_image_bicubic])[compiled_sr_model.output(0)]
         return convert_result_to_image(result)
 
 
@@ -1022,17 +1029,15 @@ package <https://www.gradio.app/docs/interface>`__
             gr.Textbox(label="Text Prompt"),
             gr.Textbox(label="Negative Text Prompt"),
         ],
-        outputs=[
-            "image"
-        ],
+        outputs=["image"],
         examples=[
             [
                 "ultra close color photo portrait of rainbow owl with deer horns in the woods",
-                "blurred unreal uncentered occluded"
+                "blurred unreal uncentered occluded",
             ],
             [
                 "A scaly mischievous dragon is driving the car in a street art style",
-                "blurred uncentered occluded"
+                "blurred uncentered occluded",
             ],
         ],
     )
@@ -1048,7 +1053,7 @@ package <https://www.gradio.app/docs/interface>`__
 Next steps
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Open the `deep-floyd-if-optimize <deep-floyd-if-optimize.ipynb>`__
 notebook to quantize stage 1 and stage 2 U-Net models with the

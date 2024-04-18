@@ -57,35 +57,30 @@ is used to act as an audio representation.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Download and Convert models <#download-and-convert-models>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Download and Convert models <#Download-and-Convert-models>`__
 
-   -  `Text Encoder <#text-encoder>`__
-   -  `Coarse encoder <#coarse-encoder>`__
-   -  `Fine encoder <#fine-encoder>`__
-   -  `Prepare Inference pipeline <#prepare-inference-pipeline>`__
+   -  `Text Encoder <#Text-Encoder>`__
+   -  `Coarse encoder <#Coarse-encoder>`__
+   -  `Fine encoder <#Fine-encoder>`__
+   -  `Prepare Inference pipeline <#Prepare-Inference-pipeline>`__
 
--  `Run model inference <#run-model-inference>`__
+-  `Run model inference <#Run-model-inference>`__
 
-   -  `Select Inference device <#select-inference-device>`__
+   -  `Select Inference device <#Select-Inference-device>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    import sys
-    
-    if sys.platform == "linux":
-        %pip install -q "torch" "torchvision" "torchaudio" --index-url https://download.pytorch.org/whl/cpu
-    else:
-        %pip install -q "torch" "torchvision" "torchaudio"
-    %pip install -q "openvino>=2023.1.0" gradio
-    %pip install -q "git+https://github.com/suno-ai/bark.git"
+    %pip install -q "torch" "torchvision" "torchaudio" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "openvino>=2023.1.0" "gradio>=4.19"
+    %pip install -q "git+https://github.com/suno-ai/bark.git" --extra-index-url https://download.pytorch.org/whl/cpu
 
 
 .. parsed-literal::
@@ -104,7 +99,7 @@ Prerequisites
 Download and Convert models
 ---------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -117,7 +112,7 @@ Download and Convert models
 Text Encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Text encoder is responsible for embedding initial text prompt into
 high-level semantic tokens. it uses tokenizer for conversion input text
@@ -130,9 +125,7 @@ models for that.
 
     text_use_small = True
     
-    text_encoder = load_model(
-        model_type="text", use_gpu=False, use_small=text_use_small, force_reload=False
-    )
+    text_encoder = load_model(model_type="text", use_gpu=False, use_small=text_use_small, force_reload=False)
     
     text_encoder_model = text_encoder["model"]
     tokenizer = text_encoder["tokenizer"]
@@ -161,9 +154,7 @@ models for that.
     
     if not text_encoder_path0.exists() or not text_encoder_path1.exists():
         text_encoder_exportable = TextEncoderModel(text_encoder_model)
-        ov_model = ov.convert_model(
-            text_encoder_exportable, example_input=torch.ones((1, 513), dtype=torch.int64)
-        )
+        ov_model = ov.convert_model(text_encoder_exportable, example_input=torch.ones((1, 513), dtype=torch.int64))
         ov.save_model(ov_model, text_encoder_path0)
         logits, kv_cache = text_encoder_exportable(torch.ones((1, 513), dtype=torch.int64))
         ov_model = ov.convert_model(
@@ -191,7 +182,7 @@ models for that.
 Coarse encoder
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Coarse encoder is a causal autoregressive transformer, that takes as
 input the results of the text encoder model. It aims at predicting the
@@ -280,21 +271,15 @@ provide empty tensor on the first step.
                     dim=-1,
                 )
     
-            y = torch.nn.functional.scaled_dot_product_attention(
-                q, k, v, dropout_p=self.dropout, attn_mask=full_attention_mask
-            )
+            y = torch.nn.functional.scaled_dot_product_attention(q, k, v, dropout_p=self.dropout, attn_mask=full_attention_mask)
         else:
             # manual implementation of attention
             att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
-            att = att.masked_fill(
-                self.bias[:, :, FULL_T - T : FULL_T, :FULL_T] == 0, float("-inf")
-            )
+            att = att.masked_fill(self.bias[:, :, FULL_T - T : FULL_T, :FULL_T] == 0, float("-inf"))
             att = F.softmax(att, dim=-1)
             att = self.attn_dropout(att)
             y = att @ v  # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
-        y = (
-            y.transpose(1, 2).contiguous().view(B, T, C)
-        )  # re-assemble all head outputs side by side
+        y = y.transpose(1, 2).contiguous().view(B, T, C)  # re-assemble all head outputs side by side
     
         # output projection
         y = self.resid_dropout(self.c_proj(y))
@@ -305,9 +290,7 @@ provide empty tensor on the first step.
         coarse_encoder_exportable = CoarseEncoderModel(coarse_model)
         for block in coarse_encoder_exportable.encoder.transformer.h:
             block.attn.forward = types.MethodType(casual_self_attention_forward, block.attn)
-        logits, kv_cache = coarse_encoder_exportable(
-            torch.ones((1, 886), dtype=torch.int64)
-        )
+        logits, kv_cache = coarse_encoder_exportable(torch.ones((1, 886), dtype=torch.int64))
         ov_model = ov.convert_model(
             coarse_encoder_exportable,
             example_input=(torch.ones((1, 1), dtype=torch.int64), kv_cache),
@@ -328,9 +311,7 @@ provide empty tensor on the first step.
 
     fine_use_small = False
     
-    fine_model = load_model(
-        model_type="fine", use_gpu=False, use_small=fine_use_small, force_reload=False
-    )
+    fine_model = load_model(model_type="fine", use_gpu=False, use_small=fine_use_small, force_reload=False)
     
     fine_model_suffix = "_small" if fine_use_small else ""
     fine_model_dir = models_dir / f"fine_model{fine_model_suffix}"
@@ -348,14 +329,9 @@ provide empty tensor on the first step.
             pos = torch.arange(0, t, dtype=torch.long).unsqueeze(0)  # shape (1, t)
     
             # forward the GPT model itself
-            tok_embs = [
-                wte(idx[:, :, i]).unsqueeze(-1)
-                for i, wte in enumerate(self.model.transformer.wtes)
-            ]  # token embeddings of shape (b, t, n_embd)
+            tok_embs = [wte(idx[:, :, i]).unsqueeze(-1) for i, wte in enumerate(self.model.transformer.wtes)]  # token embeddings of shape (b, t, n_embd)
             tok_emb = torch.cat(tok_embs, dim=-1)
-            pos_emb = self.model.transformer.wpe(
-                pos
-            )  # position embeddings of shape (1, t, n_embd)
+            pos_emb = self.model.transformer.wpe(pos)  # position embeddings of shape (1, t, n_embd)
             x = tok_emb[:, :, :, : pred_idx + 1].sum(dim=-1)
             x = self.model.transformer.drop(x + pos_emb)
             for block in self.model.transformer.h:
@@ -369,7 +345,7 @@ provide empty tensor on the first step.
 Fine encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Fine encoder is time a non-causal autoencoder transformer, which
 iteratively predicts the last codebooks based on the sum of the previous
@@ -380,9 +356,7 @@ codebooks embeddings obtained using Coarse encoder.
     if not fine_feature_extractor_path.exists():
         lm_heads = fine_model.lm_heads
         fine_feature_extractor = FineModel(fine_model)
-        feature_extractor_out = fine_feature_extractor(
-            3, torch.zeros((1, 1024, 8), dtype=torch.int32)
-        )
+        feature_extractor_out = fine_feature_extractor(3, torch.zeros((1, 1024, 8), dtype=torch.int32))
         ov_model = ov.convert_model(
             fine_feature_extractor,
             example_input=(
@@ -400,7 +374,7 @@ codebooks embeddings obtained using Coarse encoder.
 Prepare Inference pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For better usability, classes for working with models provided below.
 
@@ -420,11 +394,7 @@ For better usability, classes for working with models provided below.
             return logits, kv_cache
     
         def postprocess_outputs(self, outs, is_first_stage):
-            net_outs = (
-                self.compiled_model1.outputs
-                if is_first_stage
-                else self.compiled_model2.outputs
-            )
+            net_outs = self.compiled_model1.outputs if is_first_stage else self.compiled_model2.outputs
             logits = outs[net_outs[0]]
             kv_cache = []
             for out_tensor in net_outs[1:]:
@@ -462,21 +432,15 @@ For better usability, classes for working with models provided below.
     
     class OVBarkFineEncoder:
         def __init__(self, core, device, model_dir, num_lm_heads=7):
-            self.feats_compiled_model = core.compile_model(
-                model_dir / "bark_fine_feature_extractor.xml", device
-            )
+            self.feats_compiled_model = core.compile_model(model_dir / "bark_fine_feature_extractor.xml", device)
             self.feats_out = self.feats_compiled_model.output(0)
             lm_heads = []
             for i in range(num_lm_heads):
-                lm_heads.append(
-                    core.compile_model(model_dir / f"bark_fine_lm_{i}.xml", device)
-                )
+                lm_heads.append(core.compile_model(model_dir / f"bark_fine_lm_{i}.xml", device))
             self.lm_heads = lm_heads
     
         def __call__(self, pred_idx, idx):
-            feats = self.feats_compiled_model([ov.Tensor(pred_idx), ov.Tensor(idx)])[
-                self.feats_out
-            ]
+            feats = self.feats_compiled_model([ov.Tensor(pred_idx), ov.Tensor(idx)])[self.feats_out]
             lm_id = pred_idx - 1
             logits = self.lm_heads[int(lm_id)](feats)[0]
             return logits
@@ -621,9 +585,7 @@ consists from several steps, illustrated on the diagram below:
             semantic_history = history_prompt["semantic_prompt"]
         else:
             semantic_history = None
-        encoded_text = (
-            np.ascontiguousarray(_tokenize(tokenizer, text)) + TEXT_ENCODING_OFFSET
-        )
+        encoded_text = np.ascontiguousarray(_tokenize(tokenizer, text)) + TEXT_ENCODING_OFFSET
         if len(encoded_text) > 256:
             p = round((len(encoded_text) - 256) / len(encoded_text) * 100, 1)
             logger.warning(f"warning, text too long, lopping of last {p}%")
@@ -646,9 +608,7 @@ consists from several steps, illustrated on the diagram below:
             )
         else:
             semantic_history = np.array([SEMANTIC_PAD_TOKEN] * 256)
-        x = np.hstack(
-            [encoded_text, semantic_history, np.array([SEMANTIC_INFER_TOKEN])]
-        ).astype(np.int64)[None]
+        x = np.hstack([encoded_text, semantic_history, np.array([SEMANTIC_INFER_TOKEN])]).astype(np.int64)[None]
         assert x.shape[1] == 256 + 256 + 1
         n_tot_steps = 768
         # custom tqdm updates since we don't know when eos will occur
@@ -664,9 +624,7 @@ consists from several steps, illustrated on the diagram below:
             logits, kv_cache = ov_text_model(ov.Tensor(x_input), kv_cache)
             relevant_logits = logits[0, 0, :SEMANTIC_VOCAB_SIZE]
             if allow_early_stop:
-                relevant_logits = np.hstack(
-                    (relevant_logits, logits[0, 0, [SEMANTIC_PAD_TOKEN]])
-                )  # eos
+                relevant_logits = np.hstack((relevant_logits, logits[0, 0, [SEMANTIC_PAD_TOKEN]]))  # eos
             if top_p is not None:
                 sorted_indices = np.argsort(relevant_logits)[::-1]
                 sorted_logits = relevant_logits[sorted_indices]
@@ -682,19 +640,13 @@ consists from several steps, illustrated on the diagram below:
                 relevant_logits[relevant_logits < v[-1]] = -float("Inf")
             probs = F.softmax(torch.from_numpy(relevant_logits) / temp, dim=-1)
             item_next = torch.multinomial(probs, num_samples=1)
-            if allow_early_stop and (
-                item_next == SEMANTIC_VOCAB_SIZE
-                or (min_eos_p is not None and probs[-1] >= min_eos_p)
-            ):
+            if allow_early_stop and (item_next == SEMANTIC_VOCAB_SIZE or (min_eos_p is not None and probs[-1] >= min_eos_p)):
                 # eos found, so break
                 pbar.update(100 - pbar_state)
                 break
             x = torch.cat((torch.from_numpy(x), item_next[None]), dim=1).numpy()
             tot_generated_duration_s += 1 / SEMANTIC_RATE_HZ
-            if (
-                max_gen_duration_s is not None
-                and tot_generated_duration_s > max_gen_duration_s
-            ):
+            if max_gen_duration_s is not None and tot_generated_duration_s > max_gen_duration_s:
                 pbar.update(100 - pbar_state)
                 break
             if n == n_tot_steps - 1:
@@ -784,24 +736,15 @@ consists from several steps, illustrated on the diagram below:
                     int(np.floor(len(x_coarse_history) / semantic_to_coarse_ratio)),
                 ]
             )
-            n_coarse_hist_provided = int(
-                round(n_semantic_hist_provided * semantic_to_coarse_ratio)
-            )
-            x_semantic_history = x_semantic_history[-n_semantic_hist_provided:].astype(
-                np.int32
-            )
+            n_coarse_hist_provided = int(round(n_semantic_hist_provided * semantic_to_coarse_ratio))
+            x_semantic_history = x_semantic_history[-n_semantic_hist_provided:].astype(np.int32)
             x_coarse_history = x_coarse_history[-n_coarse_hist_provided:].astype(np.int32)
             x_coarse_history = x_coarse_history[:-2]
         else:
             x_semantic_history = np.array([], dtype=np.int32)
             x_coarse_history = np.array([], dtype=np.int32)
         # start loop
-        n_steps = int(
-            round(
-                np.floor(len(x_semantic) * semantic_to_coarse_ratio / N_COARSE_CODEBOOKS)
-                * N_COARSE_CODEBOOKS
-            )
-        )
+        n_steps = int(round(np.floor(len(x_semantic) * semantic_to_coarse_ratio / N_COARSE_CODEBOOKS) * N_COARSE_CODEBOOKS))
         x_semantic = np.hstack([x_semantic_history, x_semantic]).astype(np.int32)
         x_coarse = x_coarse_history.astype(np.int32)
         base_semantic_idx = len(x_semantic_history)
@@ -839,12 +782,8 @@ consists from several steps, illustrated on the diagram below:
                     x_input = x_in
     
                 logits, kv_cache = ov_coarse_model(x_input, past_kv=kv_cache)
-                logit_start_idx = (
-                    SEMANTIC_VOCAB_SIZE + (1 - int(is_major_step)) * CODEBOOK_SIZE
-                )
-                logit_end_idx = (
-                    SEMANTIC_VOCAB_SIZE + (2 - int(is_major_step)) * CODEBOOK_SIZE
-                )
+                logit_start_idx = SEMANTIC_VOCAB_SIZE + (1 - int(is_major_step)) * CODEBOOK_SIZE
+                logit_end_idx = SEMANTIC_VOCAB_SIZE + (2 - int(is_major_step)) * CODEBOOK_SIZE
                 relevant_logits = logits[0, 0, logit_start_idx:logit_end_idx]
                 if top_p is not None:
                     sorted_indices = np.argsort(relevant_logits)[::-1]
@@ -863,9 +802,7 @@ consists from several steps, illustrated on the diagram below:
                 item_next = torch.multinomial(probs, num_samples=1)
                 item_next = item_next
                 item_next += logit_start_idx
-                x_coarse_in = torch.cat(
-                    (torch.from_numpy(x_coarse_in), item_next[None]), dim=1
-                ).numpy()
+                x_coarse_in = torch.cat((torch.from_numpy(x_coarse_in), item_next[None]), dim=1).numpy()
                 x_in = torch.cat((torch.from_numpy(x_in), item_next[None]), dim=1).numpy()
                 del logits, relevant_logits, probs, item_next
                 n_step += 1
@@ -873,9 +810,7 @@ consists from several steps, illustrated on the diagram below:
         del x_semantic_in
         gen_coarse_arr = x_coarse_in.squeeze()[len(x_coarse_history) :]
         del x_coarse_in
-        gen_coarse_audio_arr = (
-            gen_coarse_arr.reshape(-1, N_COARSE_CODEBOOKS).T - SEMANTIC_VOCAB_SIZE
-        )
+        gen_coarse_audio_arr = gen_coarse_arr.reshape(-1, N_COARSE_CODEBOOKS).T - SEMANTIC_VOCAB_SIZE
         for n in range(1, N_COARSE_CODEBOOKS):
             gen_coarse_audio_arr[n, :] -= n * CODEBOOK_SIZE
         return gen_coarse_audio_arr
@@ -908,8 +843,7 @@ consists from several steps, illustrated on the diagram below:
         in_arr = np.vstack(
             [
                 x_coarse_gen,
-                np.zeros((N_FINE_CODEBOOKS - n_coarse, x_coarse_gen.shape[1]))
-                + CODEBOOK_SIZE,
+                np.zeros((N_FINE_CODEBOOKS - n_coarse, x_coarse_gen.shape[1])) + CODEBOOK_SIZE,
             ]
         ).astype(
             np.int32
@@ -928,14 +862,10 @@ consists from several steps, illustrated on the diagram below:
             in_arr = np.hstack(
                 [
                     in_arr,
-                    np.zeros((N_FINE_CODEBOOKS, n_remove_from_end), dtype=np.int32)
-                    + CODEBOOK_SIZE,
+                    np.zeros((N_FINE_CODEBOOKS, n_remove_from_end), dtype=np.int32) + CODEBOOK_SIZE,
                 ]
             )
-        n_loops = (
-            np.max([0, int(np.ceil((x_coarse_gen.shape[1] - (1024 - n_history)) / 512))])
-            + 1
-        )
+        n_loops = np.max([0, int(np.ceil((x_coarse_gen.shape[1] - (1024 - n_history)) / 512))]) + 1
         in_arr = in_arr.T
         for n in tqdm.tqdm(range(n_loops), disable=silent):
             start_idx = np.min([n * 512, in_arr.shape[0] - 1024])
@@ -943,27 +873,18 @@ consists from several steps, illustrated on the diagram below:
             rel_start_fill_idx = start_fill_idx - start_idx
             in_buffer = in_arr[start_idx : start_idx + 1024, :][None]
             for nn in range(n_coarse, N_FINE_CODEBOOKS):
-                logits = ov_fine_model(
-                    np.array([nn]).astype(np.int64), in_buffer.astype(np.int64)
-                )
+                logits = ov_fine_model(np.array([nn]).astype(np.int64), in_buffer.astype(np.int64))
                 if temp is None:
                     relevant_logits = logits[0, rel_start_fill_idx:, :CODEBOOK_SIZE]
                     codebook_preds = torch.argmax(relevant_logits, -1)
                 else:
                     relevant_logits = logits[0, :, :CODEBOOK_SIZE] / temp
                     probs = F.softmax(torch.from_numpy(relevant_logits), dim=-1)
-                    codebook_preds = torch.hstack(
-                        [
-                            torch.multinomial(probs[nnn], num_samples=1)
-                            for nnn in range(rel_start_fill_idx, 1024)
-                        ]
-                    )
+                    codebook_preds = torch.hstack([torch.multinomial(probs[nnn], num_samples=1) for nnn in range(rel_start_fill_idx, 1024)])
                 in_buffer[0, rel_start_fill_idx:, nn] = codebook_preds.numpy()
                 del logits, codebook_preds
             for nn in range(n_coarse, N_FINE_CODEBOOKS):
-                in_arr[
-                    start_fill_idx : start_fill_idx + (1024 - rel_start_fill_idx), nn
-                ] = in_buffer[0, rel_start_fill_idx:, nn]
+                in_arr[start_fill_idx : start_fill_idx + (1024 - rel_start_fill_idx), nn] = in_buffer[0, rel_start_fill_idx:, nn]
             del in_buffer
         gen_fine_arr = in_arr.squeeze().T
         del in_arr
@@ -975,7 +896,7 @@ consists from several steps, illustrated on the diagram below:
 Run model inference
 -------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now is time to see model in action. We need only wrap our models to
 classes and run ``generate_audio`` function.
@@ -983,7 +904,7 @@ classes and run ``generate_audio`` function.
 Select Inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -1016,9 +937,7 @@ select device from dropdown list for running inference using OpenVINO
 
     core = ov.Core()
     
-    ov_text_model = OVBarkTextEncoder(
-        core, device.value, text_encoder_path0, text_encoder_path1
-    )
+    ov_text_model = OVBarkTextEncoder(core, device.value, text_encoder_path0, text_encoder_path1)
     ov_coarse_model = OVBarkEncoder(core, device.value, coarse_encoder_path)
     ov_fine_model = OVBarkFineEncoder(core, device.value, fine_model_dir)
 
@@ -1074,7 +993,7 @@ select device from dropdown list for running inference using OpenVINO
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1198,9 +1117,7 @@ Interactive demo
         with gr.Row():
             with gr.Column():
                 input_text = gr.Textbox(label="Input Text", lines=2, value=default_text)
-                options = gr.Dropdown(
-                    AVAILABLE_PROMPTS, value="Speaker 1 (en)", label="Acoustic Prompt"
-                )
+                options = gr.Dropdown(AVAILABLE_PROMPTS, value="Speaker 1 (en)", label="Acoustic Prompt")
                 run_button = gr.Button()
             with gr.Column():
                 audio_out = gr.Audio(label="Generated Audio", type="numpy")

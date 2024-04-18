@@ -25,19 +25,19 @@ of the art.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Prepare the Model <#prepare-the-model>`__
--  `Data Processing Module <#data-processing-module>`__
--  `Visualize the original 3D data <#visualize-the-original-3d-data>`__
--  `Run inference <#run-inference>`__
+-  `Imports <#Imports>`__
+-  `Prepare the Model <#Prepare-the-Model>`__
+-  `Data Processing Module <#Data-Processing-Module>`__
+-  `Visualize the original 3D data <#Visualize-the-original-3D-data>`__
+-  `Run inference <#Run-inference>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 .. code:: ipython3
 
     import platform
     
-    %pip install -q "openvino>=2023.1.0"
+    %pip install -q "openvino>=2023.1.0" "tqdm"
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -58,7 +58,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -69,21 +69,22 @@ Imports
     import openvino as ov
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    open("notebook_utils.py", "w").write(r.text)
     
     from notebook_utils import download_file
 
 Prepare the Model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the pre-trained PointNet ONNX model. This pre-trained model is
-provided by `axinc-ai <https://github.com/axinc-ai>`__, and you can
+provided by ```axinc-ai`` <https://github.com/axinc-ai>`__, and you can
 find more point clouds examples
 `here <https://github.com/axinc-ai/ailia-models/tree/master/point_segmentation>`__.
 
@@ -92,7 +93,11 @@ find more point clouds examples
     # Set the data and model directories, model source URL and model filename
     MODEL_DIR = Path("model")
     MODEL_DIR.mkdir(exist_ok=True)
-    download_file("https://storage.googleapis.com/ailia-models/pointnet_pytorch/chair_100.onnx", directory=Path(MODEL_DIR), show_progress=False)
+    download_file(
+        "https://storage.googleapis.com/ailia-models/pointnet_pytorch/chair_100.onnx",
+        directory=Path(MODEL_DIR),
+        show_progress=False,
+    )
     onnx_model_path = MODEL_DIR / "chair_100.onnx"
 
 Convert the ONNX model to OpenVINO IR. An OpenVINO IR (Intermediate
@@ -120,12 +125,11 @@ API, see this
     else:
         # Read model
         model = core.read_model(model=ir_model_xml)
-        
 
 Data Processing Module
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -143,13 +147,13 @@ Data Processing Module
     
         # normailization
         point_set = point_set - np.expand_dims(np.mean(point_set, axis=0), 0)  # center
-        dist = np.max(np.sqrt(np.sum(point_set ** 2, axis=1)), 0)
+        dist = np.max(np.sqrt(np.sum(point_set**2, axis=1)), 0)
         point_set = point_set / dist  # scale
     
         return point_set
     
     
-    def visualize(point_set:np.ndarray):
+    def visualize(point_set: np.ndarray):
         """
         Create a 3D view for data visualization
     
@@ -158,7 +162,7 @@ Data Processing Module
         """
     
         fig = plt.figure(dpi=192, figsize=(4, 4))
-        ax = fig.add_subplot(111, projection='3d')
+        ax = fig.add_subplot(111, projection="3d")
         X = point_set[:, 0]
         Y = point_set[:, 2]
         Z = point_set[:, 1]
@@ -171,18 +175,18 @@ Data Processing Module
         ax.set_xlim(mid_x - max_range, mid_x + max_range)
         ax.set_ylim(mid_y - max_range, mid_y + max_range)
         ax.set_zlim(mid_z - max_range, mid_z + max_range)
-        
+    
         plt.tick_params(labelsize=5)
-        ax.set_xlabel('X', fontsize=10)
-        ax.set_ylabel('Y', fontsize=10)
-        ax.set_zlabel('Z', fontsize=10)
+        ax.set_xlabel("X", fontsize=10)
+        ax.set_ylabel("Y", fontsize=10)
+        ax.set_zlabel("Z", fontsize=10)
     
         return ax
 
 Visualize the original 3D data
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The point cloud data can be downloaded from
 `ShapeNet <https://shapenet.cs.stanford.edu/ericyi/shapenetcore_partanno_segmentation_benchmark_v0.zip>`__,
@@ -194,7 +198,7 @@ chair for example.
     # Download data from the openvino_notebooks storage
     point_data = download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/pts/chair.pts",
-        directory="data"
+        directory="data",
     )
     
     points = load_data(str(point_data))
@@ -202,9 +206,9 @@ chair for example.
     Y = points[:, 2]
     Z = points[:, 1]
     ax = visualize(points)
-    ax.scatter3D(X, Y, Z, s=5, cmap="jet", marker="o", label='chair')
-    ax.set_title('3D Visualization')
-    plt.legend(loc='upper right', fontsize=8)
+    ax.scatter3D(X, Y, Z, s=5, cmap="jet", marker="o", label="chair")
+    ax.set_title("3D Visualization")
+    plt.legend(loc="upper right", fontsize=8)
     plt.show()
 
 
@@ -216,8 +220,8 @@ chair for example.
 
 .. parsed-literal::
 
-    /tmp/ipykernel_2972167/2347079344.py:12: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
-      ax.scatter3D(X, Y, Z, s=5, cmap="jet", marker="o", label='chair')
+    /tmp/ipykernel_3630/2434168836.py:12: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
+      ax.scatter3D(X, Y, Z, s=5, cmap="jet", marker="o", label="chair")
 
 
 
@@ -227,7 +231,7 @@ chair for example.
 Run inference
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run inference and visualize the results of 3D segmentation. - The input
 data is a point cloud with ``1 batch size``\ ，\ ``3 axis value`` (x, y,
@@ -238,7 +242,7 @@ each input point.
 .. code:: ipython3
 
     # Parts of a chair
-    classes = ['back', 'seat', 'leg', 'arm']
+    classes = ["back", "seat", "leg", "arm"]
     
     # Preprocess the input data
     point = points.transpose(1, 0)
@@ -258,7 +262,7 @@ each input point.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -268,8 +272,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -310,14 +314,14 @@ select device from dropdown list for running inference using OpenVINO
         # add current point of the part
         ax.scatter(XCur, YCur, ZCur, s=5, cmap="jet", marker="o", label=classes[i])
     
-    ax.set_title('3D Segmentation Visualization')
-    plt.legend(loc='upper right', fontsize=8)
+    ax.set_title("3D Segmentation Visualization")
+    plt.legend(loc="upper right", fontsize=8)
     plt.show()
 
 
 .. parsed-literal::
 
-    /tmp/ipykernel_2972167/68687822.py:23: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
+    /tmp/ipykernel_3630/2804603389.py:23: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
       ax.scatter(XCur, YCur, ZCur, s=5, cmap="jet", marker="o", label=classes[i])
 
 

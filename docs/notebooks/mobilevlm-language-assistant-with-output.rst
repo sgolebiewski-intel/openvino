@@ -25,31 +25,31 @@ and `paper <https://arxiv.org/abs/2312.16886>`__.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Install requirements <#install-requirements>`__
--  `Clone MobileVLM repository <#clone-mobilevlm-repository>`__
--  `Import required packages <#import-required-packages>`__
--  `Load the model <#load-the-model>`__
+-  `Install requirements <#Install-requirements>`__
+-  `Clone MobileVLM repository <#Clone-MobileVLM-repository>`__
+-  `Import required packages <#Import-required-packages>`__
+-  `Load the model <#Load-the-model>`__
 -  `Convert model to OpenVINO Intermediate Representation
-   (IR) <#convert-model-to-openvino-intermediate-representation-ir>`__
--  `Inference <#inference>`__
+   (IR) <#Convert-model-to-OpenVINO-Intermediate-Representation-(IR)>`__
+-  `Inference <#Inference>`__
 
-   -  `Load OpenVINO model <#load-openvino-model>`__
-   -  `Prepare input data <#prepare-input-data>`__
-   -  `Run generation process <#run-generation-process>`__
+   -  `Load OpenVINO model <#Load-OpenVINO-model>`__
+   -  `Prepare input data <#Prepare-input-data>`__
+   -  `Run generation process <#Run-generation-process>`__
 
--  `Interactive inference <#interactive-inference>`__
+-  `Interactive inference <#Interactive-inference>`__
 
 .. |image0| image:: https://github.com/Meituan-AutoML/MobileVLM/raw/main/assets/mobilevlm_arch.png
 
 Install requirements
 --------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     %pip install -q "torch>=2.1.0" "timm>=0.9.12" --extra-index-url "https://download.pytorch.org/whl/cpu"
-    %pip install -q "transformers>=4.33.1,<4.35.0" accelerate "sentencepiece>=0.1.99" "openvino>=2023.2.0" "nncf>=2.7.0" ipywidgets numpy gradio
+    %pip install -q "transformers>=4.33.1,<4.35.0" accelerate "sentencepiece>=0.1.99" "openvino>=2023.2.0" "nncf>=2.7.0" ipywidgets numpy "gradio>=4.19"
 
 
 .. parsed-literal::
@@ -65,11 +65,9 @@ Install requirements
 .. parsed-literal::
 
     ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    datasets 2.18.0 requires huggingface-hub>=0.19.4, but you have huggingface-hub 0.17.3 which is incompatible.
-    diffusers 0.27.2 requires huggingface-hub>=0.20.2, but you have huggingface-hub 0.17.3 which is incompatible.
-    mobileclip 0.1.0 requires torch==1.13.1, but you have torch 2.1.0+cpu which is incompatible.
-    mobileclip 0.1.0 requires torchvision==0.14.1, but you have torchvision 0.16.0+cpu which is incompatible.
-    optimum-intel 1.17.0.dev0+e79da77 requires transformers<4.40.0,>=4.36.0, but you have transformers 4.34.1 which is incompatible.
+    mobileclip 0.1.0 requires torch==1.13.1, but you have torch 2.2.2+cpu which is incompatible.
+    mobileclip 0.1.0 requires torchvision==0.14.1, but you have torchvision 0.17.2+cpu which is incompatible.
+    optimum-intel 1.17.0.dev0+aca2b6c requires transformers<4.40.0,>=4.36.0, but you have transformers 4.33.3 which is incompatible.
     
 
 .. parsed-literal::
@@ -80,12 +78,13 @@ Install requirements
 Clone MobileVLM repository
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     from pathlib import Path
     import sys
+    
     MOBILEVLM_REPO_DIR = Path("./MobileVLM")
     if not MOBILEVLM_REPO_DIR.exists():
         !git clone -q "https://github.com/Meituan-AutoML/MobileVLM.git"
@@ -94,7 +93,7 @@ Clone MobileVLM repository
 Import required packages
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -124,14 +123,26 @@ Import required packages
 
 .. parsed-literal::
 
-    2024-04-09 23:31:13.114835: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-09 23:31:13.148633: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
+      torch.utils._pytree._register_pytree_node(
+
+
+.. parsed-literal::
+
+    2024-04-18 00:08:44.504815: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-18 00:08:44.539140: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-04-09 23:31:13.775786: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-18 00:08:45.045243: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+
+
+.. parsed-literal::
+
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
+      torch.utils._pytree._register_pytree_node(
 
 
 .. parsed-literal::
@@ -142,7 +153,7 @@ Import required packages
 .. code:: ipython3
 
     MODELS_DIR = Path("./models")
-    MODEL_PATH = 'mtgv/MobileVLM-1.7B'
+    MODEL_PATH = "mtgv/MobileVLM-1.7B"
     
     TEMPERATURE = 0.2
     TOP_P = None
@@ -155,7 +166,7 @@ Import required packages
 Load the model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To load the model, we use pre-defined ``load_pretrained_model`` function
 in ``mobilevlm`` module. It returns the model itself, tokenizer, and
@@ -163,17 +174,23 @@ image processor to convert images to appropriate tensors.
 
 .. code:: ipython3
 
-    model_name = MODEL_PATH.split('/')[-1]
+    model_name = MODEL_PATH.split("/")[-1]
     disable_torch_init()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         tokenizer, model, image_processor, _ = load_pretrained_model(MODEL_PATH, device="cpu")
     model = model.to(dtype=torch.float32)
 
+
+.. parsed-literal::
+
+    You are resizing the embedding layer without providing a `pad_to_multiple_of` parameter. This means that the new embedding dimension will be 32000. This might induce some performance reduction as *Tensor Cores* will not be available. For more details about this, or help on choosing the correct value for resizing, refer to this guide: https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html#requirements-tc
+
+
 Convert model to OpenVINO Intermediate Representation (IR)
 ----------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -227,9 +244,9 @@ compression instead of INT8 weight compression.
 .. code:: ipython3
 
     compression_mode = widgets.Dropdown(
-        options=['INT4', 'INT8'],
-        value='INT4',
-        description='Compression mode:',
+        options=["INT4", "INT8"],
+        value="INT4",
+        description="Compression mode:",
         disabled=False,
     )
     
@@ -251,7 +268,7 @@ compression instead of INT8 weight compression.
 
 .. code:: ipython3
 
-    if compression_mode.value == 'INT4':
+    if compression_mode.value == "INT4":
         wc_parameters = dict(mode=nncf.CompressWeightsMode.INT4_ASYM, group_size=128, ratio=0.8)
     else:
         wc_parameters = dict(mode=nncf.CompressWeightsMode.INT8)
@@ -268,13 +285,13 @@ compression instead of INT8 weight compression.
             input_ids: torch.LongTensor = None,
             attention_mask: Optional[torch.Tensor] = None,
             past_key_values: Optional[List[torch.FloatTensor]] = None,
-            inputs_embeds: Optional[torch.FloatTensor] = None
+            inputs_embeds: Optional[torch.FloatTensor] = None,
         ):
             outputs = self.model.model(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
                 past_key_values=past_key_values,
-                inputs_embeds=inputs_embeds
+                inputs_embeds=inputs_embeds,
             )
             hidden_states = outputs[0]
             logits = self.model.lm_head(hidden_states)
@@ -287,10 +304,7 @@ compression instead of INT8 weight compression.
         input_names = [
             "input_ids",
             "attention_mask",
-            *itertools.chain.from_iterable(
-                [f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"]
-                for idx, _ in enumerate(past_key_values)
-            ),
+            *itertools.chain.from_iterable([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"] for idx, _ in enumerate(past_key_values)),
         ]
         assert len(input_names) == len(model.inputs)
         for _input, input_name in zip(model.inputs, input_names):
@@ -301,10 +315,7 @@ compression instead of INT8 weight compression.
     def set_output_names(model, past_key_values):
         output_names = [
             "logits",
-            *itertools.chain.from_iterable(
-                [f"present.{idx}.key", f"present.{idx}.value"]
-                for idx, _ in enumerate(past_key_values)
-            ),
+            *itertools.chain.from_iterable([f"present.{idx}.key", f"present.{idx}.value"] for idx, _ in enumerate(past_key_values)),
         ]
         assert len(output_names) == len(model.outputs)
         for out, out_name in zip(ov_model.outputs, output_names):
@@ -342,25 +353,20 @@ compression instead of INT8 weight compression.
 
 .. parsed-literal::
 
-    WARNING:nncf:NNCF provides best results with torch==2.1.2, while current torch version is 2.1.0+cpu. If you encounter issues, consider switching to torch==2.1.2
+    WARNING:nncf:NNCF provides best results with torch==2.1.2, while current torch version is 2.2.2+cpu. If you encounter issues, consider switching to torch==2.1.2
 
 
 .. parsed-literal::
 
-    No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
-
-
-.. parsed-literal::
-
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:808: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:595: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if input_shape[-1] > 1:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:146: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:119: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if seq_len > self.max_seq_len_cached:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:375: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:348: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attn_weights.size() != (bsz, self.num_heads, q_len, kv_seq_len):
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:382: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:355: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attention_mask.size() != (bsz, 1, q_len, kv_seq_len):
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:392: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:365: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attn_output.size() != (bsz, self.num_heads, q_len, self.head_dim):
 
 
@@ -443,7 +449,7 @@ compression instead of INT8 weight compression.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:160: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at aten/src/ATen/core/TensorBody.h:489.)
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:165: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at aten/src/ATen/core/TensorBody.h:489.)
       if a.grad is not None:
 
 
@@ -518,7 +524,7 @@ compression instead of INT8 weight compression.
 Inference
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ``OVMobileLlamaForCausalLM`` class provides ease-to-use interface for
 using model in generation scenario. It is based on
@@ -580,11 +586,7 @@ documentation <https://huggingface.co/docs/transformers/main_classes/text_genera
                     (input_ids.shape[0], past_key_values[-1][-1].shape[-2] + 1),
                     dtype=input_ids.dtype,
                 )
-                past_key_values = tuple(
-                    past_key_value
-                    for pkv_per_layer in past_key_values
-                    for past_key_value in pkv_per_layer
-                )
+                past_key_values = tuple(past_key_value for pkv_per_layer in past_key_values for past_key_value in pkv_per_layer)
                 # Add the past_key_values to the decoder inputs
                 inputs = dict(zip(self.key_value_input_names, past_key_values))
     
@@ -602,32 +604,21 @@ documentation <https://huggingface.co/docs/transformers/main_classes/text_genera
             logits = torch.from_numpy(self.request.get_tensor("logits").data)
     
             # Tuple of length equal to : number of layer * number of past_key_value per decoder layer (2 corresponds to the self-attention layer)
-            past_key_values = tuple(
-                self.request.get_tensor(key).data for key in self.key_value_output_names
-            )
+            past_key_values = tuple(self.request.get_tensor(key).data for key in self.key_value_output_names)
             # Tuple of tuple of length `n_layers`, with each tuple of length equal to 2 (k/v of self-attention)
     
-            past_key_values = tuple(
-                past_key_values[i : i + self.num_pkv]
-                for i in range(0, len(past_key_values), self.num_pkv)
-            )
+            past_key_values = tuple(past_key_values[i : i + self.num_pkv] for i in range(0, len(past_key_values), self.num_pkv))
     
-            return transformers.modeling_outputs.CausalLMOutputWithPast(
-                logits=logits, past_key_values=past_key_values
-            )
+            return transformers.modeling_outputs.CausalLMOutputWithPast(logits=logits, past_key_values=past_key_values)
     
         def forward_with_image(self, input_ids, images, attention_mask):
             """First step inference method, that resolves multimodal data"""
-            _, attention_mask, _, input_embed, _ = prepare_inputs_labels_for_multimodal(
-                input_ids, attention_mask, images=images, past_key_values=None, labels=None
-            )
+            _, attention_mask, _, input_embed, _ = prepare_inputs_labels_for_multimodal(input_ids, attention_mask, images=images, past_key_values=None, labels=None)
             outs = self.stage1({"inputs_embeds": input_embed, "attention_mask": attention_mask})
             logits = outs[0]
             pkv = list(outs.values())[1:]
             pkv = tuple(pkv[i : i + self.num_pkv] for i in range(0, len(pkv), self.num_pkv))
-            return transformers.modeling_outputs.CausalLMOutputWithPast(
-                logits=torch.from_numpy(logits), past_key_values=pkv
-            )
+            return transformers.modeling_outputs.CausalLMOutputWithPast(logits=torch.from_numpy(logits), past_key_values=pkv)
 
 Now, when we have model and defined generation pipeline, we can run
 model inference.
@@ -659,7 +650,7 @@ Select device from dropdown list for running inference using OpenVINO.
 Load OpenVINO model
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -668,14 +659,12 @@ Load OpenVINO model
 Prepare input data
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     images = [PIL.Image.open(IMAGE_PATH).convert("RGB")]
-    images_tensor = process_images(
-        images, image_processor, transformers.AutoConfig.from_pretrained(MODELS_DIR)
-    )
+    images_tensor = process_images(images, image_processor, transformers.AutoConfig.from_pretrained(MODELS_DIR))
 
 .. code:: ipython3
 
@@ -684,9 +673,7 @@ Prepare input data
     conv.append_message(conv.roles[1], None)
     prompt = conv.get_prompt()
     stop_str = conv.sep if conv.sep_style != SeparatorStyle.TWO else conv.sep2
-    input_ids = tokenizer_image_token(
-        prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt"
-    ).unsqueeze(0)
+    input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt").unsqueeze(0)
     stopping_criteria = KeywordsStoppingCriteria([stop_str], tokenizer, input_ids)
 
 .. code:: ipython3
@@ -710,7 +697,7 @@ Prepare input data
 Run generation process
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -745,23 +732,19 @@ Run generation process
 Interactive inference
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     def generate(img, prompt):
-        images_tensor = process_images(
-            [img], image_processor, transformers.AutoConfig.from_pretrained(MODELS_DIR)
-        )
+        images_tensor = process_images([img], image_processor, transformers.AutoConfig.from_pretrained(MODELS_DIR))
         prompt = DEFAULT_IMAGE_TOKEN + "\n" + prompt
         conv = conv_templates["v1"].copy()
         conv.append_message(conv.roles[0], prompt)
         conv.append_message(conv.roles[1], None)
         prompt = conv.get_prompt()
         stop_str = conv.sep if conv.sep_style != SeparatorStyle.TWO else conv.sep2
-        input_ids = tokenizer_image_token(
-            prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt"
-        ).unsqueeze(0)
+        input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt").unsqueeze(0)
         stopping_criteria = KeywordsStoppingCriteria([stop_str], tokenizer, input_ids)
     
         output_ids = ov_model.generate(
@@ -794,7 +777,7 @@ Interactive inference
                 PROMPT_STR,
             ]
         ],
-        allow_flagging="never"
+        allow_flagging="never",
     )
     
     try:
@@ -814,7 +797,7 @@ Interactive inference
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

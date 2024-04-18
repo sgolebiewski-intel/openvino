@@ -81,39 +81,39 @@ notebook <stable-diffusion-v2-with-output.html>`__.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Stable Diffusion v2 for Text-to-Image
-   Generation <#stable-diffusion-v2-for-text-to-image-generation>`__
+   Generation <#Stable-Diffusion-v2-for-Text-to-Image-Generation>`__
 
    -  `Stable Diffusion in Diffusers
-      library <#stable-diffusion-in-diffusers-library>`__
+      library <#Stable-Diffusion-in-Diffusers-library>`__
    -  `Convert models to OpenVINO Intermediate representation (IR)
-      format <#convert-models-to-openvino-intermediate-representation-ir-format>`__
-   -  `Text Encoder <#text-encoder>`__
-   -  `U-Net <#u-net>`__
-   -  `VAE <#vae>`__
-   -  `Prepare Inference Pipeline <#prepare-inference-pipeline>`__
-   -  `Configure Inference Pipeline <#configure-inference-pipeline>`__
+      format <#Convert-models-to-OpenVINO-Intermediate-representation-(IR)-format>`__
+   -  `Text Encoder <#Text-Encoder>`__
+   -  `U-Net <#U-Net>`__
+   -  `VAE <#VAE>`__
+   -  `Prepare Inference Pipeline <#Prepare-Inference-Pipeline>`__
+   -  `Configure Inference Pipeline <#Configure-Inference-Pipeline>`__
 
--  `Quantization <#quantization>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Prepare calibration dataset <#prepare-calibration-dataset>`__
-   -  `Run Hybrid Model Quantization <#run-hybrid-model-quantization>`__
+   -  `Prepare calibration dataset <#Prepare-calibration-dataset>`__
+   -  `Run Hybrid Model Quantization <#Run-Hybrid-Model-Quantization>`__
    -  `Compare inference time of the FP16 and INT8
-      pipelines <#compare-inference-time-of-the-fp16-and-int8-pipelines>`__
+      pipelines <#Compare-inference-time-of-the-FP16-and-INT8-pipelines>`__
 
--  `Run Text-to-Image generation <#run-text-to-image-generation>`__
+-  `Run Text-to-Image generation <#Run-Text-to-Image-generation>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 install required packages
 
 .. code:: ipython3
 
-    %pip install -q "diffusers>=0.14.0" "openvino>=2023.1.0" "datasets>=2.14.6" "transformers>=4.25.1" gradio "torch>=2.1" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "diffusers>=0.14.0" "openvino>=2023.1.0" "datasets>=2.14.6" "transformers>=4.25.1" "gradio>=4.19" "torch>=2.1" Pillow opencv-python --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "nncf>=2.9.0"
 
 
@@ -125,7 +125,7 @@ install required packages
 Stable Diffusion v2 for Text-to-Image Generation
 ------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To start, let’s look on Text-to-Image process for Stable Diffusion v2.
 We will use `Stable Diffusion
@@ -142,11 +142,11 @@ and original model
 Stable Diffusion in Diffusers library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To work with Stable Diffusion
+`back to top ⬆️ <#Table-of-contents:>`__ To work with Stable Diffusion
 v2, we will use Hugging Face
 `Diffusers <https://github.com/huggingface/diffusers>`__ library. To
 experiment with Stable Diffusion models, Diffusers exposes the
-`StableDiffusionPipeline <https://huggingface.co/docs/diffusers/using-diffusers/conditional_image_generation>`__
+```StableDiffusionPipeline`` <https://huggingface.co/docs/diffusers/using-diffusers/conditional_image_generation>`__
 similar to the `other Diffusers
 pipelines <https://huggingface.co/docs/diffusers/api/pipelines/overview>`__.
 The code below demonstrates how to create ``StableDiffusionPipeline``
@@ -180,7 +180,7 @@ using ``stable-diffusion-2-1``:
 Convert models to OpenVINO Intermediate representation (IR) format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Starting from 2023.0 release, OpenVINO supports PyTorch models directly
 via Model Conversion API. ``ov.convert_model`` function accepts instance
@@ -200,7 +200,7 @@ Let us convert each part:
 Text Encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The text-encoder is responsible for transforming the input prompt, for
 example, “a photo of an astronaut riding a horse” into an embedding
@@ -228,7 +228,7 @@ hidden states.
     import torch
     import openvino as ov
     
-    TEXT_ENCODER_OV_PATH = sd2_1_model_dir / 'text_encoder.xml'
+    TEXT_ENCODER_OV_PATH = sd2_1_model_dir / "text_encoder.xml"
     
     
     def cleanup_torchscript_cache():
@@ -240,11 +240,11 @@ hidden states.
         torch.jit._state._clear_class_state()
     
     
-    def convert_encoder(text_encoder: torch.nn.Module, ir_path:Path):
+    def convert_encoder(text_encoder: torch.nn.Module, ir_path: Path):
         """
-        Convert Text Encoder model to IR. 
-        Function accepts pipeline, prepares example inputs for conversion 
-        Parameters: 
+        Convert Text Encoder model to IR.
+        Function accepts pipeline, prepares example inputs for conversion
+        Parameters:
             text_encoder (torch.nn.Module): text encoder PyTorch model
             ir_path (Path): File for storing model
         Returns:
@@ -261,12 +261,13 @@ hidden states.
                 ov_model = ov.convert_model(
                     text_encoder,  # model instance
                     example_input=input_ids,  # example inputs for model tracing
-                    input=([1,77],)  # input shape for conversion
+                    input=([1, 77],),  # input shape for conversion
                 )
                 ov.save_model(ov_model, ir_path)
                 del ov_model
                 cleanup_torchscript_cache()
-            print('Text Encoder successfully converted to IR')
+            print("Text Encoder successfully converted to IR")
+    
     
     if not TEXT_ENCODER_OV_PATH.exists():
         convert_encoder(text_encoder, TEXT_ENCODER_OV_PATH)
@@ -285,7 +286,7 @@ hidden states.
 U-Net
 ~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 U-Net model gradually denoises latent image representation guided by
 text encoder hidden state.
@@ -312,14 +313,20 @@ such use cases required to modify number of input channels.
 
     import numpy as np
     
-    UNET_OV_PATH = sd2_1_model_dir / 'unet.xml'
+    UNET_OV_PATH = sd2_1_model_dir / "unet.xml"
     
     
-    def convert_unet(unet:torch.nn.Module, ir_path:Path, num_channels:int = 4, width:int = 64, height:int = 64):
+    def convert_unet(
+        unet: torch.nn.Module,
+        ir_path: Path,
+        num_channels: int = 4,
+        width: int = 64,
+        height: int = 64,
+    ):
         """
-        Convert Unet model to IR format. 
-        Function accepts pipeline, prepares example inputs for conversion 
-        Parameters: 
+        Convert Unet model to IR format.
+        Function accepts pipeline, prepares example inputs for conversion
+        Parameters:
             unet (torch.nn.Module): UNet PyTorch model
             ir_path (Path): File for storing model
             num_channels (int, optional, 4): number of input channels
@@ -328,10 +335,7 @@ such use cases required to modify number of input channels.
         Returns:
             None
         """
-        dtype_mapping = {
-            torch.float32: ov.Type.f32,
-            torch.float64: ov.Type.f64
-        }
+        dtype_mapping = {torch.float32: ov.Type.f32, torch.float64: ov.Type.f64}
         if not ir_path.exists():
             # prepare inputs
             encoder_hidden_state = torch.ones((2, 77, 1024))
@@ -347,15 +351,11 @@ such use cases required to modify number of input channels.
                 input_info.append((shape, element_type))
     
             with torch.no_grad():
-                ov_model = ov.convert_model(
-                    unet, 
-                    example_input=dummy_inputs,
-                    input=input_info
-                )
+                ov_model = ov.convert_model(unet, example_input=dummy_inputs, input=input_info)
             ov.save_model(ov_model, ir_path)
             del ov_model
             cleanup_torchscript_cache()
-            print('U-Net successfully converted to IR')
+            print("U-Net successfully converted to IR")
     
     
     if not UNET_OV_PATH.exists():
@@ -369,7 +369,7 @@ such use cases required to modify number of input channels.
 VAE
 ~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The VAE model has two parts, an encoder and a decoder. The encoder is
 used to convert the image into a low dimensional latent representation,
@@ -394,15 +394,15 @@ RAM (recommended at least 32GB).
 
 .. code:: ipython3
 
-    VAE_ENCODER_OV_PATH = sd2_1_model_dir / 'vae_encoder.xml'
+    VAE_ENCODER_OV_PATH = sd2_1_model_dir / "vae_encoder.xml"
     
     
-    def convert_vae_encoder(vae: torch.nn.Module, ir_path: Path, width:int = 512, height:int = 512):
+    def convert_vae_encoder(vae: torch.nn.Module, ir_path: Path, width: int = 512, height: int = 512):
         """
-        Convert VAE model to IR format. 
-        VAE model, creates wrapper class for export only necessary for inference part, 
-        prepares example inputs for onversion 
-        Parameters: 
+        Convert VAE model to IR format.
+        VAE model, creates wrapper class for export only necessary for inference part,
+        prepares example inputs for onversion
+        Parameters:
             vae (torch.nn.Module): VAE PyTorch model
             ir_path (Path): File for storing model
             width (int, optional, 512): input width
@@ -410,6 +410,7 @@ RAM (recommended at least 32GB).
         Returns:
             None
         """
+    
         class VAEEncoderWrapper(torch.nn.Module):
             def __init__(self, vae):
                 super().__init__()
@@ -423,26 +424,27 @@ RAM (recommended at least 32GB).
             vae_encoder.eval()
             image = torch.zeros((1, 3, width, height))
             with torch.no_grad():
-                ov_model = ov.convert_model(vae_encoder, example_input=image, input=([1,3, width, height],))
+                ov_model = ov.convert_model(vae_encoder, example_input=image, input=([1, 3, width, height],))
             ov.save_model(ov_model, ir_path)
             del ov_model
             cleanup_torchscript_cache()
-            print('VAE encoder successfully converted to IR')
+            print("VAE encoder successfully converted to IR")
     
     
-    def convert_vae_decoder(vae: torch.nn.Module, ir_path: Path, width:int = 64, height:int = 64):
+    def convert_vae_decoder(vae: torch.nn.Module, ir_path: Path, width: int = 64, height: int = 64):
         """
-        Convert VAE decoder model to IR format. 
-        Function accepts VAE model, creates wrapper class for export only necessary for inference part, 
-        prepares example inputs for conversion 
-        Parameters: 
-            vae (torch.nn.Module): VAE model 
+        Convert VAE decoder model to IR format.
+        Function accepts VAE model, creates wrapper class for export only necessary for inference part,
+        prepares example inputs for conversion
+        Parameters:
+            vae (torch.nn.Module): VAE model
             ir_path (Path): File for storing model
             width (int, optional, 64): input width
             height (int, optional, 64): input height
         Returns:
             None
         """
+    
         class VAEDecoderWrapper(torch.nn.Module):
             def __init__(self, vae):
                 super().__init__()
@@ -457,18 +459,19 @@ RAM (recommended at least 32GB).
     
             vae_decoder.eval()
             with torch.no_grad():
-                ov_model = ov.convert_model(vae_decoder, example_input=latents, input=([1,4, width, height],))
+                ov_model = ov.convert_model(vae_decoder, example_input=latents, input=([1, 4, width, height],))
             ov.save_model(ov_model, ir_path)
             del ov_model
             cleanup_torchscript_cache()
-            print('VAE decoder successfully converted to IR')
+            print("VAE decoder successfully converted to IR")
+    
     
     if not VAE_ENCODER_OV_PATH.exists():
         convert_vae_encoder(vae, VAE_ENCODER_OV_PATH, 768, 768)
     else:
         print(f"VAE encoder will be loaded from {VAE_ENCODER_OV_PATH}")
     
-    VAE_DECODER_OV_PATH = sd2_1_model_dir / 'vae_decoder.xml'
+    VAE_DECODER_OV_PATH = sd2_1_model_dir / "vae_decoder.xml"
     
     if not VAE_DECODER_OV_PATH.exists():
         convert_vae_decoder(vae, VAE_DECODER_OV_PATH, 96, 96)
@@ -488,7 +491,7 @@ RAM (recommended at least 32GB).
 Prepare Inference Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Putting it all together, let us now take a closer look at how the model
 works in inference by illustrating the logical flow.
@@ -559,11 +562,11 @@ but there is some small difference in details:
     from diffusers.schedulers import DDIMScheduler, LMSDiscreteScheduler, PNDMScheduler
     
     
-    def scale_fit_to_window(dst_width:int, dst_height:int, image_width:int, image_height:int):
+    def scale_fit_to_window(dst_width: int, dst_height: int, image_width: int, image_height: int):
         """
-        Preprocessing helper function for calculating image size for resize with peserving original aspect ratio 
+        Preprocessing helper function for calculating image size for resize with peserving original aspect ratio
         and fitting image to specific window size
-        
+    
         Parameters:
           dst_width (int): destination window width
           dst_height (int): destination window height
@@ -583,7 +586,7 @@ but there is some small difference in details:
         then converts it to np.ndarray and adds padding with zeros on right or bottom side of image (depends from aspect ratio), after that
         converts data to float32 data type and change range of values from [0, 255] to [-1, 1], finally, converts data layout from planar NHWC to NCHW.
         The function returns preprocessed input tensor and padding size, which can be used in postprocessing.
-        
+    
         Parameters:
           image (PIL.Image.Image): input image
         Returns:
@@ -591,10 +594,8 @@ but there is some small difference in details:
            meta (Dict): dictionary with preprocessing metadata info
         """
         src_width, src_height = image.size
-        dst_width, dst_height = scale_fit_to_window(
-            512, 512, src_width, src_height)
-        image = np.array(image.resize((dst_width, dst_height),
-                         resample=PIL.Image.Resampling.LANCZOS))[None, :]
+        dst_width, dst_height = scale_fit_to_window(512, 512, src_width, src_height)
+        image = np.array(image.resize((dst_width, dst_height), resample=PIL.Image.Resampling.LANCZOS))[None, :]
         pad_width = 512 - dst_width
         pad_height = 512 - dst_height
         pad = ((0, 0), (0, pad_height), (0, pad_width), (0, 0))
@@ -688,7 +689,7 @@ but there is some small difference in details:
                 strength (int, *optional*, 1.0):
                     strength between initial image and generated in Image-to-Image pipeline, do not used in Text-to-Image
             Returns:
-                Dictionary with keys: 
+                Dictionary with keys:
                     sample - the last generated image PIL.Image.Image or np.array
             """
             if seed is not None:
@@ -698,7 +699,11 @@ but there is some small difference in details:
             # corresponds to doing no classifier free guidance.
             do_classifier_free_guidance = guidance_scale > 1.0
             # get prompt text embeddings
-            text_embeddings = self._encode_prompt(prompt, do_classifier_free_guidance=do_classifier_free_guidance, negative_prompt=negative_prompt)
+            text_embeddings = self._encode_prompt(
+                prompt,
+                do_classifier_free_guidance=do_classifier_free_guidance,
+                negative_prompt=negative_prompt,
+            )
             # set timesteps
             accepts_offset = "offset" in set(inspect.signature(self.scheduler.set_timesteps).parameters.keys())
             extra_set_kwargs = {}
@@ -741,7 +746,13 @@ but there is some small difference in details:
             image = self.postprocess_image(image, meta, output_type)
             return {"sample": image}
     
-        def _encode_prompt(self, prompt:Union[str, List[str]], num_images_per_prompt:int = 1, do_classifier_free_guidance:bool = True, negative_prompt:Union[str, List[str]] = None):
+        def _encode_prompt(
+            self,
+            prompt: Union[str, List[str]],
+            num_images_per_prompt: int = 1,
+            do_classifier_free_guidance: bool = True,
+            negative_prompt: Union[str, List[str]] = None,
+        ):
             """
             Encodes the prompt into text encoder hidden states.
     
@@ -765,16 +776,13 @@ but there is some small difference in details:
             )
             text_input_ids = text_inputs.input_ids
     
-            text_embeddings = self.text_encoder(
-                text_input_ids)[self._text_encoder_output]
+            text_embeddings = self.text_encoder(text_input_ids)[self._text_encoder_output]
     
             # duplicate text embeddings for each generation per prompt
             if num_images_per_prompt != 1:
                 bs_embed, seq_len, _ = text_embeddings.shape
-                text_embeddings = np.tile(
-                    text_embeddings, (1, num_images_per_prompt, 1))
-                text_embeddings = np.reshape(
-                    text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
+                text_embeddings = np.tile(text_embeddings, (1, num_images_per_prompt, 1))
+                text_embeddings = np.reshape(text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
     
             # get unconditional embeddings for classifier free guidance
             if do_classifier_free_guidance:
@@ -808,10 +816,10 @@ but there is some small difference in details:
     
             return text_embeddings
     
-        def prepare_latents(self, image:PIL.Image.Image = None, latent_timestep:torch.Tensor = None):
+        def prepare_latents(self, image: PIL.Image.Image = None, latent_timestep: torch.Tensor = None):
             """
             Function for getting initial latents for starting generation
-            
+    
             Parameters:
                 image (PIL.Image.Image, *optional*, None):
                     Input image for generation, if not provided randon noise will be used as starting point
@@ -834,11 +842,11 @@ but there is some small difference in details:
             latents = self.scheduler.add_noise(torch.from_numpy(latents), torch.from_numpy(noise), latent_timestep).numpy()
             return latents, meta
     
-        def postprocess_image(self, image:np.ndarray, meta:Dict, output_type:str = "pil"):
+        def postprocess_image(self, image: np.ndarray, meta: Dict, output_type: str = "pil"):
             """
-            Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required), 
+            Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required),
             normalize and convert to [0, 255] pixels range. Optionally, convertes it from np.ndarray to PIL.Image format
-            
+    
             Parameters:
                 image (np.ndarray):
                     Generated image
@@ -864,25 +872,23 @@ but there is some small difference in details:
                 image = self.numpy_to_pil(image)
                 if "src_height" in meta:
                     orig_height, orig_width = meta["src_height"], meta["src_width"]
-                    image = [img.resize((orig_width, orig_height),
-                                        PIL.Image.Resampling.LANCZOS) for img in image]
+                    image = [img.resize((orig_width, orig_height), PIL.Image.Resampling.LANCZOS) for img in image]
             else:
                 if "src_height" in meta:
                     orig_height, orig_width = meta["src_height"], meta["src_width"]
-                    image = [cv2.resize(img, (orig_width, orig_width))
-                             for img in image]
+                    image = [cv2.resize(img, (orig_width, orig_width)) for img in image]
             return image
     
-        def get_timesteps(self, num_inference_steps:int, strength:float):
+        def get_timesteps(self, num_inference_steps: int, strength: float):
             """
             Helper function for getting scheduler timesteps for generation
             In case of image-to-image generation, it updates number of steps according to strength
-            
+    
             Parameters:
                num_inference_steps (int):
                   number of inference steps for generation
                strength (float):
-                   value between 0.0 and 1.0, that controls the amount of noise that is added to the input image. 
+                   value between 0.0 and 1.0, that controls the amount of noise that is added to the input image.
                    Values that approach 1.0 allow for lots of variations but will also produce images that are not semantically consistent with the input.
             """
             # get the original timestep using init_timestep
@@ -891,12 +897,12 @@ but there is some small difference in details:
             t_start = max(num_inference_steps - init_timestep, 0)
             timesteps = self.scheduler.timesteps[t_start:]
     
-            return timesteps, num_inference_steps - t_start 
+            return timesteps, num_inference_steps - t_start
 
 Configure Inference Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, you should create instances of OpenVINO Model.
 
@@ -907,8 +913,8 @@ First, you should create instances of OpenVINO Model.
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -939,8 +945,8 @@ Let us define them and put all components together.
 
     from transformers import CLIPTokenizer
     
-    scheduler = DDIMScheduler.from_config(conf)     # DDIMScheduler is used because UNet quantization produces better results with it
-    tokenizer = CLIPTokenizer.from_pretrained('openai/clip-vit-large-patch14')
+    scheduler = DDIMScheduler.from_config(conf)  # DDIMScheduler is used because UNet quantization produces better results with it
+    tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
     
     ov_pipe = OVStableDiffusionPipeline(
         tokenizer=tokenizer,
@@ -948,13 +954,13 @@ Let us define them and put all components together.
         unet=unet_model,
         vae_encoder=vae_encoder,
         vae_decoder=vae_decoder,
-        scheduler=scheduler
+        scheduler=scheduler,
     )
 
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -992,7 +998,7 @@ improve model inference speed.
 
     to_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -1010,11 +1016,12 @@ improve model inference speed.
 .. code:: ipython3
 
     # Fetch `skip_kernel_extension` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     int8_ov_pipe = None
     
@@ -1023,7 +1030,7 @@ improve model inference speed.
 Prepare calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use a portion of
 `conceptual_captions <https://huggingface.co/datasets/conceptual_captions>`__
@@ -1085,7 +1092,7 @@ model inputs for calibration we should customize ``CompiledModel``.
 Run Hybrid Model Quantization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1212,7 +1219,7 @@ Compare UNet file size
 Compare inference time of the FP16 and INT8 pipelines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 pipelines, we use median inference time on calibration subset.
@@ -1267,7 +1274,7 @@ pipelines, we use median inference time on calibration subset.
 Run Text-to-Image generation
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, you can define a text prompts for image generation and run
 inference pipeline. Optionally, you can also change the random generator
@@ -1285,7 +1292,7 @@ launch the interactive demo.
     
     use_quantized_model = widgets.Checkbox(
         value=True if quantized_model_present else False,
-        description='Use quantized model',
+        description="Use quantized model",
         disabled=not quantized_model_present,
     )
     

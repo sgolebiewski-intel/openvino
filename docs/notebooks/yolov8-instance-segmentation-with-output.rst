@@ -23,53 +23,53 @@ quantized models. - Live demo
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Get PyTorch model <#get-pytorch-model>`__
+-  `Get PyTorch model <#Get-PyTorch-model>`__
 
-   -  `Prerequisites <#prerequisites>`__
+   -  `Prerequisites <#Prerequisites>`__
 
--  `Instantiate model <#instantiate-model>`__
+-  `Instantiate model <#Instantiate-model>`__
 
-   -  `Convert model to OpenVINO IR <#convert-model-to-openvino-ir>`__
-   -  `Verify model inference <#verify-model-inference>`__
-   -  `Select inference device <#select-inference-device>`__
-   -  `Test on single image <#test-on-single-image>`__
+   -  `Convert model to OpenVINO IR <#Convert-model-to-OpenVINO-IR>`__
+   -  `Verify model inference <#Verify-model-inference>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Test on single image <#Test-on-single-image>`__
 
 -  `Check model accuracy on the
-   dataset <#check-model-accuracy-on-the-dataset>`__
+   dataset <#Check-model-accuracy-on-the-dataset>`__
 
    -  `Download the validation
-      dataset <#download-the-validation-dataset>`__
-   -  `Define validation function <#define-validation-function>`__
+      dataset <#Download-the-validation-dataset>`__
+   -  `Define validation function <#Define-validation-function>`__
    -  `Configure Validator helper and create
-      DataLoader <#configure-validator-helper-and-create-dataloader>`__
+      DataLoader <#Configure-Validator-helper-and-create-DataLoader>`__
 
 -  `Optimize model using NNCF Post-training Quantization
-   API <#optimize-model-using-nncf-post-training-quantization-api>`__
+   API <#Optimize-model-using-NNCF-Post-training-Quantization-API>`__
 
    -  `Validate Quantized model
-      inference <#validate-quantized-model-inference>`__
+      inference <#Validate-Quantized-model-inference>`__
 
 -  `Compare the Original and Quantized
-   Models <#compare-the-original-and-quantized-models>`__
+   Models <#Compare-the-Original-and-Quantized-Models>`__
 
    -  `Compare performance of the Original and Quantized
-      Models <#compare-performance-of-the-original-and-quantized-models>`__
+      Models <#Compare-performance-of-the-Original-and-Quantized-Models>`__
    -  `Validate quantized model
-      accuracy <#validate-quantized-model-accuracy>`__
+      accuracy <#Validate-quantized-model-accuracy>`__
 
--  `Other ways to optimize model <#other-ways-to-optimize-model>`__
--  `Live demo <#live-demo>`__
+-  `Other ways to optimize model <#Other-ways-to-optimize-model>`__
+-  `Live demo <#Live-demo>`__
 
    -  `Run Live Object Detection and
-      Segmentation <#run-live-object-detection-and-segmentation>`__
+      Segmentation <#Run-Live-Object-Detection-and-Segmentation>`__
 
 Get PyTorch model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Generally, PyTorch models represent an instance of the
-`torch.nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
+```torch.nn.Module`` <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
 class, initialized by a state dictionary with model weights. We will use
 the YOLOv8 nano model (also known as ``yolov8n``) pre-trained on a COCO
 dataset, which is available in this
@@ -87,14 +87,14 @@ we do not need to do these steps manually.
 Prerequisites
 ^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install necessary packages.
 
 .. code:: ipython3
 
     %pip install -q "openvino>=2024.0.0" "nncf>=2.9.0"
-    %pip install -q "torch>=2.1" "torchvision>=0.16" "ultralytics==8.1.42" onnx --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "torch>=2.1" "torchvision>=0.16" "ultralytics==8.1.42" onnx opencv-python tqdm --extra-index-url https://download.pytorch.org/whl/cpu
 
 Import required utility functions. The lower cell will download the
 ``notebook_utils`` Python module from GitHub.
@@ -104,23 +104,24 @@ Import required utility functions. The lower cell will download the
     from pathlib import Path
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
     
+    open("notebook_utils.py", "w").write(r.text)
     from notebook_utils import download_file, VideoPlayer
 
 .. code:: ipython3
 
     # Download a test sample
-    IMAGE_PATH = Path('./data/coco_bike.jpg')
+    IMAGE_PATH = Path("./data/coco_bike.jpg")
     download_file(
-        url='https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco_bike.jpg',
+        url="https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco_bike.jpg",
         filename=IMAGE_PATH.name,
-        directory=IMAGE_PATH.parent
-    ) 
+        directory=IMAGE_PATH.parent,
+    )
 
 
 
@@ -140,7 +141,7 @@ Import required utility functions. The lower cell will download the
 Instantiate model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For loading the model, required to specify a path to the model
 checkpoint. It can be some local path or name available on models hub
@@ -156,7 +157,7 @@ Let us consider the examples:
 
 .. code:: ipython3
 
-    models_dir = Path('./models')
+    models_dir = Path("./models")
     models_dir.mkdir(exist_ok=True)
 
 .. code:: ipython3
@@ -166,7 +167,7 @@ Let us consider the examples:
     
     SEG_MODEL_NAME = "yolov8n-seg"
     
-    seg_model = YOLO(models_dir / f'{SEG_MODEL_NAME}.pt')
+    seg_model = YOLO(models_dir / f"{SEG_MODEL_NAME}.pt")
     label_map = seg_model.model.names
     
     res = seg_model(IMAGE_PATH)
@@ -176,30 +177,30 @@ Let us consider the examples:
 .. parsed-literal::
 
     Downloading https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n-seg.pt to 'models/yolov8n-seg.pt'...
-    
+
 
 .. parsed-literal::
 
     100%|██████████████████████████████████████████████████████████████████████████████| 6.73M/6.73M [00:01<00:00, 3.89MB/s]
-    
+
 
 .. parsed-literal::
 
     
     image 1/1 /home/maleksandr/test_notebooks/update_ultralytics/openvino_notebooks/notebooks/yolov8-optimization/data/coco_bike.jpg: 480x640 1 bicycle, 2 cars, 1 dog, 55.6ms
     Speed: 1.8ms preprocess, 55.6ms inference, 2.0ms postprocess per image at shape (1, 3, 480, 640)
-    
 
 
 
-.. image:: yolov8-instance-segmentation_files%5Cyolov8-instance-segmentation_9_3.png
+
+.. image:: yolov8-instance-segmentation-with-output_files/yolov8-instance-segmentation-with-output_9_3.png
 
 
 
 Convert model to OpenVINO IR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 YOLOv8 provides API for convenient model exporting to different formats
 including OpenVINO IR. ``model.export`` is responsible for model
@@ -218,22 +219,22 @@ preserve dynamic shapes in the model.
 
     Ultralytics YOLOv8.1.42 🚀 Python-3.10.12 torch-2.2.2+cpu CPU (Intel Core(TM) i9-10980XE 3.00GHz)
     
-    [34m[1mPyTorch:[0m starting from 'models/yolov8n-seg.pt' with input shape (1, 3, 640, 640) BCHW and output shape(s) ((1, 116, 8400), (1, 32, 160, 160)) (6.7 MB)
+    PyTorch: starting from 'models/yolov8n-seg.pt' with input shape (1, 3, 640, 640) BCHW and output shape(s) ((1, 116, 8400), (1, 32, 160, 160)) (6.7 MB)
     
-    [34m[1mOpenVINO:[0m starting export with openvino 2024.0.0-14509-34caeefd078-releases/2024/0...
-    [34m[1mOpenVINO:[0m export success ✅ 1.8s, saved as 'models/yolov8n-seg_openvino_model/' (6.9 MB)
+    OpenVINO: starting export with openvino 2024.0.0-14509-34caeefd078-releases/2024/0...
+    OpenVINO: export success ✅ 1.8s, saved as 'models/yolov8n-seg_openvino_model/' (6.9 MB)
     
     Export complete (3.0s)
-    Results saved to [1m/home/maleksandr/test_notebooks/update_ultralytics/openvino_notebooks/notebooks/yolov8-optimization/models[0m
+    Results saved to /home/maleksandr/test_notebooks/update_ultralytics/openvino_notebooks/notebooks/yolov8-optimization/models
     Predict:         yolo predict task=segment model=models/yolov8n-seg_openvino_model imgsz=640 half 
     Validate:        yolo val task=segment model=models/yolov8n-seg_openvino_model imgsz=640 data=coco.yaml half 
     Visualize:       https://netron.app
-    
+
 
 Verify model inference
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We can reuse the base model pipeline for pre- and postprocessing just
 replacing the inference method where we will use the IR model for
@@ -242,21 +243,21 @@ inference.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select device from dropdown list for running inference using OpenVINO
 
 .. code:: ipython3
 
     import ipywidgets as widgets
-    import openvino as ov 
+    import openvino as ov
     
     core = ov.Core()
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -274,7 +275,7 @@ Select device from dropdown list for running inference using OpenVINO
 Test on single image
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -292,9 +293,11 @@ Test on single image
 
     import torch
     
+    
     def infer(*args):
         result = seg_compiled_model(args)
         return torch.from_numpy(result[0]), torch.from_numpy(result[1])
+    
     
     seg_model.predictor.inference = infer
     seg_model.predictor.model.pt = False
@@ -310,11 +313,11 @@ Test on single image
     
     image 1/1 /home/maleksandr/test_notebooks/update_ultralytics/openvino_notebooks/notebooks/yolov8-optimization/data/coco_bike.jpg: 640x640 1 bicycle, 2 cars, 1 dog, 27.6ms
     Speed: 3.5ms preprocess, 27.6ms inference, 4.5ms postprocess per image at shape (1, 3, 640, 640)
-    
 
 
 
-.. image:: yolov8-instance-segmentation_files%5Cyolov8-instance-segmentation_18_1.png
+
+.. image:: yolov8-instance-segmentation-with-output_files/yolov8-instance-segmentation-with-output_18_1.png
 
 
 
@@ -323,7 +326,7 @@ Great! The result is the same, as produced by original models.
 Check model accuracy on the dataset
 -----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For comparing the optimized model result with the original, it is good
 to know some measurable results in terms of model accuracy on the
@@ -332,7 +335,7 @@ validation dataset.
 Download the validation dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 YOLOv8 is pre-trained on the COCO dataset, so to evaluate the model
 accuracy we need to download it. According to the instructions provided
@@ -366,15 +369,15 @@ evaluation function.
     download_file(CFG_URL, CFG_PATH.name, CFG_PATH.parent)
     
     if not (OUT_DIR / "coco/labels").exists():
-        with ZipFile(LABELS_PATH , "r") as zip_ref:
+        with ZipFile(LABELS_PATH, "r") as zip_ref:
             zip_ref.extractall(OUT_DIR)
-        with ZipFile(DATA_PATH , "r") as zip_ref:
-            zip_ref.extractall(OUT_DIR / 'coco/images')
+        with ZipFile(DATA_PATH, "r") as zip_ref:
+            zip_ref.extractall(OUT_DIR / "coco/images")
 
 Define validation function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -383,7 +386,13 @@ Define validation function
     from ultralytics.utils.metrics import ConfusionMatrix
     
     
-    def test(model:ov.Model, core:ov.Core, data_loader:torch.utils.data.DataLoader, validator, num_samples:int = None):
+    def test(
+        model: ov.Model,
+        core: ov.Core,
+        data_loader: torch.utils.data.DataLoader,
+        validator,
+        num_samples: int = None,
+    ):
         """
         OpenVINO YOLOv8 model accuracy validation function. Runs model validation on dataset and returns metrics
         Parameters:
@@ -410,14 +419,17 @@ Define validation function
             if num_outputs == 1:
                 preds = torch.from_numpy(results[compiled_model.output(0)])
             else:
-                preds = [torch.from_numpy(results[compiled_model.output(0)]), torch.from_numpy(results[compiled_model.output(1)])]
+                preds = [
+                    torch.from_numpy(results[compiled_model.output(0)]),
+                    torch.from_numpy(results[compiled_model.output(1)]),
+                ]
             preds = validator.postprocess(preds)
             validator.update_metrics(preds, batch)
         stats = validator.get_stats()
         return stats
     
     
-    def print_stats(stats:np.ndarray, total_images:int, total_objects:int):
+    def print_stats(stats: np.ndarray, total_images: int, total_objects: int):
         """
         Helper function for printing accuracy statistic
         Parameters:
@@ -428,26 +440,52 @@ Define validation function
             None
         """
         print("Boxes:")
-        mp, mr, map50, mean_ap = stats['metrics/precision(B)'], stats['metrics/recall(B)'], stats['metrics/mAP50(B)'], stats['metrics/mAP50-95(B)']
+        mp, mr, map50, mean_ap = (
+            stats["metrics/precision(B)"],
+            stats["metrics/recall(B)"],
+            stats["metrics/mAP50(B)"],
+            stats["metrics/mAP50-95(B)"],
+        )
         # Print results
         print("    Best mean average:")
-        s = ('%20s' + '%12s' * 6) % ('Class', 'Images', 'Labels', 'Precision', 'Recall', 'mAP@.5', 'mAP@.5:.95')
+        s = ("%20s" + "%12s" * 6) % (
+            "Class",
+            "Images",
+            "Labels",
+            "Precision",
+            "Recall",
+            "mAP@.5",
+            "mAP@.5:.95",
+        )
         print(s)
-        pf = '%20s' + '%12i' * 2 + '%12.3g' * 4  # print format
-        print(pf % ('all', total_images, total_objects, mp, mr, map50, mean_ap))
-        if 'metrics/precision(M)' in stats:
-            s_mp, s_mr, s_map50, s_mean_ap = stats['metrics/precision(M)'], stats['metrics/recall(M)'], stats['metrics/mAP50(M)'], stats['metrics/mAP50-95(M)']
+        pf = "%20s" + "%12i" * 2 + "%12.3g" * 4  # print format
+        print(pf % ("all", total_images, total_objects, mp, mr, map50, mean_ap))
+        if "metrics/precision(M)" in stats:
+            s_mp, s_mr, s_map50, s_mean_ap = (
+                stats["metrics/precision(M)"],
+                stats["metrics/recall(M)"],
+                stats["metrics/mAP50(M)"],
+                stats["metrics/mAP50-95(M)"],
+            )
             # Print results
             print("    Macro average mean:")
-            s = ('%20s' + '%12s' * 6) % ('Class', 'Images', 'Labels', 'Precision', 'Recall', 'mAP@.5', 'mAP@.5:.95')
+            s = ("%20s" + "%12s" * 6) % (
+                "Class",
+                "Images",
+                "Labels",
+                "Precision",
+                "Recall",
+                "mAP@.5",
+                "mAP@.5:.95",
+            )
             print(s)
-            pf = '%20s' + '%12i' * 2 + '%12.3g' * 4  # print format
-            print(pf % ('all', total_images, total_objects, s_mp, s_mr, s_map50, s_mean_ap))
+            pf = "%20s" + "%12i" * 2 + "%12.3g" * 4  # print format
+            print(pf % ("all", total_images, total_objects, s_mp, s_mr, s_map50, s_mean_ap))
 
 Configure Validator helper and create DataLoader
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The original model repository uses a ``Validator`` wrapper, which
 represents the accuracy validation pipeline. It creates dataloader and
@@ -472,7 +510,7 @@ validator class instance.
 
 .. code:: ipython3
 
-    seg_validator = seg_model.task_map[seg_model.task]['validator'](args=args)
+    seg_validator = seg_model.task_map[seg_model.task]["validator"](args=args)
     seg_validator.data = check_det_dataset(args.data)
     seg_validator.stride = 32
     seg_data_loader = seg_validator.get_dataloader(OUT_DIR / "coco/", 1)
@@ -489,8 +527,8 @@ validator class instance.
 
 .. parsed-literal::
 
-    [34m[1mval: [0mScanning /home/maleksandr/test_notebooks/ultrali/datasets/coco/labels/val2017.cache... 4952 images, 48 backgrounds,[0m
-    
+    val: Scanning /home/maleksandr/test_notebooks/ultrali/datasets/coco/labels/val2017.cache... 4952 images, 48 backgrounds,
+
 
 After definition test function and validator creation, we are ready for
 getting accuracy metrics >\ **Note**: Model evaluation is time consuming
@@ -530,7 +568,7 @@ subset difference. *To validate the models on the full dataset set
         Macro average mean:
                    Class      Images      Labels   Precision      Recall      mAP@.5  mAP@.5:.95
                      all         300        2145       0.605       0.501       0.558       0.353
-    
+
 
 ``print_stats`` reports the following list of accuracy metrics:
 
@@ -549,7 +587,7 @@ subset difference. *To validate the models on the full dataset set
 Optimize model using NNCF Post-training Quantization API
 --------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -571,11 +609,11 @@ improve model inference speed.
 
     import ipywidgets as widgets
     
-    int8_model_seg_path = models_dir / f'{SEG_MODEL_NAME}_openvino_int8_model/{SEG_MODEL_NAME}.xml'
+    int8_model_seg_path = models_dir / f"{SEG_MODEL_NAME}_openvino_int8_model/{SEG_MODEL_NAME}.xml"
     
     to_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -596,10 +634,12 @@ Let’s load ``skip magic`` extension to skip quantization if
 .. code:: ipython3
 
     # Fetch skip_kernel_extension module
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/master/notebooks/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     %load_ext skip_kernel_extension
 
@@ -634,7 +674,7 @@ transformation function for getting only input tensors.
 .. parsed-literal::
 
     INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, onnx, openvino
-    
+
 
 The ``nncf.quantize`` function provides an interface for model
 quantization. It requires an instance of the OpenVINO Model and
@@ -776,7 +816,7 @@ point precision, using the ``ignored_scope`` parameter.
     INFO:nncf:Not adding activation input quantizer for operation: 243 __module.model.22.dfl.conv/aten::_convolution/Convolution
     INFO:nncf:Not adding activation input quantizer for operation: 263 __module.model.22/aten::sub/Subtract
     INFO:nncf:Not adding activation input quantizer for operation: 264 __module.model.22/aten::add/Add_6
-    
+
 
 
 .. parsed-literal::
@@ -788,7 +828,7 @@ point precision, using the ``ignored_scope`` parameter.
 .. raw:: html
 
     <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-    
+
 
 
 
@@ -796,14 +836,14 @@ point precision, using the ``ignored_scope`` parameter.
 
     <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
     </pre>
-    
+
 
 
 .. parsed-literal::
 
     /home/maleksandr/test_notebooks/update_ultralytics/openvino_notebooks/notebooks/yolov8-optimization/venv/lib/python3.10/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
       return Tensor(self.data * unwrap_tensor_data(other))
-    
+
 
 
 .. parsed-literal::
@@ -815,7 +855,7 @@ point precision, using the ``ignored_scope`` parameter.
 .. raw:: html
 
     <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-    
+
 
 
 
@@ -823,7 +863,7 @@ point precision, using the ``ignored_scope`` parameter.
 
     <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
     </pre>
-    
+
 
 
 .. code:: ipython3
@@ -837,12 +877,12 @@ point precision, using the ``ignored_scope`` parameter.
 .. parsed-literal::
 
     Quantized segmentation model will be saved to models/yolov8n-seg_openvino_int8_model/yolov8n-seg.xml
-    
+
 
 Validate Quantized model inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ``nncf.quantize`` returns the OpenVINO Model class instance, which is
 suitable for loading on a device for making predictions. ``INT8`` model
@@ -893,21 +933,21 @@ on the image.
     
     image 1/1 /home/maleksandr/test_notebooks/update_ultralytics/openvino_notebooks/notebooks/yolov8-optimization/data/coco_bike.jpg: 640x640 1 bicycle, 2 cars, 2 dogs, 26.8ms
     Speed: 2.8ms preprocess, 26.8ms inference, 3.4ms postprocess per image at shape (1, 3, 640, 640)
-    
 
 
-.. image:: yolov8-instance-segmentation_files%5Cyolov8-instance-segmentation_46_1.png
+
+.. image:: yolov8-instance-segmentation-with-output_files/yolov8-instance-segmentation-with-output_46_1.png
 
 
 Compare the Original and Quantized Models
 -----------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Compare performance of the Original and Quantized Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Finally, use the OpenVINO
+`back to top ⬆️ <#Table-of-contents:>`__ Finally, use the OpenVINO
 `Benchmark
 Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
 to measure the inference performance of the ``FP32`` and ``INT8``
@@ -1015,7 +1055,7 @@ models.
     [ INFO ]    Min:           43.23 ms
     [ INFO ]    Max:           184.81 ms
     [ INFO ] Throughput:   140.88 FPS
-    
+
 
 .. code:: ipython3
 
@@ -1104,12 +1144,12 @@ models.
     [ INFO ]    Min:           33.17 ms
     [ INFO ]    Max:           120.39 ms
     [ INFO ] Throughput:   201.90 FPS
-    
+
 
 Validate quantized model accuracy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 As we can see, there is no significant difference between ``INT8`` and
 float model result in a single image test. To understand how
@@ -1158,7 +1198,7 @@ accuracy on a dataset.
         Macro average mean:
                    Class      Images      Labels   Precision      Recall      mAP@.5  mAP@.5:.95
                      all         300        2153       0.631       0.463       0.529       0.344
-    
+
 
 Great! Looks like accuracy was changed, but not significantly and it
 meets passing criteria.
@@ -1166,7 +1206,7 @@ meets passing criteria.
 Other ways to optimize model
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The performance could be also improved by another OpenVINO method such
 as async inference pipeline or preprocessing API.
@@ -1177,7 +1217,7 @@ inference, the application can perform other tasks in parallel (for
 example, populating inputs or scheduling other requests) rather than
 wait for the current inference to complete first. To understand how to
 perform async inference using openvino, refer to `Async API
-tutorial <../async-api/async-api.ipynb>`__
+tutorial <async-api-with-output.html>`__
 
 Preprocessing API enables making preprocessing a part of the model
 reducing application code and dependency on additional image processing
@@ -1187,7 +1227,7 @@ on a selected device (CPU/GPU etc.) rather than always being executed on
 CPU as part of an application. This will also improve selected device
 utilization. For more information, refer to the overview of
 `Preprocessing API
-tutorial <../optimize-preprocessing/optimize-preprocessing.ipynb>`__. To
+tutorial <optimize-preprocessing-with-output.html>`__. To
 see, how it could be used with YOLOV8 object detection model , please,
 see `Convert and Optimize YOLOv8 real-time object detection with
 OpenVINO tutorial <./yolov8-object-detection.ipynb>`__
@@ -1195,7 +1235,7 @@ OpenVINO tutorial <./yolov8-object-detection.ipynb>`__
 Live demo
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The following code runs model inference on a video:
 
@@ -1207,7 +1247,14 @@ The following code runs model inference on a video:
     from IPython import display
     
     
-    def run_instance_segmentation(source=0, flip=False, use_popup=False, skip_first_frames=0, model=seg_model, device=device.value):
+    def run_instance_segmentation(
+        source=0,
+        flip=False,
+        use_popup=False,
+        skip_first_frames=0,
+        model=seg_model,
+        device=device.value,
+    ):
         player = None
     
         ov_config = {}
@@ -1220,21 +1267,17 @@ The following code runs model inference on a video:
         def infer(*args):
             result = compiled_model(args)
             return torch.from_numpy(result[0]), torch.from_numpy(result[1])
-        
+    
         seg_model.predictor.inference = infer
-        
+    
         try:
             # Create a video player to play with target fps.
-            player = VideoPlayer(
-                source=source, flip=flip, fps=30, skip_first_frames=skip_first_frames
-            )
+            player = VideoPlayer(source=source, flip=flip, fps=30, skip_first_frames=skip_first_frames)
             # Start capturing.
             player.start()
             if use_popup:
                 title = "Press ESC to Exit"
-                cv2.namedWindow(
-                    winname=title, flags=cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE
-                )
+                cv2.namedWindow(winname=title, flags=cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE)
     
             processing_times = collections.deque()
             while True:
@@ -1255,7 +1298,7 @@ The following code runs model inference on a video:
                     )
                 # Get the results.
                 input_image = np.array(frame)
-               
+    
                 start_time = time.time()
                 detections = seg_model(input_image)
                 stop_time = time.time()
@@ -1289,9 +1332,7 @@ The following code runs model inference on a video:
                         break
                 else:
                     # Encode numpy array to jpg.
-                    _, encoded_img = cv2.imencode(
-                        ext=".jpg", img=frame, params=[cv2.IMWRITE_JPEG_QUALITY, 100]
-                    )
+                    _, encoded_img = cv2.imencode(ext=".jpg", img=frame, params=[cv2.IMWRITE_JPEG_QUALITY, 100])
                     # Create an IPython image.
                     i = display.Image(data=encoded_img)
                     # Display the image in this notebook.
@@ -1313,14 +1354,14 @@ The following code runs model inference on a video:
 Run Live Object Detection and Segmentation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use a webcam as the video input. By default, the primary webcam is set
-with ``source=0``. If you have multiple webcams, each one will be
-assigned a consecutive number starting at 0. Set ``flip=True`` when
+with \ ``source=0``. If you have multiple webcams, each one will be
+assigned a consecutive number starting at 0. Set \ ``flip=True`` when
 using a front-facing camera. Some web browsers, especially Mozilla
 Firefox, may cause flickering. If you experience flickering,
-set ``use_popup=True``.
+set \ ``use_popup=True``.
 
    **NOTE**: To use this notebook with a webcam, you need to run the
    notebook on a computer with a webcam. If you run the notebook on a
@@ -1336,7 +1377,7 @@ set ``use_popup=True``.
     if WEBCAM_INFERENCE:
         VIDEO_SOURCE = 0  # Webcam
     else:
-        VIDEO_SOURCE = 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/video/people.mp4'
+        VIDEO_SOURCE = "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/video/people.mp4"
 
 .. code:: ipython3
 
@@ -1353,14 +1394,20 @@ set ``use_popup=True``.
 
 .. code:: ipython3
 
-    run_instance_segmentation(source=VIDEO_SOURCE, flip=True, use_popup=False, model=seg_ov_model, device=device.value)
+    run_instance_segmentation(
+        source=VIDEO_SOURCE,
+        flip=True,
+        use_popup=False,
+        model=seg_ov_model,
+        device=device.value,
+    )
 
 
 
-.. image:: yolov8-instance-segmentation_files%5Cyolov8-instance-segmentation_62_0.png
+.. image:: yolov8-instance-segmentation-with-output_files/yolov8-instance-segmentation-with-output_62_0.png
 
 
 .. parsed-literal::
 
     Source ended
-    
+

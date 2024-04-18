@@ -31,39 +31,39 @@ Transactions on Pattern Analysis and Machine Intelligence, doi:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Preparation <#preparation>`__
+-  `Preparation <#Preparation>`__
 
-   -  `Install requirements <#install-requirements>`__
-   -  `Imports <#imports>`__
-   -  `Download the model <#download-the-model>`__
+   -  `Install requirements <#Install-requirements>`__
+   -  `Imports <#Imports>`__
+   -  `Download the model <#Download-the-model>`__
 
--  `Functions <#functions>`__
--  `Select inference device <#select-inference-device>`__
--  `Load the Model <#load-the-model>`__
--  `Monodepth on Image <#monodepth-on-image>`__
+-  `Functions <#Functions>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `Load the Model <#Load-the-Model>`__
+-  `Monodepth on Image <#Monodepth-on-Image>`__
 
    -  `Load, resize and reshape input
-      image <#load-resize-and-reshape-input-image>`__
-   -  `Do inference on the image <#do-inference-on-the-image>`__
-   -  `Display monodepth image <#display-monodepth-image>`__
+      image <#Load,-resize-and-reshape-input-image>`__
+   -  `Do inference on the image <#Do-inference-on-the-image>`__
+   -  `Display monodepth image <#Display-monodepth-image>`__
 
--  `Monodepth on Video <#monodepth-on-video>`__
+-  `Monodepth on Video <#Monodepth-on-Video>`__
 
-   -  `Video Settings <#video-settings>`__
-   -  `Load the Video <#load-the-video>`__
+   -  `Video Settings <#Video-Settings>`__
+   -  `Load the Video <#Load-the-Video>`__
    -  `Do Inference on a Video and Create Monodepth
-      Video <#do-inference-on-a-video-and-create-monodepth-video>`__
-   -  `Display Monodepth Video <#display-monodepth-video>`__
+      Video <#Do-Inference-on-a-Video-and-Create-Monodepth-Video>`__
+   -  `Display Monodepth Video <#Display-Monodepth-Video>`__
 
 Preparation
 -----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -78,11 +78,13 @@ Install requirements
         %pip install -q "matplotlib>=3.4,<3.7"
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
 
 
 .. parsed-literal::
@@ -119,14 +121,14 @@ Install requirements
 
 .. parsed-literal::
 
-    ('notebook_utils.py', <http.client.HTTPMessage at 0x7f6f12ad8340>)
+    21503
 
 
 
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -153,7 +155,7 @@ Imports
 Download the model
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The model is in the `OpenVINO Intermediate Representation
 (IR) <https://docs.openvino.ai/2024/documentation/openvino-ir-format.html>`__
@@ -161,11 +163,11 @@ format.
 
 .. code:: ipython3
 
-    model_folder = Path('model')
+    model_folder = Path("model")
     
-    ir_model_url = 'https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/depth-estimation-midas/FP32/'
-    ir_model_name_xml = 'MiDaS_small.xml'
-    ir_model_name_bin = 'MiDaS_small.bin'
+    ir_model_url = "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/depth-estimation-midas/FP32/"
+    ir_model_name_xml = "MiDaS_small.xml"
+    ir_model_name_bin = "MiDaS_small.bin"
     
     download_file(ir_model_url + ir_model_name_xml, filename=ir_model_name_xml, directory=model_folder)
     download_file(ir_model_url + ir_model_name_bin, filename=ir_model_name_bin, directory=model_folder)
@@ -188,7 +190,7 @@ format.
 Functions
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -223,7 +225,7 @@ Functions
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -234,8 +236,8 @@ select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -253,7 +255,7 @@ select device from dropdown list for running inference using OpenVINO
 Load the Model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load the model in OpenVINO Runtime with ``core.read_model`` and compile
 it for the specified device with ``core.compile_model``. Get input and
@@ -262,11 +264,11 @@ output keys and the expected input shape for the model.
 .. code:: ipython3
 
     # Create cache folder
-    cache_folder = Path('cache')
+    cache_folder = Path("cache")
     cache_folder.mkdir(exist_ok=True)
     
     core = ov.Core()
-    core.set_property({'CACHE_DIR': cache_folder})
+    core.set_property({"CACHE_DIR": cache_folder})
     model = core.read_model(model_xml_path)
     compiled_model = core.compile_model(model=model, device_name=device.value)
     
@@ -279,12 +281,12 @@ output keys and the expected input shape for the model.
 Monodepth on Image
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load, resize and reshape input image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The input image is read with OpenCV, resized to network input size, and
 reshaped to (N,C,H,W) (N=number of images, C=number of channels,
@@ -304,7 +306,7 @@ H=height, W=width).
 Do inference on the image
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Do inference, convert the result to an image, and resize it to the
 original image shape.
@@ -324,14 +326,14 @@ original image shape.
 
 .. parsed-literal::
 
-    /tmp/ipykernel_3027414/2076527990.py:15: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed two minor releases later. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap(obj)`` instead.
+    /tmp/ipykernel_64442/2076527990.py:15: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed two minor releases later. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap(obj)`` instead.
       cmap = matplotlib.cm.get_cmap(colormap)
 
 
 Display monodepth image
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -347,7 +349,7 @@ Display monodepth image
 Monodepth on Video
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 By default, only the first 4 seconds are processed in order to quickly
 check that everything works. Change ``NUM_SECONDS`` in the cell below to
@@ -356,7 +358,7 @@ modify this. Set ``NUM_SECONDS`` to 0 to process the whole video.
 Video Settings
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -387,7 +389,7 @@ Video Settings
 Load the Video
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load the video from a ``VIDEO_FILE``, set in the *Video Settings* cell
 above. Open the video to read the frame width and height and fps, and
@@ -407,10 +409,7 @@ compute values for these properties for the monodepth video.
     target_frame_width = int(input_video_frame_width * SCALE_OUTPUT)
     
     cap.release()
-    print(
-        f"The input video has a frame width of {input_video_frame_width}, "
-        f"frame height of {input_video_frame_height} and runs at {input_fps:.2f} fps"
-    )
+    print(f"The input video has a frame width of {input_video_frame_width}, " f"frame height of {input_video_frame_height} and runs at {input_fps:.2f} fps")
     print(
         "The monodepth video will be scaled with a factor "
         f"{SCALE_OUTPUT}, have width {target_frame_width}, "
@@ -427,7 +426,7 @@ compute values for these properties for the monodepth video.
 Do Inference on a Video and Create Monodepth Video
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -526,14 +525,14 @@ Do Inference on a Video and Create Monodepth Video
 
 .. parsed-literal::
 
-    Processed 60 frames in 27.00 seconds. Total FPS (including video processing): 2.22.Inference FPS: 43.55 
+    Processed 60 frames in 26.27 seconds. Total FPS (including video processing): 2.28.Inference FPS: 43.30 
     Monodepth Video saved to 'output/Coco%20Walking%20in%20Berkeley_monodepth.mp4'.
 
 
 Display Monodepth Video
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -543,10 +542,7 @@ Display Monodepth Video
         raise ValueError("OpenCV was unable to write the video file. Showing one video frame.")
     else:
         print(f"Showing monodepth video saved at\n{result_video_path.resolve()}")
-        print(
-            "If you cannot see the video in your browser, please click on the "
-            "following link to download the video "
-        )
+        print("If you cannot see the video in your browser, please click on the " "following link to download the video ")
         video_link = FileLink(result_video_path)
         video_link.html_link_str = "<a href='%s' download>%s</a>"
         display(HTML(video_link._repr_html_()))
@@ -556,7 +552,7 @@ Display Monodepth Video
 .. parsed-literal::
 
     Showing monodepth video saved at
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/vision-monodepth/output/Coco%20Walking%20in%20Berkeley_monodepth.mp4
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/vision-monodepth/output/Coco%20Walking%20in%20Berkeley_monodepth.mp4
     If you cannot see the video in your browser, please click on the following link to download the video 
 
 

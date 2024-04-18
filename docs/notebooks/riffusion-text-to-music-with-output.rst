@@ -77,31 +77,31 @@ audio generation.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Stable Diffusion pipeline in Optimum
-   Intel <#stable-diffusion-pipeline-in-optimum-intel>`__
+   Intel <#Stable-Diffusion-pipeline-in-Optimum-Intel>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Prepare postprocessing for reconstruction audio from spectrogram
-   image <#prepare-postprocessing-for-reconstruction-audio-from-spectrogram-image>`__
--  `Run Inference pipeline <#run-inference-pipeline>`__
--  `Interactive demo <#interactive-demo>`__
+   image <#Prepare-postprocessing-for-reconstruction-audio-from-spectrogram-image>`__
+-  `Run Inference pipeline <#Run-Inference-pipeline>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "torch>=2.1" torchaudio "diffusers>=0.16.1" "transformers>=4.33.0"
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu Pillow scipy "torch>=2.1" torchaudio "diffusers>=0.16.1" "transformers>=4.33.0"
     %pip install -q "git+https://github.com/huggingface/optimum-intel.git" onnx "gradio>=3.34.0" "openvino>=2023.1.0"
 
 Stable Diffusion pipeline in Optimum Intel
 ------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 As the riffusion model architecture is the same as Stable Diffusion, we
 can use it with the Stable Diffusion pipeline for text-to-image
@@ -140,21 +140,21 @@ running.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
 .. code:: ipython3
 
     import ipywidgets as widgets
-    from openvino.runtime import Core
+    import openvino as ov
     
-    core = Core()
+    core = ov.Core()
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -202,7 +202,7 @@ select device from dropdown list for running inference using OpenVINO
 Prepare postprocessing for reconstruction audio from spectrogram image
 ----------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The riffusion model generates an audio spectrogram image, which can be
 used to reconstruct audio. However, the spectrogram images from the
@@ -242,7 +242,7 @@ from a spectrogram image using Griffin-Lim Algorithm.
     def wav_bytes_from_spectrogram_image(image: Image.Image) -> Tuple[io.BytesIO, float]:
         """
         Reconstruct a WAV audio clip from a spectrogram image. Also returns the duration in seconds.
-        
+    
         Parameters:
           image (Image.Image): generated spectrogram image
         Returns:
@@ -292,12 +292,10 @@ from a spectrogram image using Griffin-Lim Algorithm.
         return wav_bytes, duration_s
     
     
-    def spectrogram_from_image(
-        image: Image.Image, max_volume: float = 50, power_for_image: float = 0.25
-    ) -> np.ndarray:
+    def spectrogram_from_image(image: Image.Image, max_volume: float = 50, power_for_image: float = 0.25) -> np.ndarray:
         """
         Compute a spectrogram magnitude array from a spectrogram image.
-        
+    
         Parameters:
           image (image.Image): input image
           max_volume (float, *optional*, 50): max volume for spectrogram magnitude
@@ -368,7 +366,7 @@ from a spectrogram image using Griffin-Lim Algorithm.
 Run Inference pipeline
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The diagram below briefly describes the workflow of our pipeline
 
@@ -402,10 +400,11 @@ reconstructed audio.
     pipe.reshape(batch_size=1, height=512, width=512, num_images_per_prompt=1)
     pipe.compile()
     
-    def generate(prompt:str, negative_prompt:str = "") -> Tuple[Image.Image, str]:
+    
+    def generate(prompt: str, negative_prompt: str = "") -> Tuple[Image.Image, str]:
         """
         function for generation audio from text prompt
-        
+    
         Parameters:
           prompt (str): input prompt for generation.
           negative_prompt (str): negative prompt for generation, contains undesired concepts for generation, which should be avoided. Can be empty.
@@ -478,6 +477,7 @@ without the other. More explanation of how it works can be found in this
 .. code:: ipython3
 
     import IPython.display as ipd
+    
     ipd.Audio(wav_path)
 
 
@@ -497,14 +497,13 @@ without the other. More explanation of how it works can be found in this
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import gradio as gr
-    from openvino.runtime import Core
     
-    available_devices = Core().available_devices + ["AUTO"]
+    available_devices = core.available_devices + ["AUTO"]
     
     examples = [
         "acoustic folk violin jam",
@@ -516,13 +515,14 @@ Interactive demo
         "ibiza at 3am",
         "k-pop boy group",
         "laughing",
-        "water drops"
+        "water drops",
     ]
     
-    def select_device(device_str:str, current_text:str = "", progress:gr.Progress = gr.Progress()):
+    
+    def select_device(device_str: str, current_text: str = "", progress: gr.Progress = gr.Progress()):
         """
         Helper function for uploading model on the device.
-        
+    
         Parameters:
           device_str (str): Device name.
           current_text (str): Current content of user instruction field (used only for backup purposes, temporally replacing it on the progress bar during model loading).
@@ -533,31 +533,32 @@ Interactive demo
         if device_str != pipe._device:
             pipe.clear_requests()
             pipe.to(device_str)
-            
+    
             for i in progress.tqdm(range(1), desc=f"Model loading on {device_str}"):
                 pipe.compile()
         return current_text
     
+    
     with gr.Blocks() as demo:
-        
         with gr.Column():
-            gr.Markdown(
-                "# Riffusion music generation with OpenVINO\n"
-                " Describe a musical prompt, generate music by getting a spectrogram image and sound."
-            )
-            
+            gr.Markdown("# Riffusion music generation with OpenVINO\n" " Describe a musical prompt, generate music by getting a spectrogram image and sound.")
+    
             prompt_input = gr.Textbox(placeholder="", label="Musical prompt")
             negative_prompt = gr.Textbox(label="Negative prompt")
             device = gr.Dropdown(choices=available_devices, value=DEVICE, label="Device")
-                
+    
             send_btn = gr.Button(value="Get a new spectrogram!")
             gr.Examples(examples, prompt_input, examples_per_page=15)
-                
+    
         with gr.Column():
-            sound_output = gr.Audio(type='filepath', label="spectrogram sound")
+            sound_output = gr.Audio(type="filepath", label="spectrogram sound")
             spectrogram_output = gr.Image(label="spectrogram image result", height=256)
-        
-        send_btn.click(generate, inputs=[prompt_input, negative_prompt], outputs=[spectrogram_output, sound_output])
+    
+        send_btn.click(
+            generate,
+            inputs=[prompt_input, negative_prompt],
+            outputs=[spectrogram_output, sound_output],
+        )
         device.change(select_device, [device, prompt_input], [prompt_input])
     
     if __name__ == "__main__":
@@ -587,7 +588,7 @@ Interactive demo
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="800" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

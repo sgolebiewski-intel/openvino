@@ -40,19 +40,19 @@ Prerequisites
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Get Books <#get-books>`__
--  `Clean Text <#clean-text>`__
--  `Split Text <#split-text>`__
--  `Get Sentence Embeddings <#get-sentence-embeddings>`__
+-  `Get Books <#Get-Books>`__
+-  `Clean Text <#Clean-Text>`__
+-  `Split Text <#Split-Text>`__
+-  `Get Sentence Embeddings <#Get-Sentence-Embeddings>`__
 
    -  `Optimize the Model with
-      OpenVINO <#optimize-the-model-with-openvino>`__
+      OpenVINO <#Optimize-the-Model-with-OpenVINO>`__
 
--  `Calculate Sentence Alignment <#calculate-sentence-alignment>`__
--  `Postprocess Sentence Alignment <#postprocess-sentence-alignment>`__
--  `Visualize Sentence Alignment <#visualize-sentence-alignment>`__
+-  `Calculate Sentence Alignment <#Calculate-Sentence-Alignment>`__
+-  `Postprocess Sentence Alignment <#Postprocess-Sentence-Alignment>`__
+-  `Visualize Sentence Alignment <#Visualize-Sentence-Alignment>`__
 -  `Speed up Embeddings
-   Computation <#speed-up-embeddings-computation>`__
+   Computation <#Speed-up-Embeddings-Computation>`__
 
 .. |image0| image:: https://user-images.githubusercontent.com/51917466/254582697-18f3ab38-e264-4b2c-a088-8e54b855c1b2.png
 
@@ -70,7 +70,7 @@ Table of contents:
 Get Books
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The first step is to get the books that we will be working with. For
 this notebook, we will use English and German versions of Anna Karenina
@@ -217,7 +217,7 @@ which in a raw format looks like this:
 Clean Text
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The downloaded books may contain service information before and after
 the main text. The text might have different formatting styles and
@@ -239,7 +239,7 @@ the last occurrence of these asterisks.
    **Hint**: There are text-cleaning libraries that clean up common
    flaws. If the source of the text is known, you can look for a library
    designed for that source, for example
-   `gutenberg_cleaner <https://github.com/kiasar/gutenberg_cleaner>`__.
+   ```gutenberg_cleaner`` <https://github.com/kiasar/gutenberg_cleaner>`__.
    These libraries can reduce manual work and even automate the
    process.process.
 
@@ -318,7 +318,7 @@ needed.
             remove_single_newline,
             unify_quotes,
             remove_markup,
-        ]    
+        ]
         progress_bar = tqdm(text_cleaning_pipeline, disable=disable_tqdm)
         for clean_func in progress_bar:
             progress_bar.set_postfix_str(clean_func.__name__)
@@ -345,7 +345,7 @@ needed.
 Split Text
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Dividing text into sentences is a challenging task in text processing.
 The problem is called `sentence boundary
@@ -387,7 +387,7 @@ languages.
 Get Sentence Embeddings
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The next step is to transform sentences into vector representations.
 Transformer encoder models, like BERT, provide high-quality embeddings
@@ -443,20 +443,10 @@ best fit.
         embedding_model: Union[BertModel, OVModel],
     ) -> np.ndarray:
         if isinstance(embedding_model, OVModel):
-            embeddings = [
-                embedding_model(tokenizer(sent, return_tensors="np").data)[
-                    "last_hidden_state"
-                ][0][0]
-                for sent in tqdm(sentences, disable=disable_tqdm)
-            ]
+            embeddings = [embedding_model(tokenizer(sent, return_tensors="np").data)["last_hidden_state"][0][0] for sent in tqdm(sentences, disable=disable_tqdm)]
             return np.vstack(embeddings)
         else:
-            embeddings = [
-                embedding_model(**tokenizer(sent, return_tensors="pt"))[
-                    "last_hidden_state"
-                ][0][0]
-                for sent in tqdm(sentences, disable=disable_tqdm)
-            ]
+            embeddings = [embedding_model(**tokenizer(sent, return_tensors="pt"))["last_hidden_state"][0][0] for sent in tqdm(sentences, disable=disable_tqdm)]
             return torch.vstack(embeddings)
     
     
@@ -479,7 +469,7 @@ best fit.
 Optimize the Model with OpenVINO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The LaBSE model is quite large and can be slow to infer on some
 hardware, so let’s optimize it with OpenVINO. `Model Conversion
@@ -499,8 +489,8 @@ For starting work, we should select device for inference first:
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -557,7 +547,7 @@ model predictions remain within an acceptable tolerance:
 Calculate Sentence Alignment
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 With the embedding matrices from the previous step, we can calculate the
 alignment: 1. Calculate sentence similarity between each pair of
@@ -584,16 +574,12 @@ the converted model is the same as the original one.
         return x / np.var(x)
     
     
-    def calculate_alignment_matrix(
-        first: np.ndarray, second: np.ndarray, threshold: float = 1e-3
-    ) -> np.ndarray:
+    def calculate_alignment_matrix(first: np.ndarray, second: np.ndarray, threshold: float = 1e-3) -> np.ndarray:
         similarity = first @ second.T  # 1
         similarity_en_to_de = np.apply_along_axis(transform, -1, similarity)  # 2
         similarity_de_to_en = np.apply_along_axis(transform, -2, similarity)  # 2
     
-        both_one = (similarity_en_to_de > threshold) * (
-            similarity_de_to_en > threshold
-        )  # 3 and 4
+        both_one = (similarity_en_to_de > threshold) * (similarity_de_to_en > threshold)  # 3 and 4
         return both_one
     
     
@@ -608,9 +594,7 @@ the converted model is the same as the original one.
     
     graph, axis = plt.subplots(1, 2, figsize=(10, 5), sharey=True)
     
-    for matrix, ax, title in zip(
-        (alignment_matrix, alignment_matrix_pt), axis, ("OpenVINO", "PyTorch")
-    ):
+    for matrix, ax, title in zip((alignment_matrix, alignment_matrix_pt), axis, ("OpenVINO", "PyTorch")):
         plot = sns.heatmap(matrix, cbar=False, square=True, ax=ax)
         plot.set_title(f"Sentence Alignment Matrix {title}")
         plot.set_xlabel("German")
@@ -684,7 +668,7 @@ will be lists of German sentence numbers.
 Postprocess Sentence Alignment
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 There are several gaps in the resulting alignment, such as English
 sentence #14 not mapping to any German sentence. Here are some possible
@@ -711,7 +695,7 @@ suitable alignment.
 Visualize Sentence Alignment
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To evaluate the final alignment and choose the best way to improve the
 results of the pipeline, we will create an interactive table with HTML
@@ -724,9 +708,7 @@ and JS.
     from io import StringIO
     
     
-    def create_interactive_table(
-        list1: List[str], list2: List[str], mapping: Dict[int, List[int]]
-    ) -> str:
+    def create_interactive_table(list1: List[str], list2: List[str], mapping: Dict[int, List[int]]) -> str:
         def inverse_mapping(mapping):
             inverse_map = {idx: [] for idx in range(len(list2))}
     
@@ -739,9 +721,7 @@ and JS.
         inversed_mapping = inverse_mapping(mapping)
     
         table_html = StringIO()
-        table_html.write(
-            '<table id="mappings-table"><tr><th>Sentences EN</th><th>Sentences DE</th></tr>'
-        )
+        table_html.write('<table id="mappings-table"><tr><th>Sentences EN</th><th>Sentences DE</th></tr>')
         for i, (first, second) in enumerate(zip_longest(list1, list2)):
             table_html.write("<tr>")
             if i < len(list1):
@@ -872,7 +852,7 @@ To read the model from disk, use the ``read_model`` method of the
 Speed up Embeddings Computation
 -------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let’s see how we can speed up the most computationally complex part of
 the pipeline - getting embeddings. You might wonder why, when using
@@ -940,9 +920,7 @@ advance and fill it in as the inference requests are executed.
         infer_queue = ov.AsyncInferQueue(embedding_model)
         infer_queue.set_callback(callback)
     
-        embedding_dim = (
-            embedding_model.output(0).get_partial_shape().get_dimension(2).get_length()
-        )
+        embedding_dim = embedding_model.output(0).get_partial_shape().get_dimension(2).get_length()
         embeddings = np.zeros((len(sentences), embedding_dim))
     
         with tqdm(total=len(sentences), disable=disable_tqdm) as pbar:
@@ -1006,9 +984,7 @@ Let’s compare the models and plot the results.
     for model, func, name in benchmarks_iterator:
         printable_name = name.replace("\n", " ")
         benchmarks_iterator.set_description(f"Run benchmark for {printable_name} model")
-        for run in tqdm(
-            range(10 + 1), leave=False, desc="Benchmark Runs: ", disable=disable_tqdm
-        ):
+        for run in tqdm(range(10 + 1), leave=False, desc="Benchmark Runs: ", disable=disable_tqdm):
             with disable_tqdm_context():
                 start = perf_counter()
                 func(benchmark_data, model)
@@ -1047,9 +1023,7 @@ Let’s compare the models and plot the results.
     cpu_name = core.get_property("CPU", "FULL_DEVICE_NAME")
     
     plot = sns.barplot(benchmark_dataframe, errorbar="sd")
-    plot.set(
-        ylabel="Sentences Per Second", title=f"Sentence Embeddings Benchmark\n{cpu_name}"
-    )
+    plot.set(ylabel="Sentences Per Second", title=f"Sentence Embeddings Benchmark\n{cpu_name}")
     perf_ratio = benchmark_dataframe.mean() / benchmark_dataframe.mean()[0]
     plot.spines["right"].set_visible(False)
     plot.spines["top"].set_visible(False)

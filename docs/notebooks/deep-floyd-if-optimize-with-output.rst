@@ -23,28 +23,28 @@ optimized models.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Compress weights <#compress-weights>`__
--  `Quantize <#quantize>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Compress weights <#Compress-weights>`__
+-  `Quantize <#Quantize>`__
 
-   -  `Prepare dataset <#prepare-dataset>`__
-   -  `Quantize first stage U-Net <#quantize-first-stage-u-net>`__
-   -  `Quantize second stage U-Net <#quantize-second-stage-u-net>`__
+   -  `Prepare dataset <#Prepare-dataset>`__
+   -  `Quantize first stage U-Net <#Quantize-first-stage-U-Net>`__
+   -  `Quantize second stage U-Net <#Quantize-second-stage-U-Net>`__
 
--  `Run optimized OpenVINO model <#run-optimized-openvino-model>`__
+-  `Run optimized OpenVINO model <#Run-optimized-OpenVINO-model>`__
 
-   -  `Compare file sizes <#compare-file-sizes>`__
+   -  `Compare file sizes <#Compare-file-sizes>`__
    -  `Compare performance time of the converted and optimized
-      models <#compare-performance-time-of-the-converted-and-optimized-models>`__
+      models <#Compare-performance-time-of-the-converted-and-optimized-models>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q datasets "nncf>=2.6.0" "torch>=2.1"
+    %pip install -q datasets "nncf>=2.6.0" "torch>=2.1" tqdm
 
 .. code:: ipython3
 
@@ -59,7 +59,7 @@ Prerequisites
     
     from utils import TextEncoder, UnetFirstStage, UnetSecondStage
     
-    checkpoint_variant = 'fp16'
+    checkpoint_variant = "fp16"
     model_dtype = torch.float32
     RANDOM_SEED = 42
     N_DIFFUSION_STEPS = 50
@@ -75,13 +75,13 @@ Prerequisites
 
 .. code:: ipython3
 
-    MODEL_DIR = Path('./models')
+    MODEL_DIR = Path("./models")
     TEXT_ENCODER_IR_PATH = MODEL_DIR / "encoder_ir.xml"
     UNET_I_IR_PATH = MODEL_DIR / "unet_ir_I.xml"
     UNET_II_IR_PATH = MODEL_DIR / "unet_ir_II.xml"
     
     if not (TEXT_ENCODER_IR_PATH.exists() and UNET_I_IR_PATH.exists() and UNET_II_IR_PATH.exists()):
-        raise RuntimeError('This notebook should be run after deep-floyd-if notebook')
+        raise RuntimeError("This notebook should be run after deep-floyd-if notebook")
 
 .. code:: ipython3
 
@@ -89,8 +89,8 @@ Prerequisites
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -108,7 +108,7 @@ Prerequisites
 Compress weights
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Text encoder model consumes ~22 GB of disk space. To avoid running out
 of memory, we suggest using 8-bit weights compression instead of
@@ -143,12 +143,12 @@ quantized model, but this will significantly reduce the model footprint.
 Quantize
 --------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Prepare dataset
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 DeepFloyd IF consists of a U-Net model for first and second stages.
 First stage U-Net generates 64x64 px image based on text prompt, second
@@ -166,15 +166,33 @@ contains over 2 billion objects.
     
     np.random.seed(RANDOM_SEED)
     
+    
     def get_negative_prompt():
         negative_prompts = [
-            "amateur", "blurred", "deformed", "disfigured", "disgusting", "jpeg artifacts", "low contrast",
-            "low quality", "low saturation", "mangled", "morbid", "mutilated", "mutation",
-            "out of frame", "out of frame", "ugly", "uncentered", "underexposed", "unreal",
+            "amateur",
+            "blurred",
+            "deformed",
+            "disfigured",
+            "disgusting",
+            "jpeg artifacts",
+            "low contrast",
+            "low quality",
+            "low saturation",
+            "mangled",
+            "morbid",
+            "mutilated",
+            "mutation",
+            "out of frame",
+            "out of frame",
+            "ugly",
+            "uncentered",
+            "underexposed",
+            "unreal",
         ]
         num_elements = np.random.randint(2, 6)
         random_elements = np.random.choice(negative_prompts, num_elements)
         return [" ".join(random_elements)]
+    
     
     def prepare_calibration_data(dataloader, stage_1):
         """
@@ -209,11 +227,7 @@ contains over 2 billion objects.
     selection_prob = 0.5
     prompts_number = np.ceil(opt_init_steps // (min(N_DIFFUSION_STEPS, UNET_2_STEPS) * selection_prob))
     
-    stage_1 = DiffusionPipeline.from_pretrained(
-        "DeepFloyd/IF-I-M-v1.0",
-        variant=checkpoint_variant,
-        torch_dtype=model_dtype
-    )
+    stage_1 = DiffusionPipeline.from_pretrained("DeepFloyd/IF-I-M-v1.0", variant=checkpoint_variant, torch_dtype=model_dtype)
     encoded_prompts = prepare_dataset(stage_1, int(prompts_number))
 
 
@@ -289,12 +303,7 @@ To collect intermediate model inputs for calibration we should customize
 
 .. code:: ipython3
 
-    stage_1.unet = UnetFirstStage(
-        UNET_I_IR_PATH,
-        stage_1.unet.config,
-        dtype=model_dtype,
-        device=device.value
-    )
+    stage_1.unet = UnetFirstStage(UNET_I_IR_PATH, stage_1.unet.config, dtype=model_dtype, device=device.value)
     stage_1.set_progress_bar_config(disable=True)
     
     stage_1_data_cache = []
@@ -304,8 +313,13 @@ To collect intermediate model inputs for calibration we should customize
     stage_2_inputs = []  # to speed up dataset preparation for stage 2 U-Net we can collect several images below
     for data in encoded_prompts:
         prompt_embeds, negative_embeds = data
-        image = stage_1(prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
-                        generator=generator, output_type="pt", num_inference_steps=N_DIFFUSION_STEPS).images
+        image = stage_1(
+            prompt_embeds=prompt_embeds,
+            negative_prompt_embeds=negative_embeds,
+            generator=generator,
+            output_type="pt",
+            num_inference_steps=N_DIFFUSION_STEPS,
+        ).images
         stage_2_inputs.append((image, prompt_embeds, negative_embeds))
     
         if len(stage_1_data_cache) >= opt_init_steps:
@@ -314,7 +328,7 @@ To collect intermediate model inputs for calibration we should customize
 Quantize first stage U-Net
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -327,7 +341,7 @@ Quantize first stage U-Net
         model=ov_model,
         calibration_dataset=stage_1_calibration_dataset,
         model_type=nncf.ModelType.TRANSFORMER,
-        advanced_parameters=nncf.AdvancedQuantizationParameters(smooth_quant_alpha=0.25)
+        advanced_parameters=nncf.AdvancedQuantizationParameters(smooth_quant_alpha=0.25),
     )
     
     UNET_I_INT8_PATH = "_optimized.".join(UNET_I_IR_PATH.as_posix().split("."))
@@ -357,8 +371,13 @@ Quantize first stage U-Net
     start = len(stage_2_inputs)
     for i, data in tqdm(enumerate(encoded_prompts[start:])):
         prompt_embeds, negative_embeds = data
-        image = stage_1(prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
-                        generator=generator, output_type="pt", num_inference_steps=N_DIFFUSION_STEPS).images
+        image = stage_1(
+            prompt_embeds=prompt_embeds,
+            negative_prompt_embeds=negative_embeds,
+            generator=generator,
+            output_type="pt",
+            num_inference_steps=N_DIFFUSION_STEPS,
+        ).images
         stage_2_inputs.append((image, prompt_embeds, negative_embeds))
 
 
@@ -385,23 +404,24 @@ Quantize first stage U-Net
         "DeepFloyd/IF-II-M-v1.0",
         text_encoder=None,
         variant=checkpoint_variant,
-        torch_dtype=model_dtype
+        torch_dtype=model_dtype,
     )
     stage_2.set_progress_bar_config(disable=True)
     
-    stage_2.unet = UnetSecondStage(
-        UNET_II_IR_PATH,
-        stage_2.unet.config,
-        dtype=model_dtype,
-        device=device.value
-    )
+    stage_2.unet = UnetSecondStage(UNET_II_IR_PATH, stage_2.unet.config, dtype=model_dtype, device=device.value)
     stage_2_data_cache = []
     stage_2.unet.unet_openvino = CompiledModelDecorator(stage_2.unet.unet_openvino, prob=selection_prob, data_cache=stage_2_data_cache)
     
     for data in tqdm(stage_2_inputs):
         image, prompt_embeds, negative_embeds = data
-        image = stage_2(image=image, prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
-                        generator=generator, output_type="pt", num_inference_steps=UNET_2_STEPS).images
+        image = stage_2(
+            image=image,
+            prompt_embeds=prompt_embeds,
+            negative_prompt_embeds=negative_embeds,
+            generator=generator,
+            output_type="pt",
+            num_inference_steps=UNET_2_STEPS,
+        ).images
     
         if len(stage_2_data_cache) >= opt_init_steps:
             break
@@ -438,7 +458,7 @@ Quantize first stage U-Net
 Quantize second stage U-Net
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -474,7 +494,7 @@ Quantize second stage U-Net
 Run optimized OpenVINO model
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let us check predictions with the optimized OpenVINO DeepFloyd IF model
 result using the same input data from the `1st
@@ -482,29 +502,20 @@ notebook <deep-floyd-if.ipynb>`__.
 
 .. code:: ipython3
 
-    prompt = 'ultra close color photo portrait of rainbow owl with deer horns in the woods'
-    negative_prompt = 'blurred unreal uncentered occluded'
+    prompt = "ultra close color photo portrait of rainbow owl with deer horns in the woods"
+    negative_prompt = "blurred unreal uncentered occluded"
 
 .. code:: ipython3
 
     %%time
     
-    stage_1 = DiffusionPipeline.from_pretrained(
-        "DeepFloyd/IF-I-M-v1.0",
-        variant=checkpoint_variant,
-        torch_dtype=model_dtype
-    )
+    stage_1 = DiffusionPipeline.from_pretrained("DeepFloyd/IF-I-M-v1.0", variant=checkpoint_variant, torch_dtype=model_dtype)
     
     # Initialize the First Stage U-Net wrapper class
-    stage_1.unet = UnetFirstStage(
-        UNET_I_INT8_PATH,
-        stage_1.unet.config,
-        dtype=model_dtype,
-        device=device.value
-    )
+    stage_1.unet = UnetFirstStage(UNET_I_INT8_PATH, stage_1.unet.config, dtype=model_dtype, device=device.value)
     
     stage_1.text_encoder = TextEncoder(TEXT_ENCODER_INT8_IR_PATH, dtype=model_dtype, device=device.value)
-    print('The model has been loaded')
+    print("The model has been loaded")
     
     # Generate text embeddings
     prompt_embeds, negative_embeds = stage_1.encode_prompt(prompt, negative_prompt=negative_prompt)
@@ -513,8 +524,13 @@ notebook <deep-floyd-if.ipynb>`__.
     generator = torch.manual_seed(RANDOM_SEED)
     
     # Inference
-    image = stage_1(prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
-                    generator=generator, output_type="pt", num_inference_steps=N_DIFFUSION_STEPS).images
+    image = stage_1(
+        prompt_embeds=prompt_embeds,
+        negative_prompt_embeds=negative_embeds,
+        generator=generator,
+        output_type="pt",
+        num_inference_steps=N_DIFFUSION_STEPS,
+    ).images
     
     # Show the image
     pt_to_pil(image)[0]
@@ -580,21 +596,21 @@ notebook <deep-floyd-if.ipynb>`__.
         "DeepFloyd/IF-II-M-v1.0",
         text_encoder=None,
         variant=checkpoint_variant,
-        torch_dtype=model_dtype
+        torch_dtype=model_dtype,
     )
     
     # Initialize the Second Stage U-Net wrapper class
-    stage_2.unet = UnetSecondStage(
-        UNET_II_INT8_PATH,
-        stage_2.unet.config,
-        dtype=model_dtype,
-        device=device.value
-    )
-    print('The model has been loaded')
+    stage_2.unet = UnetSecondStage(UNET_II_INT8_PATH, stage_2.unet.config, dtype=model_dtype, device=device.value)
+    print("The model has been loaded")
     
     image = stage_2(
-        image=image, prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
-        generator=generator, output_type="pt", num_inference_steps=UNET_2_STEPS).images
+        image=image,
+        prompt_embeds=prompt_embeds,
+        negative_prompt_embeds=negative_embeds,
+        generator=generator,
+        output_type="pt",
+        num_inference_steps=UNET_2_STEPS,
+    ).images
     
     # Show the image
     pil_image = pt_to_pil(image)[0]
@@ -648,36 +664,28 @@ notebook <deep-floyd-if.ipynb>`__.
 
 .. code:: ipython3
 
-    
     import cv2
     import numpy as np
     from utils import convert_result_to_image, download_omz_model
     
     # 1032: 4x superresolution, 1033: 3x superresolution
-    model_name = 'single-image-super-resolution-1032'
+    model_name = "single-image-super-resolution-1032"
     download_omz_model(model_name, MODEL_DIR)
     
-    sr_model_xml_path = MODEL_DIR / f'{model_name}.xml'
+    sr_model_xml_path = MODEL_DIR / f"{model_name}.xml"
     model = core.read_model(model=sr_model_xml_path)
-    model.reshape({
-        0: [1, 3, 256, 256],
-        1: [1, 3, 1024, 1024]
-    })
+    model.reshape({0: [1, 3, 256, 256], 1: [1, 3, 1024, 1024]})
     compiled_sr_model = core.compile_model(model=model, device_name=device.value)
     
     original_image = np.array(pil_image)
-    bicubic_image = cv2.resize(
-        src=original_image, dsize=(1024, 1024), interpolation=cv2.INTER_CUBIC
-    )
+    bicubic_image = cv2.resize(src=original_image, dsize=(1024, 1024), interpolation=cv2.INTER_CUBIC)
     
     # Reshape the images from (H,W,C) to (N,C,H,W) as expected by the model.
     input_image_original = np.expand_dims(original_image.transpose(2, 0, 1), axis=0)
     input_image_bicubic = np.expand_dims(bicubic_image.transpose(2, 0, 1), axis=0)
     
     # Model Inference
-    result = compiled_sr_model(
-        [input_image_original, input_image_bicubic]
-    )[compiled_sr_model.output(0)]
+    result = compiled_sr_model([input_image_original, input_image_bicubic])[compiled_sr_model.output(0)]
     
     img = convert_result_to_image(result)
     img
@@ -702,7 +710,7 @@ notebook <deep-floyd-if.ipynb>`__.
 Compare file sizes
 ^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Let’s calculate the compression rate of the optimized IRs file size
 relative to the FP16 OpenVINO models file size
@@ -743,7 +751,7 @@ relative to the FP16 OpenVINO models file size
 Compare performance time of the converted and optimized models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of OpenVINO FP16 and INT8 models,
 use `Benchmark
@@ -758,8 +766,9 @@ Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-to
 
     import re
     
+    
     def get_fps(benchmark_output: str):
-        parsed_output = [line for line in benchmark_output if 'Throughput:' in line]
+        parsed_output = [line for line in benchmark_output if "Throughput:" in line]
         fps = re.findall(r"\d+\.\d+", parsed_output[0])[0]
         return fps
 
@@ -771,7 +780,9 @@ Text encoder
     original_fps = get_fps(benchmark_output)
     print(f"FP16 Text Encoder Throughput: {original_fps} FPS")
     
-    benchmark_output = !benchmark_app -m $TEXT_ENCODER_INT8_IR_PATH -d $device.value -api async
+    benchmark_output = (
+        !benchmark_app -m $TEXT_ENCODER_INT8_IR_PATH -d $device.value -api async
+    )
     optimized_fps = get_fps(benchmark_output)
     print(f"INT8 Text Encoder Throughput: {optimized_fps} FPS")
     print(f"Text encoder speed up: {float(optimized_fps) / float(original_fps)}")

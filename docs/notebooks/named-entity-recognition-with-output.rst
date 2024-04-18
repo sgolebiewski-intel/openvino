@@ -14,9 +14,9 @@ information extraction of large amounts of data.
 
 This tutorial shows how to perform named entity recognition using
 OpenVINO. We will use the pre-trained model
-`elastic/distilbert-base-cased-finetuned-conll03-english <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__.
+```elastic/distilbert-base-cased-finetuned-conll03-english`` <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__.
 It is DistilBERT based model, trained on
-`conll03 english dataset <https://huggingface.co/datasets/conll2003>`__.
+```conll03 english dataset`` <https://huggingface.co/datasets/conll2003>`__.
 The model can recognize four named entities in text: persons, locations,
 organizations and names of miscellaneous entities that do not belong to
 the previous three groups. The model is sensitive to capital letters.
@@ -28,27 +28,27 @@ convert the model to OpenVINO™ IR format and quantize it.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Download the NER model <#download-the-ner-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Download the NER model <#Download-the-NER-model>`__
 -  `Quantize the model, using Hugging Face Optimum
-   API <#quantize-the-model-using-hugging-face-optimum-api>`__
+   API <#Quantize-the-model,-using-Hugging-Face-Optimum-API>`__
 -  `Compare the Original and Quantized
-   Models <#compare-the-original-and-quantized-models>`__
+   Models <#Compare-the-Original-and-Quantized-Models>`__
 
-   -  `Compare performance <#compare-performance>`__
-   -  `Compare size of the models <#compare-size-of-the-models>`__
+   -  `Compare performance <#Compare-performance>`__
+   -  `Compare size of the models <#Compare-size-of-the-models>`__
 
 -  `Prepare demo for Named Entity Recognition OpenVINO
-   Runtime <#prepare-demo-for-named-entity-recognition-openvino-runtime>`__
+   Runtime <#Prepare-demo-for-Named-Entity-Recognition-OpenVINO-Runtime>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q "diffusers>=0.17.1" "openvino>=2023.1.0" "nncf>=2.5.0" "gradio" "onnx>=1.11.0" "transformers>=4.33.0" "torch>=2.1" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "diffusers>=0.17.1" "openvino>=2023.1.0" "nncf>=2.5.0" "gradio>=4.19" "onnx>=1.11.0" "transformers>=4.33.0" "torch>=2.1" --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "git+https://github.com/huggingface/optimum-intel.git"
 
 
@@ -61,10 +61,10 @@ Prerequisites
 Download the NER model
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We load the
-`distilbert-base-cased-finetuned-conll03-english <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__
+```distilbert-base-cased-finetuned-conll03-english`` <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__
 model from the `Hugging Face Hub <https://huggingface.co/models>`__ with
 `Hugging Face Transformers
 library <https://huggingface.co/docs/transformers/index>`__\ and Optimum
@@ -84,12 +84,12 @@ pre-converted model for next usage, and speedup deployment process.
     from transformers import AutoTokenizer
     from optimum.intel import OVModelForTokenClassification
     
-    original_ner_model_dir = Path('original_ner_model')
+    original_ner_model_dir = Path("original_ner_model")
     
     model_id = "elastic/distilbert-base-cased-finetuned-conll03-english"
     if not original_ner_model_dir.exists():
         model = OVModelForTokenClassification.from_pretrained(model_id, export=True)
-        
+    
         model.save_pretrained(original_ner_model_dir)
     else:
         model = OVModelForTokenClassification.from_pretrained(model_id, export=True)
@@ -123,14 +123,14 @@ pre-converted model for next usage, and speedup deployment process.
     /home/ea/miniconda3/lib/python3.11/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
     /home/ea/miniconda3/lib/python3.11/site-packages/nncf/torch/dynamic_graph/wrappers.py:80: TracerWarning: torch.tensor results are registered as constants in the trace. You can safely ignore this warning if you use this function to create tensors out of constant variables that would be the same every time you call this function. In any other case, this might cause the trace to be incorrect.
-      op1 = operator(\*args, \*\*kwargs)
+      op1 = operator(*args, **kwargs)
     Compiling the model to CPU ...
 
 
 Quantize the model, using Hugging Face Optimum API
 --------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Post-training static quantization introduces an additional calibration
 step where data is fed through the network in order to compute the
@@ -139,7 +139,7 @@ activations quantization parameters. For quantization it will be used
 API <https://huggingface.co/docs/optimum/intel/index>`__.
 
 To handle the NNCF quantization process we use class
-`OVQuantizer <https://huggingface.co/docs/optimum/intel/reference_ov#optimum.intel.OVQuantizer>`__.
+```OVQuantizer`` <https://huggingface.co/docs/optimum/intel/reference_ov#optimum.intel.OVQuantizer>`__.
 The quantization with Hugging Face Optimum Intel API contains the next
 steps: \* Model class initialization starts with calling
 ``from_pretrained()`` method. \* Next we create calibration dataset with
@@ -155,18 +155,18 @@ corresponding ``OVModelForXxx`` class. So we use
 .. code:: ipython3
 
     from functools import partial
-    from optimum.intel import OVQuantizer
+    from optimum.intel import OVQuantizer, OVConfig, OVQuantizationConfig
     
     from optimum.intel import OVModelForTokenClassification
+    
     
     def preprocess_fn(data, tokenizer):
         examples = []
         for data_chunk in data["tokens"]:
-            examples.append(' '.join(data_chunk))
+            examples.append(" ".join(data_chunk))
     
-        return tokenizer(
-            examples, padding=True, truncation=True, max_length=128
-        )
+        return tokenizer(examples, padding=True, truncation=True, max_length=128)
+    
     
     quantizer = OVQuantizer.from_pretrained(model)
     calibration_dataset = quantizer.get_calibration_dataset(
@@ -181,7 +181,12 @@ corresponding ``OVModelForXxx`` class. So we use
     quantized_ner_model_dir = "quantized_ner_model"
     
     # Apply static quantization and save the resulting model in the OpenVINO IR format
-    quantizer.quantize(calibration_dataset=calibration_dataset, save_directory=quantized_ner_model_dir, subset_size=len(calibration_dataset))
+    ov_config = OVConfig(quantization_config=OVQuantizationConfig(num_samples=len(calibration_dataset)))
+    quantizer.quantize(
+        calibration_dataset=calibration_dataset,
+        save_directory=quantized_ner_model_dir,
+        ov_config=ov_config,
+    )
 
 
 .. parsed-literal::
@@ -289,8 +294,8 @@ corresponding ``OVModelForXxx`` class. So we use
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -307,7 +312,6 @@ corresponding ``OVModelForXxx`` class. So we use
 
 .. code:: ipython3
 
-    
     # Load the quantized model
     optimized_model = OVModelForTokenClassification.from_pretrained(quantized_ner_model_dir, device=device.value)
 
@@ -320,17 +324,17 @@ corresponding ``OVModelForXxx`` class. So we use
 Compare the Original and Quantized Models
 -----------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Compare the original
-`distilbert-base-cased-finetuned-conll03-english <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__
+```distilbert-base-cased-finetuned-conll03-english`` <https://huggingface.co/elastic/distilbert-base-cased-finetuned-conll03-english>`__
 model with quantized and converted to OpenVINO IR format models to see
 the difference.
 
 Compare performance
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 As the Optimum Inference models are API compatible with Hugging Face
 Transformers models, we can just use ``pipleine()`` from `Hugging Face
@@ -350,11 +354,12 @@ inference.
     import time
     import numpy as np
     
+    
     def calc_perf(ner_pipeline):
         inference_times = []
     
         for data in calibration_dataset:
-            text = ' '.join(data['tokens'])
+            text = " ".join(data["tokens"])
             start = time.perf_counter()
             ner_pipeline(text)
             end = time.perf_counter()
@@ -363,13 +368,9 @@ inference.
         return np.median(inference_times)
     
     
-    print(
-        f"Median inference time of quantized model: {calc_perf(ner_pipeline_optimized)} "
-    )
+    print(f"Median inference time of quantized model: {calc_perf(ner_pipeline_optimized)} ")
     
-    print(
-        f"Median inference time of original model: {calc_perf(ner_pipeline_original)} "
-    )
+    print(f"Median inference time of original model: {calc_perf(ner_pipeline_original)} ")
 
 
 .. parsed-literal::
@@ -381,14 +382,14 @@ inference.
 Compare size of the models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     from pathlib import Path
     
-    fp_model_file = Path(original_ner_model_dir) / "openvino_model.bin" 
-    print(f'Size of original model in Bytes is {fp_model_file.stat().st_size}')
+    fp_model_file = Path(original_ner_model_dir) / "openvino_model.bin"
+    print(f"Size of original model in Bytes is {fp_model_file.stat().st_size}")
     print(f'Size of quantized model in Bytes is {Path(quantized_ner_model_dir, "openvino_model.bin").stat().st_size}')
 
 
@@ -401,7 +402,7 @@ Compare size of the models
 Prepare demo for Named Entity Recognition OpenVINO Runtime
 ----------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, you can try NER model on own text. Put your sentence to input text
 box, click Submit button, the model label the recognized entities in the
@@ -415,15 +416,19 @@ text.
         "My name is Wolfgang and I live in Berlin.",
     ]
     
+    
     def run_ner(text):
         output = ner_pipeline_optimized(text)
-        return {"text": text, "entities": output} 
+        return {"text": text, "entities": output}
     
-    demo = gr.Interface(run_ner,
-                        gr.Textbox(placeholder="Enter sentence here...", label="Input Text"), 
-                        gr.HighlightedText(label="Output Text"),
-                        examples=examples,
-                        allow_flagging="never")
+    
+    demo = gr.Interface(
+        run_ner,
+        gr.Textbox(placeholder="Enter sentence here...", label="Input Text"),
+        gr.HighlightedText(label="Output Text"),
+        examples=examples,
+        allow_flagging="never",
+    )
     
     if __name__ == "__main__":
         try:

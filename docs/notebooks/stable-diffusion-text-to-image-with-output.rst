@@ -41,29 +41,29 @@ Notebook contains the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `login to huggingfacehub to get access to pretrained
    model <#login-to-huggingfacehub-to-get-access-to-pretrained-model>`__
--  `Create PyTorch Models pipeline <#create-pytorch-models-pipeline>`__
+-  `Create PyTorch Models pipeline <#Create-PyTorch-Models-pipeline>`__
 -  `Convert models to OpenVINO Intermediate representation (IR)
-   format <#convert-models-to-openvino-intermediate-representation-ir-format>`__
+   format <#Convert-models-to-OpenVINO-Intermediate-representation-(IR)-format>`__
 
-   -  `Text Encoder <#text-encoder>`__
-   -  `U-net <#u-net>`__
-   -  `VAE <#vae>`__
+   -  `Text Encoder <#Text-Encoder>`__
+   -  `U-net <#U-net>`__
+   -  `VAE <#VAE>`__
 
--  `Prepare Inference Pipeline <#prepare-inference-pipeline>`__
--  `Configure Inference Pipeline <#configure-inference-pipeline>`__
+-  `Prepare Inference Pipeline <#Prepare-Inference-Pipeline>`__
+-  `Configure Inference Pipeline <#Configure-Inference-Pipeline>`__
 
-   -  `Text-to-Image generation <#text-to-image-generation>`__
-   -  `Image-to-Image generation <#image-to-image-generation>`__
+   -  `Text-to-Image generation <#Text-to-Image-generation>`__
+   -  `Image-to-Image generation <#Image-to-Image-generation>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 **The following is needed only if you want to use the original model. If
 not, you do not have to do anything. Just run the notebook.**
@@ -73,7 +73,7 @@ not, you do not have to do anything. Just run the notebook.**
    its weights. Visit the `stable-diffusion-v1-4
    card <https://huggingface.co/CompVis/stable-diffusion-v1-4>`__ to
    read and accept the license before you proceed. To use this diffusion
-   model, you must be a registered user in Hugging Face Hub. You will
+   model, you must be a registered user in 🤗 Hugging Face Hub. You will
    need to use an access token for the code below to run. For more
    information on access tokens, refer to `this section of the
    documentation <https://huggingface.co/docs/hub/security-tokens>`__.
@@ -105,13 +105,13 @@ solutions based on Stable Diffusion.
     %pip install -q "openvino>=2023.1.0"
     %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "diffusers>=0.9.0" "torch>=2.1"
     %pip install -q "huggingface-hub>=0.9.1"
-    %pip install -q gradio
-    %pip install -q transformers
+    %pip install -q "gradio>=4.19"
+    %pip install -q transformers Pillow opencv-python tqdm
 
 Create PyTorch Models pipeline
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ``StableDiffusionPipeline`` is an end-to-end inference pipeline that you
 can use to generate images from text with just a few lines of code.
@@ -269,7 +269,7 @@ First, load the pre-trained weights of all components of the model.
 Convert models to OpenVINO Intermediate representation (IR) format
 ------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Staring from 2023.0 release, OpenVINO supports direct conversion PyTorch
 models to OpenVINO IR format. You need to provide a model object and
@@ -293,7 +293,7 @@ Let us convert each part.
 Text Encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The text-encoder is responsible for transforming the input prompt, for
 example, “a photo of an astronaut riding a horse” into an embedding
@@ -316,6 +316,7 @@ hidden states.
     
     TEXT_ENCODER_OV_PATH = Path("text_encoder.xml")
     
+    
     def cleanup_torchscript_cache():
         """
         Helper for removing cached model representation
@@ -324,11 +325,12 @@ hidden states.
         torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
         torch.jit._state._clear_class_state()
     
-    def convert_encoder(text_encoder: torch.nn.Module, ir_path:Path):
+    
+    def convert_encoder(text_encoder: torch.nn.Module, ir_path: Path):
         """
-        Convert Text Encoder mode. 
-        Function accepts text encoder model, and prepares example inputs for conversion, 
-        Parameters: 
+        Convert Text Encoder mode.
+        Function accepts text encoder model, and prepares example inputs for conversion,
+        Parameters:
             text_encoder (torch.nn.Module): text_encoder model from Stable Diffusion pipeline
             ir_path (Path): File for storing model
         Returns:
@@ -341,12 +343,18 @@ hidden states.
         # disable gradients calculation for reducing memory consumption
         with torch.no_grad():
             # Export model to IR format
-            ov_model = ov.convert_model(text_encoder, example_input=input_ids, input=[(1,77),])
+            ov_model = ov.convert_model(
+                text_encoder,
+                example_input=input_ids,
+                input=[
+                    (1, 77),
+                ],
+            )
         ov.save_model(ov_model, ir_path)
         del ov_model
         cleanup_torchscript_cache()
-        print(f'Text Encoder successfully converted to IR and saved to {ir_path}')
-        
+        print(f"Text Encoder successfully converted to IR and saved to {ir_path}")
+    
     
     if not TEXT_ENCODER_OV_PATH.exists():
         convert_encoder(text_encoder, TEXT_ENCODER_OV_PATH)
@@ -391,7 +399,7 @@ hidden states.
 U-net
 ~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Unet model has three inputs:
 
@@ -406,19 +414,16 @@ Model predicts the ``sample`` state for the next step.
 
     import numpy as np
     
-    UNET_OV_PATH = Path('unet.xml')
+    UNET_OV_PATH = Path("unet.xml")
     
-    dtype_mapping = {
-        torch.float32: ov.Type.f32,
-        torch.float64: ov.Type.f64
-    }
+    dtype_mapping = {torch.float32: ov.Type.f32, torch.float64: ov.Type.f64}
     
     
-    def convert_unet(unet:torch.nn.Module, ir_path:Path):
+    def convert_unet(unet: torch.nn.Module, ir_path: Path):
         """
-        Convert U-net model to IR format. 
-        Function accepts unet model, prepares example inputs for conversion, 
-        Parameters: 
+        Convert U-net model to IR format.
+        Function accepts unet model, prepares example inputs for conversion,
+        Parameters:
             unet (StableDiffusionPipeline): unet from Stable Diffusion pipeline
             ir_path (Path): File for storing model
         Returns:
@@ -442,7 +447,7 @@ Model predicts the ``sample`` state for the next step.
         ov.save_model(ov_model, ir_path)
         del ov_model
         cleanup_torchscript_cache()
-        print(f'Unet successfully converted to IR and saved to {ir_path}')
+        print(f"Unet successfully converted to IR and saved to {ir_path}")
     
     
     if not UNET_OV_PATH.exists():
@@ -484,7 +489,7 @@ Model predicts the ``sample`` state for the next step.
 VAE
 ~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The VAE model has two parts, an encoder and a decoder. The encoder is
 used to convert the image into a low dimensional latent representation,
@@ -507,17 +512,19 @@ of the pipeline, it will be better to convert them to separate models.
 
     VAE_ENCODER_OV_PATH = Path("vae_encoder.xml")
     
+    
     def convert_vae_encoder(vae: torch.nn.Module, ir_path: Path):
         """
-        Convert VAE model for encoding to IR format. 
-        Function accepts vae model, creates wrapper class for export only necessary for inference part, 
-        prepares example inputs for conversion, 
-        Parameters: 
-            vae (torch.nn.Module): VAE model from StableDiffusio pipeline 
+        Convert VAE model for encoding to IR format.
+        Function accepts vae model, creates wrapper class for export only necessary for inference part,
+        prepares example inputs for conversion,
+        Parameters:
+            vae (torch.nn.Module): VAE model from StableDiffusio pipeline
             ir_path (Path): File for storing model
         Returns:
             None
         """
+    
         class VAEEncoderWrapper(torch.nn.Module):
             def __init__(self, vae):
                 super().__init__()
@@ -525,15 +532,16 @@ of the pipeline, it will be better to convert them to separate models.
     
             def forward(self, image):
                 return self.vae.encode(x=image)["latent_dist"].sample()
+    
         vae_encoder = VAEEncoderWrapper(vae)
         vae_encoder.eval()
         image = torch.zeros((1, 3, 512, 512))
         with torch.no_grad():
-            ov_model = ov.convert_model(vae_encoder, example_input=image, input=[((1,3,512,512),)])
+            ov_model = ov.convert_model(vae_encoder, example_input=image, input=[((1, 3, 512, 512),)])
         ov.save_model(ov_model, ir_path)
         del ov_model
         cleanup_torchscript_cache()
-        print(f'VAE encoder successfully converted to IR and saved to {ir_path}')
+        print(f"VAE encoder successfully converted to IR and saved to {ir_path}")
     
     
     if not VAE_ENCODER_OV_PATH.exists():
@@ -541,19 +549,21 @@ of the pipeline, it will be better to convert them to separate models.
     else:
         print(f"VAE encoder will be loaded from {VAE_ENCODER_OV_PATH}")
     
-    VAE_DECODER_OV_PATH = Path('vae_decoder.xml')
+    VAE_DECODER_OV_PATH = Path("vae_decoder.xml")
+    
     
     def convert_vae_decoder(vae: torch.nn.Module, ir_path: Path):
         """
-        Convert VAE model for decoding to IR format. 
-        Function accepts vae model, creates wrapper class for export only necessary for inference part, 
-        prepares example inputs for conversion, 
-        Parameters: 
+        Convert VAE model for decoding to IR format.
+        Function accepts vae model, creates wrapper class for export only necessary for inference part,
+        prepares example inputs for conversion,
+        Parameters:
             vae (torch.nn.Module): VAE model frm StableDiffusion pipeline
             ir_path (Path): File for storing model
         Returns:
             None
         """
+    
         class VAEDecoderWrapper(torch.nn.Module):
             def __init__(self, vae):
                 super().__init__()
@@ -561,17 +571,17 @@ of the pipeline, it will be better to convert them to separate models.
     
             def forward(self, latents):
                 return self.vae.decode(latents)
-        
+    
         vae_decoder = VAEDecoderWrapper(vae)
         latents = torch.zeros((1, 4, 64, 64))
     
         vae_decoder.eval()
         with torch.no_grad():
-            ov_model = ov.convert_model(vae_decoder, example_input=latents, input=[((1,4,64,64),)])
+            ov_model = ov.convert_model(vae_decoder, example_input=latents, input=[((1, 4, 64, 64),)])
         ov.save_model(ov_model, ir_path)
         del ov_model
         cleanup_torchscript_cache()
-        print(f'VAE decoder successfully converted to IR and saved to {ir_path}')
+        print(f"VAE decoder successfully converted to IR and saved to {ir_path}")
     
     
     if not VAE_DECODER_OV_PATH.exists():
@@ -615,7 +625,7 @@ of the pipeline, it will be better to convert them to separate models.
 Prepare Inference Pipeline
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Putting it all together, let us now take a closer look at how the model
 works in inference by illustrating the logical flow.
@@ -677,11 +687,11 @@ of the variational auto encoder.
     from openvino.runtime import Model
     
     
-    def scale_fit_to_window(dst_width:int, dst_height:int, image_width:int, image_height:int):
+    def scale_fit_to_window(dst_width: int, dst_height: int, image_width: int, image_height: int):
         """
-        Preprocessing helper function for calculating image size for resize with peserving original aspect ratio 
+        Preprocessing helper function for calculating image size for resize with peserving original aspect ratio
         and fitting image to specific window size
-        
+    
         Parameters:
           dst_width (int): destination window width
           dst_height (int): destination window height
@@ -701,7 +711,7 @@ of the variational auto encoder.
         then converts it to np.ndarray and adds padding with zeros on right or bottom side of image (depends from aspect ratio), after that
         converts data to float32 data type and change range of values from [0, 255] to [-1, 1], finally, converts data layout from planar NHWC to NCHW.
         The function returns preprocessed input tensor and padding size, which can be used in postprocessing.
-        
+    
         Parameters:
           image (PIL.Image.Image): input image
         Returns:
@@ -709,10 +719,8 @@ of the variational auto encoder.
            meta (Dict): dictionary with preprocessing metadata info
         """
         src_width, src_height = image.size
-        dst_width, dst_height = scale_fit_to_window(
-            512, 512, src_width, src_height)
-        image = np.array(image.resize((dst_width, dst_height),
-                         resample=PIL.Image.Resampling.LANCZOS))[None, :]
+        dst_width, dst_height = scale_fit_to_window(512, 512, src_width, src_height)
+        image = np.array(image.resize((dst_width, dst_height), resample=PIL.Image.Resampling.LANCZOS))[None, :]
         pad_width = 512 - dst_width
         pad_height = 512 - dst_height
         pad = ((0, 0), (0, pad_height), (0, pad_width), (0, 0))
@@ -805,7 +813,7 @@ of the variational auto encoder.
                 gif (bool, *optional*, False):
                     Flag for storing all steps results or not.
             Returns:
-                Dictionary with keys: 
+                Dictionary with keys:
                     sample - the last generated image PIL.Image.Image or np.array
                     iterations - *optional* (if gif=True) images for all diffusion steps, List of PIL.Image.Image or np.array.
             """
@@ -815,8 +823,12 @@ of the variational auto encoder.
             img_buffer = []
             do_classifier_free_guidance = guidance_scale > 1.0
             # get prompt text embeddings
-            text_embeddings = self._encode_prompt(prompt, do_classifier_free_guidance=do_classifier_free_guidance, negative_prompt=negative_prompt)
-            
+            text_embeddings = self._encode_prompt(
+                prompt,
+                do_classifier_free_guidance=do_classifier_free_guidance,
+                negative_prompt=negative_prompt,
+            )
+    
             # set timesteps
             accepts_offset = "offset" in set(inspect.signature(self.scheduler.set_timesteps).parameters.keys())
             extra_set_kwargs = {}
@@ -852,7 +864,12 @@ of the variational auto encoder.
                     noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
     
                 # compute the previous noisy sample x_t -> x_t-1
-                latents = self.scheduler.step(torch.from_numpy(noise_pred), t, torch.from_numpy(latents), **extra_step_kwargs)["prev_sample"].numpy()
+                latents = self.scheduler.step(
+                    torch.from_numpy(noise_pred),
+                    t,
+                    torch.from_numpy(latents),
+                    **extra_step_kwargs,
+                )["prev_sample"].numpy()
                 if gif:
                     image = self.vae_decoder(latents * (1 / 0.18215))[self._vae_d_output]
                     image = self.postprocess_image(image, meta, output_type)
@@ -862,9 +879,15 @@ of the variational auto encoder.
             image = self.vae_decoder(latents * (1 / 0.18215))[self._vae_d_output]
     
             image = self.postprocess_image(image, meta, output_type)
-            return {"sample": image, 'iterations': img_buffer}
-        
-        def _encode_prompt(self, prompt:Union[str, List[str]], num_images_per_prompt:int = 1, do_classifier_free_guidance:bool = True, negative_prompt:Union[str, List[str]] = None):
+            return {"sample": image, "iterations": img_buffer}
+    
+        def _encode_prompt(
+            self,
+            prompt: Union[str, List[str]],
+            num_images_per_prompt: int = 1,
+            do_classifier_free_guidance: bool = True,
+            negative_prompt: Union[str, List[str]] = None,
+        ):
             """
             Encodes the prompt into text encoder hidden states.
     
@@ -888,16 +911,13 @@ of the variational auto encoder.
             )
             text_input_ids = text_inputs.input_ids
     
-            text_embeddings = self.text_encoder(
-                text_input_ids)[self._text_encoder_output]
+            text_embeddings = self.text_encoder(text_input_ids)[self._text_encoder_output]
     
             # duplicate text embeddings for each generation per prompt
             if num_images_per_prompt != 1:
                 bs_embed, seq_len, _ = text_embeddings.shape
-                text_embeddings = np.tile(
-                    text_embeddings, (1, num_images_per_prompt, 1))
-                text_embeddings = np.reshape(
-                    text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
+                text_embeddings = np.tile(text_embeddings, (1, num_images_per_prompt, 1))
+                text_embeddings = np.reshape(text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
     
             # get unconditional embeddings for classifier free guidance
             if do_classifier_free_guidance:
@@ -931,11 +951,10 @@ of the variational auto encoder.
     
             return text_embeddings
     
-    
-        def prepare_latents(self, image:PIL.Image.Image = None, latent_timestep:torch.Tensor = None):
+        def prepare_latents(self, image: PIL.Image.Image = None, latent_timestep: torch.Tensor = None):
             """
             Function for getting initial latents for starting generation
-            
+    
             Parameters:
                 image (PIL.Image.Image, *optional*, None):
                     Input image for generation, if not provided randon noise will be used as starting point
@@ -957,11 +976,11 @@ of the variational auto encoder.
             latents = self.scheduler.add_noise(torch.from_numpy(latents), torch.from_numpy(noise), latent_timestep).numpy()
             return latents, meta
     
-        def postprocess_image(self, image:np.ndarray, meta:Dict, output_type:str = "pil"):
+        def postprocess_image(self, image: np.ndarray, meta: Dict, output_type: str = "pil"):
             """
-            Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required), 
+            Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required),
             normalize and convert to [0, 255] pixels range. Optionally, convertes it from np.ndarray to PIL.Image format
-            
+    
             Parameters:
                 image (np.ndarray):
                     Generated image
@@ -987,25 +1006,23 @@ of the variational auto encoder.
                 image = self.numpy_to_pil(image)
                 if "src_height" in meta:
                     orig_height, orig_width = meta["src_height"], meta["src_width"]
-                    image = [img.resize((orig_width, orig_height),
-                                        PIL.Image.Resampling.LANCZOS) for img in image]
+                    image = [img.resize((orig_width, orig_height), PIL.Image.Resampling.LANCZOS) for img in image]
             else:
                 if "src_height" in meta:
                     orig_height, orig_width = meta["src_height"], meta["src_width"]
-                    image = [cv2.resize(img, (orig_width, orig_width))
-                             for img in image]
+                    image = [cv2.resize(img, (orig_width, orig_width)) for img in image]
             return image
     
-        def get_timesteps(self, num_inference_steps:int, strength:float):
+        def get_timesteps(self, num_inference_steps: int, strength: float):
             """
             Helper function for getting scheduler timesteps for generation
             In case of image-to-image generation, it updates number of steps according to strength
-            
+    
             Parameters:
                num_inference_steps (int):
                   number of inference steps for generation
                strength (float):
-                   value between 0.0 and 1.0, that controls the amount of noise that is added to the input image. 
+                   value between 0.0 and 1.0, that controls the amount of noise that is added to the input image.
                    Values that approach 1.0 enable lots of variations but will also produce images that are not semantically consistent with the input.
             """
             # get the original timestep using init_timestep
@@ -1014,12 +1031,12 @@ of the variational auto encoder.
             t_start = max(num_inference_steps - init_timestep, 0)
             timesteps = self.scheduler.timesteps[t_start:]
     
-            return timesteps, num_inference_steps - t_start 
+            return timesteps, num_inference_steps - t_start
 
 Configure Inference Pipeline
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, you should create instances of OpenVINO Model.
 
@@ -1035,8 +1052,8 @@ Select device from dropdown list for running inference using OpenVINO.
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='CPU',
-        description='Device:',
+        value="CPU",
+        description="Device:",
         disabled=False,
     )
     
@@ -1053,7 +1070,6 @@ Select device from dropdown list for running inference using OpenVINO.
 
 .. code:: ipython3
 
-    
     text_enc = core.compile_model(TEXT_ENCODER_OV_PATH, device.value)
 
 .. code:: ipython3
@@ -1075,12 +1091,8 @@ Let us define them and put all components together
     from transformers import CLIPTokenizer
     from diffusers.schedulers import LMSDiscreteScheduler
     
-    lms = LMSDiscreteScheduler(
-        beta_start=0.00085, 
-        beta_end=0.012, 
-        beta_schedule="scaled_linear"
-    )
-    tokenizer = CLIPTokenizer.from_pretrained('openai/clip-vit-large-patch14')
+    lms = LMSDiscreteScheduler(beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear")
+    tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
     
     ov_pipe = OVStableDiffusionPipeline(
         tokenizer=tokenizer,
@@ -1088,13 +1100,13 @@ Let us define them and put all components together
         unet=unet_model,
         vae_encoder=vae_encoder,
         vae_decoder=vae_decoder,
-        scheduler=lms
+        scheduler=lms,
     )
 
 Text-to-Image generation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, you can define a text prompt for image generation and run inference
 pipeline. Optionally, you can also change the random generator seed for
@@ -1106,15 +1118,18 @@ latent state initialization and number of steps.
 .. code:: ipython3
 
     import ipywidgets as widgets
-    sample_text = ('cyberpunk cityscape like Tokyo New York  with tall buildings at dusk golden hour cinematic lighting, epic composition. '
-                   'A golden daylight, hyper-realistic environment. '
-                   'Hyper and intricate detail, photo-realistic. '
-                   'Cinematic and volumetric light. '
-                   'Epic concept art. '
-                   'Octane render and Unreal Engine, trending on artstation')
-    text_prompt = widgets.Text(value=sample_text, description='your text')
-    num_steps = widgets.IntSlider(min=1, max=50, value=20, description='steps:')
-    seed = widgets.IntSlider(min=0, max=10000000, description='seed: ', value=42)
+    
+    sample_text = (
+        "cyberpunk cityscape like Tokyo New York  with tall buildings at dusk golden hour cinematic lighting, epic composition. "
+        "A golden daylight, hyper-realistic environment. "
+        "Hyper and intricate detail, photo-realistic. "
+        "Cinematic and volumetric light. "
+        "Epic concept art. "
+        "Octane render and Unreal Engine, trending on artstation"
+    )
+    text_prompt = widgets.Text(value=sample_text, description="your text")
+    num_steps = widgets.IntSlider(min=1, max=50, value=20, description="steps:")
+    seed = widgets.IntSlider(min=0, max=10000000, description="seed: ", value=42)
     widgets.VBox([text_prompt, seed, num_steps])
 
 
@@ -1128,10 +1143,10 @@ latent state initialization and number of steps.
 
 .. code:: ipython3
 
-    print('Pipeline settings')
-    print(f'Input text: {text_prompt.value}')
-    print(f'Seed: {seed.value}')
-    print(f'Number of steps: {num_steps.value}')
+    print("Pipeline settings")
+    print(f"Input text: {text_prompt.value}")
+    print(f"Seed: {seed.value}")
+    print(f"Number of steps: {num_steps.value}")
 
 
 .. parsed-literal::
@@ -1159,12 +1174,19 @@ contains list of intermediate results for each step.
 
 .. code:: ipython3
 
-    final_image = result['sample'][0]
-    if result['iterations']:
-        all_frames = result['iterations']
+    final_image = result["sample"][0]
+    if result["iterations"]:
+        all_frames = result["iterations"]
         img = next(iter(all_frames))
-        img.save(fp='result.gif', format='GIF', append_images=iter(all_frames), save_all=True, duration=len(all_frames) * 5, loop=0)
-    final_image.save('result.png')
+        img.save(
+            fp="result.gif",
+            format="GIF",
+            append_images=iter(all_frames),
+            save_all=True,
+            duration=len(all_frames) * 5,
+            loop=0,
+        )
+    final_image.save("result.png")
 
 Now is show time!
 
@@ -1172,7 +1194,7 @@ Now is show time!
 
     import ipywidgets as widgets
     
-    text = '\n\t'.join(text_prompt.value.split('.'))
+    text = "\n\t".join(text_prompt.value.split("."))
     print("Input text:")
     print("\t" + text)
     display(final_image)
@@ -1198,7 +1220,7 @@ Nice. As you can see, the picture has quite a high definition 🔥.
 Image-to-Image generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Image-to-Image generation, additionally to text prompt, requires
 providing initial image. Optionally, you can also change ``strength``
@@ -1209,15 +1231,15 @@ semantically consistent with the input.
 
 .. code:: ipython3
 
-    text_prompt_i2i = widgets.Text(value='amazing watercolor painting', description='your text')
-    num_steps_i2i = widgets.IntSlider(min=1, max=50, value=10, description='steps:')
-    seed_i2i = widgets.IntSlider(min=0, max=1024, description='seed: ', value=42)
+    text_prompt_i2i = widgets.Text(value="amazing watercolor painting", description="your text")
+    num_steps_i2i = widgets.IntSlider(min=1, max=50, value=10, description="steps:")
+    seed_i2i = widgets.IntSlider(min=0, max=1024, description="seed: ", value=42)
     image_widget = widgets.FileUpload(
-        accept='',
+        accept="",
         multiple=False,
-        description='Upload image',
+        description="Upload image",
     )
-    strength = widgets.FloatSlider(min=0, max=1, description='strength: ', value=0.5)
+    strength = widgets.FloatSlider(min=0, max=1, description="strength: ", value=0.5)
     widgets.VBox([text_prompt_i2i, seed_i2i, num_steps_i2i, image_widget, strength])
 
 
@@ -1232,11 +1254,13 @@ semantically consistent with the input.
 .. code:: ipython3
 
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     
     from notebook_utils import download_file
 
@@ -1246,19 +1270,25 @@ semantically consistent with the input.
     
     default_image_path = download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg",
-        filename="coco.jpg"
+        filename="coco.jpg",
     )
     
     # read uploaded image
-    image = PIL.Image.open(io.BytesIO(image_widget.value[-1]['content']) if image_widget.value else str(default_image_path))
-    print('Pipeline settings')
-    print(f'Input text: {text_prompt_i2i.value}')
-    print(f'Seed: {seed_i2i.value}')
-    print(f'Number of steps: {num_steps_i2i.value}')
-    print(f'Strength: {strength.value}')
+    image = PIL.Image.open(io.BytesIO(image_widget.value[-1]["content"]) if image_widget.value else str(default_image_path))
+    print("Pipeline settings")
+    print(f"Input text: {text_prompt_i2i.value}")
+    print(f"Seed: {seed_i2i.value}")
+    print(f"Number of steps: {num_steps_i2i.value}")
+    print(f"Strength: {strength.value}")
     print("Input image:")
     display(image)
-    processed_image = ov_pipe(text_prompt_i2i.value, image, num_inference_steps=num_steps_i2i.value, seed=seed_i2i.value, strength=strength.value)
+    processed_image = ov_pipe(
+        text_prompt_i2i.value,
+        image,
+        num_inference_steps=num_steps_i2i.value,
+        seed=seed_i2i.value,
+        strength=strength.value,
+    )
 
 
 .. parsed-literal::
@@ -1283,16 +1313,23 @@ semantically consistent with the input.
 
 .. code:: ipython3
 
-    final_image_i2i = processed_image['sample'][0]
-    if processed_image['iterations']:
-        all_frames_i2i = processed_image['iterations']
+    final_image_i2i = processed_image["sample"][0]
+    if processed_image["iterations"]:
+        all_frames_i2i = processed_image["iterations"]
         img = next(iter(all_frames_i2i))
-        img.save(fp='result_i2i.gif', format='GIF', append_images=iter(all_frames_i2i), save_all=True, duration=len(all_frames_i2i) * 5, loop=0)
-    final_image_i2i.save('result_i2i.png')
+        img.save(
+            fp="result_i2i.gif",
+            format="GIF",
+            append_images=iter(all_frames_i2i),
+            save_all=True,
+            duration=len(all_frames_i2i) * 5,
+            loop=0,
+        )
+    final_image_i2i.save("result_i2i.png")
 
 .. code:: ipython3
 
-    text_i2i = '\n\t'.join(text_prompt_i2i.value.split('.'))
+    text_i2i = "\n\t".join(text_prompt_i2i.value.split("."))
     print("Input text:")
     print("\t" + text_i2i)
     display(final_image_i2i)
@@ -1311,11 +1348,12 @@ semantically consistent with the input.
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import gradio as gr
+    
     
     def generate_from_text(text, seed, num_steps, _=gr.Progress(track_tqdm=True)):
         result = ov_pipe(text, num_inference_steps=num_steps, seed=seed)
@@ -1351,12 +1389,24 @@ Interactive demo
             sample_i2i_text = "amazing watercolor painting"
             i2i_btn.click(
                 generate_from_image,
-                [i2i_input, i2i_text_input, i2i_seed_input, i2i_steps_input, strength_input],
+                [
+                    i2i_input,
+                    i2i_text_input,
+                    i2i_seed_input,
+                    i2i_steps_input,
+                    strength_input,
+                ],
                 i2i_out,
             )
             gr.Examples(
                 [[str(default_image_path), sample_i2i_text, 42, 10, 0.5]],
-                [i2i_input, i2i_text_input, i2i_seed_input, i2i_steps_input, strength_input],
+                [
+                    i2i_input,
+                    i2i_text_input,
+                    i2i_seed_input,
+                    i2i_steps_input,
+                    strength_input,
+                ],
             )
     
     try:
@@ -1376,7 +1426,7 @@ Interactive demo
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

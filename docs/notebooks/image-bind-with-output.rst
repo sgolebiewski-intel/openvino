@@ -70,51 +70,51 @@ zero-shot classification.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Instantiate PyTorch model <#instantiate-pytorch-model>`__
--  `Prepare input data <#prepare-input-data>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Instantiate PyTorch model <#Instantiate-PyTorch-model>`__
+-  `Prepare input data <#Prepare-input-data>`__
 -  `Convert Model to OpenVINO Intermediate Representation (IR)
-   format <#convert-model-to-openvino-intermediate-representation-ir-format>`__
+   format <#Convert-Model-to-OpenVINO-Intermediate-Representation-(IR)-format>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Zero-shot classification using ImageBind and
-   OpenVINO <#zero-shot-classification-using-imagebind-and-openvino>`__
+   OpenVINO <#Zero-shot-classification-using-ImageBind-and-OpenVINO>`__
 
-   -  `Text-Image classification <#text-image-classification>`__
-   -  `Text-Audio classification <#text-audio-classification>`__
-   -  `Image-Audio classification <#image-audio-classification>`__
+   -  `Text-Image classification <#Text-Image-classification>`__
+   -  `Text-Audio classification <#Text-Audio-classification>`__
+   -  `Image-Audio classification <#Image-Audio-classification>`__
 
 -  `Post-Training Quantization of ImageBind model with
-   NNCF <#post-training-quantization-of-imagebind-model-with-nncf>`__
+   NNCF <#Post-Training-Quantization-of-ImageBind-model-with-NNCF>`__
 
-   -  `Prepare datasets <#prepare-datasets>`__
-   -  `Apply quantization <#apply-quantization>`__
+   -  `Prepare datasets <#Prepare-datasets>`__
+   -  `Apply quantization <#Apply-quantization>`__
 
       -  `Quantize ImageBind model for vision
-         modality. <#quantize-imagebind-model-for-vision-modality->`__
+         modality. <#Quantize-ImageBind-model-for-vision-modality.>`__
       -  `Quantize ImageBind model for text
-         modality <#quantize-imagebind-model-for-text-modality>`__
+         modality <#Quantize-ImageBind-model-for-text-modality>`__
       -  `Quantize ImageBind model for audio
-         modality <#quantize-imagebind-model-for-audio-modality>`__
+         modality <#Quantize-ImageBind-model-for-audio-modality>`__
 
    -  `Compare results for the OpenVINO FP16 model and the quantized
-      model <#compare-results-for-the-openvino-fp16-model-and-the-quantized-model>`__
+      model <#Compare-results-for-the-OpenVINO-FP16-model-and-the-quantized-model>`__
 
-      -  `Select inference device <#select-inference-device>`__
+      -  `Select inference device <#Select-inference-device>`__
 
-   -  `Compare File Size <#compare-file-size>`__
+   -  `Compare File Size <#Compare-File-Size>`__
    -  `Compare inference time of the FP16 IR and quantized
-      models <#compare-inference-time-of-the-fp16-ir-and-quantized-models>`__
+      models <#Compare-inference-time-of-the-FP16-IR-and-quantized-models>`__
 
-      -  `Vision model <#vision-model>`__
-      -  `Text model <#text-model>`__
-      -  `Audio model <#audio-model>`__
+      -  `Vision model <#Vision-model>`__
+      -  `Text model <#Text-model>`__
+      -  `Audio model <#Audio-model>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -143,7 +143,7 @@ Prerequisites
 Instantiate PyTorch model
 -------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To start work with the model, we should instantiate the PyTorch model
 class. ``imagebind_model.imagebind_huge(pretrained=True)`` downloads
@@ -181,7 +181,7 @@ card <https://github.com/facebookresearch/ImageBind/blob/main/model_card.md>`__.
 Prepare input data
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ImageBind works with data across 6 different modalities. Each of them
 requires its steps for preprocessing. ``data`` module is responsible for
@@ -203,8 +203,16 @@ data reading and preprocessing for each modality.
     # Prepare inputs
     
     text_list = ["A car", "A bird", "A dog"]
-    image_paths = [".assets/dog_image.jpg", ".assets/car_image.jpg", ".assets/bird_image.jpg"]
-    audio_paths = [".assets/dog_audio.wav", ".assets/bird_audio.wav", ".assets/car_audio.wav"]
+    image_paths = [
+        ".assets/dog_image.jpg",
+        ".assets/car_image.jpg",
+        ".assets/bird_image.jpg",
+    ]
+    audio_paths = [
+        ".assets/dog_audio.wav",
+        ".assets/bird_audio.wav",
+        ".assets/car_audio.wav",
+    ]
     
     inputs = {
         ModalityType.TEXT: data.load_and_transform_text(text_list, "cpu"),
@@ -215,7 +223,7 @@ data reading and preprocessing for each modality.
 Convert Model to OpenVINO Intermediate Representation (IR) format
 -----------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO supports PyTorch through Model Conversion API. You will use
 `model conversion Python
@@ -238,7 +246,7 @@ embeddings.
             super().__init__()
             self.model = model
             self.modality = modality
-        
+    
         def forward(self, data):
             return self.model({self.modality: data})
 
@@ -251,7 +259,7 @@ embeddings.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -261,8 +269,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -299,7 +307,7 @@ select device from dropdown list for running inference using OpenVINO
 Zero-shot classification using ImageBind and OpenVINO
 -----------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In zero-shot classification, a piece of data is embedded and fed to the
 model to retrieve a label that corresponds with the contents of the
@@ -349,20 +357,21 @@ they represent the same object.
     
     def visualize_prob_matrix(matrix, x_label, y_label):
         fig, ax = plt.subplots()
-        ax.matshow(matrix, cmap='winter')
+        ax.matshow(matrix, cmap="winter")
     
         for (i, j), z in np.ndenumerate(matrix):
-            ax.text(j, i, '{:0.3f}'.format(z), ha='center', va='center')
+            ax.text(j, i, "{:0.3f}".format(z), ha="center", va="center")
             ax.set_xticks(range(len(x_label)), x_label)
             ax.set_yticks(range(len(y_label)), y_label)
     
-    image_list = [img.split('/')[-1] for img in image_paths]
-    audio_list = [audio.split('/')[-1] for audio in audio_paths]
+    
+    image_list = [img.split("/")[-1] for img in image_paths]
+    audio_list = [audio.split("/")[-1] for audio in audio_paths]
 
 Text-Image classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -378,7 +387,7 @@ Text-Image classification
 Text-Audio classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -394,7 +403,7 @@ Text-Audio classification
 Image-Audio classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -413,9 +422,12 @@ Putting all together, we can match text, image, and sound for our data.
 
     import IPython.display as ipd
     from PIL import Image
+    
     text_image_ids = np.argmax(text_vision_scores, axis=0)
     text_audio_ids = np.argmax(text_audio_scores, axis=0)
-    print(f"Predicted label: {text_list[0]} \nprobability for image - {text_vision_scores[text_image_ids[0], 0]:.3f}\nprobability for audio - {text_audio_scores[0, text_audio_ids[0]]:.3f}")
+    print(
+        f"Predicted label: {text_list[0]} \nprobability for image - {text_vision_scores[text_image_ids[0], 0]:.3f}\nprobability for audio - {text_audio_scores[0, text_audio_ids[0]]:.3f}"
+    )
     display(Image.open(image_paths[text_image_ids[0]]))
     ipd.Audio(audio_paths[text_audio_ids[0]])
 
@@ -446,7 +458,9 @@ Putting all together, we can match text, image, and sound for our data.
 
 .. code:: ipython3
 
-    print(f"Predicted label: {text_list[1]} \nprobability for image - {text_vision_scores[text_image_ids[1], 1]:.3f}\nprobability for audio - {text_audio_scores[1, text_audio_ids[1]]:.3f}")
+    print(
+        f"Predicted label: {text_list[1]} \nprobability for image - {text_vision_scores[text_image_ids[1], 1]:.3f}\nprobability for audio - {text_audio_scores[1, text_audio_ids[1]]:.3f}"
+    )
     display(Image.open(image_paths[text_image_ids[1]]))
     ipd.Audio(audio_paths[text_audio_ids[1]])
 
@@ -477,7 +491,9 @@ Putting all together, we can match text, image, and sound for our data.
 
 .. code:: ipython3
 
-    print(f"Predicted label: {text_list[2]} \nprobability for image - {text_vision_scores[text_image_ids[2], 2]:.3f}\nprobability for audio - {text_audio_scores[2, text_audio_ids[2]]:.3f}")
+    print(
+        f"Predicted label: {text_list[2]} \nprobability for image - {text_vision_scores[text_image_ids[2], 2]:.3f}\nprobability for audio - {text_audio_scores[2, text_audio_ids[2]]:.3f}"
+    )
     display(Image.open(image_paths[text_image_ids[2]]))
     ipd.Audio(audio_paths[text_audio_ids[2]])
 
@@ -509,7 +525,7 @@ Putting all together, we can match text, image, and sound for our data.
 Post-Training Quantization of ImageBind model with NNCF
 -------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The goal of this part of tutorial is to demonstrate how to speed up the
 model by applying 8-bit post-training quantization from
@@ -531,7 +547,7 @@ data examples. 4. Compare model size of converted and quantized models.
 Prepare datasets
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The `Conceptual
 Captions <https://ai.google.com/research/ConceptualCaptions/>`__ dataset
@@ -546,7 +562,9 @@ quantize image and text models.
     import tempfile
     
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
+    
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    
     
     def check_text_data(data):
         """
@@ -557,6 +575,7 @@ quantize image and text models.
         if isinstance(data, list):
             return all(isinstance(x, str) for x in data)
         return False
+    
     
     def collate_fn(examples, image_column="image_url", text_column="caption"):
         """
@@ -575,7 +594,7 @@ quantize image and text models.
     
         url = example[image_column]
         with tempfile.TemporaryDirectory() as tempdir:
-            f_name = os.path.join(tempdir, 'image.jpg')
+            f_name = os.path.join(tempdir, "image.jpg")
             try:
                 response = requests.get(url, verify=False, timeout=20)
                 with open(f_name, "wb") as file:
@@ -587,10 +606,7 @@ quantize image and text models.
     
         text = data.load_and_transform_text([example[text_column]], "cpu")
     
-        return {
-            "pixel_values": pixel_values,
-            "input_ids": text
-        }
+        return {"pixel_values": pixel_values, "input_ids": text}
 
 .. code:: ipython3
 
@@ -598,6 +614,7 @@ quantize image and text models.
     import itertools
     import torch
     from tqdm.notebook import tqdm
+    
     
     def collect_vision_text_data(dataloader, init_steps):
         """
@@ -619,6 +636,7 @@ quantize image and text models.
                     vision_data.append(batch["pixel_values"].to("cpu"))
         return vision_data, text_data
     
+    
     def prepare_vision_text_dataset(opt_init_steps=50):
         """
         Prepares a vision-text dataset for quantization by collecting vision and text data.
@@ -629,7 +647,7 @@ quantize image and text models.
         vision_data, text_data = collect_vision_text_data(dataloader, opt_init_steps)
         return vision_data, text_data
 
-The `ESC-50 <https://github.com/karolpiczak/ESC-50>`__ dataset is
+The ```ESC-50`` <https://github.com/karolpiczak/ESC-50>`__ dataset is
 used to quantize the audio modality of the ImageBind model. Dataset is a
 labeled collection of 2000 environmental audio recordings suitable for
 benchmarking methods of environmental sound classification. The dataset
@@ -639,6 +657,7 @@ consists of 5-second-long recordings organized into 50 semantic classes.
 
     import numpy as np
     import torchaudio
+    
     
     def collect_audio_data(dataloader, init_steps=300):
         """
@@ -650,6 +669,7 @@ consists of 5-second-long recordings organized into 50 semantic classes.
             with torch.no_grad():
                 audio_data.append(batch)
         return audio_data
+    
     
     def prepare_audio_dataset():
         """
@@ -663,9 +683,9 @@ consists of 5-second-long recordings organized into 50 semantic classes.
         def collate_fn(examples):
             assert len(examples) == 1
             with tempfile.TemporaryDirectory() as tempdir:
-                f_name = os.path.join(tempdir, 'audio.wav')
-                audio_data = examples[0]['audio']['array']
-                sample_rate = examples[0]['audio']["sampling_rate"]
+                f_name = os.path.join(tempdir, "audio.wav")
+                audio_data = examples[0]["audio"]["array"]
+                sample_rate = examples[0]["audio"]["sampling_rate"]
                 audio_data = torch.from_numpy(audio_data).to(torch.float32).unsqueeze(0)
                 torchaudio.save(f_name, audio_data, sample_rate)
                 return data.load_and_transform_audio_data([f_name], "cpu")
@@ -684,7 +704,7 @@ consists of 5-second-long recordings organized into 50 semantic classes.
 Apply quantization
 ~~~~~~~~~~~~~~~~~~
 
-### Apply quantization
+`back to top ⬆️ <#Table-of-contents:>`__ ### Apply quantization
 
 .. code:: ipython3
 
@@ -695,6 +715,7 @@ Apply quantization
     nncf.set_log_level(logging.ERROR)
     
     core = ov.Core()
+    
     
     def quantize_openvino_model(modality, calibration_data):
         model_path = fp_model_paths[modality]
@@ -716,7 +737,7 @@ Apply quantization
 Quantize ImageBind model for vision modality.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
    **NOTE**: Quantization is time and memory consuming operation.
    Running quantization code below may take a long time.
@@ -725,9 +746,7 @@ Quantize ImageBind model for vision modality.
 
     if not int8_model_paths[ModalityType.VISION].exists():
         if len(vision_data) == 0:
-            raise RuntimeError(
-                'Calibration dataset is empty. Please check internet connection and try to download images manually from the URLs above.'
-            )
+            raise RuntimeError("Calibration dataset is empty. Please check internet connection and try to download images manually from the URLs above.")
     
         vision_dataset = nncf.Dataset(vision_data)
         vision_quantized_model = quantize_openvino_model(modality=ModalityType.VISION, calibration_data=vision_dataset)
@@ -735,7 +754,7 @@ Quantize ImageBind model for vision modality.
 Quantize ImageBind model for text modality
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -746,7 +765,7 @@ Quantize ImageBind model for text modality
 Quantize ImageBind model for audio modality
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-#### Quantize ImageBind model
+`back to top ⬆️ <#Table-of-contents:>`__ #### Quantize ImageBind model
 for audio modality
 
 .. code:: ipython3
@@ -764,7 +783,7 @@ in the NNCF repository for more information.
 Compare results for the OpenVINO FP16 model and the quantized model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Compare the probability matrices for ``FP16`` and ``INT8`` models.
 
@@ -773,8 +792,16 @@ Compare the probability matrices for ``FP16`` and ``INT8`` models.
     # Prepare inputs
     
     text_list = ["A car", "A bird", "A dog"]
-    image_paths = [".assets/dog_image.jpg", ".assets/car_image.jpg", ".assets/bird_image.jpg"]
-    audio_paths = [".assets/dog_audio.wav", ".assets/bird_audio.wav", ".assets/car_audio.wav"]
+    image_paths = [
+        ".assets/dog_image.jpg",
+        ".assets/car_image.jpg",
+        ".assets/bird_image.jpg",
+    ]
+    audio_paths = [
+        ".assets/dog_audio.wav",
+        ".assets/bird_audio.wav",
+        ".assets/car_audio.wav",
+    ]
     
     inputs = {
         ModalityType.TEXT: data.load_and_transform_text(text_list, "cpu"),
@@ -785,7 +812,7 @@ Compare the probability matrices for ``FP16`` and ``INT8`` models.
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -819,22 +846,26 @@ select device from dropdown list for running inference using OpenVINO
     def visualize_prob_matrices(fp_matrix, int_matrix, x_label, y_label):
         fig, ax = plt.subplots(1, 2)
         for i, matrix in enumerate([fp_matrix, int_matrix]):
-            ax[i].matshow(matrix, cmap='winter')
+            ax[i].matshow(matrix, cmap="winter")
     
             for (k, j), z in np.ndenumerate(matrix):
-                ax[i].title.set_text('FP16 probs' if i == 0 else 'INT8 probs')
-                ax[i].text(j, k, '{:0.3f}'.format(z), ha='center', va='center')
+                ax[i].title.set_text("FP16 probs" if i == 0 else "INT8 probs")
+                ax[i].text(j, k, "{:0.3f}".format(z), ha="center", va="center")
                 ax[i].set_xticks(range(len(x_label)), x_label)
                 ax[i].set_yticks(range(len(y_label)), y_label)
         fig.tight_layout()
     
-    image_list = [img.split('/')[-1] for img in image_paths]
-    audio_list = [audio.split('/')[-1] for audio in audio_paths]
+    
+    image_list = [img.split("/")[-1] for img in image_paths]
+    audio_list = [audio.split("/")[-1] for audio in audio_paths]
 
 .. code:: ipython3
 
     fp_text_vision_scores = softmax(embeddings[ModalityType.VISION] @ embeddings[ModalityType.TEXT].T, axis=-1)
-    int_text_vision_scores = softmax(quantized_embeddings[ModalityType.VISION] @ quantized_embeddings[ModalityType.TEXT].T, axis=-1)
+    int_text_vision_scores = softmax(
+        quantized_embeddings[ModalityType.VISION] @ quantized_embeddings[ModalityType.TEXT].T,
+        axis=-1,
+    )
     
     visualize_prob_matrices(fp_text_vision_scores, int_text_vision_scores, text_list, image_list)
 
@@ -846,7 +877,10 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     fp_text_audio_scores = softmax(embeddings[ModalityType.AUDIO] @ embeddings[ModalityType.TEXT].T, axis=-1)
-    int_text_audio_scores = softmax(quantized_embeddings[ModalityType.AUDIO] @ quantized_embeddings[ModalityType.TEXT].T, axis=-1)
+    int_text_audio_scores = softmax(
+        quantized_embeddings[ModalityType.AUDIO] @ quantized_embeddings[ModalityType.TEXT].T,
+        axis=-1,
+    )
     
     visualize_prob_matrices(fp_text_audio_scores, int_text_audio_scores, text_list, image_list)
 
@@ -858,7 +892,10 @@ select device from dropdown list for running inference using OpenVINO
 .. code:: ipython3
 
     fp_audio_vision_scores = softmax(embeddings[ModalityType.VISION] @ embeddings[ModalityType.AUDIO].T, axis=-1)
-    int_audio_vision_scores = softmax(quantized_embeddings[ModalityType.VISION] @ quantized_embeddings[ModalityType.AUDIO].T, axis=-1)
+    int_audio_vision_scores = softmax(
+        quantized_embeddings[ModalityType.VISION] @ quantized_embeddings[ModalityType.AUDIO].T,
+        axis=-1,
+    )
     
     visualize_prob_matrices(fp_audio_vision_scores, int_audio_vision_scores, text_list, image_list)
 
@@ -870,17 +907,18 @@ select device from dropdown list for running inference using OpenVINO
 Compare File Size
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     def calculate_compression_rate(modality):
         fp16_ir_model_size = Path(fp_model_paths[modality]).with_suffix(".bin").stat().st_size / 1024
         quantized_model_size = Path(int8_model_paths[modality]).with_suffix(".bin").stat().st_size / 1024
-        print(f'Modality: {modality}')
+        print(f"Modality: {modality}")
         print(f"    * FP16 IR model size: {fp16_ir_model_size:.2f} KB")
         print(f"    * INT8 model size: {quantized_model_size:.2f} KB")
         print(f"    * Model compression rate: {fp16_ir_model_size / quantized_model_size:.3f}")
+    
     
     for modality in modalities:
         calculate_compression_rate(modality)
@@ -905,7 +943,7 @@ Compare File Size
 Compare inference time of the FP16 IR and quantized models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 models, we use median inference time on calibration dataset. So we can
@@ -918,6 +956,7 @@ approximately estimate the speed up of the dynamic quantized models.
 .. code:: ipython3
 
     import time
+    
     
     def calculate_inference_time(model_path, calibration_data):
         model = core.compile_model(model_path)
@@ -934,7 +973,7 @@ approximately estimate the speed up of the dynamic quantized models.
 Vision model
 ^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -951,7 +990,7 @@ Vision model
 Text model
 ^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -968,7 +1007,7 @@ Text model
 Audio model
 ^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 

@@ -26,25 +26,25 @@ independently.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Image classification <#image-classification>`__
+-  `Image classification <#Image-classification>`__
 
-   -  `Install required packages <#install-required-packages>`__
-   -  `Import libraries <#import-libraries>`__
-   -  `Download the classifier <#download-the-classifier>`__
+   -  `Install required packages <#Install-required-packages>`__
+   -  `Import libraries <#Import-libraries>`__
+   -  `Download the classifier <#Download-the-classifier>`__
    -  `Download a single image to try the model
-      on <#download-a-single-image-to-try-the-model-on>`__
-   -  `Convert model to OpenVINO IR <#convert-model-to-openvino-ir>`__
-   -  `Select inference device <#select-inference-device>`__
-   -  `Inference <#inference>`__
+      on <#Download-a-single-image-to-try-the-model-on>`__
+   -  `Convert model to OpenVINO IR <#Convert-model-to-OpenVINO-IR>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Inference <#Inference>`__
 
--  `Image style transfer <#image-style-transfer>`__
+-  `Image style transfer <#Image-style-transfer>`__
 
-   -  `Install required packages <#install-required-packages>`__
-   -  `Load the model <#load-the-model>`__
+   -  `Install required packages <#Install-required-packages>`__
+   -  `Load the model <#Load-the-model>`__
    -  `Convert the model to OpenVINO
-      IR <#convert-the-model-to-openvino-ir>`__
-   -  `Select inference device <#select-inference-device>`__
-   -  `Inference <#inference>`__
+      IR <#Convert-the-model-to-OpenVINO-IR>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Inference <#Inference>`__
 
 .. |Colab| image:: https://colab.research.google.com/assets/colab-badge.svg
    :target: https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/tensorflow-hub/tensorflow-hub.ipynb
@@ -54,7 +54,7 @@ Table of contents:
 Image classification
 --------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We will use the `MobileNet_v2 <https://arxiv.org/abs/1704.04861>`__
 image classification model from `TensorFlow Hub <https://tfhub.dev/>`__.
@@ -77,7 +77,7 @@ Hub <https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5>`__
 Install required packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -203,13 +203,14 @@ Install required packages
 Import libraries
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     from pathlib import Path
     import os
-    from urllib.request import urlretrieve
+    import requests
+    
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
     os.environ["TF_USE_LEGACY_KERAS"] = "1"
     os.environ["TFHUB_CACHE_DIR"] = str(Path("./tfhub_modules").resolve())
@@ -227,13 +228,19 @@ Import libraries
 .. code:: ipython3
 
     IMAGE_SHAPE = (224, 224)
-    IMAGE_URL, IMAGE_PATH = "https://storage.googleapis.com/download.tensorflow.org/example_images/grace_hopper.jpg", "data/grace_hopper.jpg"
-    MODEL_URL, MODEL_PATH = "https://www.kaggle.com/models/google/mobilenet-v1/frameworks/tensorFlow2/variations/100-224-classification/versions/2", "models/mobilenet_v2_100_224.xml"
+    IMAGE_URL, IMAGE_PATH = (
+        "https://storage.googleapis.com/download.tensorflow.org/example_images/grace_hopper.jpg",
+        "data/grace_hopper.jpg",
+    )
+    MODEL_URL, MODEL_PATH = (
+        "https://www.kaggle.com/models/google/mobilenet-v1/frameworks/tensorFlow2/variations/100-224-classification/versions/2",
+        "models/mobilenet_v2_100_224.xml",
+    )
 
 Download the classifier
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Select a MobileNetV2
+`back to top ⬆️ <#Table-of-contents:>`__ Select a MobileNetV2
 pre-trained model `from TensorFlow
 Hub <https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5>`__
 and wrap it as a Keras layer with ``hub.KerasLayer``.
@@ -245,14 +252,14 @@ and wrap it as a Keras layer with ``hub.KerasLayer``.
 
 .. parsed-literal::
 
-    2024-04-10 00:27:22.945836: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
-    2024-04-10 00:27:22.946010: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
+    2024-04-18 01:06:17.784754: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
+    2024-04-18 01:06:17.784935: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
 
 
 Download a single image to try the model on
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The input ``images`` are
+`back to top ⬆️ <#Table-of-contents:>`__ The input ``images`` are
 expected to have color values in the range [0,1], following the `common
 image input
 conventions <https://www.tensorflow.org/hub/common_signatures/images#input>`__.
@@ -262,8 +269,11 @@ For this model, the size of the input images is fixed to ``height`` x
 .. code:: ipython3
 
     Path(IMAGE_PATH).parent.mkdir(parents=True, exist_ok=True)
-    grace_hopper, _ = urlretrieve(IMAGE_URL, IMAGE_PATH)
-    grace_hopper = PIL.Image.open(grace_hopper).resize(IMAGE_SHAPE)
+    
+    r = requests.get(IMAGE_URL)
+    with Path(IMAGE_PATH).open("wb") as f:
+        f.write(r.content)
+    grace_hopper = PIL.Image.open(IMAGE_PATH).resize(IMAGE_SHAPE)
     grace_hopper
 
 
@@ -292,7 +302,7 @@ Normalize the image to [0,1] range.
 Convert model to OpenVINO IR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We will convert the loaded model to OpenVINO IR using
 ``ov.convert_model`` function. We pass the model object to it, no
@@ -308,7 +318,7 @@ additional arguments required. Then, we save the model to disk using
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -320,8 +330,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -343,7 +353,7 @@ select device from dropdown list for running inference using OpenVINO
 Inference
 ~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Add a batch dimension (with ``np.newaxis``) and pass the image to the
 model:
@@ -386,10 +396,13 @@ dataset labels to decode the predictions:
 
 .. code:: ipython3
 
-    labels_path = tf.keras.utils.get_file('ImageNetLabels.txt','https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt')
+    labels_path = tf.keras.utils.get_file(
+        "ImageNetLabels.txt",
+        "https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt",
+    )
     imagenet_labels = np.array(open(labels_path).read().splitlines())
     plt.imshow(grace_hopper)
-    plt.axis('off')
+    plt.axis("off")
     predicted_class_name = imagenet_labels[predicted_class]
     _ = plt.title("Prediction: " + predicted_class_name.title())
 
@@ -401,7 +414,7 @@ dataset labels to decode the predictions:
 Image style transfer
 --------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We will use `arbitrary image stylization
 model <https://arxiv.org/abs/1705.06830>`__ from `TensorFlow
@@ -432,7 +445,7 @@ Hub <https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2>`__.
 Install required packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -463,8 +476,8 @@ Install required packages
 .. code:: ipython3
 
     import os
+    
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-    from urllib.request import urlretrieve
     from pathlib import Path
     
     import openvino as ov
@@ -489,7 +502,7 @@ Install required packages
 Load the model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We load the model from TensorFlow Hub using ``hub.KerasLayer``. Since
 the model has multiple inputs (content image and style image), we need
@@ -509,7 +522,7 @@ function.
 Convert the model to OpenVINO IR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We convert the loaded model to OpenVINO IR using ``ov.convert_model``
 function. We pass our model to the function, no additional arguments
@@ -526,7 +539,7 @@ needed. After converting, we save the model to disk using
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -538,8 +551,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -561,14 +574,16 @@ select device from dropdown list for running inference using OpenVINO
 Inference
 ~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     def download_image(src, dst):
         if not Path(dst).exists():
             Path(dst).parent.mkdir(parents=True, exist_ok=True)
-            urlretrieve(src, dst)
+            r = requests.get(src)
+            with open(dst, "wb") as f:
+                f.write(r.content)
         image = cv2.imread(dst)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert image color to RGB space
         image = image / 255  # Normalize to [0, 1] interval
@@ -579,7 +594,7 @@ Inference
 
     content_image = download_image(CONTENT_IMAGE_URL, CONTENT_IMAGE_PATH)
     style_image = download_image(STYLE_IMAGE_URL, STYLE_IMAGE_PATH)
-    style_image = cv2.resize(style_image, (256,256))  # model was trained on 256x256 images
+    style_image = cv2.resize(style_image, (256, 256))  # model was trained on 256x256 images
 
 .. code:: ipython3
 

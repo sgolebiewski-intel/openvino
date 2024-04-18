@@ -84,32 +84,32 @@ and `repo <https://github.com/databrickslabs/dolly>`__
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
--  `Download and Convert Model <#download-and-convert-model>`__
+-  `Download and Convert Model <#Download-and-Convert-Model>`__
 
    -  `NNCF model weights
-      compression <#nncf-model-weights-compression>`__
+      compression <#NNCF-model-weights-compression>`__
 
 -  `Create an instruction-following inference
-   pipeline <#create-an-instruction-following-inference-pipeline>`__
+   pipeline <#Create-an-instruction-following-inference-pipeline>`__
 
-   -  `Setup imports <#setup-imports>`__
+   -  `Setup imports <#Setup-imports>`__
    -  `Prepare template for user
-      prompt <#prepare-template-for-user-prompt>`__
-   -  `Helpers for output parsing <#helpers-for-output-parsing>`__
-   -  `Main generation function <#main-generation-function>`__
-   -  `Helpers for application <#helpers-for-application>`__
+      prompt <#Prepare-template-for-user-prompt>`__
+   -  `Helpers for output parsing <#Helpers-for-output-parsing>`__
+   -  `Main generation function <#Main-generation-function>`__
+   -  `Helpers for application <#Helpers-for-application>`__
 
 -  `Run instruction-following
-   pipeline <#run-instruction-following-pipeline>`__
+   pipeline <#Run-instruction-following-pipeline>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, we should install the `Hugging Face
 Optimum <https://huggingface.co/docs/optimum/installation>`__ library
@@ -121,13 +121,13 @@ documentation <https://huggingface.co/docs/optimum/intel/inference>`__.
 
 .. code:: ipython3
 
-    %pip install -q "diffusers>=0.16.1" "transformers>=4.33.0" "torch>=2.1" "openvino>=2023.2.0" "nncf>=2.6.0" onnx gradio --extra-index-url https://download.pytorch.org/whl/cpu
-    %pip install -q --upgrade "git+https://github.com/huggingface/optimum-intel.git" 
+    %pip install -q "diffusers>=0.16.1" "transformers>=4.33.0" "torch>=2.1" "openvino>=2023.2.0" "nncf>=2.6.0" onnx "gradio>=4.19" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q --upgrade "git+https://github.com/huggingface/optimum-intel.git"
 
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -140,8 +140,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='CPU',
-        description='Device:',
+        value="CPU",
+        description="Device:",
         disabled=False,
     )
     
@@ -159,7 +159,7 @@ select device from dropdown list for running inference using OpenVINO
 Download and Convert Model
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Optimum Intel can be used to load optimized models from the `Hugging
 Face Hub <https://huggingface.co/docs/optimum/intel/hf.co/models>`__ and
@@ -201,12 +201,18 @@ compatible with Optimum models.
     
     current_device = device.value
     
-    ov_config = {'PERFORMANCE_HINT': 'LATENCY', 'NUM_STREAMS': '1', "CACHE_DIR": ""}
+    ov_config = {"PERFORMANCE_HINT": "LATENCY", "NUM_STREAMS": "1", "CACHE_DIR": ""}
     
     if model_path.exists():
         ov_model = OVModelForCausalLM.from_pretrained(model_path, device=current_device, ov_config=ov_config)
     else:
-        ov_model = OVModelForCausalLM.from_pretrained(model_id, device=current_device, export=True, ov_config=ov_config, load_in_8bit=False)
+        ov_model = OVModelForCausalLM.from_pretrained(
+            model_id,
+            device=current_device,
+            export=True,
+            ov_config=ov_config,
+            load_in_8bit=False,
+        )
         ov_model.half()
         ov_model.save_pretrained(model_path)
 
@@ -229,7 +235,7 @@ compatible with Optimum models.
 NNCF model weights compression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NNCF `Weights Compression
 algorithm <https://github.com/openvinotoolkit/nncf/blob/develop/docs/compression_algorithms/CompressWeights.md>`__
@@ -247,7 +253,7 @@ accuracy drop.
 
     to_compress = widgets.Checkbox(
         value=True,
-        description='INT8 Compression',
+        description="INT8 Compression",
         disabled=False,
     )
     print("Click on checkbox for enabling / disabling weights compression")
@@ -270,25 +276,28 @@ accuracy drop.
 .. code:: ipython3
 
     import gc
-    from optimum.intel import OVQuantizer
+    from optimum.intel import OVQuantizer, OVConfig, OVWeightQuantizationConfig
     
-    compressed_model_path = Path(f'{model_path}_compressed')
+    compressed_model_path = Path(f"{model_path}_compressed")
+    
     
     def calculate_compression_rate(model_path_ov, model_path_ov_compressed):
-        model_size_original = model_path_ov.with_suffix(".bin").stat().st_size / 2 ** 20
-        model_size_compressed = model_path_ov_compressed.with_suffix(".bin").stat().st_size / 2 ** 20
+        model_size_original = model_path_ov.with_suffix(".bin").stat().st_size / 2**20
+        model_size_compressed = model_path_ov_compressed.with_suffix(".bin").stat().st_size / 2**20
         print(f"* Original IR model size: {model_size_original:.2f} MB")
         print(f"* Compressed IR model size: {model_size_compressed:.2f} MB")
         print(f"* Model compression rate: {model_size_original / model_size_compressed:.3f}")
     
+    
     if to_compress.value:
         if not compressed_model_path.exists():
             quantizer = OVQuantizer.from_pretrained(ov_model)
-            quantizer.quantize(save_directory=compressed_model_path, weights_only=True)
+            ov_config = OVConfig(quantization_config=OVWeightQuantizationConfig(bits=8))
+            quantizer.quantize(save_directory=compressed_model_path, ov_config=ov_config)
             del quantizer
             gc.collect()
-        
-        calculate_compression_rate(model_path / 'openvino_model.xml', compressed_model_path / 'openvino_model.xml')
+    
+        calculate_compression_rate(model_path / "openvino_model.xml", compressed_model_path / "openvino_model.xml")
         ov_model = OVModelForCausalLM.from_pretrained(compressed_model_path, device=current_device, ov_config=ov_config)
 
 
@@ -307,7 +316,7 @@ accuracy drop.
 Create an instruction-following inference pipeline
 --------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``run_generation`` function accepts user-provided text input,
 tokenizes it, and runs the generation process. Text generation is an
@@ -315,7 +324,7 @@ iterative process, where each next token depends on previously generated
 until a maximum number of tokens or stop generation condition is not
 reached. To obtain intermediate generation results without waiting until
 when generation is finished, we will use
-`TextIteratorStreamer <https://huggingface.co/docs/transformers/main/en/internal/generation_utils#transformers.TextIteratorStreamer>`__,
+```TextIteratorStreamer`` <https://huggingface.co/docs/transformers/main/en/internal/generation_utils#transformers.TextIteratorStreamer>`__,
 provided as part of HuggingFace `Streaming
 API <https://huggingface.co/docs/transformers/main/en/generation_strategies#streaming>`__.
 
@@ -413,7 +422,7 @@ and then prints them when they are ready.
 Setup imports
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -427,7 +436,7 @@ Setup imports
 Prepare template for user prompt
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For effective generation, model expects to have input in specific
 format. The code below prepare template for passing user instruction
@@ -438,9 +447,7 @@ into model with providing additional context.
     INSTRUCTION_KEY = "### Instruction:"
     RESPONSE_KEY = "### Response:"
     END_KEY = "### End"
-    INTRO_BLURB = (
-        "Below is an instruction that describes a task. Write a response that appropriately completes the request."
-    )
+    INTRO_BLURB = "Below is an instruction that describes a task. Write a response that appropriately completes the request."
     
     # This is the prompt that is used for generating responses using an already trained model.  It ends with the response
     # key, where the job of the model is to provide the completion that follows it (i.e. the response itself).
@@ -460,7 +467,7 @@ into model with providing additional context.
 Helpers for output parsing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model was retrained to finish generation using special token ``### End``
 the code below find its id for using it as generation stop-criteria.
@@ -489,7 +496,11 @@ the code below find its id for using it as generation stop-criteria.
             raise ValueError(f"Expected only a single token for '{key}' but found {token_ids}")
         return token_ids[0]
     
-    tokenizer_response_key = next((token for token in tokenizer.additional_special_tokens if token.startswith(RESPONSE_KEY)), None)
+    
+    tokenizer_response_key = next(
+        (token for token in tokenizer.additional_special_tokens if token.startswith(RESPONSE_KEY)),
+        None,
+    )
     
     end_key_token_id = None
     if tokenizer_response_key:
@@ -502,7 +513,7 @@ the code below find its id for using it as generation stop-criteria.
 Main generation function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 As it was discussed above, ``run_generation`` function is the entry
 point for starting generation. It gets provided input instruction as
@@ -510,10 +521,17 @@ parameter and returns model response.
 
 .. code:: ipython3
 
-    def run_generation(user_text:str, top_p:float, temperature:float, top_k:int, max_new_tokens:int, perf_text:str):
+    def run_generation(
+        user_text: str,
+        top_p: float,
+        temperature: float,
+        top_k: int,
+        max_new_tokens: int,
+        perf_text: str,
+    ):
         """
         Text generation function
-        
+    
         Parameters:
           user_text (str): User-provided instruction for a generation.
           top_p (float):  Nucleus sampling. If set to < 1, only the smallest set of most probable tokens with probabilities that add up to top_p or higher are kept for a generation.
@@ -525,10 +543,10 @@ parameter and returns model response.
           model_output (str) - model-generated text
           perf_text (str) - updated perf text filed content
         """
-        
+    
         # Prepare input prompt according to model expected template
         prompt_text = PROMPT_FOR_GENERATION_FORMAT.format(instruction=user_text)
-        
+    
         # Tokenize the user text.
         model_inputs = tokenizer(prompt_text, return_tensors="pt")
     
@@ -543,7 +561,7 @@ parameter and returns model response.
             top_p=top_p,
             temperature=float(temperature),
             top_k=top_k,
-            eos_token_id=end_key_token_id
+            eos_token_id=end_key_token_id,
         )
         t = Thread(target=ov_model.generate, kwargs=generate_kwargs)
         t.start()
@@ -564,7 +582,7 @@ parameter and returns model response.
 Helpers for application
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For making interactive user interface we will use Gradio library. The
 code bellow provides useful functions used for communication with UI
@@ -572,17 +590,23 @@ elements.
 
 .. code:: ipython3
 
-    def estimate_latency(current_time:float, current_perf_text:str, new_gen_text:str, per_token_time:List[float], num_tokens:int):
+    def estimate_latency(
+        current_time: float,
+        current_perf_text: str,
+        new_gen_text: str,
+        per_token_time: List[float],
+        num_tokens: int,
+    ):
         """
         Helper function for performance estimation
-        
+    
         Parameters:
           current_time (float): This step time in seconds.
           current_perf_text (str): Current content of performance UI field.
           new_gen_text (str): New generated text.
           per_token_time (List[float]): history of performance from previous steps.
           num_tokens (int): Total number of generated tokens.
-          
+    
         Returns:
           update for performance text field
           update for a total number of tokens
@@ -592,28 +616,32 @@ elements.
         per_token_time.append(num_current_toks / current_time)
         if len(per_token_time) > 10 and len(per_token_time) % 4 == 0:
             current_bucket = per_token_time[:-10]
-            return f"Average generation speed: {np.mean(current_bucket):.2f} tokens/s. Total generated tokens: {num_tokens}", num_tokens
+            return (
+                f"Average generation speed: {np.mean(current_bucket):.2f} tokens/s. Total generated tokens: {num_tokens}",
+                num_tokens,
+            )
         return current_perf_text, num_tokens
     
-    def reset_textbox(instruction:str, response:str, perf:str):
+    
+    def reset_textbox(instruction: str, response: str, perf: str):
         """
         Helper function for resetting content of all text fields
-        
+    
         Parameters:
           instruction (str): Content of user instruction field.
           response (str): Content of model response field.
           perf (str): Content of performance info filed
-        
+    
         Returns:
           empty string for each placeholder
         """
         return "", "", ""
     
     
-    def select_device(device_str:str, current_text:str = "", progress:gr.Progress = gr.Progress()):
+    def select_device(device_str: str, current_text: str = "", progress: gr.Progress = gr.Progress()):
         """
         Helper function for uploading model on the device.
-        
+    
         Parameters:
           device_str (str): Device name.
           current_text (str): Current content of user instruction field (used only for backup purposes, temporally replacing it on the progress bar during model loading).
@@ -624,7 +652,7 @@ elements.
         if device_str != ov_model._device:
             ov_model.request = None
             ov_model._device = device_str
-            
+    
             for i in progress.tqdm(range(1), desc=f"Model loading on {device_str}"):
                 ov_model.compile()
         return current_text
@@ -632,7 +660,7 @@ elements.
 Run instruction-following pipeline
 ----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, we are ready to explore model capabilities. This demo provides a
 simple interface that allows communication with a model using text
@@ -679,7 +707,7 @@ generation parameters:
             with gr.Column(scale=4):
                 user_text = gr.Textbox(
                     placeholder="Write an email about an alpaca that likes flan",
-                    label="User instruction"
+                    label="User instruction",
                 )
                 model_output = gr.Textbox(label="Model response", interactive=False)
                 performance = gr.Textbox(label="Performance", lines=1, interactive=False)
@@ -690,22 +718,54 @@ generation parameters:
             with gr.Column(scale=1):
                 device = gr.Dropdown(choices=available_devices, value=current_device, label="Device")
                 max_new_tokens = gr.Slider(
-                    minimum=1, maximum=1000, value=256, step=1, interactive=True, label="Max New Tokens",
+                    minimum=1,
+                    maximum=1000,
+                    value=256,
+                    step=1,
+                    interactive=True,
+                    label="Max New Tokens",
                 )
                 top_p = gr.Slider(
-                    minimum=0.05, maximum=1.0, value=0.92, step=0.05, interactive=True, label="Top-p (nucleus sampling)",
+                    minimum=0.05,
+                    maximum=1.0,
+                    value=0.92,
+                    step=0.05,
+                    interactive=True,
+                    label="Top-p (nucleus sampling)",
                 )
                 top_k = gr.Slider(
-                    minimum=0, maximum=50, value=0, step=1, interactive=True, label="Top-k",
+                    minimum=0,
+                    maximum=50,
+                    value=0,
+                    step=1,
+                    interactive=True,
+                    label="Top-k",
                 )
                 temperature = gr.Slider(
-                    minimum=0.1, maximum=5.0, value=0.8, step=0.1, interactive=True, label="Temperature",
+                    minimum=0.1,
+                    maximum=5.0,
+                    value=0.8,
+                    step=0.1,
+                    interactive=True,
+                    label="Temperature",
                 )
     
-        user_text.submit(run_generation, [user_text, top_p, temperature, top_k, max_new_tokens, performance], [model_output, performance])
+        user_text.submit(
+            run_generation,
+            [user_text, top_p, temperature, top_k, max_new_tokens, performance],
+            [model_output, performance],
+        )
         button_submit.click(select_device, [device, user_text], [user_text])
-        button_submit.click(run_generation, [user_text, top_p, temperature, top_k, max_new_tokens, performance], [model_output, performance])
-        button_clear.click(reset_textbox, [user_text, model_output, performance], [user_text, model_output, performance])
+        button_submit.click(
+            run_generation,
+            [user_text, top_p, temperature, top_k, max_new_tokens, performance],
+            [model_output, performance],
+        )
+        button_clear.click(
+            reset_textbox,
+            [user_text, model_output, performance],
+            [user_text, model_output, performance],
+        )
         device.change(select_device, [device, user_text], [user_text])
     
     if __name__ == "__main__":

@@ -19,18 +19,18 @@ class.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Download model weights <#download-model-weights>`__
--  `Select inference device <#select-inference-device>`__
--  `Load the Model <#load-the-model>`__
--  `Load an Image <#load-an-image>`__
--  `Do Inference <#do-inference>`__
--  `Visualize Results <#visualize-results>`__
+-  `Imports <#Imports>`__
+-  `Download model weights <#Download-model-weights>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `Load the Model <#Load-the-Model>`__
+-  `Load an Image <#Load-an-Image>`__
+-  `Do Inference <#Do-Inference>`__
+-  `Visualize Results <#Visualize-Results>`__
 
 .. code:: ipython3
 
     # Install openvino package
-    %pip install -q "openvino>=2023.1.0"
+    %pip install -q "openvino>=2023.1.0" opencv-python tqdm
 
 
 .. parsed-literal::
@@ -41,7 +41,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -52,26 +52,28 @@ Imports
     from pathlib import Path
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     
     from notebook_utils import download_file
 
 Download model weights
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     base_model_dir = Path("./model").expanduser()
     
     model_name = "horizontal-text-detection-0001"
-    model_xml_name = f'{model_name}.xml'
-    model_bin_name = f'{model_name}.bin'
+    model_xml_name = f"{model_name}.xml"
+    model_bin_name = f"{model_name}.bin"
     
     model_xml_path = base_model_dir / model_xml_name
     model_bin_path = base_model_dir / model_bin_name
@@ -83,7 +85,7 @@ Download model weights
         download_file(model_xml_url, model_xml_name, base_model_dir)
         download_file(model_bin_url, model_bin_name, base_model_dir)
     else:
-        print(f'{model_name} already downloaded to {base_model_dir}')
+        print(f"{model_name} already downloaded to {base_model_dir}")
 
 
 
@@ -101,7 +103,7 @@ Download model weights
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -112,8 +114,8 @@ select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -131,7 +133,7 @@ select device from dropdown list for running inference using OpenVINO
 Load the Model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -146,14 +148,14 @@ Load the Model
 Load an Image
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # Download the image from the openvino_notebooks storage
     image_filename = download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/intel_rnb.jpg",
-        directory="data"
+        directory="data",
     )
     
     # Text detection models expect an image in BGR format.
@@ -184,7 +186,7 @@ Load an Image
 Do Inference
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -197,7 +199,7 @@ Do Inference
 Visualize Results
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -208,7 +210,10 @@ Visualize Results
         colors = {"red": (255, 0, 0), "green": (0, 255, 0)}
     
         # Fetch the image shapes to calculate a ratio.
-        (real_y, real_x), (resized_y, resized_x) = bgr_image.shape[:2], resized_image.shape[:2]
+        (real_y, real_x), (resized_y, resized_x) = (
+            bgr_image.shape[:2],
+            resized_image.shape[:2],
+        )
         ratio_x, ratio_y = real_x / resized_x, real_y / resized_y
     
         # Convert the base image from BGR to RGB format.
@@ -220,12 +225,10 @@ Visualize Results
             conf = box[-1]
             if conf > threshold:
                 # Convert float to int and multiply corner position of each box by x and y ratio.
-                # If the bounding box is found at the top of the image, 
-                # position the upper box bar little lower to make it visible on the image. 
+                # If the bounding box is found at the top of the image,
+                # position the upper box bar little lower to make it visible on the image.
                 (x_min, y_min, x_max, y_max) = [
-                    int(max(corner_position * ratio_y, 10)) if idx % 2 
-                    else int(corner_position * ratio_x)
-                    for idx, corner_position in enumerate(box[:-1])
+                    (int(max(corner_position * ratio_y, 10)) if idx % 2 else int(corner_position * ratio_x)) for idx, corner_position in enumerate(box[:-1])
                 ]
     
                 # Draw a box based on the position, parameters in rectangle function are: image, start_point, end_point, color, thickness.

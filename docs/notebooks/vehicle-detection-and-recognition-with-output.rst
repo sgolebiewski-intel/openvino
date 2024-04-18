@@ -20,30 +20,30 @@ As a result, you can get:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Download Models <#download-models>`__
--  `Load Models <#load-models>`__
+-  `Imports <#Imports>`__
+-  `Download Models <#Download-Models>`__
+-  `Load Models <#Load-Models>`__
 
-   -  `Get attributes from model <#get-attributes-from-model>`__
-   -  `Helper function <#helper-function>`__
-   -  `Read and display a test image <#read-and-display-a-test-image>`__
+   -  `Get attributes from model <#Get-attributes-from-model>`__
+   -  `Helper function <#Helper-function>`__
+   -  `Read and display a test image <#Read-and-display-a-test-image>`__
 
 -  `Use the Detection Model to Detect
-   Vehicles <#use-the-detection-model-to-detect-vehicles>`__
+   Vehicles <#Use-the-Detection-Model-to-Detect-Vehicles>`__
 
-   -  `Detection Processing <#detection-processing>`__
-   -  `Recognize vehicle attributes <#recognize-vehicle-attributes>`__
+   -  `Detection Processing <#Detection-Processing>`__
+   -  `Recognize vehicle attributes <#Recognize-vehicle-attributes>`__
 
-      -  `Recognition processing <#recognition-processing>`__
+      -  `Recognition processing <#Recognition-processing>`__
 
-   -  `Combine two models <#combine-two-models>`__
+   -  `Combine two models <#Combine-two-models>`__
 
 .. |flowchart| image:: https://user-images.githubusercontent.com/47499836/157867076-9e997781-f9ef-45f6-9a51-b515bbf41048.png
 
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Import the required modules.
 
@@ -51,7 +51,7 @@ Import the required modules.
 
     import platform
     
-    %pip install -q "openvino>=2023.1.0"
+    %pip install -q "openvino>=2023.1.0" opencv-python tqdm
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -91,18 +91,20 @@ Import the required modules.
     import openvino as ov
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
+    import requests
+    
+    r = requests.get(
         url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
-        filename="notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     
     import notebook_utils as utils
 
 Download Models
 ---------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download pretrained models from
 https://storage.openvinotoolkit.org/repositories/open_model_zoo. If the
@@ -132,23 +134,27 @@ model is already downloaded, this step is skipped.
     base_model_url = "https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1"
     
     # Check if the model exists.
-    detection_model_url = (
-        f"{base_model_url}/{detection_model_name}/{precision}/{detection_model_name}.xml"
-    )
-    recognition_model_url = (
-        f"{base_model_url}/{recognition_model_name}/{precision}/{recognition_model_name}.xml"
-    )
-    detection_model_path = (base_model_dir / detection_model_name).with_suffix('.xml')
-    recognition_model_path = (base_model_dir / recognition_model_name).with_suffix('.xml')
+    detection_model_url = f"{base_model_url}/{detection_model_name}/{precision}/{detection_model_name}.xml"
+    recognition_model_url = f"{base_model_url}/{recognition_model_name}/{precision}/{recognition_model_name}.xml"
+    detection_model_path = (base_model_dir / detection_model_name).with_suffix(".xml")
+    recognition_model_path = (base_model_dir / recognition_model_name).with_suffix(".xml")
     
     # Download the detection model.
     if not detection_model_path.exists():
-        utils.download_file(detection_model_url, detection_model_name + '.xml', base_model_dir)
-        utils.download_file(detection_model_url.replace('.xml', '.bin'), detection_model_name + '.bin', base_model_dir)
+        utils.download_file(detection_model_url, detection_model_name + ".xml", base_model_dir)
+        utils.download_file(
+            detection_model_url.replace(".xml", ".bin"),
+            detection_model_name + ".bin",
+            base_model_dir,
+        )
     # Download the recognition model.
     if not os.path.exists(recognition_model_path):
-        utils.download_file(recognition_model_url, recognition_model_name + '.xml', base_model_dir)
-        utils.download_file(recognition_model_url.replace('.xml', '.bin'), recognition_model_name + '.bin', base_model_dir)
+        utils.download_file(recognition_model_url, recognition_model_name + ".xml", base_model_dir)
+        utils.download_file(
+            recognition_model_url.replace(".xml", ".bin"),
+            recognition_model_name + ".bin",
+            base_model_dir,
+        )
 
 
 
@@ -178,7 +184,7 @@ model is already downloaded, this step is skipped.
 Load Models
 -----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This tutorial requires a detection model and a recognition model. After
 downloading the models, initialize OpenVINO Runtime, and use
@@ -194,8 +200,8 @@ specified device.
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -240,7 +246,7 @@ specified device.
 Get attributes from model
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use ``input_keys.shape`` to get data shapes.
 
@@ -261,7 +267,7 @@ Use ``input_keys.shape`` to get data shapes.
 Helper function
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``plt_show()`` function is used to show image.
 
@@ -281,7 +287,7 @@ The ``plt_show()`` function is used to show image.
 Read and display a test image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The input shape of detection model is ``[1, 3, 256, 256]``. Therefore,
 you need to resize the image to ``256 x 256``, and expand the batch
@@ -294,7 +300,12 @@ channel with ``expand_dims`` function.
     filename = "cars.jpg"
     directory = "data"
     image_file = utils.download_file(
-        url, filename=filename, directory=directory, show_progress=False, silent=True,timeout=30
+        url,
+        filename=filename,
+        directory=directory,
+        show_progress=False,
+        silent=True,
+        timeout=30,
     )
     assert Path(image_file).exists()
     
@@ -315,7 +326,7 @@ channel with ``expand_dims`` function.
 Use the Detection Model to Detect Vehicles
 ------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. figure:: https://user-images.githubusercontent.com/47499836/157867076-9e997781-f9ef-45f6-9a51-b515bbf41048.png
    :alt: pipline
@@ -349,7 +360,7 @@ Delete unused dims and filter out results that are not used.
 Detection Processing
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 With the function below, you change the ratio to the real position in
 the image and filter out low-confidence results.
@@ -359,7 +370,7 @@ the image and filter out low-confidence results.
     def crop_images(bgr_image, resized_image, boxes, threshold=0.6) -> np.ndarray:
         """
         Use bounding boxes from detection model to find the absolute car position
-        
+    
         :param: bgr_image: raw image
         :param: resized_image: resized image
         :param: boxes: detection model returns rectangle position
@@ -367,7 +378,10 @@ the image and filter out low-confidence results.
         :returns: car_position: car's absolute position
         """
         # Fetch image shapes to calculate ratio
-        (real_y, real_x), (resized_y, resized_x) = bgr_image.shape[:2], resized_image.shape[:2]
+        (real_y, real_x), (resized_y, resized_x) = (
+            bgr_image.shape[:2],
+            resized_image.shape[:2],
+        )
         ratio_x, ratio_y = real_x / resized_x, real_y / resized_y
     
         # Find the boxes ratio
@@ -380,16 +394,15 @@ the image and filter out low-confidence results.
             conf = box[0]
             if conf > threshold:
                 # Convert float to int and multiply corner position of each box by x and y ratio
-                # In case that bounding box is found at the top of the image, 
-                # upper box  bar should be positioned a little bit lower to make it visible on image 
+                # In case that bounding box is found at the top of the image,
+                # upper box  bar should be positioned a little bit lower to make it visible on image
                 (x_min, y_min, x_max, y_max) = [
-                    int(max(corner_position * ratio_y * resized_y, 10)) if idx % 2 
-                    else int(corner_position * ratio_x * resized_x)
+                    (int(max(corner_position * ratio_y * resized_y, 10)) if idx % 2 else int(corner_position * ratio_x * resized_x))
                     for idx, corner_position in enumerate(box[1:])
                 ]
-                
+    
                 car_position.append([x_min, y_min, x_max, y_max])
-                
+    
         return car_position
 
 .. code:: ipython3
@@ -400,7 +413,7 @@ the image and filter out low-confidence results.
 Recognize vehicle attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select one of the detected boxes. Then, crop to an area containing a
 vehicle to test with the recognition model. Again, you need to resize
@@ -411,7 +424,7 @@ the input image and run inference.
     # Select a vehicle to recognize.
     pos = car_position[0]
     # Crop the image with [y_min:y_max, x_min:x_max].
-    test_car = image_de[pos[1]:pos[3], pos[0]:pos[2]]
+    test_car = image_de[pos[1] : pos[3], pos[0] : pos[2]]
     # Resize the image to input_size.
     resized_image_re = cv2.resize(test_car, (width_re, height_re))
     input_image_re = np.expand_dims(resized_image_re.transpose(2, 0, 1), 0)
@@ -425,7 +438,7 @@ the input image and run inference.
 Recognition processing
 ''''''''''''''''''''''
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The result contains colors of the vehicles (white, gray, yellow, red,
 green, blue, black) and types of vehicles (car, bus, truck, van). Next,
@@ -437,20 +450,20 @@ determine the maximum probability as the result.
     def vehicle_recognition(compiled_model_re, input_size, raw_image):
         """
         Vehicle attributes recognition, input a single vehicle, return attributes
-        :param: compiled_model_re: recognition net 
+        :param: compiled_model_re: recognition net
         :param: input_size: recognition input size
         :param: raw_image: single vehicle image
         :returns: attr_color: predicted color
                            attr_type: predicted type
         """
         # An attribute of a vehicle.
-        colors = ['White', 'Gray', 'Yellow', 'Red', 'Green', 'Blue', 'Black']
-        types = ['Car', 'Bus', 'Truck', 'Van']
-        
+        colors = ["White", "Gray", "Yellow", "Red", "Green", "Blue", "Black"]
+        types = ["Car", "Bus", "Truck", "Van"]
+    
         # Resize the image to input size.
         resized_image_re = cv2.resize(raw_image, input_size)
         input_image_re = np.expand_dims(resized_image_re.transpose(2, 0, 1), 0)
-        
+    
         # Run inference.
         # Predict result.
         predict_colors = compiled_model_re([input_image_re])[compiled_model_re.output(1)]
@@ -459,8 +472,10 @@ determine the maximum probability as the result.
         predict_types = compiled_model_re([input_image_re])[compiled_model_re.output(0)]
         predict_types = np.squeeze(predict_types, (2, 3))
     
-        attr_color, attr_type = (colors[np.argmax(predict_colors)],
-                                 types[np.argmax(predict_types)])
+        attr_color, attr_type = (
+            colors[np.argmax(predict_colors)],
+            types[np.argmax(predict_types)],
+        )
         return attr_color, attr_type
 
 .. code:: ipython3
@@ -476,7 +491,7 @@ determine the maximum probability as the result.
 Combine two models
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Congratulations! You successfully used a detection model to crop an
 image with a vehicle and recognize the attributes of a vehicle.
@@ -486,7 +501,7 @@ image with a vehicle and recognize the attributes of a vehicle.
     def convert_result_to_image(compiled_model_re, bgr_image, resized_image, boxes, threshold=0.6):
         """
         Use Detection model boxes to draw rectangles and plot the result
-        
+    
         :param: compiled_model_re: recognition net
         :param: input_key_re: recognition input key
         :param: bgr_image: raw image
@@ -497,17 +512,16 @@ image with a vehicle and recognize the attributes of a vehicle.
         """
         # Define colors for boxes and descriptions.
         colors = {"red": (255, 0, 0), "green": (0, 255, 0)}
-        
+    
         # Convert the base image from BGR to RGB format.
         rgb_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
-        
+    
         # Find positions of cars.
         car_position = crop_images(image_de, resized_image, boxes)
-        
+    
         for x_min, y_min, x_max, y_max in car_position:
             # Run vehicle recognition inference.
-            attr_color, attr_type = vehicle_recognition(compiled_model_re, (72, 72), 
-                                                        image_de[y_min:y_max, x_min:x_max])
+            attr_color, attr_type = vehicle_recognition(compiled_model_re, (72, 72), image_de[y_min:y_max, x_min:x_max])
     
             # Close the window with a vehicle.
             plt.close()
@@ -516,17 +530,17 @@ image with a vehicle and recognize the attributes of a vehicle.
             # Parameters in the `rectangle` function are: image, start_point, end_point, color, thickness.
             rgb_image = cv2.rectangle(rgb_image, (x_min, y_min), (x_max, y_max), colors["red"], 2)
     
-            # Print the attributes of a vehicle. 
+            # Print the attributes of a vehicle.
             # Parameters in the `putText` function are: img, text, org, fontFace, fontScale, color, thickness, lineType.
             rgb_image = cv2.putText(
-                rgb_image, 
+                rgb_image,
                 f"{attr_color} {attr_type}",
                 (x_min, y_min - 10),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 2,
                 colors["green"],
                 10,
-                cv2.LINE_AA
+                cv2.LINE_AA,
             )
     
         return rgb_image

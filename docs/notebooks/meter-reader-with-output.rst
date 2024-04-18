@@ -22,31 +22,31 @@ to build up a multiple inference task pipeline:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Import <#import>`__
+-  `Import <#Import>`__
 -  `Prepare the Model and Test
-   Image <#prepare-the-model-and-test-image>`__
--  `Configuration <#configuration>`__
--  `Load the Models <#load-the-models>`__
--  `Data Process <#data-process>`__
--  `Main Function <#main-function>`__
+   Image <#Prepare-the-Model-and-Test-Image>`__
+-  `Configuration <#Configuration>`__
+-  `Load the Models <#Load-the-Models>`__
+-  `Data Process <#Data-Process>`__
+-  `Main Function <#Main-Function>`__
 
    -  `Initialize the model and
-      parameters. <#initialize-the-model-and-parameters->`__
-   -  `Run meter detection model <#run-meter-detection-model>`__
-   -  `Run meter segmentation model <#run-meter-segmentation-model>`__
+      parameters. <#Initialize-the-model-and-parameters.>`__
+   -  `Run meter detection model <#Run-meter-detection-model>`__
+   -  `Run meter segmentation model <#Run-meter-segmentation-model>`__
    -  `Postprocess the models result and calculate the final
-      readings <#postprocess-the-models-result-and-calculate-the-final-readings>`__
+      readings <#Postprocess-the-models-result-and-calculate-the-final-readings>`__
    -  `Get the reading result on the meter
-      picture <#get-the-reading-result-on-the-meter-picture>`__
+      picture <#Get-the-reading-result-on-the-meter-picture>`__
 
--  `Try it with your meter photos! <#try-it-with-your-meter-photos>`__
+-  `Try it with your meter photos! <#Try-it-with-your-meter-photos!>`__
 
 .. code:: ipython3
 
     import platform
     
     # Install openvino package
-    %pip install -q "openvino>=2023.1.0"
+    %pip install -q "openvino>=2023.1.0" opencv-python tqdm
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -67,7 +67,7 @@ Table of contents:
 Import
 ------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -81,17 +81,19 @@ Import
     import openvino as ov
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     from notebook_utils import download_file, segmentation_map_to_image
 
 Prepare the Model and Test Image
 --------------------------------
 
-Download PPYOLOv2 and
+`back to top ⬆️ <#Table-of-contents:>`__ Download PPYOLOv2 and
 DeepLabV3P pre-trained models from PaddlePaddle community.
 
 .. code:: ipython3
@@ -112,7 +114,7 @@ DeepLabV3P pre-trained models from PaddlePaddle community.
     file = tarfile.open(f"model/{DET_FILE_NAME}")
     res = file.extractall("model")
     if not res:
-        print(f"Detection Model Extracted to \"./{MODEL_DIR}\".")
+        print(f'Detection Model Extracted to "./{MODEL_DIR}".')
     else:
         print("Error Extracting the Detection model. Please check the network.")
     
@@ -120,13 +122,13 @@ DeepLabV3P pre-trained models from PaddlePaddle community.
     file = tarfile.open(f"model/{SEG_FILE_NAME}")
     res = file.extractall("model")
     if not res:
-        print(f"Segmentation Model Extracted to \"./{MODEL_DIR}\".")
+        print(f'Segmentation Model Extracted to "./{MODEL_DIR}".')
     else:
         print("Error Extracting the Segmentation model. Please check the network.")
     
     download_file(IMG_LINK, directory=DATA_DIR, show_progress=True)
     if IMG_PATH.is_file():
-        print(f"Test Image Saved to \"./{DATA_DIR}\".")
+        print(f'Test Image Saved to "./{DATA_DIR}".')
     else:
         print("Error Downloading the Test Image. Please check the network.")
 
@@ -167,13 +169,13 @@ DeepLabV3P pre-trained models from PaddlePaddle community.
 Configuration
 -------------
 
-Add parameter configuration for
+`back to top ⬆️ <#Table-of-contents:>`__ Add parameter configuration for
 reading calculation.
 
 .. code:: ipython3
 
-    METER_SHAPE = [512, 512] 
-    CIRCLE_CENTER = [256, 256] 
+    METER_SHAPE = [512, 512]
+    CIRCLE_CENTER = [256, 256]
     CIRCLE_RADIUS = 250
     PI = math.pi
     RECTANGLE_HEIGHT = 120
@@ -182,22 +184,17 @@ reading calculation.
     COLORMAP = np.array([[28, 28, 28], [238, 44, 44], [250, 250, 250]])
     
     # There are 2 types of meters in test image datasets
-    METER_CONFIG = [{
-        'scale_interval_value': 25.0 / 50.0,
-        'range': 25.0,
-        'unit': "(MPa)"
-    }, {
-        'scale_interval_value': 1.6 / 32.0,
-        'range': 1.6,
-        'unit': "(MPa)"
-    }]
+    METER_CONFIG = [
+        {"scale_interval_value": 25.0 / 50.0, "range": 25.0, "unit": "(MPa)"},
+        {"scale_interval_value": 1.6 / 32.0, "range": 1.6, "unit": "(MPa)"},
+    ]
     
-    SEG_LABEL = {'background': 0, 'pointer': 1, 'scale': 2}
+    SEG_LABEL = {"background": 0, "pointer": 1, "scale": 2}
 
 Load the Models
 ---------------
 
-Define a common class for model
+`back to top ⬆️ <#Table-of-contents:>`__ Define a common class for model
 loading and inference
 
 .. code:: ipython3
@@ -211,11 +208,12 @@ loading and inference
         This class represents a OpenVINO model object.
     
         """
+    
         def __init__(self, model_path, new_shape, device="CPU"):
             """
             Initialize the model object
-            
-            Param: 
+    
+            Param:
                 model_path (string): path of inference model
                 new_shape (dict): new shape of model input
     
@@ -228,10 +226,10 @@ loading and inference
         def predict(self, input_image):
             """
             Run inference
-            
-            Param: 
+    
+            Param:
                 input_image (np.array): input data
-                
+    
             Retuns:
                 result (np.array)): model output data
             """
@@ -241,7 +239,7 @@ loading and inference
 Data Process
 ------------
 
-Including the preprocessing and
+`back to top ⬆️ <#Table-of-contents:>`__ Including the preprocessing and
 postprocessing tasks of each model.
 
 .. code:: ipython3
@@ -250,12 +248,12 @@ postprocessing tasks of each model.
         """
         Preprocessing the input data for detection task
     
-        Param: 
+        Param:
             input_image (np.array): input data
             size (int): the image size required by model input layer
         Retuns:
             img.astype (np.array): preprocessed image
-        
+    
         """
         img = cv2.resize(input_image, (target_size, target_size))
         img = np.transpose(img, [2, 0, 1]) / 255
@@ -277,7 +275,7 @@ postprocessing tasks of each model.
     
         Retuns：
             filtered_results (list[dict]): filter detection results
-        
+    
         """
         filtered_results = []
         for i in range(len(det_results)):
@@ -299,14 +297,19 @@ postprocessing tasks of each model.
         Retuns：
             roi_imgs (list[np.array]): the list of meter images
             loc (list[int]): the list of meter locations
-        
+    
         """
         roi_imgs = []
         loc = []
         for result in results:
             bbox = result[2:]
-            xmin, ymin, xmax, ymax = [int(bbox[0] * scale_x), int(bbox[1] * scale_y), int(bbox[2] * scale_x), int(bbox[3] * scale_y)]
-            sub_img = image[ymin:(ymax + 1), xmin:(xmax + 1), :]
+            xmin, ymin, xmax, ymax = [
+                int(bbox[0] * scale_x),
+                int(bbox[1] * scale_y),
+                int(bbox[2] * scale_x),
+                int(bbox[3] * scale_y),
+            ]
+            sub_img = image[ymin : (ymax + 1), xmin : (xmax + 1), :]
             roi_imgs.append(sub_img)
             loc.append([xmin, ymin, xmax, ymax])
         return roi_imgs, loc
@@ -325,7 +328,7 @@ postprocessing tasks of each model.
         Retuns：
             img_list (list[np.array])：the list of processed images
             resize_img (list[np.array]): for visualization
-        
+    
         """
         img_list = list()
         resize_list = list()
@@ -354,7 +357,7 @@ postprocessing tasks of each model.
     
         Return：
             eroded_results (list[dict])： the lab map of eroded_results
-            
+    
         """
         kernel = np.ones((erode_kernel, erode_kernel), np.uint8)
         eroded_results = seg_results
@@ -383,7 +386,7 @@ postprocessing tasks of each model.
             for row in range(RECTANGLE_HEIGHT):
                 for col in range(RECTANGLE_WIDTH):
                     theta = PI * 2 * (col + 1) / RECTANGLE_WIDTH
-                    
+    
                     # The radius of meter circle will be mapped to the height of rectangle image
                     rho = CIRCLE_RADIUS - row - 1
                     y = int(CIRCLE_CENTER[0] + rho * math.cos(theta) + 0.5)
@@ -413,9 +416,9 @@ postprocessing tasks of each model.
             line_pointer = np.zeros((width), dtype=np.uint8)
             for col in range(width):
                 for row in range(height):
-                    if rectangle_meter[row, col] == SEG_LABEL['pointer']:
+                    if rectangle_meter[row, col] == SEG_LABEL["pointer"]:
                         line_pointer[col] += 1
-                    elif rectangle_meter[row, col] == SEG_LABEL['scale']:
+                    elif rectangle_meter[row, col] == SEG_LABEL["scale"]:
                         line_scale[col] += 1
             line_scales.append(line_scale)
             line_pointers.append(line_pointer)
@@ -509,7 +512,7 @@ postprocessing tasks of each model.
                         pointer_start = j
                         find_start = True
                 if find_start:
-                    if line_pointer[j] == 0 and line_pointer[j + 1] == 0 :
+                    if line_pointer[j] == 0 and line_pointer[j + 1] == 0:
                         pointer_end = j - 1
                         location = (pointer_start + pointer_end) / 2
                         find_start = False
@@ -530,18 +533,17 @@ postprocessing tasks of each model.
             pointed_scales (list[dict])： a list of dict with:
                                          'num_scales': total number of scales
                                          'pointed_scale': predicted number of scales
-                
+    
         """
         pointed_scales = list()
-        for scale_location, pointer_location in zip(scale_locations,
-                                                    pointer_locations):
+        for scale_location, pointer_location in zip(scale_locations, pointer_locations):
             num_scales = len(scale_location)
             pointed_scale = -1
             if num_scales > 0:
                 for i in range(num_scales - 1):
                     if scale_location[i] <= pointer_location < scale_location[i + 1]:
                         pointed_scale = i + (pointer_location - scale_location[i]) / (scale_location[i + 1] - scale_location[i] + 1e-05) + 1
-            result = {'num_scales': num_scales, 'pointed_scale': pointed_scale}
+            result = {"num_scales": num_scales, "pointed_scale": pointed_scale}
             pointed_scales.append(result)
         return pointed_scales
     
@@ -555,29 +557,29 @@ postprocessing tasks of each model.
     
         Return：
             readings (list[float])： the list of values read from meter
-                
+    
         """
         readings = list()
         batch_size = len(pointed_scales)
         for i in range(batch_size):
             pointed_scale = pointed_scales[i]
             # find the type of meter according the total number of scales
-            if pointed_scale['num_scales'] > TYPE_THRESHOLD:
-                reading = pointed_scale['pointed_scale'] * METER_CONFIG[0]['scale_interval_value']
+            if pointed_scale["num_scales"] > TYPE_THRESHOLD:
+                reading = pointed_scale["pointed_scale"] * METER_CONFIG[0]["scale_interval_value"]
             else:
-                reading = pointed_scale['pointed_scale'] * METER_CONFIG[1]['scale_interval_value']
+                reading = pointed_scale["pointed_scale"] * METER_CONFIG[1]["scale_interval_value"]
             readings.append(reading)
         return readings
 
 Main Function
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Initialize the model and parameters.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -587,8 +589,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -616,9 +618,13 @@ bounds of input batch size.
 
     img_file = f"{DATA_DIR}/{IMG_FILE_NAME}"
     det_model_path = f"{MODEL_DIR}/meter_det_model/model.pdmodel"
-    det_model_shape = {'image': [1, 3, 608, 608], 'im_shape': [1, 2], 'scale_factor': [1, 2]}
+    det_model_shape = {
+        "image": [1, 3, 608, 608],
+        "im_shape": [1, 2],
+        "scale_factor": [1, 2],
+    }
     seg_model_path = f"{MODEL_DIR}/meter_seg_model/model.pdmodel"
-    seg_model_shape = {'image': [ov.Dimension(1, 2), 3, 512, 512]}
+    seg_model_shape = {"image": [ov.Dimension(1, 2), 3, 512, 512]}
     
     erode_kernel = 4
     score_threshold = 0.5
@@ -639,7 +645,7 @@ bounds of input batch size.
 
 .. parsed-literal::
 
-    <matplotlib.image.AxesImage at 0x7febfb3be070>
+    <matplotlib.image.AxesImage at 0x7f8110d1bd60>
 
 
 
@@ -650,16 +656,16 @@ bounds of input batch size.
 Run meter detection model
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Detect the location of the
+`back to top ⬆️ <#Table-of-contents:>`__ Detect the location of the
 meter and prepare the ROI images for segmentation.
 
 .. code:: ipython3
 
     # Prepare the input data for meter detection model
-    im_shape = np.array([[input_shape, input_shape]]).astype('float32')
-    scale_factor = np.array([[1, 2]]).astype('float32')
+    im_shape = np.array([[input_shape, input_shape]]).astype("float32")
+    scale_factor = np.array([[1, 2]]).astype("float32")
     input_image = det_preprocess(image, input_shape)
-    inputs_dict = {'image': input_image, "im_shape": im_shape, "scale_factor": scale_factor}
+    inputs_dict = {"image": input_image, "im_shape": im_shape, "scale_factor": scale_factor}
     
     # Run meter detection model
     det_results = detector.predict(inputs_dict)
@@ -679,7 +685,7 @@ meter and prepare the ROI images for segmentation.
     roi_stack = np.hstack(resize_imgs)
     
     if cv2.imwrite(f"{DATA_DIR}/detection_results.jpg", roi_stack):
-        print("The detection result image has been saved as \"detection_results.jpg\" in data")
+        print('The detection result image has been saved as "detection_results.jpg" in data')
         plt.imshow(cv2.cvtColor(roi_stack, cv2.COLOR_BGR2RGB))
 
 
@@ -695,7 +701,7 @@ meter and prepare the ROI images for segmentation.
 Run meter segmentation model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Get the results of segmentation
+`back to top ⬆️ <#Table-of-contents:>`__ Get the results of segmentation
 task on detected ROI.
 
 .. code:: ipython3
@@ -711,7 +717,7 @@ task on detected ROI.
         seg_results.extend(seg_result)
     results = []
     for i in range(len(seg_results)):
-        results.append(np.argmax(seg_results[i], axis=0)) 
+        results.append(np.argmax(seg_results[i], axis=0))
     seg_results = erode(results, erode_kernel)
     
     # Create the pictures of segmentation results
@@ -720,7 +726,7 @@ task on detected ROI.
     mask_stack = np.hstack(mask_list)
     
     if cv2.imwrite(f"{DATA_DIR}/segmentation_results.jpg", cv2.cvtColor(mask_stack, cv2.COLOR_RGB2BGR)):
-        print("The segmentation result image has been saved as \"segmentation_results.jpg\" in data")
+        print('The segmentation result image has been saved as "segmentation_results.jpg" in data')
         plt.imshow(mask_stack)
 
 
@@ -736,12 +742,12 @@ task on detected ROI.
 Postprocess the models result and calculate the final readings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use OpenCV function to find the
+`back to top ⬆️ <#Table-of-contents:>`__ Use OpenCV function to find the
 location of the pointer in a scale map.
 
 .. code:: ipython3
 
-    # Find the pointer location in scale map and calculate the meters reading 
+    # Find the pointer location in scale map and calculate the meters reading
     rectangle_meters = circle_to_rectangle(seg_results)
     line_scales, line_pointers = rectangle_to_line(rectangle_meters)
     binaried_scales = mean_binarization(line_scales)
@@ -757,8 +763,11 @@ location of the pointer in a scale map.
         rectangle_list.append(segmentation_map_to_image(rectangle_meters[i], COLORMAP))
     rectangle_meters_stack = np.hstack(rectangle_list)
     
-    if cv2.imwrite(f"{DATA_DIR}/rectangle_meters.jpg", cv2.cvtColor(rectangle_meters_stack, cv2.COLOR_RGB2BGR)):
-        print("The rectangle_meters result image has been saved as \"rectangle_meters.jpg\" in data")
+    if cv2.imwrite(
+        f"{DATA_DIR}/rectangle_meters.jpg",
+        cv2.cvtColor(rectangle_meters_stack, cv2.COLOR_RGB2BGR),
+    ):
+        print('The rectangle_meters result image has been saved as "rectangle_meters.jpg" in data')
         plt.imshow(rectangle_meters_stack)
 
 
@@ -774,22 +783,37 @@ location of the pointer in a scale map.
 Get the reading result on the meter picture
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # Create a final result photo with reading
     for i in range(len(meter_readings)):
         print("Meter {}: {:.3f}".format(i + 1, meter_readings[i]))
-        
+    
     result_image = image.copy()
     for i in range(len(loc)):
-        cv2.rectangle(result_image,(loc[i][0], loc[i][1]), (loc[i][2], loc[i][3]), (0, 150, 0), 3)
+        cv2.rectangle(result_image, (loc[i][0], loc[i][1]), (loc[i][2], loc[i][3]), (0, 150, 0), 3)
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.rectangle(result_image, (loc[i][0], loc[i][1]), (loc[i][0] + 100, loc[i][1] + 40), (0, 150, 0), -1)
-        cv2.putText(result_image, "#{:.3f}".format(meter_readings[i]), (loc[i][0],loc[i][1] + 25), font, 0.8, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.rectangle(
+            result_image,
+            (loc[i][0], loc[i][1]),
+            (loc[i][0] + 100, loc[i][1] + 40),
+            (0, 150, 0),
+            -1,
+        )
+        cv2.putText(
+            result_image,
+            "#{:.3f}".format(meter_readings[i]),
+            (loc[i][0], loc[i][1] + 25),
+            font,
+            0.8,
+            (255, 255, 255),
+            2,
+            cv2.LINE_AA,
+        )
     if cv2.imwrite(f"{DATA_DIR}/reading_results.jpg", result_image):
-        print("The reading results image has been saved as \"reading_results.jpg\" in data")
+        print('The reading results image has been saved as "reading_results.jpg" in data')
         plt.imshow(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB))
 
 
@@ -807,4 +831,4 @@ Get the reading result on the meter picture
 Try it with your meter photos!
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__

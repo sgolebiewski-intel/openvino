@@ -73,35 +73,35 @@ and the sequence is passed back into the model.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Model Selection <#model-selection>`__
--  `Load Model <#load-model>`__
+-  `Model Selection <#Model-Selection>`__
+-  `Load Model <#Load-Model>`__
 -  `Convert Pytorch Model to OpenVINO
-   IR <#convert-pytorch-model-to-openvino-ir>`__
+   IR <#Convert-Pytorch-Model-to-OpenVINO-IR>`__
 
-   -  `Load the model <#load-the-model>`__
+   -  `Load the model <#Load-the-model>`__
 
-      -  `Select inference device <#select-inference-device>`__
+      -  `Select inference device <#Select-inference-device>`__
 
--  `Pre-Processing <#pre-processing>`__
--  `Define tokenization <#define-tokenization>`__
+-  `Pre-Processing <#Pre-Processing>`__
+-  `Define tokenization <#Define-tokenization>`__
 
-   -  `Define Softmax layer <#define-softmax-layer>`__
+   -  `Define Softmax layer <#Define-Softmax-layer>`__
    -  `Set the minimum sequence
-      length <#set-the-minimum-sequence-length>`__
-   -  `Top-K sampling <#top-k-sampling>`__
-   -  `Main Processing Function <#main-processing-function>`__
+      length <#Set-the-minimum-sequence-length>`__
+   -  `Top-K sampling <#Top-K-sampling>`__
+   -  `Main Processing Function <#Main-Processing-Function>`__
 
--  `Inference with GPT-Neo/GPT-2 <#inference-with-gpt-neogpt-2>`__
+-  `Inference with GPT-Neo/GPT-2 <#Inference-with-GPT-Neo/GPT-2>`__
 -  `Conversation with PersonaGPT using
-   OpenVINO <#conversation-with-personagpt-using-openvino>`__
--  `Converse Function <#converse-function>`__
--  `Conversation Class <#conversation-class>`__
--  `Conversation with PersonaGPT <#conversation-with-personagpt>`__
+   OpenVINO <#Conversation-with-PersonaGPT-using-OpenVINO>`__
+-  `Converse Function <#Converse-Function>`__
+-  `Conversation Class <#Conversation-Class>`__
+-  `Conversation with PersonaGPT <#Conversation-with-PersonaGPT>`__
 
 Model Selection
 ---------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select the Model to be used for text generation, GPT-2 and GPT-Neo are
 used for text generation whereas PersonaGPT is used for Conversation.
@@ -109,7 +109,7 @@ used for text generation whereas PersonaGPT is used for Conversation.
 .. code:: ipython3
 
     %pip install -q "openvino>=2023.1.0"
-    %pip install -q gradio
+    %pip install -q "gradio>=4.19"
     %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu transformers "torch>=2.1"
 
 
@@ -152,12 +152,12 @@ used for text generation whereas PersonaGPT is used for Conversation.
 
     import ipywidgets as widgets
     
-    style = {'description_width': 'initial'}
+    style = {"description_width": "initial"}
     model_name = widgets.Select(
-        options=['PersonaGPT (Converastional)', 'GPT-2', 'GPT-Neo'],
-        value='PersonaGPT (Converastional)',
-        description='Select Model:',
-        disabled=False
+        options=["PersonaGPT (Converastional)", "GPT-2", "GPT-Neo"],
+        value="PersonaGPT (Converastional)",
+        description="Select Model:",
+        disabled=False,
     )
     
     widgets.VBox([model_name])
@@ -174,35 +174,33 @@ used for text generation whereas PersonaGPT is used for Conversation.
 Load Model
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the Selected Model and Tokenizer from HuggingFace
 
 .. code:: ipython3
 
-    from transformers import GPTNeoForCausalLM, GPT2TokenizerFast, GPT2Tokenizer, GPT2LMHeadModel
+    from transformers import (
+        GPTNeoForCausalLM,
+        GPT2TokenizerFast,
+        GPT2Tokenizer,
+        GPT2LMHeadModel,
+    )
     
     if model_name.value == "PersonaGPT (Converastional)":
-        pt_model = GPT2LMHeadModel.from_pretrained('af1tang/personaGPT')
-        tokenizer = GPT2Tokenizer.from_pretrained('af1tang/personaGPT')
-    elif model_name.value == 'GPT-2':
-        pt_model = GPT2LMHeadModel.from_pretrained('gpt2')
-        tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-    elif model_name.value == 'GPT-Neo':
-        pt_model = GPTNeoForCausalLM.from_pretrained('EleutherAI/gpt-neo-125M')
-        tokenizer = GPT2TokenizerFast.from_pretrained('EleutherAI/gpt-neo-125M')
-
-
-.. parsed-literal::
-
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
-      return self.fget.__get__(instance, owner)()
-
+        pt_model = GPT2LMHeadModel.from_pretrained("af1tang/personaGPT")
+        tokenizer = GPT2Tokenizer.from_pretrained("af1tang/personaGPT")
+    elif model_name.value == "GPT-2":
+        pt_model = GPT2LMHeadModel.from_pretrained("gpt2")
+        tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+    elif model_name.value == "GPT-Neo":
+        pt_model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M")
+        tokenizer = GPT2TokenizerFast.from_pretrained("EleutherAI/gpt-neo-125M")
 
 Convert Pytorch Model to OpenVINO IR
 ------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For starting work with GPT-Neo model using OpenVINO, a model should be
 converted to OpenVINO Intermediate Representation (IR) format.
@@ -228,14 +226,31 @@ consumption.
     # define path for saving openvino model
     model_path = Path("model/text_generator.xml")
     
-    example_input = {"input_ids": torch.ones((1, 10), dtype=torch.long), "attention_mask": torch.ones((1, 10), dtype=torch.long)}
+    example_input = {
+        "input_ids": torch.ones((1, 10), dtype=torch.long),
+        "attention_mask": torch.ones((1, 10), dtype=torch.long),
+    }
     pt_model.config.torchscript = True
     
     # convert model to openvino
     if model_name.value == "PersonaGPT (Converastional)":
-        ov_model = ov.convert_model(pt_model, example_input=example_input, input=[('input_ids', [1, -1], ov.Type.i64), ('attention_mask', [1,-1], ov.Type.i64)])
+        ov_model = ov.convert_model(
+            pt_model,
+            example_input=example_input,
+            input=[
+                ("input_ids", [1, -1], ov.Type.i64),
+                ("attention_mask", [1, -1], ov.Type.i64),
+            ],
+        )
     else:
-        ov_model = ov.convert_model(pt_model, example_input=example_input, input=[('input_ids', [1, ov.Dimension(1,128)], ov.Type.i64), ('attention_mask', [1, ov.Dimension(1,128)], ov.Type.i64)])
+        ov_model = ov.convert_model(
+            pt_model,
+            example_input=example_input,
+            input=[
+                ("input_ids", [1, ov.Dimension(1, 128)], ov.Type.i64),
+                ("attention_mask", [1, ov.Dimension(1, 128)], ov.Type.i64),
+            ],
+        )
     
     # serialize openvino model
     ov.save_model(ov_model, str(model_path))
@@ -243,31 +258,31 @@ consumption.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/gpt2/modeling_gpt2.py:801: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/gpt2/modeling_gpt2.py:801: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if batch_size <= 0:
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:1093: TracerWarning: Output nr 1. of the traced function does not match the corresponding output of the Python function. Detailed error:
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:1102: TracerWarning: Output nr 1. of the traced function does not match the corresponding output of the Python function. Detailed error:
     Tensor-likes are not close!
     
-    Mismatched elements: 2 / 502630 (0.0%)
-    Greatest absolute difference: 1.2874603271484375e-05 at index (0, 4, 1237) (up to 1e-05 allowed)
-    Greatest relative difference: 0.008905013192612138 at index (0, 4, 1237) (up to 1e-05 allowed)
+    Mismatched elements: 22 / 502630 (0.0%)
+    Greatest absolute difference: 1.3828277587890625e-05 at index (0, 1, 1287) (up to 1e-05 allowed)
+    Greatest relative difference: 0.006159087930808544 at index (0, 5, 8109) (up to 1e-05 allowed)
       _check_trace(
 
 
 Load the model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We start by building an OpenVINO Core object. Then we read the network
 architecture and model weights from the ``.xml`` and ``.bin`` files,
@@ -276,7 +291,7 @@ respectively. Finally, we compile the model for the desired device.
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -289,8 +304,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -326,7 +341,7 @@ have ``batch size`` and ``sequence length`` as inputs and
 Pre-Processing
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NLP models often take a list of tokens as a standard input. A token is a
 word or a part of a word mapped to an integer. To provide the proper
@@ -336,7 +351,7 @@ load the vocabulary file.
 Define tokenization
 -------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -370,20 +385,20 @@ at later stage.
 
 .. parsed-literal::
 
-    2024-04-10 00:38:23.533816: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-10 00:38:23.566100: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-18 01:17:07.121619: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-18 01:17:07.154872: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-04-10 00:38:24.110667: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-18 01:17:07.673304: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 Define Softmax layer
 ~~~~~~~~~~~~~~~~~~~~
 
-A softmax function is used to
+`back to top ⬆️ <#Table-of-contents:>`__ A softmax function is used to
 convert top-k logits into a probability distribution.
 
 .. code:: ipython3
@@ -391,7 +406,7 @@ convert top-k logits into a probability distribution.
     import numpy as np
     
     
-    def softmax(x : np.array) -> np.array:
+    def softmax(x: np.array) -> np.array:
         e_x = np.exp(x - np.max(x, axis=-1, keepdims=True))
         summation = e_x.sum(axis=-1, keepdims=True)
         return e_x / summation
@@ -399,7 +414,7 @@ convert top-k logits into a probability distribution.
 Set the minimum sequence length
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 If the minimum sequence length is not reached, the following code will
 reduce the probability of the ``eos`` token occurring. This continues
@@ -407,7 +422,7 @@ the process of generating the next words.
 
 .. code:: ipython3
 
-    def process_logits(cur_length: int, scores: np.array, eos_token_id : int, min_length : int = 0) -> np.array:
+    def process_logits(cur_length: int, scores: np.array, eos_token_id: int, min_length: int = 0) -> np.array:
         """
         Reduce probability for padded indices.
     
@@ -427,14 +442,14 @@ the process of generating the next words.
 Top-K sampling
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In Top-K sampling, we filter the K most likely next words and
 redistribute the probability mass among only those K next words.
 
 .. code:: ipython3
 
-    def get_top_k_logits(scores : np.array, top_k : int) -> np.array:
+    def get_top_k_logits(scores: np.array, top_k: int) -> np.array:
         """
         Perform top-k sampling on the logits scores.
     
@@ -451,21 +466,25 @@ redistribute the probability mass among only those K next words.
         top_k = min(max(top_k, 1), scores.shape[-1])
         top_k_scores = -np.sort(-scores)[:, :top_k]
         indices_to_remove = scores < np.min(top_k_scores)
-        filtred_scores = np.ma.array(scores, mask=indices_to_remove,
-                                     fill_value=filter_value).filled()
+        filtred_scores = np.ma.array(scores, mask=indices_to_remove, fill_value=filter_value).filled()
         return filtred_scores
 
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Generating the predicted sequence.
 
 .. code:: ipython3
 
-    def generate_sequence(input_ids : List[int], attention_mask : List[int], max_sequence_length : int = 128,
-                          eos_token_id : int = eos_token_id, dynamic_shapes : bool = True) -> List[int]:
+    def generate_sequence(
+        input_ids: List[int],
+        attention_mask: List[int],
+        max_sequence_length: int = 128,
+        eos_token_id: int = eos_token_id,
+        dynamic_shapes: bool = True,
+    ) -> List[int]:
         """
         Generates a sequence of tokens using a pre-trained language model.
     
@@ -491,14 +510,12 @@ Generating the predicted sequence.
             outputs = compiled_model({"input_ids": model_input_ids, "attention_mask": model_input_attention_mask})[output_key]
             next_token_logits = outputs[:, cur_input_len - 1, :]
             # pre-process distribution
-            next_token_scores = process_logits(cur_input_len,
-                                               next_token_logits, eos_token_id)
+            next_token_scores = process_logits(cur_input_len, next_token_logits, eos_token_id)
             top_k = 20
             next_token_scores = get_top_k_logits(next_token_scores, top_k)
             # get next token id
             probs = softmax(next_token_scores)
-            next_tokens = np.random.choice(probs.shape[-1], 1,
-                                           p=probs[0], replace=True)
+            next_tokens = np.random.choice(probs.shape[-1], 1, p=probs[0], replace=True)
             # break the loop if max length or end of text token is reached
             if cur_input_len == max_sequence_length or next_tokens[0] == eos_token_id:
                 break
@@ -510,7 +527,7 @@ Generating the predicted sequence.
 Inference with GPT-Neo/GPT-2
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``text`` variable below is the input used to generate a predicted
 sequence.
@@ -546,7 +563,7 @@ sequence.
 Conversation with PersonaGPT using OpenVINO
 ===========================================
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 User Input is tokenized with ``eos_token`` concatenated in the end.
 Model input is tokenized text, which serves as initial condition for
@@ -564,14 +581,18 @@ model.
 Converse Function
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Wrapper on generate sequence function to support conversation
 
 .. code:: ipython3
 
-    def converse(input: str, history: List[int], eos_token: str = eos_token,
-                 eos_token_id: int = eos_token_id) -> Tuple[str, List[int]]:
+    def converse(
+        input: str,
+        history: List[int],
+        eos_token: str = eos_token,
+        eos_token_id: int = eos_token_id,
+    ) -> Tuple[str, List[int]]:
         """
         Converse with the Model.
     
@@ -605,13 +626,13 @@ Wrapper on generate sequence function to support conversation
         history = np.append(history[0], eos_token_id)
     
         # convert the tokens to text, and then split the responses into lines and retrieve the response from the Model
-        response = ''.join(tokenizer.batch_decode(history)).split(eos_token)[-2]
+        response = "".join(tokenizer.batch_decode(history)).split(eos_token)[-2]
         return response, history
 
 Conversation Class
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -637,19 +658,19 @@ Conversation Class
 Conversation with PersonaGPT
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This notebook provides two styles of inference, Plain and Interactive.
 The style of inference can be selected in the next cell.
 
 .. code:: ipython3
 
-    style = {'description_width': 'initial'}
+    style = {"description_width": "initial"}
     interactive_mode = widgets.Select(
-        options=['Plain', 'Interactive'],
-        value='Plain',
-        description='Inference Style:',
-        disabled=False
+        options=["Plain", "Interactive"],
+        value="Plain",
+        description="Inference Style:",
+        disabled=False,
     )
     
     widgets.VBox([interactive_mode])
@@ -668,10 +689,15 @@ The style of inference can be selected in the next cell.
     import gradio as gr
     
     if model_name.value == "PersonaGPT (Converastional)":
-        if interactive_mode.value == 'Plain':
+        if interactive_mode.value == "Plain":
             conversation = Conversation()
             user_prompt = None
-            pre_written_prompts = ["Hi,How are you?", "What are you doing?", "I like to dance,do you?", "Can you recommend me some books?"]
+            pre_written_prompts = [
+                "Hi,How are you?",
+                "What are you doing?",
+                "I like to dance,do you?",
+                "Can you recommend me some books?",
+            ]
             # Number of responses generated by model
             n_prompts = 10
             for i in range(n_prompts):
@@ -684,6 +710,7 @@ The style of inference can be selected in the next cell.
                 print(conversation.messages[-1])
                 user_prompt = None
         else:
+    
             def add_text(history, text):
                 history = history + [(text, None)]
                 return history, ""
@@ -704,12 +731,10 @@ The style of inference can be selected in the next cell.
                         txt = gr.Textbox(
                             show_label=False,
                             placeholder="Enter text and press enter, or upload an image",
-                            container=False
+                            container=False,
                         )
     
-                txt.submit(add_text, [chatbot, txt], [chatbot, txt]).then(
-                    bot, chatbot, chatbot
-                )
+                txt.submit(add_text, [chatbot, txt], [chatbot, txt]).then(bot, chatbot, chatbot)
             try:
                 demo.launch(debug=False)
             except Exception:
@@ -724,59 +749,59 @@ The style of inference can be selected in the next cell.
 .. parsed-literal::
 
     Person: Hi,How are you?
-    PersonaGPT: hello. great. how are you? tell me more about yourself.
+    PersonaGPT: i'm good thanks for asking
 
 
 .. parsed-literal::
 
     Person: What are you doing?
-    PersonaGPT: just hanging out after a long day of work. how about you?
+    PersonaGPT: just relaxing before bed
 
 
 .. parsed-literal::
 
     Person: I like to dance,do you?
-    PersonaGPT: not really. are you in a band or something?
+    PersonaGPT: no. what do you dance to?
 
 
 .. parsed-literal::
 
     Person: Can you recommend me some books?
-    PersonaGPT: well, there are plenty of dance books. what do you do for fun?
+    PersonaGPT: what do you do for fun or for a hobby?
 
 
 .. parsed-literal::
 
     Person: Hi,How are you?
-    PersonaGPT: i like to spend time with my family and take care of my siblings.
+    PersonaGPT: i like to read and play games.
 
 
 .. parsed-literal::
 
     Person: What are you doing?
-    PersonaGPT: i'm getting ready for my shift at the supermarket tomorrow. you?
+    PersonaGPT: i'm great thanks for asking.
 
 
 .. parsed-literal::
 
     Person: I like to dance,do you?
-    PersonaGPT: what else do you like to do for fun?
+    PersonaGPT: no. what do you like to do for fun?
 
 
 .. parsed-literal::
 
     Person: Can you recommend me some books?
-    PersonaGPT: well, there are plenty of book about dance. do you like to read?
+    PersonaGPT: what do you like to do for fun?
 
 
 .. parsed-literal::
 
     Person: Hi,How are you?
-    PersonaGPT: good. i like to read too. what are your hobbies?
+    PersonaGPT: i am good thanks for asking
 
 
 .. parsed-literal::
 
     Person: What are you doing?
-    PersonaGPT: getting ready for work tomorrow. you like reading?
+    PersonaGPT: i'm relaxing before bed.
 

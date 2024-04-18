@@ -27,34 +27,34 @@ of increased latency, however.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Install required libraries <#install-required-libraries>`__
--  `Prepare the environment <#prepare-the-environment>`__
+-  `Install required libraries <#Install-required-libraries>`__
+-  `Prepare the environment <#Prepare-the-environment>`__
 -  `Load OneFormer fine-tuned on COCO for universal
-   segmentation <#load-oneformer-fine-tuned-on-coco-for-universal-segmentation>`__
+   segmentation <#Load-OneFormer-fine-tuned-on-COCO-for-universal-segmentation>`__
 -  `Convert the model to OpenVINO IR
-   format <#convert-the-model-to-openvino-ir-format>`__
--  `Select inference device <#select-inference-device>`__
--  `Choose a segmentation task <#choose-a-segmentation-task>`__
--  `Inference <#inference>`__
--  `Quantization <#quantization>`__
+   format <#Convert-the-model-to-OpenVINO-IR-format>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `Choose a segmentation task <#Choose-a-segmentation-task>`__
+-  `Inference <#Inference>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Preparing calibration dataset <#preparing-calibration-dataset>`__
-   -  `Run quantization <#run-quantization>`__
+   -  `Preparing calibration dataset <#Preparing-calibration-dataset>`__
+   -  `Run quantization <#Run-quantization>`__
    -  `Compare model size and
-      performance <#compare-model-size-and-performance>`__
+      performance <#Compare-model-size-and-performance>`__
 
--  `Interactive Demo <#interactive-demo>`__
+-  `Interactive Demo <#Interactive-Demo>`__
 
 Install required libraries
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import platform
     
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "transformers>=4.26.0" "openvino>=2023.1.0" "nncf>=2.7.0" gradio "torch>=2.1" scipy ipywidgets Pillow
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "transformers>=4.26.0" "openvino>=2023.1.0" "nncf>=2.7.0" "gradio>=4.19" "torch>=2.1" scipy ipywidgets Pillow tqdm
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -70,7 +70,7 @@ Install required libraries
 Prepare the environment
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Import all required packages and set paths for models and constant
 variables.
@@ -82,7 +82,9 @@ variables.
     from pathlib import Path
     
     from transformers import OneFormerProcessor, OneFormerForUniversalSegmentation
-    from transformers.models.oneformer.modeling_oneformer import OneFormerForUniversalSegmentationOutput
+    from transformers.models.oneformer.modeling_oneformer import (
+        OneFormerForUniversalSegmentationOutput,
+    )
     import torch
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
@@ -92,22 +94,24 @@ variables.
     import openvino
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     from notebook_utils import download_file
 
 .. code:: ipython3
 
     IR_PATH = Path("oneformer.xml")
-    OUTPUT_NAMES = ['class_queries_logits', 'masks_queries_logits']
+    OUTPUT_NAMES = ["class_queries_logits", "masks_queries_logits"]
 
 Load OneFormer fine-tuned on COCO for universal segmentation
 ------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Here we use the ``from_pretrained`` method of
 ``OneFormerForUniversalSegmentation`` to load the `HuggingFace OneFormer
@@ -143,13 +147,13 @@ images and post-process model outputs for visualization.
     shape = (800, 800)
     dummy_input = {
         "pixel_values": torch.randn(1, 3, *shape),
-        "task_inputs": torch.randn(1, task_seq_length)
+        "task_inputs": torch.randn(1, task_seq_length),
     }
 
 Convert the model to OpenVINO IR format
 ---------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Convert the PyTorch model to IR format to take advantage of OpenVINO
 optimization tools and features. The ``openvino.convert_model`` python
@@ -187,7 +191,7 @@ should provide PyTorch model instance and example input to
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select device from dropdown list for running inference using OpenVINO
 
@@ -199,8 +203,8 @@ Select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -228,8 +232,8 @@ images and text to solve image segmentation.
         image = ImageOps.pad(image, shape)
         inputs = processor(image, [task], return_tensors="pt")
         converted = {
-            'pixel_values': inputs['pixel_values'],
-            'task_inputs': inputs['task_inputs']
+            "pixel_values": inputs["pixel_values"],
+            "task_inputs": inputs["task_inputs"],
         }
         return converted
 
@@ -237,9 +241,7 @@ images and text to solve image segmentation.
 
     def process_output(d):
         """Convert OpenVINO model output to HuggingFace representation for visualization"""
-        hf_kwargs = {
-            output_name: torch.tensor(d[output_name]) for output_name in OUTPUT_NAMES
-        }
+        hf_kwargs = {output_name: torch.tensor(d[output_name]) for output_name in OUTPUT_NAMES}
     
         return OneFormerForUniversalSegmentationOutput(**hf_kwargs)
 
@@ -263,15 +265,15 @@ the inference results.
         @staticmethod
         def extract_legend(handles):
             fig = plt.figure()
-            fig.legend(handles=handles, ncol=len(handles) // 20 + 1, loc='center')
+            fig.legend(handles=handles, ncol=len(handles) // 20 + 1, loc="center")
             fig.tight_layout()
             return fig
-        
+    
         @staticmethod
         def predicted_semantic_map_to_figure(predicted_map):
             segmentation = predicted_map[0]
             # get the used color map
-            viridis = plt.get_cmap('viridis', max(1, torch.max(segmentation)))
+            viridis = plt.get_cmap("viridis", max(1, torch.max(segmentation)))
             # get all the unique numbers
             labels_ids = torch.unique(segmentation).tolist()
             fig, ax = plt.subplots()
@@ -285,13 +287,13 @@ the inference results.
             fig_legend = Visualizer.extract_legend(handles=handles)
             fig.tight_layout()
             return fig, fig_legend
-            
+    
         @staticmethod
         def predicted_instance_map_to_figure(predicted_map):
-            segmentation = predicted_map[0]['segmentation']
-            segments_info = predicted_map[0]['segments_info']
+            segmentation = predicted_map[0]["segmentation"]
+            segments_info = predicted_map[0]["segments_info"]
             # get the used color map
-            viridis = plt.get_cmap('viridis', max(torch.max(segmentation), 1))
+            viridis = plt.get_cmap("viridis", max(torch.max(segmentation), 1))
             fig, ax = plt.subplots()
             ax.imshow(segmentation)
             ax.set_axis_off()
@@ -299,24 +301,24 @@ the inference results.
             handles = []
             # for each segment, draw its legend
             for segment in segments_info:
-                segment_id = segment['id']
-                segment_label_id = segment['label_id']
+                segment_id = segment["id"]
+                segment_label_id = segment["label_id"]
                 segment_label = id2label[segment_label_id]
                 label = f"{segment_label}-{instances_counter[segment_label_id]}"
                 instances_counter[segment_label_id] += 1
                 color = viridis(segment_id)
                 handles.append(mpatches.Patch(color=color, label=label))
-                
+    
             fig_legend = Visualizer.extract_legend(handles)
             fig.tight_layout()
             return fig, fig_legend
     
         @staticmethod
         def predicted_panoptic_map_to_figure(predicted_map):
-            segmentation = predicted_map[0]['segmentation']
-            segments_info = predicted_map[0]['segments_info']
+            segmentation = predicted_map[0]["segmentation"]
+            segments_info = predicted_map[0]["segments_info"]
             # get the used color map
-            viridis = plt.get_cmap('viridis', max(torch.max(segmentation), 1))
+            viridis = plt.get_cmap("viridis", max(torch.max(segmentation), 1))
             fig, ax = plt.subplots()
             ax.imshow(segmentation)
             ax.set_axis_off()
@@ -324,21 +326,24 @@ the inference results.
             handles = []
             # for each segment, draw its legend
             for segment in segments_info:
-                segment_id = segment['id']
-                segment_label_id = segment['label_id']
+                segment_id = segment["id"]
+                segment_label_id = segment["label_id"]
                 segment_label = id2label[segment_label_id]
                 label = f"{segment_label}-{instances_counter[segment_label_id]}"
                 instances_counter[segment_label_id] += 1
                 color = viridis(segment_id)
                 handles.append(mpatches.Patch(color=color, label=label))
-                
+    
             fig_legend = Visualizer.extract_legend(handles)
             fig.tight_layout()
             return fig, fig_legend
     
         @staticmethod
         def figures_to_images(fig, fig_legend, name_suffix=""):
-            seg_filename, leg_filename = f"segmentation{name_suffix}.png", f"legend{name_suffix}.png"
+            seg_filename, leg_filename = (
+                f"segmentation{name_suffix}.png",
+                f"legend{name_suffix}.png",
+            )
             fig.savefig(seg_filename, bbox_inches="tight")
             fig_legend.savefig(leg_filename, bbox_inches="tight")
             segmentation = Image.open(seg_filename)
@@ -362,9 +367,7 @@ the inference results.
         inputs = prepare_inputs(img, task)
         outputs = model(inputs)
         hf_output = process_output(outputs)
-        predicted_map = getattr(processor, f"post_process_{task}_segmentation")(
-            hf_output, target_sizes=[img.size[::-1]]
-        )
+        predicted_map = getattr(processor, f"post_process_{task}_segmentation")(hf_output, target_sizes=[img.size[::-1]])
         return getattr(Visualizer, f"predicted_{task}_map_to_figure")(predicted_map)
 
 .. code:: ipython3
@@ -389,7 +392,7 @@ the inference results.
 Choose a segmentation task
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -410,18 +413,21 @@ Choose a segmentation task
 Inference
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import matplotlib
+    
     matplotlib.use("Agg")  # disable showing figures
     
+    
     def stack_images_horizontally(img1: Image, img2: Image):
-        res = Image.new("RGB", (img1.width + img2.width, max(img1.height, img2.height)), (255, 255,255))
+        res = Image.new("RGB", (img1.width + img2.width, max(img1.height, img2.height)), (255, 255, 255))
         res.paste(img1, (0, 0))
         res.paste(img2, (img1.width, 0))
         return res
+    
     
     segmentation_fig, legend_fig = segment(compiled_model, image, task.value)
     segmentation_image, legend_image = Visualizer.figures_to_images(segmentation_fig, legend_fig)
@@ -439,7 +445,7 @@ Inference
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -465,7 +471,7 @@ improve model inference speed.
     
     to_quantize = widgets.Checkbox(
         value=False,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -486,18 +492,17 @@ not selected
 .. code:: ipython3
 
     # Fetch `skip_kernel_extension` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     %load_ext skip_kernel_extension
 
 Preparing calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use images from
 `COCO128 <https://www.kaggle.com/datasets/ultralytics/coco128>`__
@@ -565,7 +570,7 @@ dataset as calibration samples.
 Run quantization
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Below we call ``nncf.quantize()`` in order to apply quantization to
 OneFormer model.
@@ -647,7 +652,7 @@ Let’s see quantized model prediction next to original model prediction.
 Compare model size and performance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Below we compare original and quantized model footprint and inference
 speed.
@@ -716,7 +721,7 @@ speed.
 Interactive Demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -732,6 +737,7 @@ Interactive Demo
         compiled_model = core.compile_model(model=model, device_name=device)
         if quantized_model_present:
             compiled_quantized_model = core.compile_model(model=quantized_model, device_name=device)
+    
     
     def segment_wrapper(image, task, run_quantized=False):
         current_model = compiled_quantized_model if run_quantized else compiled_model
@@ -751,43 +757,44 @@ Interactive Demo
         with gr.Row():
             with gr.Column():
                 inp_img = gr.Image(label="Image", type="pil")
-                inp_task = gr.Radio(
-                    ["semantic", "instance", "panoptic"], label="Task", value="semantic"
-                )
-                inp_device = gr.Dropdown(
-                    label="Device", choices=core.available_devices + ["AUTO"], value="AUTO"
-                )
+                inp_task = gr.Radio(["semantic", "instance", "panoptic"], label="Task", value="semantic")
+                inp_device = gr.Dropdown(label="Device", choices=core.available_devices + ["AUTO"], value="AUTO")
             with gr.Column():
                 out_result = gr.Image(label="Result (Original)" if quantized_model_present else "Result")
                 inference_time = gr.Textbox(label="Time (seconds)")
                 out_result_quantized = gr.Image(label="Result (Quantized)", visible=quantized_model_present)
                 inference_time_quantized = gr.Textbox(label="Time (seconds)", visible=quantized_model_present)
         run_button = gr.Button(value="Run")
-        run_button.click(segment_wrapper, [inp_img, inp_task, gr.Number(0, visible=False)], [out_result, inference_time])
-        run_quantized_button = gr.Button(value="Run quantized", visible=quantized_model_present)
-        run_quantized_button.click(segment_wrapper, [inp_img, inp_task, gr.Number(1, visible=False)], [out_result_quantized, inference_time_quantized])
-        gr.Examples(
-            examples=[["sample.jpg", "semantic"]], inputs=[inp_img, inp_task]
+        run_button.click(
+            segment_wrapper,
+            [inp_img, inp_task, gr.Number(0, visible=False)],
+            [out_result, inference_time],
         )
-    
+        run_quantized_button = gr.Button(value="Run quantized", visible=quantized_model_present)
+        run_quantized_button.click(
+            segment_wrapper,
+            [inp_img, inp_task, gr.Number(1, visible=False)],
+            [out_result_quantized, inference_time_quantized],
+        )
+        gr.Examples(examples=[["sample.jpg", "semantic"]], inputs=[inp_img, inp_task])
     
         def on_device_change_begin():
             return (
                 run_button.update(value="Changing device...", interactive=False),
                 run_quantized_button.update(value="Changing device...", interactive=False),
-                inp_device.update(interactive=False)
+                inp_device.update(interactive=False),
             )
     
         def on_device_change_end():
             return (
                 run_button.update(value="Run", interactive=True),
                 run_quantized_button.update(value="Run quantized", interactive=True),
-                inp_device.update(interactive=True)
+                inp_device.update(interactive=True),
             )
     
-        inp_device.change(on_device_change_begin, outputs=[run_button, run_quantized_button, inp_device]).then(
-            compile_model, inp_device
-        ).then(on_device_change_end, outputs=[run_button, run_quantized_button, inp_device])
+        inp_device.change(on_device_change_begin, outputs=[run_button, run_quantized_button, inp_device]).then(compile_model, inp_device).then(
+            on_device_change_end, outputs=[run_button, run_quantized_button, inp_device]
+        )
     
     try:
         demo.launch(debug=False)
@@ -806,7 +813,7 @@ Interactive Demo
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

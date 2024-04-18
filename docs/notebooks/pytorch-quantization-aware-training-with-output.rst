@@ -37,25 +37,25 @@ hub <https://pytorch.org/hub/pytorch_vision_resnet/>`__.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports and Settings <#imports-and-settings>`__
--  `Pre-train Floating-Point Model <#pre-train-floating-point-model>`__
+-  `Imports and Settings <#Imports-and-Settings>`__
+-  `Pre-train Floating-Point Model <#Pre-train-Floating-Point-Model>`__
 
-   -  `Train Function <#train-function>`__
-   -  `Validate Function <#validate-function>`__
-   -  `Helpers <#helpers>`__
-   -  `Get a Pre-trained FP32 Model <#get-a-pre-trained-fp32-model>`__
+   -  `Train Function <#Train-Function>`__
+   -  `Validate Function <#Validate-Function>`__
+   -  `Helpers <#Helpers>`__
+   -  `Get a Pre-trained FP32 Model <#Get-a-Pre-trained-FP32-Model>`__
 
 -  `Create and Initialize
-   Quantization <#create-and-initialize-quantization>`__
--  `Fine-tune the Compressed Model <#fine-tune-the-compressed-model>`__
+   Quantization <#Create-and-Initialize-Quantization>`__
+-  `Fine-tune the Compressed Model <#Fine-tune-the-Compressed-Model>`__
 -  `Export INT8 Model to OpenVINO
-   IR <#export-int8-model-to-openvino-ir>`__
+   IR <#Export-INT8-Model-to-OpenVINO-IR>`__
 -  `Benchmark Model Performance by Computing Inference
-   Time <#benchmark-model-performance-by-computing-inference-time>`__
+   Time <#Benchmark-Model-Performance-by-Computing-Inference-Time>`__
 
 .. code:: ipython3
 
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu  "openvino>=2024.0.0" "torch" "torchvision"
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu  "openvino>=2024.0.0" "torch" "torchvision" "tqdm"
     %pip install -q "nncf>=2.9.0"
 
 
@@ -82,7 +82,7 @@ Table of contents:
 Imports and Settings
 --------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 On Windows, add the required C++ directories to the system PATH.
 
@@ -118,11 +118,13 @@ models will be stored.
     from torch.jit import TracerWarning
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     from notebook_utils import download_file
     
     torch.manual_seed(0)
@@ -165,7 +167,7 @@ models will be stored.
 
 .. parsed-literal::
 
-    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/pytorch-quantization-aware-training/model/resnet18_fp32.pth')
+    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/pytorch-quantization-aware-training/model/resnet18_fp32.pth')
 
 
 
@@ -188,13 +190,14 @@ Download Tiny ImageNet dataset
         zip_ref.extractall(path=data_dir)
         zip_ref.close()
     
+    
     def prepare_tiny_imagenet_200(dataset_dir: Path):
         # Format validation set the same way as train set is formatted.
-        val_data_dir = dataset_dir / 'val'
-        val_annotations_file = val_data_dir / 'val_annotations.txt'
-        with open(val_annotations_file, 'r') as f:
-            val_annotation_data = map(lambda line: line.split('\t')[:2], f.readlines())
-        val_images_dir = val_data_dir / 'images'
+        val_data_dir = dataset_dir / "val"
+        val_annotations_file = val_data_dir / "val_annotations.txt"
+        with open(val_annotations_file, "r") as f:
+            val_annotation_data = map(lambda line: line.split("\t")[:2], f.readlines())
+        val_images_dir = val_data_dir / "images"
         for image_filename, image_label in val_annotation_data:
             from_image_filepath = val_images_dir / image_filename
             to_image_dir = val_data_dir / image_label
@@ -204,7 +207,7 @@ Download Tiny ImageNet dataset
             from_image_filepath.rename(to_image_filepath)
         val_annotations_file.unlink()
         val_images_dir.rmdir()
-        
+    
     
     DATASET_DIR = DATA_DIR / "tiny-imagenet-200"
     if not DATASET_DIR.exists():
@@ -227,7 +230,7 @@ Download Tiny ImageNet dataset
 Pre-train Floating-Point Model
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Using NNCF for model compression assumes that a pre-trained model and a
 training pipeline are already in use.
@@ -242,7 +245,7 @@ for quantization-aware training.
 Train Function
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -252,7 +255,9 @@ Train Function
         top1 = AverageMeter("Acc@1", ":2.2f")
         top5 = AverageMeter("Acc@5", ":2.2f")
         progress = ProgressMeter(
-            len(train_loader), [batch_time, losses, top1, top5], prefix="Epoch:[{}]".format(epoch)
+            len(train_loader),
+            [batch_time, losses, top1, top5],
+            prefix="Epoch:[{}]".format(epoch),
         )
     
         # Switch to train mode.
@@ -289,7 +294,7 @@ Train Function
 Validate Function
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -333,7 +338,7 @@ Validate Function
 Helpers
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -398,7 +403,7 @@ Helpers
 Get a Pre-trained FP32 Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 А pre-trained floating-point model is a prerequisite for quantization.
 It can be obtained by tuning from scratch with the code below. However,
@@ -450,12 +455,15 @@ section at the top of this notebook.
     )
     
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True, sampler=None
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=0,
+        pin_memory=True,
+        sampler=None,
     )
     
-    val_loader = torch.utils.data.DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True
-    )
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True)
     
     # Define loss function (criterion) and optimizer.
     criterion = nn.CrossEntropyLoss().to(device)
@@ -464,9 +472,9 @@ section at the top of this notebook.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
       warnings.warn(
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
       warnings.warn(msg)
 
 
@@ -527,7 +535,7 @@ benchmark it in comparison with the ``INT8`` model.
 Create and Initialize Quantization
 ----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NNCF enables compression-aware training by integrating into regular
 training pipelines. The framework is designed so that modifications to
@@ -543,14 +551,14 @@ modifications.
 
     import nncf
     
+    
     def transform_fn(data_item):
         return data_item[0]
     
+    
     # Creating separate dataloader with batch size = 1
     # as dataloaders with batches > 1 is not supported yet.
-    quantization_loader = torch.utils.data.DataLoader(
-        val_dataset, batch_size=1, shuffle=False, num_workers=0, pin_memory=True
-    )
+    quantization_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=0, pin_memory=True)
     
     quantization_dataset = nncf.Dataset(quantization_loader, transform_fn)
 
@@ -576,24 +584,19 @@ about supported parameters can be found on this
 
 .. parsed-literal::
 
-    2024-04-09 23:56:16.570689: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-09 23:56:16.606566: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-18 00:33:36.062903: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-18 00:33:36.099858: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-04-09 23:56:17.167902: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-18 00:33:36.657984: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 .. parsed-literal::
 
-    WARNING:nncf:NNCF provides best results with torch==2.1.2, while current torch version is 2.1.0+cpu. If you encounter issues, consider switching to torch==2.1.2
-
-
-.. parsed-literal::
-
-    No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
+    WARNING:nncf:NNCF provides best results with torch==2.1.2, while current torch version is 2.2.2+cpu. If you encounter issues, consider switching to torch==2.1.2
 
 
 
@@ -661,42 +664,42 @@ demonstrated here.
 
 .. parsed-literal::
 
-    Test: [ 0/79]	Time 0.200 (0.200)	Loss 1.005 (1.005)	Acc@1 78.91 (78.91)	Acc@5 88.28 (88.28)
+    Test: [ 0/79]	Time 0.183 (0.183)	Loss 1.005 (1.005)	Acc@1 78.91 (78.91)	Acc@5 88.28 (88.28)
 
 
 .. parsed-literal::
 
-    Test: [10/79]	Time 0.147 (0.155)	Loss 1.992 (1.625)	Acc@1 44.53 (60.37)	Acc@5 79.69 (83.66)
+    Test: [10/79]	Time 0.144 (0.153)	Loss 1.992 (1.625)	Acc@1 44.53 (60.37)	Acc@5 79.69 (83.66)
 
 
 .. parsed-literal::
 
-    Test: [20/79]	Time 0.144 (0.151)	Loss 1.814 (1.705)	Acc@1 60.94 (58.04)	Acc@5 80.47 (82.66)
+    Test: [20/79]	Time 0.145 (0.149)	Loss 1.814 (1.705)	Acc@1 60.94 (58.04)	Acc@5 80.47 (82.66)
 
 
 .. parsed-literal::
 
-    Test: [30/79]	Time 0.147 (0.149)	Loss 2.287 (1.795)	Acc@1 50.78 (56.48)	Acc@5 68.75 (80.97)
+    Test: [30/79]	Time 0.146 (0.148)	Loss 2.287 (1.795)	Acc@1 50.78 (56.48)	Acc@5 68.75 (80.97)
 
 
 .. parsed-literal::
 
-    Test: [40/79]	Time 0.145 (0.149)	Loss 1.615 (1.832)	Acc@1 60.94 (55.43)	Acc@5 82.81 (80.43)
+    Test: [40/79]	Time 0.146 (0.147)	Loss 1.615 (1.832)	Acc@1 60.94 (55.43)	Acc@5 82.81 (80.43)
 
 
 .. parsed-literal::
 
-    Test: [50/79]	Time 0.145 (0.148)	Loss 1.952 (1.833)	Acc@1 57.03 (55.51)	Acc@5 75.00 (80.16)
+    Test: [50/79]	Time 0.144 (0.147)	Loss 1.952 (1.833)	Acc@1 57.03 (55.51)	Acc@5 75.00 (80.16)
 
 
 .. parsed-literal::
 
-    Test: [60/79]	Time 0.143 (0.148)	Loss 1.794 (1.856)	Acc@1 57.03 (55.16)	Acc@5 84.38 (79.84)
+    Test: [60/79]	Time 0.143 (0.146)	Loss 1.794 (1.856)	Acc@1 57.03 (55.16)	Acc@5 84.38 (79.84)
 
 
 .. parsed-literal::
 
-    Test: [70/79]	Time 0.146 (0.147)	Loss 2.371 (1.889)	Acc@1 46.88 (54.68)	Acc@5 74.22 (79.14)
+    Test: [70/79]	Time 0.144 (0.146)	Loss 2.371 (1.889)	Acc@1 46.88 (54.68)	Acc@5 74.22 (79.14)
 
 
 .. parsed-literal::
@@ -708,7 +711,7 @@ demonstrated here.
 Fine-tune the Compressed Model
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 At this step, a regular fine-tuning process is applied to further
 improve quantized model accuracy. Normally, several epochs of tuning are
@@ -733,135 +736,135 @@ training pipeline are required. Here is a simple example.
 
 .. parsed-literal::
 
-    Epoch:[0][  0/782]	Time 0.405 (0.405)	Loss 0.917 (0.917)	Acc@1 76.56 (76.56)	Acc@5 93.75 (93.75)
+    Epoch:[0][  0/782]	Time 0.410 (0.410)	Loss 0.917 (0.917)	Acc@1 76.56 (76.56)	Acc@5 93.75 (93.75)
 
 
 .. parsed-literal::
 
-    Epoch:[0][ 50/782]	Time 0.367 (0.376)	Loss 0.628 (0.812)	Acc@1 87.50 (80.33)	Acc@5 96.09 (93.92)
+    Epoch:[0][ 50/782]	Time 0.363 (0.366)	Loss 0.625 (0.812)	Acc@1 87.50 (80.27)	Acc@5 96.88 (93.92)
 
 
 .. parsed-literal::
 
-    Epoch:[0][100/782]	Time 0.366 (0.373)	Loss 0.759 (0.806)	Acc@1 79.69 (80.55)	Acc@5 93.75 (94.12)
+    Epoch:[0][100/782]	Time 0.361 (0.366)	Loss 0.764 (0.807)	Acc@1 79.69 (80.37)	Acc@5 94.53 (94.17)
 
 
 .. parsed-literal::
 
-    Epoch:[0][150/782]	Time 0.377 (0.373)	Loss 0.865 (0.799)	Acc@1 82.81 (80.71)	Acc@5 92.97 (94.18)
+    Epoch:[0][150/782]	Time 0.363 (0.366)	Loss 0.863 (0.799)	Acc@1 82.81 (80.53)	Acc@5 92.97 (94.25)
 
 
 .. parsed-literal::
 
-    Epoch:[0][200/782]	Time 0.378 (0.373)	Loss 0.581 (0.787)	Acc@1 86.72 (80.96)	Acc@5 97.66 (94.32)
+    Epoch:[0][200/782]	Time 0.365 (0.367)	Loss 0.581 (0.787)	Acc@1 85.16 (80.80)	Acc@5 97.66 (94.34)
 
 
 .. parsed-literal::
 
-    Epoch:[0][250/782]	Time 0.372 (0.373)	Loss 0.720 (0.782)	Acc@1 83.59 (81.00)	Acc@5 93.75 (94.42)
+    Epoch:[0][250/782]	Time 0.363 (0.367)	Loss 0.722 (0.782)	Acc@1 82.81 (80.88)	Acc@5 93.75 (94.42)
 
 
 .. parsed-literal::
 
-    Epoch:[0][300/782]	Time 0.376 (0.373)	Loss 0.739 (0.777)	Acc@1 78.91 (81.11)	Acc@5 93.75 (94.40)
+    Epoch:[0][300/782]	Time 0.365 (0.367)	Loss 0.737 (0.777)	Acc@1 78.91 (81.01)	Acc@5 93.75 (94.41)
 
 
 .. parsed-literal::
 
-    Epoch:[0][350/782]	Time 0.365 (0.373)	Loss 0.819 (0.767)	Acc@1 78.12 (81.36)	Acc@5 92.97 (94.52)
+    Epoch:[0][350/782]	Time 0.366 (0.367)	Loss 0.819 (0.767)	Acc@1 80.47 (81.29)	Acc@5 92.97 (94.53)
 
 
 .. parsed-literal::
 
-    Epoch:[0][400/782]	Time 0.364 (0.373)	Loss 0.787 (0.766)	Acc@1 80.47 (81.42)	Acc@5 94.53 (94.51)
+    Epoch:[0][400/782]	Time 0.368 (0.366)	Loss 0.787 (0.767)	Acc@1 80.47 (81.35)	Acc@5 94.53 (94.53)
 
 
 .. parsed-literal::
 
-    Epoch:[0][450/782]	Time 0.376 (0.373)	Loss 0.733 (0.763)	Acc@1 82.03 (81.55)	Acc@5 96.88 (94.54)
+    Epoch:[0][450/782]	Time 0.364 (0.366)	Loss 0.726 (0.763)	Acc@1 82.03 (81.48)	Acc@5 96.88 (94.55)
 
 
 .. parsed-literal::
 
-    Epoch:[0][500/782]	Time 0.366 (0.373)	Loss 0.728 (0.760)	Acc@1 82.81 (81.59)	Acc@5 94.53 (94.57)
+    Epoch:[0][500/782]	Time 0.365 (0.366)	Loss 0.727 (0.760)	Acc@1 82.03 (81.54)	Acc@5 94.53 (94.58)
 
 
 .. parsed-literal::
 
-    Epoch:[0][550/782]	Time 0.365 (0.373)	Loss 0.777 (0.758)	Acc@1 83.59 (81.63)	Acc@5 95.31 (94.59)
+    Epoch:[0][550/782]	Time 0.365 (0.366)	Loss 0.781 (0.758)	Acc@1 82.81 (81.58)	Acc@5 95.31 (94.59)
 
 
 .. parsed-literal::
 
-    Epoch:[0][600/782]	Time 0.398 (0.373)	Loss 0.725 (0.756)	Acc@1 80.47 (81.67)	Acc@5 97.66 (94.60)
+    Epoch:[0][600/782]	Time 0.362 (0.366)	Loss 0.721 (0.756)	Acc@1 80.47 (81.63)	Acc@5 97.66 (94.61)
 
 
 .. parsed-literal::
 
-    Epoch:[0][650/782]	Time 0.369 (0.373)	Loss 0.920 (0.755)	Acc@1 76.56 (81.66)	Acc@5 92.97 (94.62)
+    Epoch:[0][650/782]	Time 0.365 (0.366)	Loss 0.922 (0.755)	Acc@1 76.56 (81.64)	Acc@5 92.97 (94.63)
 
 
 .. parsed-literal::
 
-    Epoch:[0][700/782]	Time 0.373 (0.373)	Loss 0.648 (0.753)	Acc@1 84.38 (81.70)	Acc@5 92.97 (94.63)
+    Epoch:[0][700/782]	Time 0.366 (0.366)	Loss 0.651 (0.753)	Acc@1 83.59 (81.68)	Acc@5 92.97 (94.63)
 
 
 .. parsed-literal::
 
-    Epoch:[0][750/782]	Time 0.361 (0.373)	Loss 0.782 (0.750)	Acc@1 80.47 (81.71)	Acc@5 94.53 (94.66)
+    Epoch:[0][750/782]	Time 0.369 (0.366)	Loss 0.781 (0.751)	Acc@1 80.47 (81.70)	Acc@5 95.31 (94.66)
 
 
 .. parsed-literal::
 
-    Test: [ 0/79]	Time 0.145 (0.145)	Loss 1.094 (1.094)	Acc@1 76.56 (76.56)	Acc@5 86.72 (86.72)
+    Test: [ 0/79]	Time 0.146 (0.146)	Loss 1.092 (1.092)	Acc@1 73.44 (73.44)	Acc@5 86.72 (86.72)
 
 
 .. parsed-literal::
 
-    Test: [10/79]	Time 0.146 (0.146)	Loss 1.848 (1.527)	Acc@1 49.22 (62.93)	Acc@5 80.47 (84.30)
+    Test: [10/79]	Time 0.145 (0.147)	Loss 1.826 (1.522)	Acc@1 49.22 (62.78)	Acc@5 81.25 (84.23)
 
 
 .. parsed-literal::
 
-    Test: [20/79]	Time 0.144 (0.146)	Loss 1.540 (1.597)	Acc@1 64.06 (60.64)	Acc@5 81.25 (83.82)
+    Test: [20/79]	Time 0.147 (0.147)	Loss 1.531 (1.594)	Acc@1 64.84 (60.83)	Acc@5 82.03 (83.85)
 
 
 .. parsed-literal::
 
-    Test: [30/79]	Time 0.146 (0.146)	Loss 2.052 (1.692)	Acc@1 56.25 (59.20)	Acc@5 71.88 (82.21)
+    Test: [30/79]	Time 0.148 (0.147)	Loss 2.059 (1.690)	Acc@1 57.03 (59.22)	Acc@5 71.09 (82.26)
 
 
 .. parsed-literal::
 
-    Test: [40/79]	Time 0.147 (0.146)	Loss 1.515 (1.745)	Acc@1 64.06 (57.79)	Acc@5 85.16 (81.44)
+    Test: [40/79]	Time 0.147 (0.147)	Loss 1.516 (1.744)	Acc@1 64.06 (57.91)	Acc@5 85.16 (81.46)
 
 
 .. parsed-literal::
 
-    Test: [50/79]	Time 0.145 (0.146)	Loss 1.915 (1.751)	Acc@1 53.91 (57.60)	Acc@5 77.34 (81.14)
+    Test: [50/79]	Time 0.147 (0.147)	Loss 1.922 (1.750)	Acc@1 53.12 (57.69)	Acc@5 76.56 (81.14)
 
 
 .. parsed-literal::
 
-    Test: [60/79]	Time 0.145 (0.146)	Loss 1.585 (1.786)	Acc@1 67.19 (57.01)	Acc@5 85.16 (80.69)
+    Test: [60/79]	Time 0.146 (0.147)	Loss 1.594 (1.785)	Acc@1 65.62 (57.17)	Acc@5 84.38 (80.60)
 
 
 .. parsed-literal::
 
-    Test: [70/79]	Time 0.145 (0.146)	Loss 2.454 (1.812)	Acc@1 44.53 (56.57)	Acc@5 74.22 (80.24)
+    Test: [70/79]	Time 0.141 (0.147)	Loss 2.460 (1.811)	Acc@1 46.09 (56.75)	Acc@5 74.22 (80.08)
 
 
 .. parsed-literal::
 
-     * Acc@1 56.970 Acc@5 80.830
-    Accuracy of tuned INT8 model: 56.970
-    Accuracy drop of tuned INT8 model over pre-trained FP32 model: -1.450
+     * Acc@1 57.180 Acc@5 80.680
+    Accuracy of tuned INT8 model: 57.180
+    Accuracy drop of tuned INT8 model over pre-trained FP32 model: -1.660
 
 
 Export INT8 Model to OpenVINO IR
 --------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -887,7 +890,7 @@ Export INT8 Model to OpenVINO IR
 Benchmark Model Performance by Computing Inference Time
 -------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Finally, measure the inference performance of the ``FP32`` and ``INT8``
 models, using `Benchmark
@@ -914,8 +917,8 @@ throughput (frames per second) values.
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices,
-        value='CPU',
-        description='Device:',
+        value="CPU",
+        description="Device:",
         disabled=False,
     )
     
@@ -933,15 +936,15 @@ throughput (frames per second) values.
 .. code:: ipython3
 
     def parse_benchmark_output(benchmark_output):
-        parsed_output = [line for line in benchmark_output if 'FPS' in line]
-        print(*parsed_output, sep='\n')
+        parsed_output = [line for line in benchmark_output if "FPS" in line]
+        print(*parsed_output, sep="\n")
     
     
-    print('Benchmark FP32 model (IR)')
+    print("Benchmark FP32 model (IR)")
     benchmark_output = ! benchmark_app -m $fp32_ir_path -d $device.value -api async -t 15
     parse_benchmark_output(benchmark_output)
     
-    print('Benchmark INT8 model (IR)')
+    print("Benchmark INT8 model (IR)")
     benchmark_output = ! benchmark_app -m $int8_ir_path -d $device.value -api async -t 15
     parse_benchmark_output(benchmark_output)
 
@@ -953,13 +956,13 @@ throughput (frames per second) values.
 
 .. parsed-literal::
 
-    [ INFO ] Throughput:   2928.54 FPS
+    [ INFO ] Throughput:   2928.21 FPS
     Benchmark INT8 model (IR)
 
 
 .. parsed-literal::
 
-    [ INFO ] Throughput:   11859.51 FPS
+    [ INFO ] Throughput:   11678.74 FPS
 
 
 Show Device Information for reference.

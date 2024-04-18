@@ -4,41 +4,41 @@ Object masks from prompts with SAM and OpenVINO
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Background <#background>`__
--  `Prerequisites <#prerequisites>`__
+-  `Background <#Background>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Convert model to OpenVINO Intermediate
-   Representation <#convert-model-to-openvino-intermediate-representation>`__
+   Representation <#Convert-model-to-OpenVINO-Intermediate-Representation>`__
 
    -  `Download model checkpoint and create PyTorch
-      model <#download-model-checkpoint-and-create-pytorch-model>`__
-   -  `Image Encoder <#image-encoder>`__
-   -  `Mask predictor <#mask-predictor>`__
+      model <#Download-model-checkpoint-and-create-PyTorch-model>`__
+   -  `Image Encoder <#Image-Encoder>`__
+   -  `Mask predictor <#Mask-predictor>`__
 
 -  `Run OpenVINO model in interactive segmentation
-   mode <#run-openvino-model-in-interactive-segmentation-mode>`__
+   mode <#Run-OpenVINO-model-in-interactive-segmentation-mode>`__
 
-   -  `Example Image <#example-image>`__
+   -  `Example Image <#Example-Image>`__
    -  `Preprocessing and visualization
-      utilities <#preprocessing-and-visualization-utilities>`__
-   -  `Image encoding <#image-encoding>`__
-   -  `Example point input <#example-point-input>`__
-   -  `Example with multiple points <#example-with-multiple-points>`__
+      utilities <#Preprocessing-and-visualization-utilities>`__
+   -  `Image encoding <#Image-encoding>`__
+   -  `Example point input <#Example-point-input>`__
+   -  `Example with multiple points <#Example-with-multiple-points>`__
    -  `Example box and point input with negative
-      label <#example-box-and-point-input-with-negative-label>`__
+      label <#Example-box-and-point-input-with-negative-label>`__
 
--  `Interactive segmentation <#interactive-segmentation>`__
+-  `Interactive segmentation <#Interactive-segmentation>`__
 -  `Run OpenVINO model in automatic mask generation
-   mode <#run-openvino-model-in-automatic-mask-generation-mode>`__
+   mode <#Run-OpenVINO-model-in-automatic-mask-generation-mode>`__
 -  `Optimize encoder using NNCF Post-training Quantization
-   API <#optimize-encoder-using-nncf-post-training-quantization-api>`__
+   API <#Optimize-encoder-using-NNCF-Post-training-Quantization-API>`__
 
-   -  `Prepare a calibration dataset <#prepare-a-calibration-dataset>`__
+   -  `Prepare a calibration dataset <#Prepare-a-calibration-dataset>`__
    -  `Run quantization and serialize OpenVINO IR
-      model <#run-quantization-and-serialize-openvino-ir-model>`__
+      model <#Run-quantization-and-serialize-OpenVINO-IR-model>`__
    -  `Validate Quantized Model
-      Inference <#validate-quantized-model-inference>`__
+      Inference <#Validate-Quantized-Model-Inference>`__
    -  `Compare Performance of the Original and Quantized
-      Models <#compare-performance-of-the-original-and-quantized-models>`__
+      Models <#Compare-Performance-of-the-Original-and-Quantized-Models>`__
 
 Segmentation - identifying which image pixels belong to an object - is a
 core task in computer vision and is used in a broad array of
@@ -67,7 +67,7 @@ a variety of platforms that support an OpenVINO.
 Background
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Previously, to solve any kind of segmentation problem, there were two
 classes of approaches. The first, interactive segmentation, allowed for
@@ -137,21 +137,28 @@ post <https://ai.facebook.com/blog/segment-anything-foundation-model-image-segme
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q "segment_anything" "gradio>=4.13" "openvino>=2023.1.0" "nncf>=2.7.0" "torch>=2.1" "torchvision>=0.16"  --extra-index-url https://download.pytorch.org/whl/cpu
+    import platform
+    
+    %pip install -q "segment_anything" "gradio>=4.13" "openvino>=2023.1.0" "nncf>=2.7.0" "torch>=2.1" "torchvision>=0.16" Pillow opencv-python tqdm  --extra-index-url https://download.pytorch.org/whl/cpu
+    
+    if platform.system() != "Windows":
+        %pip install -q "matplotlib>=3.4"
+    else:
+        %pip install -q "matplotlib>=3.4,<3.7"
 
 Convert model to OpenVINO Intermediate Representation
 -----------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download model checkpoint and create PyTorch model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 There are several Segment Anything Model
 `checkpoints <https://github.com/facebookresearch/segment-anything#model-checkpoints>`__
@@ -164,11 +171,13 @@ model type below to a SAM model checkpoint, then load the model using
 .. code:: ipython3
 
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     from notebook_utils import download_file
     
     checkpoint = "sam_vit_b_01ec64.pth"
@@ -207,7 +216,7 @@ Decoder).
 Image Encoder
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Image Encoder input is tensor with shape ``1x3x1024x1024`` in ``NCHW``
 format, contains image for segmentation. Image Encoder output is image
@@ -228,7 +237,11 @@ embeddings, tensor with shape ``1x256x64x64``
             warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)
             warnings.filterwarnings("ignore", category=UserWarning)
     
-            ov_encoder_model = ov.convert_model(sam.image_encoder, example_input=torch.zeros(1,3,1024,1024), input=([1,3,1024,1024],))
+            ov_encoder_model = ov.convert_model(
+                sam.image_encoder,
+                example_input=torch.zeros(1, 3, 1024, 1024),
+                input=([1, 3, 1024, 1024],),
+            )
         ov.save_model(ov_encoder_model, ov_encoder_path)
     else:
         ov_encoder_model = core.read_model(ov_encoder_path)
@@ -239,8 +252,8 @@ embeddings, tensor with shape ``1x256x64x64``
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -262,7 +275,7 @@ embeddings, tensor with shape ``1x256x64x64``
 Mask predictor
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This notebook expects the model was exported with the parameter
 ``return_single_mask=True``. It means that model will only return the
@@ -298,6 +311,7 @@ Model outputs:
 
     from typing import Tuple
     
+    
     class SamExportableModel(torch.nn.Module):
         def __init__(
             self,
@@ -322,14 +336,10 @@ Model outputs:
             point_labels = point_labels.unsqueeze(-1).expand_as(point_embedding)
     
             point_embedding = point_embedding * (point_labels != -1).to(torch.float32)
-            point_embedding = point_embedding + self.model.prompt_encoder.not_a_point_embed.weight * (
-                point_labels == -1
-            ).to(torch.float32)
+            point_embedding = point_embedding + self.model.prompt_encoder.not_a_point_embed.weight * (point_labels == -1).to(torch.float32)
     
             for i in range(self.model.prompt_encoder.num_point_embeddings):
-                point_embedding = point_embedding + self.model.prompt_encoder.point_embeddings[
-                    i
-                ].weight * (point_labels == i).to(torch.float32)
+                point_embedding = point_embedding + self.model.prompt_encoder.point_embeddings[i].weight * (point_labels == i).to(torch.float32)
     
             return point_embedding
     
@@ -346,14 +356,10 @@ Model outputs:
             )
             return masks
     
-        def select_masks(
-            self, masks: torch.Tensor, iou_preds: torch.Tensor, num_points: int
-        ) -> Tuple[torch.Tensor, torch.Tensor]:
+        def select_masks(self, masks: torch.Tensor, iou_preds: torch.Tensor, num_points: int) -> Tuple[torch.Tensor, torch.Tensor]:
             # Determine if we should return the multiclick mask or not from the number of points.
             # The reweighting is used to avoid control flow.
-            score_reweight = torch.tensor(
-                [[1000] + [0] * (self.model.mask_decoder.num_mask_tokens - 1)]
-            ).to(iou_preds.device)
+            score_reweight = torch.tensor([[1000] + [0] * (self.model.mask_decoder.num_mask_tokens - 1)]).to(iou_preds.device)
             score = iou_preds + (num_points - 2.5) * score_reweight
             best_idx = torch.argmax(score, dim=1)
             masks = masks[torch.arange(masks.shape[0]), best_idx, :, :].unsqueeze(1)
@@ -385,9 +391,7 @@ Model outputs:
             )
     
             if self.use_stability_score:
-                scores = calculate_stability_score(
-                    masks, self.model.mask_threshold, self.stability_score_offset
-                )
+                scores = calculate_stability_score(masks, self.model.mask_threshold, self.stability_score_offset)
     
             if self.return_single_mask:
                 masks, scores = self.select_masks(masks, scores, point_coords.shape[1])
@@ -395,13 +399,12 @@ Model outputs:
             upscaled_masks = self.mask_postprocessing(masks)
     
             if self.return_extra_metrics:
-                stability_scores = calculate_stability_score(
-                    upscaled_masks, self.model.mask_threshold, self.stability_score_offset
-                )
+                stability_scores = calculate_stability_score(upscaled_masks, self.model.mask_threshold, self.stability_score_offset)
                 areas = (upscaled_masks > self.model.mask_threshold).sum(-1).sum(-1)
                 return upscaled_masks, scores, stability_scores, areas, masks
     
             return upscaled_masks, scores
+    
     
     ov_model_path = Path("sam_mask_predictor.xml")
     if not ov_model_path.exists():
@@ -441,12 +444,12 @@ Model outputs:
 Run OpenVINO model in interactive segmentation mode
 ---------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Example Image
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -455,7 +458,7 @@ Example Image
     import matplotlib.pyplot as plt
     
     download_file("https://raw.githubusercontent.com/facebookresearch/segment-anything/main/notebooks/images/truck.jpg")
-    image = cv2.imread('truck.jpg')
+    image = cv2.imread("truck.jpg")
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 
@@ -466,9 +469,9 @@ Example Image
 
 .. code:: ipython3
 
-    plt.figure(figsize=(10,10))
+    plt.figure(figsize=(10, 10))
     plt.imshow(image)
-    plt.axis('off')
+    plt.axis("off")
     plt.show()
 
 
@@ -479,7 +482,7 @@ Example Image
 Preprocessing and visualization utilities
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To prepare input for Image Encoder we should:
 
@@ -498,7 +501,8 @@ These steps are applicable to all available models
 
     from copy import deepcopy
     from typing import Tuple
-    from torchvision.transforms.functional import resize, to_pil_image 
+    from torchvision.transforms.functional import resize, to_pil_image
+    
     
     class ResizeLongestSide:
         """
@@ -523,9 +527,7 @@ These steps are applicable to all available models
             original image size in (H, W) format.
             """
             old_h, old_w = original_size
-            new_h, new_w = self.get_preprocess_shape(
-                original_size[0], original_size[1], self.target_length
-            )
+            new_h, new_w = self.get_preprocess_shape(original_size[0], original_size[1], self.target_length)
             coords = deepcopy(coords).astype(float)
             coords[..., 0] = coords[..., 0] * (new_w / old_w)
             coords[..., 1] = coords[..., 1] * (new_h / old_h)
@@ -556,7 +558,11 @@ These steps are applicable to all available models
     
     def preprocess_image(image: np.ndarray):
         resized_image = resizer.apply_image(image)
-        resized_image = (resized_image.astype(np.float32) - [123.675, 116.28, 103.53]) / [58.395, 57.12, 57.375]
+        resized_image = (resized_image.astype(np.float32) - [123.675, 116.28, 103.53]) / [
+            58.395,
+            57.12,
+            57.375,
+        ]
         resized_image = np.expand_dims(np.transpose(resized_image, (2, 0, 1)).astype(np.float32), 0)
     
         # Pad
@@ -569,7 +575,7 @@ These steps are applicable to all available models
     
     def postprocess_masks(masks: np.ndarray, orig_size):
         size_before_pad = resizer.get_preprocess_shape(orig_size[0], orig_size[1], masks.shape[-1])
-        masks = masks[..., :int(size_before_pad[0]), :int(size_before_pad[1])]
+        masks = masks[..., : int(size_before_pad[0]), : int(size_before_pad[1])]
         masks = torch.nn.functional.interpolate(torch.from_numpy(masks), size=orig_size, mode="bilinear", align_corners=False).numpy()
         return masks
 
@@ -581,23 +587,39 @@ These steps are applicable to all available models
         mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
         ax.imshow(mask_image)
     
-        
+    
     def show_points(coords, labels, ax, marker_size=375):
         pos_points = coords[labels == 1]
         neg_points = coords[labels == 0]
-        ax.scatter(pos_points[:, 0], pos_points[:, 1], color='green', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
-        ax.scatter(neg_points[:, 0], neg_points[:, 1], color='red', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)   
+        ax.scatter(
+            pos_points[:, 0],
+            pos_points[:, 1],
+            color="green",
+            marker="*",
+            s=marker_size,
+            edgecolor="white",
+            linewidth=1.25,
+        )
+        ax.scatter(
+            neg_points[:, 0],
+            neg_points[:, 1],
+            color="red",
+            marker="*",
+            s=marker_size,
+            edgecolor="white",
+            linewidth=1.25,
+        )
     
-        
+    
     def show_box(box, ax):
         x0, y0 = box[0], box[1]
         w, h = box[2] - box[0], box[3] - box[1]
-        ax.add_patch(plt.Rectangle((x0, y0), w, h, edgecolor='green', facecolor=(0, 0, 0, 0), lw=2))  
+        ax.add_patch(plt.Rectangle((x0, y0), w, h, edgecolor="green", facecolor=(0, 0, 0, 0), lw=2))
 
 Image encoding
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To start work with image, we should preprocess it and obtain image
 embeddings using ``ov_encoder``. We will use the same image for all
@@ -616,7 +638,7 @@ Now, we can try to provide different prompts for mask generation
 Example point input
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In this example we select one point. The green star symbol show its
 location on the image below.
@@ -626,11 +648,11 @@ location on the image below.
     input_point = np.array([[500, 375]])
     input_label = np.array([1])
     
-    plt.figure(figsize=(10,10))
+    plt.figure(figsize=(10, 10))
     plt.imshow(image)
     show_points(input_point, input_label, plt.gca())
-    plt.axis('off')
-    plt.show() 
+    plt.axis("off")
+    plt.show()
 
 
 
@@ -669,12 +691,12 @@ object).
 
 .. code:: ipython3
 
-    plt.figure(figsize=(10,10))
+    plt.figure(figsize=(10, 10))
     plt.imshow(image)
     show_mask(masks, plt.gca())
     show_points(input_point, input_label, plt.gca())
-    plt.axis('off')
-    plt.show() 
+    plt.axis("off")
+    plt.show()
 
 
 
@@ -684,7 +706,7 @@ object).
 Example with multiple points
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 in this example, we provide additional point for cover larger object
 area.
@@ -698,11 +720,11 @@ Now, prompt for model looks like represented on this image:
 
 .. code:: ipython3
 
-    plt.figure(figsize=(10,10))
+    plt.figure(figsize=(10, 10))
     plt.imshow(image)
     show_points(input_point, input_label, plt.gca())
-    plt.axis('off')
-    plt.show() 
+    plt.axis("off")
+    plt.show()
 
 
 
@@ -736,12 +758,12 @@ Package inputs, then predict and threshold the mask.
 
 .. code:: ipython3
 
-    plt.figure(figsize=(10,10))
+    plt.figure(figsize=(10, 10))
     plt.imshow(image)
     show_mask(masks, plt.gca())
     show_points(input_point, input_label, plt.gca())
-    plt.axis('off')
-    plt.show() 
+    plt.axis("off")
+    plt.show()
 
 
 
@@ -753,7 +775,7 @@ Great! Looks like now, predicted mask cover whole truck.
 Example box and point input with negative label
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In this example we define input prompt using bounding box and point
 inside it.The bounding box represented as set of points of its left
@@ -772,7 +794,7 @@ point should be excluded from mask.
     plt.imshow(image)
     show_box(input_box, plt.gca())
     show_points(input_point, input_label, plt.gca())
-    plt.axis('off')
+    plt.axis("off")
     plt.show()
 
 
@@ -787,7 +809,7 @@ padding point since the input includes a box input.
 .. code:: ipython3
 
     box_coords = input_box.reshape(2, 2)
-    box_labels = np.array([2,3])
+    box_labels = np.array([2, 3])
     
     coord = np.concatenate([input_point, box_coords], axis=0)[None, :, :]
     label = np.concatenate([input_label, box_labels], axis=0)[None, :].astype(np.float32)
@@ -817,7 +839,7 @@ Package inputs, then predict and threshold the mask.
     show_mask(masks[0], plt.gca())
     show_box(input_box, plt.gca())
     show_points(input_point, input_label, plt.gca())
-    plt.axis('off')
+    plt.axis("off")
     plt.show()
 
 
@@ -828,7 +850,7 @@ Package inputs, then predict and threshold the mask.
 Interactive segmentation
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, you can try SAM on own image. Upload image to input window and
 click on desired point, model predict segment based on your image and
@@ -838,13 +860,14 @@ point.
 
     import gradio as gr
     
+    
     class Segmenter:
         def __init__(self, ov_encoder, ov_predictor):
             self.encoder = ov_encoder
             self.predictor = ov_predictor
             self._img_embeddings = None
     
-        def set_image(self, img:np.ndarray):
+        def set_image(self, img: np.ndarray):
             if self._img_embeddings is not None:
                 del self._img_embeddings
             preprocessed_image = preprocess_image(img)
@@ -855,7 +878,7 @@ point.
     
         def get_mask(self, points, img):
             coord = np.array(points)
-            coord = np.concatenate([coord, np.array([[0,0]])], axis=0)
+            coord = np.concatenate([coord, np.array([[0, 0]])], axis=0)
             coord = coord[None, :, :]
             label = np.concatenate([np.ones(len(points)), np.array([-1])], axis=0)[None, :].astype(np.float32)
             coord = resizer.apply_coords(coord, img.shape[:2]).astype(np.float32)
@@ -870,20 +893,21 @@ point.
             results = self.predictor(inputs)
             masks = results[ov_predictor.output(0)]
             masks = postprocess_masks(masks, img.shape[:-1])
-            
+    
             masks = masks > 0.0
             mask = masks[0]
             mask = np.transpose(mask, (1, 2, 0))
             return mask
-            
+    
+    
     segmenter = Segmenter(ov_encoder, ov_predictor)
-            
-            
+    
+    
     with gr.Blocks() as demo:
         with gr.Row():
             input_img = gr.Image(label="Input", type="numpy", height=480, width=480)
             output_img = gr.Image(label="Selected Segment", type="numpy", height=480, width=480)
-        
+    
         def on_image_change(img):
             segmenter.set_image(img)
             return img
@@ -903,7 +927,7 @@ point.
                 out = cv2.addWeighted(out.astype(np.float32), 0.7, mask_image.astype(np.float32), 0.3, 0.0)
             out = out.astype(np.uint8)
             return out
-        
+    
         input_img.select(get_select_coords, [input_img], output_img)
         input_img.upload(on_image_change, [input_img], [input_img])
     
@@ -922,15 +946,15 @@ point.
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 
 
 Run OpenVINO model in automatic mask generation mode
 ----------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Since SAM can efficiently process prompts, masks for the entire image
 can be generated by sampling a large number of prompts over an image.
@@ -945,21 +969,21 @@ postprocessing masks to remove small disconnected regions and holes.
 .. code:: ipython3
 
     from segment_anything.utils.amg import (
-        MaskData, 
-        generate_crop_boxes, 
-        uncrop_boxes_xyxy, 
-        uncrop_masks, 
-        uncrop_points, 
-        calculate_stability_score, 
-        rle_to_mask, 
-        batched_mask_to_box, 
-        mask_to_rle_pytorch, 
+        MaskData,
+        generate_crop_boxes,
+        uncrop_boxes_xyxy,
+        uncrop_masks,
+        uncrop_points,
+        calculate_stability_score,
+        rle_to_mask,
+        batched_mask_to_box,
+        mask_to_rle_pytorch,
         is_box_near_crop_edge,
         batch_iterator,
         remove_small_regions,
         build_all_layer_point_grids,
         box_xyxy_to_xywh,
-        area_from_rle
+        area_from_rle,
     )
     from torchvision.ops.boxes import batched_nms, box_area
     from typing import Tuple, List, Dict, Any
@@ -975,7 +999,7 @@ postprocessing masks to remove small disconnected regions and holes.
         iou_thresh,
         mask_threshold,
         stability_score_offset,
-        stability_score_thresh
+        stability_score_thresh,
     ) -> MaskData:
         orig_h, orig_w = orig_size
     
@@ -1008,9 +1032,7 @@ postprocessing masks to remove small disconnected regions and holes.
             data.filter(keep_mask)
     
         # Calculate stability score
-        data["stability_score"] = calculate_stability_score(
-            data["masks"], mask_threshold, stability_score_offset
-        )
+        data["stability_score"] = calculate_stability_score(data["masks"], mask_threshold, stability_score_offset)
         if stability_score_thresh > 0.0:
             keep_mask = data["stability_score"] >= stability_score_thresh
             data.filter(keep_mask)
@@ -1039,8 +1061,8 @@ postprocessing masks to remove small disconnected regions and holes.
         crop_box: List[int],
         crop_layer_idx: int,
         orig_size: Tuple[int, ...],
-        box_nms_thresh:float = 0.7,
-        mask_threshold:float = 0.0,
+        box_nms_thresh: float = 0.7,
+        mask_threshold: float = 0.0,
         points_per_batch: int = 64,
         pred_iou_thresh: float = 0.88,
         stability_score_thresh: float = 0.95,
@@ -1060,7 +1082,17 @@ postprocessing masks to remove small disconnected regions and holes.
         # Generate masks for this crop in batches
         data = MaskData()
         for (points,) in batch_iterator(points_per_batch, points_for_image):
-            batch_data = process_batch(crop_embeddings, points, cropped_im_size, crop_box, orig_size, pred_iou_thresh, mask_threshold, stability_score_offset, stability_score_thresh)
+            batch_data = process_batch(
+                crop_embeddings,
+                points,
+                cropped_im_size,
+                crop_box,
+                orig_size,
+                pred_iou_thresh,
+                mask_threshold,
+                stability_score_offset,
+                stability_score_thresh,
+            )
             data.cat(batch_data)
             del batch_data
     
@@ -1084,9 +1116,7 @@ postprocessing masks to remove small disconnected regions and holes.
 
     def generate_masks(image: np.ndarray, point_grids, crop_n_layers, crop_overlap_ratio, crop_nms_thresh) -> MaskData:
         orig_size = image.shape[:2]
-        crop_boxes, layer_idxs = generate_crop_boxes(
-            orig_size, crop_n_layers, crop_overlap_ratio
-        )
+        crop_boxes, layer_idxs = generate_crop_boxes(orig_size, crop_n_layers, crop_overlap_ratio)
     
         # Iterate over image crops
         data = MaskData()
@@ -1170,7 +1200,14 @@ smaller objects, and post-processing can remove stray pixels and holes
 .. code:: ipython3
 
     def automatic_mask_generation(
-        image: np.ndarray, min_mask_region_area: int = 0, points_per_side: int = 32, crop_n_layers: int = 0, crop_n_points_downscale_factor: int = 1, crop_overlap_ratio: float = 512 / 1500, box_nms_thresh: float = 0.7, crop_nms_thresh: float = 0.7
+        image: np.ndarray,
+        min_mask_region_area: int = 0,
+        points_per_side: int = 32,
+        crop_n_layers: int = 0,
+        crop_n_points_downscale_factor: int = 1,
+        crop_overlap_ratio: float = 512 / 1500,
+        box_nms_thresh: float = 0.7,
+        crop_nms_thresh: float = 0.7,
     ) -> List[Dict[str, Any]]:
         """
         Generates masks for the given image.
@@ -1200,8 +1237,7 @@ smaller objects, and post-processing can remove stray pixels and holes
             crop_n_layers,
             crop_n_points_downscale_factor,
         )
-        mask_data = generate_masks(
-            image, point_grids, crop_n_layers, crop_overlap_ratio, crop_nms_thresh)
+        mask_data = generate_masks(image, point_grids, crop_n_layers, crop_overlap_ratio, crop_nms_thresh)
     
         # Filter small disconnected regions and holes in masks
         if min_mask_region_area > 0:
@@ -1211,8 +1247,7 @@ smaller objects, and post-processing can remove stray pixels and holes
                 max(box_nms_thresh, crop_nms_thresh),
             )
     
-        mask_data["segmentations"] = [
-            rle_to_mask(rle) for rle in mask_data["rles"]]
+        mask_data["segmentations"] = [rle_to_mask(rle) for rle in mask_data["rles"]]
     
         # Write mask records
         curr_anns = []
@@ -1263,11 +1298,12 @@ is a dictionary containing various data about the mask. These keys are:
 
     from tqdm.notebook import tqdm
     
+    
     def draw_anns(image, anns):
         if len(anns) == 0:
             return
         segments_image = image.copy()
-        sorted_anns = sorted(anns, key=(lambda x: x['area']), reverse=True)
+        sorted_anns = sorted(anns, key=(lambda x: x["area"]), reverse=True)
         for ann in tqdm(sorted_anns):
             mask = ann["segmentation"]
             mask_color = np.random.randint(0, 255, size=(1, 1, 3)).astype(np.uint8)
@@ -1299,7 +1335,7 @@ is a dictionary containing various data about the mask. These keys are:
 Optimize encoder using NNCF Post-training Quantization API
 ----------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -1319,7 +1355,7 @@ The optimization process contains the following steps:
 Prepare a calibration dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download COCO dataset. Since the dataset is used to calibrate the
 model’s parameter instead of fine-tuning it, we don’t need to download
@@ -1330,12 +1366,12 @@ the label files.
     from zipfile import ZipFile
     
     DATA_URL = "https://ultralytics.com/assets/coco128.zip"
-    OUT_DIR = Path('.')
+    OUT_DIR = Path(".")
     
     download_file(DATA_URL, directory=OUT_DIR, show_progress=True)
     
     if not (OUT_DIR / "coco128/images/train2017").exists():
-        with ZipFile('coco128.zip' , "r") as zip_ref:
+        with ZipFile("coco128.zip", "r") as zip_ref:
             zip_ref.extractall(OUT_DIR)
 
 
@@ -1352,6 +1388,7 @@ calibration dataset. For PyTorch, we can pass an instance of the
 
     import torch.utils.data as data
     
+    
     class COCOLoader(data.Dataset):
         def __init__(self, images_path):
             self.images = list(Path(images_path).iterdir())
@@ -1361,11 +1398,12 @@ calibration dataset. For PyTorch, we can pass an instance of the
             image = cv2.imread(str(image_path))
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             return image
-        
+    
         def __len__(self):
             return len(self.images)
-        
-    coco_dataset = COCOLoader(OUT_DIR / 'coco128/images/train2017')
+    
+    
+    coco_dataset = COCOLoader(OUT_DIR / "coco128/images/train2017")
     calibration_loader = torch.utils.data.DataLoader(coco_dataset)
 
 The transformation function is a function that takes a sample from the
@@ -1374,6 +1412,7 @@ dataset and returns data that can be passed to the model for inference.
 .. code:: ipython3
 
     import nncf
+    
     
     def transform_fn(image_data):
         """
@@ -1387,6 +1426,7 @@ dataset and returns data that can be passed to the model for inference.
         processed_image = preprocess_image(np.squeeze(image))
         return processed_image
     
+    
     calibration_dataset = nncf.Dataset(calibration_loader, transform_fn)
 
 
@@ -1398,7 +1438,7 @@ dataset and returns data that can be passed to the model for inference.
 Run quantization and serialize OpenVINO IR model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``nncf.quantize`` function provides an interface for model
 quantization. It requires an instance of the OpenVINO Model and
@@ -1421,12 +1461,13 @@ activations.
 
 .. code:: ipython3
 
-    
     model = core.read_model(ov_encoder_path)
-    quantized_model = nncf.quantize(model,
-                                    calibration_dataset,
-                                    model_type=nncf.parameters.ModelType.TRANSFORMER,
-                                    subset_size=128)
+    quantized_model = nncf.quantize(
+        model,
+        calibration_dataset,
+        model_type=nncf.parameters.ModelType.TRANSFORMER,
+        subset_size=128,
+    )
     print("model quantization finished")
 
 
@@ -1455,7 +1496,7 @@ activations.
     model quantization finished
 
 
-
+.. parsed-literal::
 
     
 
@@ -1468,7 +1509,7 @@ activations.
 Validate Quantized Model Inference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We can reuse the previous code to validate the output of ``INT8`` model.
 
@@ -1496,12 +1537,12 @@ We can reuse the previous code to validate the output of ``INT8`` model.
     masks = results[ov_predictor.output(0)]
     masks = postprocess_masks(masks, image.shape[:-1])
     masks = masks > 0.0
-    plt.figure(figsize=(10,10))
+    plt.figure(figsize=(10, 10))
     plt.imshow(image)
     show_mask(masks, plt.gca())
     show_points(input_point, input_label, plt.gca())
-    plt.axis('off')
-    plt.show() 
+    plt.axis("off")
+    plt.show()
 
 
 
@@ -1534,7 +1575,7 @@ Run ``INT8`` model in automatic mask generation mode
 Compare Performance of the Original and Quantized Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Finally, use the OpenVINO
+`back to top ⬆️ <#Table-of-contents:>`__ Finally, use the OpenVINO
 `Benchmark
 Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
 to measure the inference performance of the ``FP32`` and ``INT8``

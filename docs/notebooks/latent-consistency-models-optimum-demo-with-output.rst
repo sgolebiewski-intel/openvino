@@ -31,18 +31,18 @@ https://latent-consistency-models.github.io/
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Full precision model on the
-   CPU <#using-full-precision-model-in-cpu-with-latentconsistencymodelpipeline>`__
+   CPU <#Using-full-precision-model-in-CPU-with-LatentConsistencyModelPipeline>`__
 -  `Running inference using Optimum Intel
-   OVLatentConsistencyModelPipeline <#running-inference-using-optimum-intel-ovlatentconsistencymodelpipeline>`__
+   ``OVLatentConsistencyModelPipeline`` <#Running-inference-using-Optimum-Intel-OVLatentConsistencyModelPipeline>`__
 
 .. |image0| image:: https://github.com/openvinotoolkit/openvino_notebooks/assets/10940214/1858dae4-72fd-401e-b055-66d503d82446
 
 Prerequisites
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install required packages
 
@@ -71,12 +71,13 @@ Install required packages
 .. code:: ipython3
 
     import warnings
-    warnings.filterwarnings('ignore')
+    
+    warnings.filterwarnings("ignore")
 
 Showing Info Available Devices
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``available_devices`` property shows the available devices in your
 system. The “FULL_DEVICE_NAME” option to ``ie.get_property()`` shows the
@@ -95,13 +96,13 @@ this
 .. code:: ipython3
 
     import openvino as ov
+    
     core = ov.Core()
     devices = core.available_devices
     
     for device in devices:
         device_name = core.get_property(device, "FULL_DEVICE_NAME")
         print(f"{device}: {device_name}")
-
 
 
 .. parsed-literal::
@@ -112,7 +113,7 @@ this
 Using full precision model in CPU with ``LatentConsistencyModelPipeline``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Standard pipeline for the Latent Consistency Model(LCM) from Diffusers
 library is used here. For more information please refer to
@@ -126,17 +127,16 @@ https://huggingface.co/docs/diffusers/en/api/pipelines/latent_consistency_models
     pipeline = LatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
 
 
-
 .. parsed-literal::
 
-    2024-04-09 23:26:49.874670: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-09 23:26:49.909775: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-18 00:04:08.916564: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-18 00:04:08.953118: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-04-09 23:26:50.504347: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-18 00:04:09.550802: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 
@@ -149,9 +149,7 @@ https://huggingface.co/docs/diffusers/en/api/pipelines/latent_consistency_models
 
     prompt = "A cute squirrel in the forest, portrait, 8k"
     
-    image = pipeline(
-        prompt=prompt, num_inference_steps=4, guidance_scale=8.0
-    ).images[0]
+    image = pipeline(prompt=prompt, num_inference_steps=4, guidance_scale=8.0).images[0]
     image.save("image_standard_pipeline.png")
     image
 
@@ -184,8 +182,8 @@ Select inference device for text-to-image generation
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='CPU',
-        description='Device:',
+        value="CPU",
+        description="Device:",
         disabled=False,
     )
     
@@ -203,7 +201,7 @@ Select inference device for text-to-image generation
 Running inference using Optimum Intel ``OVLatentConsistencyModelPipeline``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Accelerating inference of LCM using Intel Optimum with OpenVINO backend.
 For more information please refer to
@@ -232,17 +230,12 @@ and there is no need to do it manually
 
 .. parsed-literal::
 
-    No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
-
-
-.. parsed-literal::
-
     Framework not specified. Using pt to export the model.
 
 
 .. parsed-literal::
 
-    Keyword arguments {'subfolder': '', 'use_auth_token': None, 'trust_remote_code': False} are not expected by StableDiffusionPipeline and will be ignored.
+    Keyword arguments {'subfolder': '', 'trust_remote_code': False} are not expected by StableDiffusionPipeline and will be ignored.
 
 
 
@@ -253,7 +246,7 @@ and there is no need to do it manually
 
 .. parsed-literal::
 
-    Using framework PyTorch: 2.1.0+cpu
+    Using framework PyTorch: 2.2.2+cpu
 
 
 .. parsed-literal::
@@ -268,17 +261,17 @@ and there is no need to do it manually
 
 .. parsed-literal::
 
-    Using framework PyTorch: 2.1.0+cpu
+    Using framework PyTorch: 2.2.2+cpu
 
 
 .. parsed-literal::
 
-    Using framework PyTorch: 2.1.0+cpu
+    Using framework PyTorch: 2.2.2+cpu
 
 
 .. parsed-literal::
 
-    Using framework PyTorch: 2.1.0+cpu
+    Using framework PyTorch: 2.2.2+cpu
 
 
 .. code:: ipython3
@@ -299,12 +292,12 @@ and there is no need to do it manually
 
 .. parsed-literal::
 
-    Compiling the text_encoder to CPU ...
+    Compiling the vae_encoder to CPU ...
 
 
 .. parsed-literal::
 
-    Compiling the vae_encoder to CPU ...
+    Compiling the text_encoder to CPU ...
 
 
 .. code:: ipython3

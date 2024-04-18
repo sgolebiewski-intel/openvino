@@ -22,36 +22,36 @@ backing it one by one and will run an interactive app with Gradio!
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Instantiating Generation
-   Pipeline <#instantiating-generation-pipeline>`__
+   Pipeline <#Instantiating-Generation-Pipeline>`__
 -  `Convert models to OpenVINO Intermediate representation (IR)
-   format <#convert-models-to-openvino-intermediate-representation-ir-format>`__
+   format <#Convert-models-to-OpenVINO-Intermediate-representation-(IR)-format>`__
 
-   -  `CLAP Text Encoder Conversion <#clap-text-encoder-conversion>`__
-   -  `T5 Text Encoder Conversion <#t5-text-encoder-conversion>`__
-   -  `Projection model conversion <#projection-model-conversion>`__
-   -  `GPT-2 conversion <#gpt-2-conversion>`__
-   -  `Vocoder conversion <#vocoder-conversion>`__
-   -  `UNet conversion <#unet-conversion>`__
-   -  `VAE Decoder conversion <#vae-decoder-conversion>`__
+   -  `CLAP Text Encoder Conversion <#CLAP-Text-Encoder-Conversion>`__
+   -  `T5 Text Encoder Conversion <#T5-Text-Encoder-Conversion>`__
+   -  `Projection model conversion <#Projection-model-conversion>`__
+   -  `GPT-2 conversion <#GPT-2-conversion>`__
+   -  `Vocoder conversion <#Vocoder-conversion>`__
+   -  `UNet conversion <#UNet-conversion>`__
+   -  `VAE Decoder conversion <#VAE-Decoder-conversion>`__
 
 -  `Select inference device for AudioLDM2
-   pipeline <#select-inference-device-for-audioldm2-pipeline>`__
+   pipeline <#Select-inference-device-for-AudioLDM2-pipeline>`__
 -  `Adapt OpenVINO models to the original
-   pipeline <#adapt-openvino-models-to-the-original-pipeline>`__
--  `Try out the converted pipeline <#try-out-the-converted-pipeline>`__
+   pipeline <#Adapt-OpenVINO-models-to-the-original-pipeline>`__
+-  `Try out the converted pipeline <#Try-out-the-converted-pipeline>`__
 
 .. |image0| image:: https://github.com/openvinotoolkit/openvino_notebooks/assets/76463150/c93a0f86-d9cf-4bd1-93b9-e27532170d75
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q accelerate "diffusers>=0.21.0" transformers "torch>=2.1" gradio "peft==0.6.2" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q accelerate "diffusers>=0.21.0" transformers "torch>=2.1" "gradio>=4.19" "peft==0.6.2" --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "openvino>=2024.0.0"
 
 
@@ -64,10 +64,10 @@ Prerequisites
 Instantiating Generation Pipeline
 ---------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To work with `AudioLDM 2 <https://huggingface.co/cvssp/audioldm2>`__ by
-`Centre for Vision, Speech and Signal Processing - University of Surrey <https://www.surrey.ac.uk/centre-vision-speech-signal-processing>`__,
+```Centre for Vision, Speech and Signal Processing - University of Surrey`` <https://www.surrey.ac.uk/centre-vision-speech-signal-processing>`__,
 we will use `Hugging Face Diffusers
 package <https://github.com/huggingface/diffusers>`__. Diffusers package
 exposes the ``AudioLDM2Pipeline`` class, simplifying the model
@@ -97,7 +97,7 @@ sample.
         prompt,
         negative_prompt=negative_prompt,
         num_inference_steps=150,
-        audio_length_in_s=3.0
+        audio_length_in_s=3.0,
     ).audios[0]
     
     sampling_rate = 16000
@@ -132,7 +132,7 @@ sample.
 Convert models to OpenVINO Intermediate representation (IR) format
 ------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `Model conversion
 API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
@@ -158,6 +158,7 @@ The pipeline consists of seven important parts:
 
     models_base_folder = Path("models")
     
+    
     def cleanup_torchscript_cache():
         """
         Helper for removing cached model representation
@@ -169,13 +170,13 @@ The pipeline consists of seven important parts:
 CLAP Text Encoder Conversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First frozen text-encoder. AudioLDM2 uses the joint audio-text embedding
 model
 `CLAP <https://huggingface.co/docs/transformers/model_doc/clap#transformers.CLAPTextModelWithProjection>`__,
 specifically the
-`laion/clap-htsat-unfused <https://huggingface.co/laion/clap-htsat-unfused>`__
+```laion/clap-htsat-unfused`` <https://huggingface.co/laion/clap-htsat-unfused>`__
 variant. The text branch is used to encode the text prompt to a prompt
 embedding. The full audio-text model is used to rank generated waveforms
 against the text prompt by computing similarity scores.
@@ -190,6 +191,7 @@ against the text prompt by computing similarity scores.
     
         def forward(self, input_ids, attention_mask):
             return self.encoder.get_text_features(input_ids, attention_mask)
+    
     
     clap_text_encoder_ir_path = models_base_folder / "clap_text_encoder.xml"
     
@@ -219,7 +221,7 @@ against the text prompt by computing similarity scores.
 T5 Text Encoder Conversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 As second frozen text-encoder, AudioLDM2 uses the
 `T5 <https://huggingface.co/docs/transformers/model_doc/t5#transformers.T5EncoderModel>`__,
@@ -268,7 +270,7 @@ hidden states.
 Projection model conversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 A trained model used to linearly project the hidden-states from the
 first and second text encoder models and insert learned Start Of
@@ -311,7 +313,7 @@ input to the language model.
 GPT-2 conversion
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `GPT-2 <https://huggingface.co/gpt2>`__ is an auto-regressive language
 model used to generate a sequence of hidden-states conditioned on the
@@ -329,10 +331,10 @@ projected outputs from the two text encoders.
     if not language_model_ir_path.exists():
         pipe.language_model.config.torchscript = True
         pipe.language_model.eval()
-        pipe.language_model.__call__ = partial(pipe.language_model.__call__, kwargs={
-            "past_key_values": None,
-            "use_cache": False,
-            "return_dict": False})
+        pipe.language_model.__call__ = partial(
+            pipe.language_model.__call__,
+            kwargs={"past_key_values": None, "use_cache": False, "return_dict": False},
+        )
         with torch.no_grad():
             ov_model = ov.convert_model(
                 pipe.language_model,  # model instance
@@ -343,7 +345,7 @@ projected outputs from the two text encoders.
         ov_model.inputs[0].get_node().set_element_type(ov.Type.i64)
         ov_model.inputs[1].get_node().set_partial_shape(ov.PartialShape([1, -1, 768]))
         ov_model.inputs[1].get_node().set_element_type(ov.Type.f32)
-        
+    
         ov_model.validate_nodes_and_infer_types()
     
         ov.save_model(ov_model, language_model_ir_path)
@@ -363,9 +365,9 @@ projected outputs from the two text encoders.
 Vocoder conversion
 ~~~~~~~~~~~~~~~~~~
 
+`back to top ⬆️ <#Table-of-contents:>`__
 
-
-`SpeechT5 HiFi-GAN Vocoder <https://huggingface.co/microsoft/speecht5_hifigan>`__
+```SpeechT5 HiFi-GAN Vocoder`` <https://huggingface.co/microsoft/speecht5_hifigan>`__
 is used to convert the mel-spectrogram latents to the final audio
 waveform.
 
@@ -397,7 +399,7 @@ waveform.
 UNet conversion
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The UNet model is used to denoise the encoded audio latents. The process
 of UNet model conversion remains the same, like for original Stable
@@ -425,9 +427,9 @@ Diffusion model.
         ov_model.inputs[3].get_node().set_partial_shape(ov.PartialShape((2, -1, 1024)))
         ov_model.inputs[4].get_node().set_partial_shape(ov.PartialShape((2, -1)))
         ov_model.validate_nodes_and_infer_types()
-            
+    
         ov.save_model(ov_model, unet_ir_path)
-        
+    
         del ov_model
         cleanup_torchscript_cache()
         gc.collect()
@@ -444,7 +446,7 @@ Diffusion model.
 VAE Decoder conversion
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The VAE model has two parts, an encoder, and a decoder. The encoder is
 used to convert the image into a low-dimensional latent representation,
@@ -465,6 +467,7 @@ diffusion
 
     vae_ir_path = models_base_folder / "vae.xml"
     
+    
     class VAEDecoderWrapper(torch.nn.Module):
         def __init__(self, vae):
             super().__init__()
@@ -473,6 +476,7 @@ diffusion
     
         def forward(self, latents):
             return self.vae.decode(latents)
+    
     
     if not vae_ir_path.exists():
         vae_decoder = VAEDecoderWrapper(pipe.vae)
@@ -498,7 +502,7 @@ diffusion
 Select inference device for AudioLDM2 pipeline
 ----------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -529,7 +533,7 @@ select device from dropdown list for running inference using OpenVINO
 Adapt OpenVINO models to the original pipeline
 ----------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Here we create wrapper classes for all three OpenVINO models that we
 want to embed in the original inference pipeline. Here are some of the
@@ -557,6 +561,7 @@ model inference into the ``get_text_features`` method.
             last_hidden_state = self.encoder([input_ids, attention_mask])[0]
             return torch.from_numpy(last_hidden_state)
     
+    
     class OVT5EncoderWrapper:
         def __init__(self, encoder_ir, config):
             self.encoder = core.compile_model(encoder_ir, device.value)
@@ -566,7 +571,8 @@ model inference into the ``get_text_features`` method.
         def __call__(self, input_ids, **_):
             last_hidden_state = self.encoder(input_ids)[0]
             return torch.from_numpy(last_hidden_state)[None, ...]
-        
+    
+    
     class OVVocoderWrapper:
         def __init__(self, vocoder_ir, config):
             self.vocoder = core.compile_model(vocoder_ir, device.value)
@@ -575,47 +581,43 @@ model inference into the ``get_text_features`` method.
         def __call__(self, mel_spectrogram, **_):
             waveform = self.vocoder(mel_spectrogram)[0]
             return torch.from_numpy(waveform)
-        
+    
+    
     class OVProjectionModelWrapper:
         def __init__(self, proj_model_ir, config):
             self.proj_model = core.compile_model(proj_model_ir, device.value)
             self.config = config
             self.output_type = namedtuple("ProjectionOutput", ["hidden_states", "attention_mask"])
     
-        def __call__(
-            self, hidden_states,
-            hidden_states_1,
-            attention_mask,
-            attention_mask_1, **_
-        ):
-            output = self.proj_model({
-                "hidden_states": hidden_states,
-                "hidden_states_1": hidden_states_1,
-                "attention_mask": attention_mask,
-                "attention_mask_1": attention_mask_1,
-            })
+        def __call__(self, hidden_states, hidden_states_1, attention_mask, attention_mask_1, **_):
+            output = self.proj_model(
+                {
+                    "hidden_states": hidden_states,
+                    "hidden_states_1": hidden_states_1,
+                    "attention_mask": attention_mask,
+                    "attention_mask_1": attention_mask_1,
+                }
+            )
             return self.output_type(torch.from_numpy(output[0]), torch.from_numpy(output[1]))
-        
+    
+    
     class OVUnetWrapper:
         def __init__(self, unet_ir, config):
             self.unet = core.compile_model(unet_ir, device.value)
             self.config = config
     
-        def __call__(
-            self, sample,
-            timestep,
-            encoder_hidden_states,
-            encoder_hidden_states_1,
-            encoder_attention_mask_1, **_
-        ):
-            output = self.unet({
-                "sample": sample,
-                "timestep": timestep,
-                "encoder_hidden_states": encoder_hidden_states,
-                "encoder_hidden_states_1": encoder_hidden_states_1,
-                "encoder_attention_mask_1": encoder_attention_mask_1,
-            })
-            return (torch.from_numpy(output[0]), )
+        def __call__(self, sample, timestep, encoder_hidden_states, encoder_hidden_states_1, encoder_attention_mask_1, **_):
+            output = self.unet(
+                {
+                    "sample": sample,
+                    "timestep": timestep,
+                    "encoder_hidden_states": encoder_hidden_states,
+                    "encoder_hidden_states_1": encoder_hidden_states_1,
+                    "encoder_attention_mask_1": encoder_attention_mask_1,
+                }
+            )
+            return (torch.from_numpy(output[0]),)
+    
     
     class OVVaeDecoderWrapper:
         def __init__(self, vae_ir, config):
@@ -626,14 +628,9 @@ model inference into the ``get_text_features`` method.
         def decode(self, latents, **_):
             last_hidden_state = self.vae(latents)[0]
             return self.output_type(torch.from_numpy(last_hidden_state))
-        
-    def generate_language_model(
-        gpt_2: ov.CompiledModel,
-        inputs_embeds: torch.Tensor,
-        attention_mask: torch.Tensor,
-        max_new_tokens: int = 8,
-        **_
-    ) -> torch.Tensor:
+    
+    
+    def generate_language_model(gpt_2: ov.CompiledModel, inputs_embeds: torch.Tensor, attention_mask: torch.Tensor, max_new_tokens: int = 8, **_) -> torch.Tensor:
         """
         Generates a sequence of hidden-states from the language model, conditioned on the embedding inputs.
         """
@@ -643,7 +640,7 @@ model inference into the ``get_text_features`` method.
         attention_mask = attention_mask.cpu().numpy()
         for _ in range(max_new_tokens):
             # forward pass to get next hidden states
-            output = gpt_2({"inputs_embeds":inputs_embeds, "attention_mask":attention_mask})
+            output = gpt_2({"inputs_embeds": inputs_embeds, "attention_mask": attention_mask})
     
             next_hidden_states = output[0]
     
@@ -651,7 +648,6 @@ model inference into the ``get_text_features`` method.
             inputs_embeds = np.concatenate([inputs_embeds, next_hidden_states[:, -1:, :]], axis=1)
             attention_mask = np.concatenate([attention_mask, np.ones((attention_mask.shape[0], 1))], axis=1)
         return torch.from_numpy(inputs_embeds[:, -max_new_tokens:, :])
-
 
 Now we initialize the wrapper objects and load them to the HF pipeline
 
@@ -662,7 +658,7 @@ Now we initialize the wrapper objects and load them to the HF pipeline
     pipe.config.return_dict = False
     
     np.random.seed(0)
-    torch.manual_seed(0) 
+    torch.manual_seed(0)
     
     pipe.text_encoder = OVClapEncoderWrapper(clap_text_encoder_ir_path, pipe.text_encoder.config)
     pipe.text_encoder_2 = OVT5EncoderWrapper(t5_text_encoder_ir_path, pipe.text_encoder_2.config)
@@ -681,7 +677,7 @@ Now we initialize the wrapper objects and load them to the HF pipeline
         prompt,
         negative_prompt=negative_prompt,
         num_inference_steps=150,
-        audio_length_in_s=3.0
+        audio_length_in_s=3.0,
     ).audios[0]
     
     sampling_rate = 16000
@@ -716,7 +712,7 @@ Now we initialize the wrapper objects and load them to the HF pipeline
 Try out the converted pipeline
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, we are ready to start generation. For improving the generation
 process, we also introduce an opportunity to provide a
@@ -729,17 +725,24 @@ package <https://www.gradio.app/docs/interface>`__
 
     import gradio as gr
     
-    def _generate(prompt, negative_prompt, audio_length_in_s,
-                  num_inference_steps, _=gr.Progress(track_tqdm=True)):
+    
+    def _generate(
+        prompt,
+        negative_prompt,
+        audio_length_in_s,
+        num_inference_steps,
+        _=gr.Progress(track_tqdm=True),
+    ):
         """Gradio backing function."""
         audio_values = pipe(
             prompt,
             negative_prompt=negative_prompt,
             num_inference_steps=num_inference_steps,
-            audio_length_in_s=audio_length_in_s
+            audio_length_in_s=audio_length_in_s,
         )
         waveform = audio_values[0].squeeze() * 2**15
         return (sampling_rate, waveform.astype(np.int16))
+    
     
     demo = gr.Interface(
         _generate,
@@ -753,11 +756,9 @@ package <https://www.gradio.app/docs/interface>`__
                 value=7,
                 label="Audio Length (s)",
             ),
-            gr.Slider(label="Inference Steps", step=5, value=150, minimum=50, maximum=250)
+            gr.Slider(label="Inference Steps", step=5, value=150, minimum=50, maximum=250),
         ],
-        outputs=[
-            "audio"
-        ],
+        outputs=["audio"],
         examples=[
             ["birds singing in the forest", "Low quality", 7, 150],
             ["The sound of a hammer hitting a wooden surface", "", 4, 200],

@@ -22,29 +22,29 @@ steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Download and prepare model <#download-and-prepare-model>`__
+-  `Download and prepare model <#Download-and-prepare-model>`__
 
    -  `Obtain Pytorch model
-      representation <#obtain-pytorch-model-representation>`__
+      representation <#Obtain-Pytorch-model-representation>`__
    -  `Convert model to OpenVINO Intermediate
-      Representation <#convert-model-to-openvino-intermediate-representation>`__
-   -  `Prepare inference data <#prepare-inference-data>`__
+      Representation <#Convert-model-to-OpenVINO-Intermediate-Representation>`__
+   -  `Prepare inference data <#Prepare-inference-data>`__
 
--  `Check model inference result <#check-model-inference-result>`__
+-  `Check model inference result <#Check-model-inference-result>`__
 -  `Validate model accuracy on
-   dataset <#validate-model-accuracy-on-dataset>`__
--  `Quantization <#quantization>`__
+   dataset <#Validate-model-accuracy-on-dataset>`__
+-  `Quantization <#Quantization>`__
 -  `Check INT8 model inference
-   result <#check-int8-model-inference-result>`__
+   result <#Check-INT8-model-inference-result>`__
 -  `Compare Performance of the Original and Quantized
-   Models <#compare-performance-of-the-original-and-quantized-models>`__
+   Models <#Compare-Performance-of-the-Original-and-Quantized-Models>`__
 -  `Compare Accuracy of the Original and Quantized
-   Models <#compare-accuracy-of-the-original-and-quantized-models>`__
+   Models <#Compare-Accuracy-of-the-Original-and-Quantized-Models>`__
 
 Download and prepare model
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 data2vec is a framework for self-supervised representation learning for
 images, speech, and text as described in `data2vec: A General Framework
@@ -65,7 +65,7 @@ Recognition corpus and distributed as part of HuggingFace transformers.
 Obtain Pytorch model representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For instantiating PyTorch model class, we should use
 ``Data2VecAudioForCTC.from_pretrained`` method with providing model ID
@@ -93,11 +93,12 @@ model specific pre- and post-processing steps.
 Convert model to OpenVINO Intermediate Representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     from pathlib import Path
+    
     # Set model directory
     MODEL_DIR = Path("model")
     MODEL_DIR.mkdir(exist_ok=True)
@@ -122,11 +123,10 @@ Convert model to OpenVINO Intermediate Representation
         print("Read IR model from {}".format(ir_model_path))
         ov_model = core.read_model(ir_model_path)
 
-
 Prepare inference data
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For demonstration purposes, we will use short dummy version of
 LibriSpeech dataset - ``patrickvonplaten/librispeech_asr_dummy`` to
@@ -143,9 +143,14 @@ dataset.
     
     # define preprocessing function for converting audio to input values for model
     def map_to_input(batch):
-        preprocessed_signal = processor(batch["audio"]["array"], return_tensors="pt", padding="longest", sampling_rate=batch['audio']['sampling_rate'])
+        preprocessed_signal = processor(
+            batch["audio"]["array"],
+            return_tensors="pt",
+            padding="longest",
+            sampling_rate=batch["audio"]["sampling_rate"],
+        )
         input_values = preprocessed_signal.input_values
-        batch['input_values'] = input_values
+        batch["input_values"] = input_values
         return batch
     
     
@@ -157,7 +162,7 @@ dataset.
 Check model inference result
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The code below is used for running model inference on a single sample
 from the dataset. It contains the following steps:
@@ -176,7 +181,7 @@ For reference, see the same function provided for OpenVINO model.
     
     # inference function for pytorch
     def torch_infer(model, sample):
-        logits = model(torch.Tensor(sample['input_values'])).logits
+        logits = model(torch.Tensor(sample["input_values"])).logits
         # take argmax and decode
         predicted_ids = torch.argmax(logits, dim=-1)
         transcription = processor.batch_decode(predicted_ids)
@@ -186,7 +191,7 @@ For reference, see the same function provided for OpenVINO model.
     # inference function for openvino
     def ov_infer(model, sample):
         output = model.output(0)
-        logits = model(np.array(sample['input_values']))[output]
+        logits = model(np.array(sample["input_values"]))[output]
         predicted_ids = np.argmax(logits, axis=-1)
         transcription = processor.batch_decode(torch.from_numpy(predicted_ids))
         return transcription
@@ -200,8 +205,8 @@ Select inference device for OpenVINO
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -257,7 +262,7 @@ Select inference device for OpenVINO
 Validate model accuracy on dataset
 ----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For model accuracy evaluation, `Word Error
 Rate <https://en.wikipedia.org/wiki/Word_error_rate>`__ metric can be
@@ -266,7 +271,7 @@ the total words spoken. A lower WER in speech-to-text means better
 accuracy in recognizing speech.
 
 For WER calculation, we will use
-`torchmetrics <https://torchmetrics.readthedocs.io/en/stable/text/word_error_rate.html>`__
+```torchmetrics`` <https://torchmetrics.readthedocs.io/en/stable/text/word_error_rate.html>`__
 library.
 
 .. code:: ipython3
@@ -281,7 +286,7 @@ library.
             # run infer function on sample
             transcription = infer_fn(model, sample)
             # update metric on sample result
-            wer.update(transcription, [sample['text']])
+            wer.update(transcription, [sample["text"]])
         # finalize metric calculation
         result = wer.compute()
         return result
@@ -306,8 +311,8 @@ library.
 
 .. code:: ipython3
 
-    print(f'[PyTorch]   Word Error Rate: {pt_result:.4f}')
-    print(f'[OpenVino]  Word Error Rate: {ov_result:.4f}')
+    print(f"[PyTorch]   Word Error Rate: {pt_result:.4f}")
+    print(f"[OpenVino]  Word Error Rate: {ov_result:.4f}")
 
 
 .. parsed-literal::
@@ -319,7 +324,7 @@ library.
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -477,14 +482,14 @@ saved using ``ov.save_model`` function.
 
 .. code:: ipython3
 
-    MODEL_NAME = 'quantized_data2vec_base'
+    MODEL_NAME = "quantized_data2vec_base"
     quantized_model_path = Path(f"{MODEL_NAME}_openvino_model/{MODEL_NAME}_quantized.xml")
     ov.save_model(quantized_model, quantized_model_path)
 
 Check INT8 model inference result
 ---------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 ``INT8`` model is the same in usage like the original one. We need to
 read it, using the ``core.read_model`` method and load on the device,
@@ -529,7 +534,7 @@ using ``core.compile_model``. After that, we can reuse the same
 Compare Performance of the Original and Quantized Models
 --------------------------------------------------------
 
-`Benchmark
+`back to top ⬆️ <#Table-of-contents:>`__ `Benchmark
 Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
 is used to measure the inference performance of the ``FP16`` and
 ``INT8`` models.
@@ -712,7 +717,7 @@ is used to measure the inference performance of the ``FP16`` and
 Compare Accuracy of the Original and Quantized Models
 -----------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Finally, calculate WER metric for the ``INT8`` model representation and
 compare it with the ``FP16`` result.
@@ -720,8 +725,8 @@ compare it with the ``FP16`` result.
 .. code:: ipython3
 
     int8_ov_result = compute_wer(dataset, int8_compiled_model, ov_infer)
-    print(f'[OpenVino FP16] Word Error Rate: {ov_result:.4}')
-    print(f'[OpenVino INT8] Word Error Rate: {int8_ov_result:.4f}')
+    print(f"[OpenVino FP16] Word Error Rate: {ov_result:.4}")
+    print(f"[OpenVino INT8] Word Error Rate: {int8_ov_result:.4f}")
 
 
 

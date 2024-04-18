@@ -12,28 +12,28 @@ of this notebook provides live inference results from your inputs.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `The model <#the-model>`__
+-  `Imports <#Imports>`__
+-  `The model <#The-model>`__
 
-   -  `Download the model <#download-the-model>`__
-   -  `Load the model <#load-the-model>`__
+   -  `Download the model <#Download-the-model>`__
+   -  `Load the model <#Load-the-model>`__
 
-      -  `Select inference device <#select-inference-device>`__
+      -  `Select inference device <#Select-inference-device>`__
 
--  `Processing <#processing>`__
+-  `Processing <#Processing>`__
 
-   -  `Preprocessing <#preprocessing>`__
-   -  `Postprocessing <#postprocessing>`__
-   -  `Main Processing Function <#main-processing-function>`__
+   -  `Preprocessing <#Preprocessing>`__
+   -  `Postprocessing <#Postprocessing>`__
+   -  `Main Processing Function <#Main-Processing-Function>`__
 
--  `Run <#run>`__
+-  `Run <#Run>`__
 
-   -  `Run on local paragraphs <#run-on-local-paragraphs>`__
-   -  `Run on websites <#run-on-websites>`__
+   -  `Run on local paragraphs <#Run-on-local-paragraphs>`__
+   -  `Run on websites <#Run-on-websites>`__
 
 .. code:: ipython3
 
-    %pip install -q "openvino>=2023.1.0"
+    %pip install -q "openvino>=2023.1.0" tqdm
 
 
 .. parsed-literal::
@@ -49,16 +49,18 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     
     from notebook_utils import download_file
 
@@ -74,14 +76,14 @@ Imports
     
     
     download_file(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/question-answering/html_reader.py',
-        filename='html_reader.py'
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/question-answering/html_reader.py",
+        filename="html_reader.py",
     )
     import html_reader as reader
     
     download_file(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/question-answering/tokens_bert.py',
-        filename='tokens_bert.py'
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/question-answering/tokens_bert.py",
+        filename="tokens_bert.py",
     )
     import tokens_bert as tokens
 
@@ -89,24 +91,24 @@ Imports
 
 .. parsed-literal::
 
-    html_reader.py:   0%|          | 0.00/635 [00:00<?, ?B/s]
+    html_reader.py:   0%|          | 0.00/632 [00:00<?, ?B/s]
 
 
 
 .. parsed-literal::
 
-    tokens_bert.py:   0%|          | 0.00/929 [00:00<?, ?B/s]
+    tokens_bert.py:   0%|          | 0.00/926 [00:00<?, ?B/s]
 
 
 The model
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the model
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download pretrained models from
 https://storage.openvinotoolkit.org/repositories/open_model_zoo. If the
@@ -163,7 +165,7 @@ converted to OpenVINO Intermediate Representation (OpenVINO IR).
 Load the model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Downloaded models are located in a fixed structure, which indicates a
 vendor, a model name and a precision. Only a few lines of code are
@@ -182,7 +184,7 @@ You can choose ``CPU`` or ``GPU`` for this model.
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -194,8 +196,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -242,7 +244,7 @@ for BERT-large-like model.
 Processing
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NLP models usually take a list of tokens as a standard input. A token is
 a single word converted to some integer. To provide the proper input,
@@ -255,7 +257,7 @@ content from provided URLs.
     # Download the vocabulary from the openvino_notebooks storage
     vocab_file_path = download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/text/bert-uncased/vocab.txt",
-        directory="data"
+        directory="data",
     )
     
     # Create a dictionary with words and their indices.
@@ -292,7 +294,7 @@ content from provided URLs.
 Preprocessing
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The input size in this case is 384 tokens long. The main input
 (``input_ids``) to used BERT model consists of two parts: question
@@ -333,7 +335,7 @@ documentation <https://github.com/openvinotoolkit/open_model_zoo/tree/master/mod
         # Take parts of the context with overlapping by 0.5.
         for start in range(0, max(1, len(context_tokens) - context_len), context_len // 2):
             # A part of the context.
-            part_context_tokens = context_tokens[start:start + context_len]
+            part_context_tokens = context_tokens[start : start + context_len]
             # The input: a question and the context separated by special tokens.
             input_ids = [cls_token] + question_tokens + [sep_token] + part_context_tokens + [sep_token]
             # 1 for any index if there is no padding token, 0 otherwise.
@@ -342,9 +344,11 @@ documentation <https://github.com/openvinotoolkit/open_model_zoo/tree/master/mod
             token_type_ids = [0] * (question_len + 2) + [1] * (len(part_context_tokens) + 1)
     
             # Add padding at the end.
-            (input_ids, attention_mask, token_type_ids), pad_number = pad(input_ids=input_ids,
-                                                                          attention_mask=attention_mask,
-                                                                          token_type_ids=token_type_ids)
+            (input_ids, attention_mask, token_type_ids), pad_number = pad(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                token_type_ids=token_type_ids,
+            )
     
             # Create an input to feed the model.
             input_dict = {
@@ -377,7 +381,7 @@ documentation <https://github.com/openvinotoolkit/open_model_zoo/tree/master/mod
 Postprocessing
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The results from the network are raw (logits). Use the softmax function
 to get the probability distribution. Then, find the best answer in the
@@ -387,8 +391,14 @@ the context range for the answer.
 .. code:: ipython3
 
     # Based on https://github.com/openvinotoolkit/open_model_zoo/blob/bf03f505a650bafe8da03d2747a8b55c5cb2ef16/demos/common/python/openvino/model_zoo/model_api/models/bert.py#L163
-    def postprocess(output_start, output_end, question_tokens, context_tokens_start_end, padding, start_idx):
-    
+    def postprocess(
+        output_start,
+        output_end,
+        question_tokens,
+        context_tokens_start_end,
+        padding,
+        start_idx,
+    ):
         def get_score(logits):
             out = np.exp(logits)
             return out / out.sum(axis=-1)
@@ -403,10 +413,12 @@ the context range for the answer.
         context_end_idx = input_size - padding - 1
     
         # Find product of all start-end combinations to find the best one.
-        max_score, max_start, max_end = find_best_answer_window(start_score=score_start,
-                                                                end_score=score_end,
-                                                                context_start_idx=context_start_idx,
-                                                                context_end_idx=context_end_idx)
+        max_score, max_start, max_end = find_best_answer_window(
+            start_score=score_start,
+            end_score=score_end,
+            context_start_idx=context_start_idx,
+            context_end_idx=context_end_idx,
+        )
     
         # Convert to context text start-end index.
         max_start = context_tokens_start_end[max_start + start_idx][0]
@@ -440,15 +452,13 @@ answer should come with the highest score.
 
     def get_best_answer(question, context):
         # Convert the context string to tokens.
-        context_tokens, context_tokens_start_end = tokens.text_to_tokens(text=context.lower(),
-                                                                         vocab=vocab)
+        context_tokens, context_tokens_start_end = tokens.text_to_tokens(text=context.lower(), vocab=vocab)
         # Convert the question string to tokens.
         question_tokens, _ = tokens.text_to_tokens(text=question.lower(), vocab=vocab)
     
         results = []
         # Iterate through different parts of the context.
-        for network_input, padding, start_idx in prepare_input(question_tokens=question_tokens,
-                                                               context_tokens=context_tokens):
+        for network_input, padding, start_idx in prepare_input(question_tokens=question_tokens, context_tokens=context_tokens):
             # Get output layers.
             output_start_key = compiled_model.output("output_s")
             output_end_key = compiled_model.output("output_e")
@@ -456,23 +466,25 @@ answer should come with the highest score.
             # OpenVINO inference.
             result = compiled_model(network_input)
             # Postprocess the result, getting the score and context range for the answer.
-            score_start_end = postprocess(output_start=result[output_start_key][0],
-                                          output_end=result[output_end_key][0],
-                                          question_tokens=question_tokens,
-                                          context_tokens_start_end=context_tokens_start_end,
-                                          padding=padding,
-                                          start_idx=start_idx)
+            score_start_end = postprocess(
+                output_start=result[output_start_key][0],
+                output_end=result[output_end_key][0],
+                question_tokens=question_tokens,
+                context_tokens_start_end=context_tokens_start_end,
+                padding=padding,
+                start_idx=start_idx,
+            )
             results.append(score_start_end)
     
         # Find the highest score.
         answer = max(results, key=operator.itemgetter(0))
         # Return the part of the context, which is already an answer.
-        return context[answer[1]:answer[2]], answer[0]
+        return context[answer[1] : answer[2]], answer[0]
 
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run question answering on a specific knowledge base (websites) and
 iterate through the questions.
@@ -516,12 +528,12 @@ iterate through the questions.
 Run
 ---
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run on local paragraphs
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Change sources to your own to answer your questions. You can use as many
 sources as you want. Usually, you need to wait a few seconds for the
@@ -552,11 +564,13 @@ questions in the box.**
 
 .. code:: ipython3
 
-    sources = ["Computational complexity theory is a branch of the theory of computation in theoretical computer "
-               "science that focuses on classifying computational problems according to their inherent difficulty, "
-               "and relating those classes to each other. A computational problem is understood to be a task that "
-               "is in principle amenable to being solved by a computer, which is equivalent to stating that the "
-               "problem may be solved by mechanical application of mathematical steps, such as an algorithm."]
+    sources = [
+        "Computational complexity theory is a branch of the theory of computation in theoretical computer "
+        "science that focuses on classifying computational problems according to their inherent difficulty, "
+        "and relating those classes to each other. A computational problem is understood to be a task that "
+        "is in principle amenable to being solved by a computer, which is equivalent to stating that the "
+        "problem may be solved by mechanical application of mathematical steps, such as an algorithm."
+    ]
     
     question = "What is the term for a task that generally lends itself to being solved by a computer?"
     
@@ -579,7 +593,7 @@ questions in the box.**
 Run on websites
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 You can also provide URLs. Note that the context (a knowledge base) is
 built from paragraphs on websites. If some information is outside the

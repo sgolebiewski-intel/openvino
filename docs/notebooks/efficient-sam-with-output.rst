@@ -31,43 +31,43 @@ OpenVINO. We also demonstrate how to quantize model using
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Load PyTorch model <#load-pytorch-model>`__
--  `Run PyTorch model inference <#run-pytorch-model-inference>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Load PyTorch model <#Load-PyTorch-model>`__
+-  `Run PyTorch model inference <#Run-PyTorch-model-inference>`__
 
-   -  `Prepare input data <#prepare-input-data>`__
+   -  `Prepare input data <#Prepare-input-data>`__
    -  `Define helpers for input and output
-      processing <#define-helpers-for-input-and-output-processing>`__
+      processing <#Define-helpers-for-input-and-output-processing>`__
 
 -  `Convert model to OpenVINO IR
-   format <#convert-model-to-openvino-ir-format>`__
--  `Run OpenVINO model inference <#run-openvino-model-inference>`__
+   format <#Convert-model-to-OpenVINO-IR-format>`__
+-  `Run OpenVINO model inference <#Run-OpenVINO-model-inference>`__
 
    -  `Select inference device from dropdown
-      list <#select-inference-device-from-dropdown-list>`__
-   -  `Compile OpenVINO model <#compile-openvino-model>`__
+      list <#Select-inference-device-from-dropdown-list>`__
+   -  `Compile OpenVINO model <#Compile-OpenVINO-model>`__
    -  `Inference and visualize
-      result <#inference-and-visualize-result>`__
+      result <#Inference-and-visualize-result>`__
 
--  `Quantization <#quantization>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Prepare calibration datasets <#prepare-calibration-datasets>`__
-   -  `Run Model Quantization <#run-model-quantization>`__
+   -  `Prepare calibration datasets <#Prepare-calibration-datasets>`__
+   -  `Run Model Quantization <#Run-Model-Quantization>`__
 
 -  `Verify quantized model
-   inference <#verify-quantized-model-inference>`__
+   inference <#Verify-quantized-model-inference>`__
 
-   -  `Save quantize model on disk <#save-quantize-model-on-disk>`__
-   -  `Compare quantized model size <#compare-quantized-model-size>`__
+   -  `Save quantize model on disk <#Save-quantize-model-on-disk>`__
+   -  `Compare quantized model size <#Compare-quantized-model-size>`__
    -  `Compare inference time of the FP16 and INT8
-      models <#compare-inference-time-of-the-fp16-and-int8-models>`__
+      models <#Compare-inference-time-of-the-FP16-and-INT8-models>`__
 
--  `Interactive segmentation demo <#interactive-segmentation-demo>`__
+-  `Interactive segmentation demo <#Interactive-segmentation-demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -78,7 +78,7 @@ Prerequisites
     else:
         %pip install -q "matplotlib>=3.4,<3.7"
     
-    %pip install -q "openvino>=2023.3.0" "nncf>=2.7.0" opencv-python "gradio>=4.13" torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "openvino>=2023.3.0" "nncf>=2.7.0" opencv-python "gradio>=4.13" torch torchvision tqdm  --extra-index-url https://download.pytorch.org/whl/cpu
 
 
 .. parsed-literal::
@@ -115,386 +115,162 @@ Prerequisites
 .. parsed-literal::
 
     remote: Enumerating objects: 424, done.[K
-    remote: Counting objects:   1% (1/85)[K
-remote: Counting objects:   2% (2/85)[K
-remote: Counting objects:   3% (3/85)[K
-remote: Counting objects:   4% (4/85)[K
-remote: Counting objects:   5% (5/85)[K
-remote: Counting objects:   7% (6/85)[K
-remote: Counting objects:   8% (7/85)[K
-remote: Counting objects:   9% (8/85)[K
-remote: Counting objects:  10% (9/85)[K
-remote: Counting objects:  11% (10/85)[K
-remote: Counting objects:  12% (11/85)[K
-remote: Counting objects:  14% (12/85)[K
-remote: Counting objects:  15% (13/85)[K
-remote: Counting objects:  16% (14/85)[K
-remote: Counting objects:  17% (15/85)[K
-remote: Counting objects:  18% (16/85)[K
-remote: Counting objects:  20% (17/85)[K
-remote: Counting objects:  21% (18/85)[K
-remote: Counting objects:  22% (19/85)[K
-remote: Counting objects:  23% (20/85)[K
-remote: Counting objects:  24% (21/85)[K
-remote: Counting objects:  25% (22/85)[K
-remote: Counting objects:  27% (23/85)[K
-remote: Counting objects:  28% (24/85)[K
-remote: Counting objects:  29% (25/85)[K
-remote: Counting objects:  30% (26/85)[K
-remote: Counting objects:  31% (27/85)[K
-remote: Counting objects:  32% (28/85)[K
-remote: Counting objects:  34% (29/85)[K
-remote: Counting objects:  35% (30/85)[K
-remote: Counting objects:  36% (31/85)[K
-remote: Counting objects:  37% (32/85)[K
-remote: Counting objects:  38% (33/85)[K
-remote: Counting objects:  40% (34/85)[K
-remote: Counting objects:  41% (35/85)[K
-remote: Counting objects:  42% (36/85)[K
-remote: Counting objects:  43% (37/85)[K
-remote: Counting objects:  44% (38/85)[K
-remote: Counting objects:  45% (39/85)[K
-remote: Counting objects:  47% (40/85)[K
-remote: Counting objects:  48% (41/85)[K
-remote: Counting objects:  49% (42/85)[K
-remote: Counting objects:  50% (43/85)[K
-remote: Counting objects:  51% (44/85)[K
-remote: Counting objects:  52% (45/85)[K
-remote: Counting objects:  54% (46/85)[K
-remote: Counting objects:  55% (47/85)[K
-remote: Counting objects:  56% (48/85)[K
-remote: Counting objects:  57% (49/85)[K
-remote: Counting objects:  58% (50/85)[K
-remote: Counting objects:  60% (51/85)[K
-remote: Counting objects:  61% (52/85)[K
-remote: Counting objects:  62% (53/85)[K
-remote: Counting objects:  63% (54/85)[K
-remote: Counting objects:  64% (55/85)[K
-remote: Counting objects:  65% (56/85)[K
-remote: Counting objects:  67% (57/85)[K
-remote: Counting objects:  68% (58/85)[K
-remote: Counting objects:  69% (59/85)[K
-remote: Counting objects:  70% (60/85)[K
-remote: Counting objects:  71% (61/85)[K
-remote: Counting objects:  72% (62/85)[K
-remote: Counting objects:  74% (63/85)[K
-remote: Counting objects:  75% (64/85)[K
-remote: Counting objects:  76% (65/85)[K
-remote: Counting objects:  77% (66/85)[K
-remote: Counting objects:  78% (67/85)[K
-remote: Counting objects:  80% (68/85)[K
-remote: Counting objects:  81% (69/85)[K
-remote: Counting objects:  82% (70/85)[K
-remote: Counting objects:  83% (71/85)[K
-remote: Counting objects:  84% (72/85)[K
-remote: Counting objects:  85% (73/85)[K
-remote: Counting objects:  87% (74/85)[K
-remote: Counting objects:  88% (75/85)[K
-remote: Counting objects:  89% (76/85)[K
-remote: Counting objects:  90% (77/85)[K
-remote: Counting objects:  91% (78/85)[K
-remote: Counting objects:  92% (79/85)[K
-remote: Counting objects:  94% (80/85)[K
-remote: Counting objects:  95% (81/85)[K
-remote: Counting objects:  96% (82/85)[K
-remote: Counting objects:  97% (83/85)[K
-remote: Counting objects:  98% (84/85)[K
-remote: Counting objects: 100% (85/85)[K
-remote: Counting objects: 100% (85/85), done.[K
-    remote: Compressing objects:   3% (1/33)[K
-remote: Compressing objects:   6% (2/33)[K
-remote: Compressing objects:   9% (3/33)[K
-remote: Compressing objects:  12% (4/33)[K
-remote: Compressing objects:  15% (5/33)[K
-remote: Compressing objects:  18% (6/33)[K
-remote: Compressing objects:  21% (7/33)[K
-remote: Compressing objects:  24% (8/33)[K
-remote: Compressing objects:  27% (9/33)[K
-remote: Compressing objects:  30% (10/33)[K
-remote: Compressing objects:  33% (11/33)[K
-remote: Compressing objects:  36% (12/33)[K
-remote: Compressing objects:  39% (13/33)[K
-remote: Compressing objects:  42% (14/33)[K
-remote: Compressing objects:  45% (15/33)[K
-remote: Compressing objects:  48% (16/33)[K
-remote: Compressing objects:  51% (17/33)[K
-remote: Compressing objects:  54% (18/33)[K
-remote: Compressing objects:  57% (19/33)[K
-remote: Compressing objects:  60% (20/33)[K
-remote: Compressing objects:  63% (21/33)[K
-remote: Compressing objects:  66% (22/33)[K
-remote: Compressing objects:  69% (23/33)[K
-remote: Compressing objects:  72% (24/33)[K
-remote: Compressing objects:  75% (25/33)[K
-remote: Compressing objects:  78% (26/33)[K
-remote: Compressing objects:  81% (27/33)[K
-remote: Compressing objects:  84% (28/33)[K
-remote: Compressing objects:  87% (29/33)[K
-remote: Compressing objects:  90% (30/33)[K
-remote: Compressing objects:  93% (31/33)[K
-remote: Compressing objects:  96% (32/33)[K
-remote: Compressing objects: 100% (33/33)[K
-remote: Compressing objects: 100% (33/33), done.[K
-    Receiving objects:   0% (1/424)
-Receiving objects:   1% (5/424)
+    remote: Counting objects:   1% (1/85)[Kremote: Counting objects:   2% (2/85)[Kremote: Counting objects:   3% (3/85)[Kremote: Counting objects:   4% (4/85)[Kremote: Counting objects:   5% (5/85)[Kremote: Counting objects:   7% (6/85)[Kremote: Counting objects:   8% (7/85)[Kremote: Counting objects:   9% (8/85)[Kremote: Counting objects:  10% (9/85)[Kremote: Counting objects:  11% (10/85)[Kremote: Counting objects:  12% (11/85)[Kremote: Counting objects:  14% (12/85)[Kremote: Counting objects:  15% (13/85)[Kremote: Counting objects:  16% (14/85)[Kremote: Counting objects:  17% (15/85)[Kremote: Counting objects:  18% (16/85)[Kremote: Counting objects:  20% (17/85)[Kremote: Counting objects:  21% (18/85)[Kremote: Counting objects:  22% (19/85)[Kremote: Counting objects:  23% (20/85)[Kremote: Counting objects:  24% (21/85)[Kremote: Counting objects:  25% (22/85)[Kremote: Counting objects:  27% (23/85)[Kremote: Counting objects:  28% (24/85)[Kremote: Counting objects:  29% (25/85)[Kremote: Counting objects:  30% (26/85)[Kremote: Counting objects:  31% (27/85)[Kremote: Counting objects:  32% (28/85)[Kremote: Counting objects:  34% (29/85)[Kremote: Counting objects:  35% (30/85)[Kremote: Counting objects:  36% (31/85)[Kremote: Counting objects:  37% (32/85)[Kremote: Counting objects:  38% (33/85)[Kremote: Counting objects:  40% (34/85)[Kremote: Counting objects:  41% (35/85)[Kremote: Counting objects:  42% (36/85)[Kremote: Counting objects:  43% (37/85)[Kremote: Counting objects:  44% (38/85)[Kremote: Counting objects:  45% (39/85)[Kremote: Counting objects:  47% (40/85)[Kremote: Counting objects:  48% (41/85)[Kremote: Counting objects:  49% (42/85)[Kremote: Counting objects:  50% (43/85)[Kremote: Counting objects:  51% (44/85)[Kremote: Counting objects:  52% (45/85)[Kremote: Counting objects:  54% (46/85)[Kremote: Counting objects:  55% (47/85)[Kremote: Counting objects:  56% (48/85)[Kremote: Counting objects:  57% (49/85)[Kremote: Counting objects:  58% (50/85)[Kremote: Counting objects:  60% (51/85)[Kremote: Counting objects:  61% (52/85)[Kremote: Counting objects:  62% (53/85)[Kremote: Counting objects:  63% (54/85)[Kremote: Counting objects:  64% (55/85)[Kremote: Counting objects:  65% (56/85)[Kremote: Counting objects:  67% (57/85)[Kremote: Counting objects:  68% (58/85)[Kremote: Counting objects:  69% (59/85)[Kremote: Counting objects:  70% (60/85)[Kremote: Counting objects:  71% (61/85)[Kremote: Counting objects:  72% (62/85)[Kremote: Counting objects:  74% (63/85)[Kremote: Counting objects:  75% (64/85)[Kremote: Counting objects:  76% (65/85)[Kremote: Counting objects:  77% (66/85)[Kremote: Counting objects:  78% (67/85)[Kremote: Counting objects:  80% (68/85)[Kremote: Counting objects:  81% (69/85)[Kremote: Counting objects:  82% (70/85)[Kremote: Counting objects:  83% (71/85)[Kremote: Counting objects:  84% (72/85)[Kremote: Counting objects:  85% (73/85)[Kremote: Counting objects:  87% (74/85)[Kremote: Counting objects:  88% (75/85)[Kremote: Counting objects:  89% (76/85)[Kremote: Counting objects:  90% (77/85)[Kremote: Counting objects:  91% (78/85)[Kremote: Counting objects:  92% (79/85)[Kremote: Counting objects:  94% (80/85)[Kremote: Counting objects:  95% (81/85)[Kremote: Counting objects:  96% (82/85)[Kremote: Counting objects:  97% (83/85)[Kremote: Counting objects:  98% (84/85)[Kremote: Counting objects: 100% (85/85)[Kremote: Counting objects: 100% (85/85), done.[K
+    remote: Compressing objects:   3% (1/33)[Kremote: Compressing objects:   6% (2/33)[Kremote: Compressing objects:   9% (3/33)[Kremote: Compressing objects:  12% (4/33)[Kremote: Compressing objects:  15% (5/33)[Kremote: Compressing objects:  18% (6/33)[Kremote: Compressing objects:  21% (7/33)[Kremote: Compressing objects:  24% (8/33)[Kremote: Compressing objects:  27% (9/33)[Kremote: Compressing objects:  30% (10/33)[Kremote: Compressing objects:  33% (11/33)[Kremote: Compressing objects:  36% (12/33)[Kremote: Compressing objects:  39% (13/33)[Kremote: Compressing objects:  42% (14/33)[Kremote: Compressing objects:  45% (15/33)[Kremote: Compressing objects:  48% (16/33)[Kremote: Compressing objects:  51% (17/33)[Kremote: Compressing objects:  54% (18/33)[Kremote: Compressing objects:  57% (19/33)[Kremote: Compressing objects:  60% (20/33)[Kremote: Compressing objects:  63% (21/33)[Kremote: Compressing objects:  66% (22/33)[Kremote: Compressing objects:  69% (23/33)[Kremote: Compressing objects:  72% (24/33)[Kremote: Compressing objects:  75% (25/33)[Kremote: Compressing objects:  78% (26/33)[Kremote: Compressing objects:  81% (27/33)[Kremote: Compressing objects:  84% (28/33)[Kremote: Compressing objects:  87% (29/33)[Kremote: Compressing objects:  90% (30/33)[Kremote: Compressing objects:  93% (31/33)[Kremote: Compressing objects:  96% (32/33)[Kremote: Compressing objects: 100% (33/33)[Kremote: Compressing objects: 100% (33/33), done.[K
+    Receiving objects:   0% (1/424)Receiving objects:   1% (5/424)
 
 .. parsed-literal::
 
-    Receiving objects:   2% (9/424)
-Receiving objects:   3% (13/424)
-Receiving objects:   4% (17/424)
-Receiving objects:   5% (22/424)
+    Receiving objects:   2% (9/424)Receiving objects:   3% (13/424)Receiving objects:   4% (17/424)Receiving objects:   5% (22/424)
 
 .. parsed-literal::
 
-    Receiving objects:   5% (24/424), 20.37 MiB | 20.37 MiB/s
+    Receiving objects:   5% (24/424), 7.11 MiB | 7.01 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:   6% (26/424), 33.60 MiB | 22.38 MiB/s
-Receiving objects:   7% (30/424), 33.60 MiB | 22.38 MiB/s
-Receiving objects:   8% (34/424), 33.60 MiB | 22.38 MiB/s
-Receiving objects:   9% (39/424), 33.60 MiB | 22.38 MiB/s
-Receiving objects:  10% (43/424), 33.60 MiB | 22.38 MiB/s
-Receiving objects:  11% (47/424), 33.60 MiB | 22.38 MiB/s
-Receiving objects:  12% (51/424), 33.60 MiB | 22.38 MiB/s
+    Receiving objects:   5% (24/424), 15.89 MiB | 7.84 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  12% (54/424), 47.11 MiB | 23.54 MiB/s
+    Receiving objects:   5% (24/424), 25.21 MiB | 8.33 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  12% (54/424), 70.30 MiB | 23.42 MiB/s
+    Receiving objects:   5% (24/424), 35.32 MiB | 8.76 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  13% (56/424), 70.30 MiB | 23.42 MiB/s
+    Receiving objects:   6% (26/424), 35.32 MiB | 8.76 MiB/sReceiving objects:   7% (30/424), 35.32 MiB | 8.76 MiB/sReceiving objects:   8% (34/424), 35.32 MiB | 8.76 MiB/sReceiving objects:   9% (39/424), 35.32 MiB | 8.76 MiB/sReceiving objects:  10% (43/424), 35.32 MiB | 8.76 MiB/sReceiving objects:  11% (47/424), 35.32 MiB | 8.76 MiB/sReceiving objects:  12% (51/424), 35.32 MiB | 8.76 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  13% (56/424), 94.78 MiB | 23.30 MiB/s
+    Receiving objects:  12% (54/424), 46.28 MiB | 9.54 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  14% (60/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  15% (64/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  16% (68/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  17% (73/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  18% (77/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  19% (81/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  20% (85/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  21% (90/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  22% (94/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  23% (98/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  24% (102/424), 108.84 MiB | 23.83 MiB/s
+    Receiving objects:  12% (54/424), 58.26 MiB | 10.40 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  25% (106/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  26% (111/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  27% (115/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  28% (119/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  29% (123/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  30% (128/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  31% (132/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  32% (136/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  33% (140/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  34% (145/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  35% (149/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  36% (153/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  37% (157/424), 108.84 MiB | 23.83 MiB/s
-Receiving objects:  38% (162/424), 108.84 MiB | 23.83 MiB/s
+    Receiving objects:  12% (54/424), 70.74 MiB | 11.14 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  38% (164/424), 120.93 MiB | 25.18 MiB/s
+    Receiving objects:  13% (56/424), 70.74 MiB | 11.14 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  38% (164/424), 149.53 MiB | 25.39 MiB/s
+    Receiving objects:  13% (56/424), 81.30 MiB | 11.36 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  38% (164/424), 179.03 MiB | 25.93 MiB/s
+    Receiving objects:  13% (56/424), 93.08 MiB | 11.64 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  38% (164/424), 187.14 MiB | 22.76 MiB/s
+    Receiving objects:  13% (56/424), 105.71 MiB | 11.89 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  38% (164/424), 191.04 MiB | 18.07 MiB/s
+    Receiving objects:  14% (60/424), 105.71 MiB | 11.89 MiB/sReceiving objects:  15% (64/424), 105.71 MiB | 11.89 MiB/sReceiving objects:  16% (68/424), 105.71 MiB | 11.89 MiB/sReceiving objects:  17% (73/424), 105.71 MiB | 11.89 MiB/sReceiving objects:  18% (77/424), 105.71 MiB | 11.89 MiB/sReceiving objects:  19% (81/424), 105.71 MiB | 11.89 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  38% (164/424), 196.48 MiB | 13.35 MiB/s
+    Receiving objects:  20% (85/424), 105.71 MiB | 11.89 MiB/sReceiving objects:  21% (90/424), 105.71 MiB | 11.89 MiB/sReceiving objects:  22% (94/424), 105.71 MiB | 11.89 MiB/sReceiving objects:  23% (98/424), 105.71 MiB | 11.89 MiB/sReceiving objects:  24% (102/424), 105.71 MiB | 11.89 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  38% (164/424), 203.55 MiB | 8.65 MiB/s 
+    Receiving objects:  25% (106/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  26% (111/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  27% (115/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  28% (119/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  29% (123/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  30% (128/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  31% (132/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  32% (136/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  33% (140/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  34% (145/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  35% (149/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  36% (153/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  37% (157/424), 112.21 MiB | 11.99 MiB/sReceiving objects:  38% (162/424), 112.21 MiB | 11.99 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  39% (166/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  40% (170/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  41% (174/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  42% (179/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  43% (183/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  44% (187/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  45% (191/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  46% (196/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  47% (200/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  48% (204/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  49% (208/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  50% (212/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  51% (217/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  52% (221/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  53% (225/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  54% (229/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  55% (234/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  56% (238/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  57% (242/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  58% (246/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  59% (251/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  60% (255/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  61% (259/424), 207.69 MiB | 6.31 MiB/s
+    Receiving objects:  38% (164/424), 118.79 MiB | 12.04 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  62% (263/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  63% (268/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  64% (272/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  65% (276/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  66% (280/424), 207.69 MiB | 6.31 MiB/s
-Receiving objects:  67% (285/424), 207.69 MiB | 6.31 MiB/s
+    Receiving objects:  38% (164/424), 132.56 MiB | 12.57 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  67% (288/424), 212.21 MiB | 5.88 MiB/s
+    Receiving objects:  38% (164/424), 147.18 MiB | 13.34 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  67% (288/424), 222.49 MiB | 7.43 MiB/s
+    Receiving objects:  38% (164/424), 159.14 MiB | 13.27 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  67% (288/424), 234.10 MiB | 8.98 MiB/s
+    Receiving objects:  38% (164/424), 172.36 MiB | 13.30 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  67% (288/424), 243.87 MiB | 9.75 MiB/s
+    Receiving objects:  38% (164/424), 186.46 MiB | 13.47 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  68% (289/424), 243.87 MiB | 9.75 MiB/s
-Receiving objects:  69% (293/424), 243.87 MiB | 9.75 MiB/s
-Receiving objects:  70% (297/424), 243.87 MiB | 9.75 MiB/s
-Receiving objects:  71% (302/424), 243.87 MiB | 9.75 MiB/s
-Receiving objects:  72% (306/424), 243.87 MiB | 9.75 MiB/s
-Receiving objects:  73% (310/424), 243.87 MiB | 9.75 MiB/s
+    Receiving objects:  38% (164/424), 201.36 MiB | 13.62 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  73% (312/424), 255.11 MiB | 10.52 MiB/s
+    Receiving objects:  39% (166/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  40% (170/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  41% (174/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  42% (179/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  43% (183/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  44% (187/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  45% (191/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  46% (196/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  47% (200/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  48% (204/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  49% (208/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  50% (212/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  51% (217/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  52% (221/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  53% (225/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  54% (229/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  55% (234/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  56% (238/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  57% (242/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  58% (246/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  59% (251/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  60% (255/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  61% (259/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  62% (263/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  63% (268/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  64% (272/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  65% (276/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  66% (280/424), 208.90 MiB | 13.65 MiB/sReceiving objects:  67% (285/424), 208.90 MiB | 13.65 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  74% (314/424), 255.11 MiB | 10.52 MiB/s
-Receiving objects:  75% (318/424), 255.11 MiB | 10.52 MiB/s
-Receiving objects:  76% (323/424), 255.11 MiB | 10.52 MiB/s
-Receiving objects:  77% (327/424), 255.11 MiB | 10.52 MiB/s
-Receiving objects:  78% (331/424), 255.11 MiB | 10.52 MiB/s
+    Receiving objects:  67% (288/424), 216.43 MiB | 13.99 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  79% (335/424), 261.28 MiB | 10.90 MiB/s
+    Receiving objects:  67% (288/424), 232.14 MiB | 14.78 MiB/s
 
 .. parsed-literal::
 
-    Receiving objects:  80% (340/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  81% (344/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  82% (348/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  83% (352/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  84% (357/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  85% (361/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  86% (365/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  87% (369/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  88% (374/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  89% (378/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  90% (382/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  91% (386/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  92% (391/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  93% (395/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  94% (399/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  95% (403/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  96% (408/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  97% (412/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects:  98% (416/424), 261.28 MiB | 10.90 MiB/s
-remote: Total 424 (delta 76), reused 52 (delta 52), pack-reused 339[K
-    Receiving objects:  99% (420/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects: 100% (424/424), 261.28 MiB | 10.90 MiB/s
-Receiving objects: 100% (424/424), 262.14 MiB | 15.69 MiB/s, done.
-    Resolving deltas:   0% (0/246)
-Resolving deltas:   4% (12/246)
-Resolving deltas:   6% (17/246)
-Resolving deltas:  14% (36/246)
-Resolving deltas:  19% (47/246)
-Resolving deltas:  21% (54/246)
-Resolving deltas:  23% (57/246)
-Resolving deltas:  26% (64/246)
-Resolving deltas:  28% (69/246)
-Resolving deltas:  32% (81/246)
-Resolving deltas:  36% (91/246)
-Resolving deltas:  37% (92/246)
-Resolving deltas:  38% (94/246)
-Resolving deltas:  41% (101/246)
+    Receiving objects:  68% (289/424), 240.34 MiB | 15.09 MiB/sReceiving objects:  69% (293/424), 240.34 MiB | 15.09 MiB/sReceiving objects:  70% (297/424), 240.34 MiB | 15.09 MiB/sReceiving objects:  71% (302/424), 240.34 MiB | 15.09 MiB/sReceiving objects:  72% (306/424), 240.34 MiB | 15.09 MiB/sReceiving objects:  73% (310/424), 240.34 MiB | 15.09 MiB/s
 
 .. parsed-literal::
 
-    Resolving deltas:  42% (105/246)
-Resolving deltas:  44% (110/246)
-Resolving deltas:  46% (114/246)
+    Receiving objects:  73% (310/424), 248.86 MiB | 15.43 MiB/s
 
 .. parsed-literal::
 
-    Resolving deltas:  48% (119/246)
-Resolving deltas:  49% (121/246)
-Resolving deltas:  51% (127/246)
-Resolving deltas:  52% (128/246)
-Resolving deltas:  54% (133/246)
-Resolving deltas:  57% (142/246)
-Resolving deltas:  61% (152/246)
-Resolving deltas:  62% (154/246)
-Resolving deltas:  65% (162/246)
-Resolving deltas:  66% (164/246)
-Resolving deltas:  67% (165/246)
+    Receiving objects:  74% (314/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  75% (318/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  76% (323/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  77% (327/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  78% (331/424), 257.49 MiB | 15.77 MiB/s
 
 .. parsed-literal::
 
-    Resolving deltas:  68% (168/246)
-Resolving deltas:  70% (173/246)
-Resolving deltas:  71% (175/246)
-Resolving deltas:  88% (218/246)
-Resolving deltas:  96% (238/246)
-Resolving deltas:  97% (241/246)
-Resolving deltas:  99% (244/246)
+    Receiving objects:  79% (335/424), 257.49 MiB | 15.77 MiB/s
 
 .. parsed-literal::
 
-    Resolving deltas: 100% (246/246)
-Resolving deltas: 100% (246/246), done.
+    Receiving objects:  80% (340/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  81% (344/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  82% (348/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  83% (352/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  84% (357/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  85% (361/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  86% (365/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  87% (369/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  88% (374/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  89% (378/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  90% (382/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  91% (386/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  92% (391/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  93% (395/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  94% (399/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  95% (403/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  96% (408/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  97% (412/424), 257.49 MiB | 15.77 MiB/sReceiving objects:  98% (416/424), 257.49 MiB | 15.77 MiB/sremote: Total 424 (delta 76), reused 52 (delta 52), pack-reused 339[K
+    Receiving objects:  99% (420/424), 257.49 MiB | 15.77 MiB/sReceiving objects: 100% (424/424), 257.49 MiB | 15.77 MiB/sReceiving objects: 100% (424/424), 262.14 MiB | 12.58 MiB/s, done.
+    Resolving deltas:   0% (0/246)Resolving deltas:   4% (10/246)Resolving deltas:   6% (17/246)Resolving deltas:  14% (36/246)Resolving deltas:  18% (46/246)Resolving deltas:  22% (56/246)Resolving deltas:  23% (57/246)Resolving deltas:  26% (64/246)Resolving deltas:  27% (68/246)Resolving deltas:  32% (81/246)Resolving deltas:  36% (89/246)Resolving deltas:  37% (92/246)Resolving deltas:  41% (101/246)
+
+.. parsed-literal::
+
+    Resolving deltas:  42% (105/246)Resolving deltas:  44% (110/246)Resolving deltas:  46% (114/246)
+
+.. parsed-literal::
+
+    Resolving deltas:  48% (120/246)Resolving deltas:  49% (122/246)Resolving deltas:  52% (128/246)Resolving deltas:  54% (134/246)Resolving deltas:  58% (143/246)Resolving deltas:  62% (153/246)Resolving deltas:  63% (155/246)Resolving deltas:  66% (163/246)Resolving deltas:  67% (165/246)Resolving deltas:  69% (172/246)Resolving deltas:  70% (174/246)Resolving deltas:  88% (217/246)Resolving deltas:  96% (237/246)Resolving deltas:  97% (240/246)Resolving deltas:  98% (243/246)
+
+.. parsed-literal::
+
+    Resolving deltas:  99% (245/246)
+
+.. parsed-literal::
+
+    Resolving deltas: 100% (246/246)Resolving deltas: 100% (246/246), done.
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM
 
 
 Load PyTorch model
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 There are several models available in the repository:
 
@@ -512,13 +288,19 @@ one of them as example.
 
 .. code:: ipython3
 
-    from efficient_sam.build_efficient_sam import build_efficient_sam_vitt, build_efficient_sam_vits
+    from efficient_sam.build_efficient_sam import (
+        build_efficient_sam_vitt,
+        build_efficient_sam_vits,
+    )
     import zipfile
     
-    MODELS_LIST = {"efficient-sam-vitt": build_efficient_sam_vitt, "efficient-sam-vits": build_efficient_sam_vits}
+    MODELS_LIST = {
+        "efficient-sam-vitt": build_efficient_sam_vitt,
+        "efficient-sam-vits": build_efficient_sam_vits,
+    }
     
     # Since EfficientSAM-S checkpoint file is >100MB, we store the zip file.
-    with zipfile.ZipFile("weights/efficient_sam_vits.pt.zip", 'r') as zip_ref:
+    with zipfile.ZipFile("weights/efficient_sam_vits.pt.zip", "r") as zip_ref:
         zip_ref.extractall("weights")
 
 Select one from supported models:
@@ -558,13 +340,13 @@ build PyTorch model
 Run PyTorch model inference
 ---------------------------
 
-Now, when we selected and
+`back to top ⬆️ <#Table-of-contents:>`__ Now, when we selected and
 loaded PyTorch model, we can check its result
 
 Prepare input data
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First of all, we should prepare input data for model. Model has 3
 inputs: \* image tensor - tensor with normalized input image. \* input
@@ -594,7 +376,7 @@ bounding box, 3 - right-bottom point of bounding box.
 Define helpers for input and output processing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The code below defines helpers for preparing model input and postprocess
 inference results. The input format is accepted by the model described
@@ -624,9 +406,7 @@ points. We also provided some helper function for results visualization.
     def postprocess_results(predicted_iou, predicted_logits):
         sorted_ids = np.argsort(-predicted_iou, axis=-1)
         predicted_iou = np.take_along_axis(predicted_iou, sorted_ids, axis=2)
-        predicted_logits = np.take_along_axis(
-            predicted_logits, sorted_ids[..., None, None], axis=2
-        )
+        predicted_logits = np.take_along_axis(predicted_logits, sorted_ids[..., None, None], axis=2)
     
         return predicted_logits[0, 0, 0, :, :] >= 0
     
@@ -657,9 +437,7 @@ points. We also provided some helper function for results visualization.
     def show_box(box, ax):
         x0, y0 = box[0], box[1]
         w, h = box[2] - box[0], box[3] - box[1]
-        ax.add_patch(
-            plt.Rectangle((x0, y0), w, h, edgecolor="yellow", facecolor=(0, 0, 0, 0), lw=5)
-        )
+        ax.add_patch(plt.Rectangle((x0, y0), w, h, edgecolor="yellow", facecolor=(0, 0, 0, 0), lw=5))
     
     
     def show_anns(mask, ax):
@@ -712,7 +490,7 @@ The complete model inference example demonstrated below
 Convert model to OpenVINO IR format
 -----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO supports PyTorch models via conversion in Intermediate
 Representation (IR) format using OpenVINO `Model Conversion
@@ -730,7 +508,7 @@ disk using ``openvino.save_model``.
     
     core = ov.Core()
     
-    ov_model_path = Path(f'{model_id.value}.xml')
+    ov_model_path = Path(f"{model_id.value}.xml")
     
     if not ov_model_path.exists():
         ov_model = ov.convert_model(pt_model, example_input=example_input)
@@ -741,39 +519,39 @@ disk using ``openvino.save_model``.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam.py:220: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam.py:220: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if (
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam_encoder.py:241: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam_encoder.py:241: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       assert (
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam_encoder.py:163: TracerWarning: Converting a tensor to a Python float might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam_encoder.py:163: TracerWarning: Converting a tensor to a Python float might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       size = int(math.sqrt(xy_num))
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam_encoder.py:164: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam_encoder.py:164: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       assert size * size == xy_num
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam_encoder.py:166: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam_encoder.py:166: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if size != h or size != w:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam_encoder.py:251: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam_encoder.py:251: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       assert x.shape[2] == num_patches
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam.py:85: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam.py:85: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if num_pts > self.decoder_max_num_input_points:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam.py:92: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam.py:92: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       elif num_pts < self.decoder_max_num_input_points:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam.py:126: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/efficient-sam/EfficientSAM/efficient_sam/efficient_sam.py:126: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if output_w > 0 and output_h > 0:
 
 
 Run OpenVINO model inference
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select inference device from dropdown list
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -798,7 +576,7 @@ Select inference device from dropdown list
 Compile OpenVINO model
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -807,13 +585,12 @@ Compile OpenVINO model
 Inference and visualize result
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, we can take a look on OpenVINO model prediction
 
 .. code:: ipython3
 
-    
     example_input = prepare_input(image, input_points, input_labels, torch_tensor=False)
     result = compiled_model(example_input)
     
@@ -844,7 +621,7 @@ Now, we can take a look on OpenVINO model prediction
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding the quantization layers into the
@@ -871,7 +648,7 @@ quantization.
 
     to_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -889,19 +666,19 @@ quantization.
 .. code:: ipython3
 
     # Fetch `skip_kernel_extension` module
-    import urllib.request
+    import requests
     
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     %load_ext skip_kernel_extension
 
 Prepare calibration datasets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The first step is to prepare calibration datasets for quantization. We
 will use coco128 dataset for quantization. Usually, this dataset used
@@ -916,10 +693,11 @@ creates DataLoader for preparing inputs for EfficientSAM model.
     
     from zipfile import ZipFile
     
-    urllib.request.urlretrieve(
+    r = requests.get(
         url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
     )
+    
+    open('notebook_utils.py', 'w').write(r.text)
     
     from notebook_utils import download_file
     
@@ -989,7 +767,7 @@ creates DataLoader for preparing inputs for EfficientSAM model.
 Run Model Quantization
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``nncf.quantize`` function provides an interface for model
 quantization. It requires an instance of the OpenVINO Model and
@@ -1025,14 +803,14 @@ architecture type, we should specify ``transformer`` in ``model_type``.
 
 .. parsed-literal::
 
-    2024-04-09 23:06:18.861915: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-09 23:06:18.894438: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-17 23:43:02.085337: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-17 23:43:02.119379: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-04-09 23:06:19.413953: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-17 23:43:02.732513: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 
@@ -1110,7 +888,7 @@ architecture type, we should specify ``transformer`` in ``model_type``.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
       return Tensor(self.data * unwrap_tensor_data(other))
 
 
@@ -1143,7 +921,7 @@ architecture type, we should specify ``transformer`` in ``model_type``.
 Verify quantized model inference
 --------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1180,7 +958,7 @@ Verify quantized model inference
 Save quantize model on disk
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1192,7 +970,7 @@ Save quantize model on disk
 Compare quantized model size
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1216,7 +994,7 @@ Compare quantized model size
 Compare inference time of the FP16 and INT8 models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 models, we use ``bencmark_app``.
@@ -1251,7 +1029,7 @@ models, we use ``bencmark_app``.
 
 .. parsed-literal::
 
-    [ INFO ] Read model took 42.83 ms
+    [ INFO ] Read model took 42.86 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     batched_images (node: batched_images) : f32 / [...] / [?,?,?,?]
@@ -1275,7 +1053,7 @@ models, we use ``bencmark_app``.
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 1360.14 ms
+    [ INFO ] Compile model took 1414.09 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
     [ INFO ]   NETWORK_NAME: Model0
@@ -1283,6 +1061,10 @@ models, we use ``bencmark_app``.
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
     [ INFO ]   OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
     [ INFO ]   MULTI_DEVICE_PRIORITIES: CPU
+
+
+.. parsed-literal::
+
     [ INFO ]   CPU:
     [ INFO ]     AFFINITY: Affinity.CORE
     [ INFO ]     CPU_DENORMALS_OPTIMIZATION: False
@@ -1306,10 +1088,6 @@ models, we use ``bencmark_app``.
     [ INFO ]   MODEL_PRIORITY: Priority.MEDIUM
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
-
-
-.. parsed-literal::
-
     [ WARNING ] No input files were given for input 'batched_images'!. This input will be filled with random values!
     [ WARNING ] No input files were given for input 'batched_points'!. This input will be filled with random values!
     [ WARNING ] No input files were given for input 'batched_point_labels'!. This input will be filled with random values!
@@ -1322,21 +1100,21 @@ models, we use ``bencmark_app``.
 
 .. parsed-literal::
 
-    [ INFO ] First inference took 634.42 ms
+    [ INFO ] First inference took 644.24 ms
 
 
 .. parsed-literal::
 
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            55 iterations
-    [ INFO ] Duration:         17191.44 ms
+    [ INFO ] Count:            49 iterations
+    [ INFO ] Duration:         15719.86 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        1850.16 ms
-    [ INFO ]    Average:       1828.70 ms
-    [ INFO ]    Min:           610.83 ms
-    [ INFO ]    Max:           1923.54 ms
-    [ INFO ] Throughput:   3.20 FPS
+    [ INFO ]    Median:        1890.94 ms
+    [ INFO ]    Average:       1870.83 ms
+    [ INFO ]    Min:           622.00 ms
+    [ INFO ]    Max:           1963.97 ms
+    [ INFO ] Throughput:   3.12 FPS
 
 
 .. code:: ipython3
@@ -1366,11 +1144,15 @@ models, we use ``bencmark_app``.
 
 .. parsed-literal::
 
-    [ INFO ] Read model took 65.89 ms
+    [ INFO ] Read model took 66.17 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
     [ INFO ]     batched_images (node: batched_images) : f32 / [...] / [?,?,?,?]
     [ INFO ]     batched_points (node: batched_points) : i64 / [...] / [?,?,?,?]
+
+
+.. parsed-literal::
+
     [ INFO ]     batched_point_labels (node: batched_point_labels) : i64 / [...] / [?,?,?]
     [ INFO ] Model outputs:
     [ INFO ]     ***NO_NAME*** (node: aten::reshape/Reshape_3) : f32 / [...] / [?,?,?,?,?]
@@ -1390,7 +1172,7 @@ models, we use ``bencmark_app``.
 
 .. parsed-literal::
 
-    [ INFO ] Compile model took 1903.42 ms
+    [ INFO ] Compile model took 1891.51 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
     [ INFO ]   NETWORK_NAME: Model0
@@ -1398,10 +1180,6 @@ models, we use ``bencmark_app``.
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
     [ INFO ]   OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
     [ INFO ]   MULTI_DEVICE_PRIORITIES: CPU
-
-
-.. parsed-literal::
-
     [ INFO ]   CPU:
     [ INFO ]     AFFINITY: Affinity.CORE
     [ INFO ]     CPU_DENORMALS_OPTIMIZATION: False
@@ -1437,7 +1215,7 @@ models, we use ``bencmark_app``.
 
 .. parsed-literal::
 
-    [ INFO ] First inference took 579.16 ms
+    [ INFO ] First inference took 588.40 ms
 
 
 .. parsed-literal::
@@ -1445,19 +1223,19 @@ models, we use ``bencmark_app``.
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
     [ INFO ] Count:            55 iterations
-    [ INFO ] Duration:         15903.99 ms
+    [ INFO ] Duration:         16253.02 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        1715.52 ms
-    [ INFO ]    Average:       1698.60 ms
-    [ INFO ]    Min:           624.09 ms
-    [ INFO ]    Max:           1775.09 ms
-    [ INFO ] Throughput:   3.46 FPS
+    [ INFO ]    Median:        1752.95 ms
+    [ INFO ]    Average:       1732.80 ms
+    [ INFO ]    Min:           518.84 ms
+    [ INFO ]    Max:           1804.26 ms
+    [ INFO ] Throughput:   3.38 FPS
 
 
 Interactive segmentation demo
 -----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1478,7 +1256,10 @@ Interactive segmentation demo
     examples_dir.mkdir(exist_ok=True)
     
     for img_id, image_url in enumerate(example_images):
-        urllib.request.urlretrieve(image_url, examples_dir / f"example_{img_id}.jpg")
+        r = requests.get(image_url)
+        img_path = examples_dir / f"example_{img_id}.jpg"
+        with img_path.open("wb") as f:
+            f.write(r.content)
     
     
     def sigmoid(x):
@@ -1501,7 +1282,12 @@ Interactive segmentation demo
                 continue
             annotation["id"] = i
             annotation["segmentation"] = mask
-            annotation["bbox"] = [np.min(tmp[0]), np.min(tmp[1]), np.max(tmp[1]), np.max(tmp[0])]
+            annotation["bbox"] = [
+                np.min(tmp[0]),
+                np.min(tmp[1]),
+                np.max(tmp[1]),
+                np.max(tmp[0]),
+            ]
             annotation["score"] = scores[i]
             annotation["area"] = annotation["segmentation"].sum()
             annotations.append(annotation)
@@ -1512,10 +1298,7 @@ Interactive segmentation demo
         h = masks[0]["segmentation"].shape[0]
         w = masks[0]["segmentation"].shape[1]
         if h != target_height or w != target_width:
-            points = [
-                [int(point[0] * w / target_width), int(point[1] * h / target_height)]
-                for point in points
-            ]
+            points = [[int(point[0] * w / target_width), int(point[1] * h / target_height)] for point in points]
         onemask = np.zeros((h, w))
         for i, annotation in enumerate(masks):
             if isinstance(annotation, dict):
@@ -1560,9 +1343,7 @@ Interactive segmentation demo
     
         mask = np.zeros((height, weight, 4))
     
-        h_indices, w_indices = np.meshgrid(
-            np.arange(height), np.arange(weight), indexing="ij"
-        )
+        h_indices, w_indices = np.meshgrid(np.arange(height), np.arange(weight), indexing="ij")
         indices = (index[h_indices, w_indices], h_indices, w_indices, slice(None))
     
         mask[h_indices, w_indices, :] = mask_image[indices]
@@ -1625,9 +1406,7 @@ Interactive segmentation demo
                         (original_w, original_h),
                         interpolation=cv2.INTER_NEAREST,
                     )
-                contours, _ = cv2.findContours(
-                    annotation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
-                )
+                contours, _ = cv2.findContours(annotation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
                 for contour in contours:
                     contour_all.append(contour)
             cv2.drawContours(temp, contour_all, -1, (255, 255, 255), 2 // scale)
@@ -1643,7 +1422,6 @@ Interactive segmentation demo
             image.paste(overlay_contour, (0, 0), overlay_contour)
     
         return image
-    
     
     
     # Description
@@ -1714,7 +1492,6 @@ Interactive segmentation demo
         all_masks = sigmoid(predicted_logits[0, 0, :, :, :]) >= 0.5
         predicted_iou = predicted_iou[0, 0, ...]
     
-    
         max_predicted_iou = -1
         selected_mask_using_predicted_iou = None
         selected_predicted_iou = None
@@ -1723,8 +1500,8 @@ Interactive segmentation demo
             curr_predicted_iou = predicted_iou[m]
             if curr_predicted_iou > max_predicted_iou or selected_mask_using_predicted_iou is None:
                 max_predicted_iou = curr_predicted_iou
-                selected_mask_using_predicted_iou = all_masks[m:m + 1]
-                selected_predicted_iou = predicted_iou[m:m + 1]
+                selected_mask_using_predicted_iou = all_masks[m : m + 1]
+                selected_predicted_iou = predicted_iou[m : m + 1]
     
         results = format_results(selected_mask_using_predicted_iou, selected_predicted_iou, predicted_logits, 0)
     
@@ -1812,14 +1589,28 @@ Interactive segmentation demo
             image = copy.deepcopy(cond_image)
         x, y = evt.index[0], evt.index[1]
         label = "Add Mask"
-        point_radius, point_color = 15, (255, 255, 0) if label == "Add Mask" else (255, 0, 255)
+        point_radius, point_color = 15, (
+            (255, 255, 0)
+            if label == "Add Mask"
+            else (
+                255,
+                0,
+                255,
+            )
+        )
         global_points.append([x, y])
         global_point_label.append(1 if label == "Add Mask" else 0)
     
         if image is not None:
             draw = ImageDraw.Draw(image)
     
-            draw.ellipse([(x - point_radius, y - point_radius), (x + point_radius, y + point_radius)], fill=point_color)
+            draw.ellipse(
+                [
+                    (x - point_radius, y - point_radius),
+                    (x + point_radius, y + point_radius),
+                ],
+                fill=point_color,
+            )
     
         return image, global_points, global_point_label
     
@@ -1831,13 +1622,27 @@ Interactive segmentation demo
             return image, global_points, global_point_label
         x, y = evt.index[0], evt.index[1]
         label = "Add Mask"
-        point_radius, point_color = 15, (255, 255, 0) if label == "Add Mask" else (255, 0, 255)
+        point_radius, point_color = 15, (
+            (255, 255, 0)
+            if label == "Add Mask"
+            else (
+                255,
+                0,
+                255,
+            )
+        )
         global_points.append([x, y])
         global_point_label.append(1 if label == "Add Mask" else 0)
     
         if image is not None:
             draw = ImageDraw.Draw(image)
-            draw.ellipse([(x - point_radius, y - point_radius), (x + point_radius, y + point_radius)], fill=point_color)
+            draw.ellipse(
+                [
+                    (x - point_radius, y - point_radius),
+                    (x + point_radius, y + point_radius),
+                ],
+                fill=point_color,
+            )
     
         if len(global_points) == 2:
             x1, y1 = global_points[0]
@@ -1894,11 +1699,8 @@ Interactive segmentation demo
             # ###
             with gr.Row():
                 with gr.Column():
-    
                     with gr.Column():
-                        segment_btn_p = gr.Button(
-                            "Segment with Point Prompt", variant="primary"
-                        )
+                        segment_btn_p = gr.Button("Segment with Point Prompt", variant="primary")
                         clear_btn_p = gr.Button("Clear", variant="secondary")
     
                     gr.Markdown("Try some of the examples below ⬇️")
@@ -1924,18 +1726,14 @@ Interactive segmentation demo
             # Submit & Clear
             with gr.Row():
                 with gr.Column():
-    
                     with gr.Column():
-                        segment_btn_b = gr.Button(
-                            "Segment with Box Prompt", variant="primary"
-                        )
+                        segment_btn_b = gr.Button("Segment with Box Prompt", variant="primary")
                         clear_btn_b = gr.Button("Clear", variant="secondary")
     
                     gr.Markdown("Try some of the examples below ⬇️")
                     gr.Examples(
                         examples=examples,
                         inputs=[cond_img_b],
-    
                         examples_per_page=4,
                     )
     
@@ -1943,16 +1741,28 @@ Interactive segmentation demo
                     # Description
                     gr.Markdown(description_p)
     
-        cond_img_p.select(get_points_with_draw, inputs=[segm_img_p, cond_img_p, global_points, global_point_label], outputs=[segm_img_p, global_points, global_point_label])
+        cond_img_p.select(
+            get_points_with_draw,
+            inputs=[segm_img_p, cond_img_p, global_points, global_point_label],
+            outputs=[segm_img_p, global_points, global_point_label],
+        )
     
-        cond_img_b.select(get_points_with_draw_, [segm_img_b, cond_img_b, global_points, global_point_label], [segm_img_b, global_points, global_point_label])
+        cond_img_b.select(
+            get_points_with_draw_,
+            [segm_img_b, cond_img_b, global_points, global_point_label],
+            [segm_img_b, global_points, global_point_label],
+        )
     
         segment_btn_p.click(
-            segment_with_points, inputs=[cond_img_p, global_points, global_point_label], outputs=[segm_img_p, global_points, global_point_label]
+            segment_with_points,
+            inputs=[cond_img_p, global_points, global_point_label],
+            outputs=[segm_img_p, global_points, global_point_label],
         )
     
         segment_btn_b.click(
-            segment_with_boxs, inputs=[cond_img_b, segm_img_b, global_points, global_point_label], outputs=[segm_img_b, global_points, global_point_label]
+            segment_with_boxs,
+            inputs=[cond_img_b, segm_img_b, global_points, global_point_label],
+            outputs=[segm_img_b, global_points, global_point_label],
         )
     
         clear_btn_p.click(clear, outputs=[cond_img_p, segm_img_p, global_points, global_point_label])
@@ -1976,7 +1786,7 @@ Interactive segmentation demo
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

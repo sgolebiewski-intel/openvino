@@ -25,35 +25,35 @@ the PaddleOCR is as follows:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
+-  `Imports <#Imports>`__
 
-   -  `Select inference device <#select-inference-device>`__
-   -  `Models for PaddleOCR <#models-for-paddleocr>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Models for PaddleOCR <#Models-for-PaddleOCR>`__
 
       -  `Download the Model for Text
-         Detection <#download-the-model-for-text-detection>`__
+         Detection <#Download-the-Model-for-Text-**Detection**>`__
       -  `Load the Model for Text
-         Detection <#load-the-model-for-text-detection>`__
+         Detection <#Load-the-Model-for-Text-**Detection**>`__
       -  `Download the Model for Text
-         Recognition <#download-the-model-for-text-recognition>`__
+         Recognition <#Download-the-Model-for-Text-**Recognition**>`__
       -  `Load the Model for Text Recognition with Dynamic
-         Shape <#load-the-model-for-text-recognition-with-dynamic-shape>`__
+         Shape <#Load-the-Model-for-Text-**Recognition**-with-Dynamic-Shape>`__
 
    -  `Preprocessing Image Functions for Text Detection and
-      Recognition <#preprocessing-image-functions-for-text-detection-and-recognition>`__
+      Recognition <#Preprocessing-Image-Functions-for-Text-Detection-and-Recognition>`__
    -  `Postprocessing Image for Text
-      Detection <#postprocessing-image-for-text-detection>`__
+      Detection <#Postprocessing-Image-for-Text-Detection>`__
    -  `Main Processing Function for
-      PaddleOCR <#main-processing-function-for-paddleocr>`__
+      PaddleOCR <#Main-Processing-Function-for-PaddleOCR>`__
 
 -  `Run Live PaddleOCR with
-   OpenVINO <#run-live-paddleocr-with-openvino>`__
+   OpenVINO <#Run-Live-PaddleOCR-with-OpenVINO>`__
 
 .. code:: ipython3
 
     %pip install -q "openvino>=2023.1.0"
     %pip install -q "paddlepaddle>=2.5.1"
-    %pip install -q "pyclipper>=1.2.1" "shapely>=1.7.1"
+    %pip install -q "pyclipper>=1.2.1" "shapely>=1.7.1" tqdm
 
 
 .. parsed-literal::
@@ -74,7 +74,7 @@ Table of contents:
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -96,21 +96,22 @@ Imports
 
     # Import local modules
     
-    if not Path('./notebook_utils.py').exists():
+    if not Path("./notebook_utils.py").exists():
         # Fetch `notebook_utils` module
-        import urllib.request
-        urllib.request.urlretrieve(
-            url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-            filename='notebook_utils.py'
+        import requests
+    
+        r = requests.get(
+            url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
         )
     
+        open("notebook_utils.py", "w").write(r.text)
     import notebook_utils as utils
     import pre_post_processing as processing
 
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -122,8 +123,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -141,7 +142,7 @@ select device from dropdown list for running inference using OpenVINO
 Models for PaddleOCR
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 PaddleOCR includes two parts of deep learning models, text detection and
 text recognition. Pre-trained models used in the demo are downloaded and
@@ -156,6 +157,7 @@ files to load to CPU/GPU.
 
     # Define the function to download text detection and recognition models from PaddleOCR resources.
     
+    
     def run_model_download(model_url: str, model_file_path: Path) -> None:
         """
         Download pre-trained models from PaddleOCR resources
@@ -165,7 +167,7 @@ files to load to CPU/GPU.
             model_file_path: file path to store the downloaded model
         """
         archive_path = model_file_path.absolute().parent.parent / model_url.split("/")[-1]
-        if model_file_path.is_file(): 
+        if model_file_path.is_file():
             print("Model already exists")
         else:
             # Download the model from the server, and untar it.
@@ -174,7 +176,6 @@ files to load to CPU/GPU.
             # Create a directory.
             utils.download_file(model_url, archive_path.name, archive_path.parent)
             print("Model Downloaded")
-    
     
             file = tarfile.open(archive_path)
             res = file.extractall(archive_path.parent)
@@ -187,7 +188,7 @@ files to load to CPU/GPU.
 Download the Model for Text **Detection**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -207,7 +208,7 @@ Download the Model for Text **Detection**
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/paddle-o…
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/paddle-o…
 
 
 .. parsed-literal::
@@ -219,7 +220,7 @@ Download the Model for Text **Detection**
 Load the Model for Text **Detection**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -235,7 +236,7 @@ Load the Model for Text **Detection**
 Download the Model for Text **Recognition**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -253,7 +254,7 @@ Download the Model for Text **Recognition**
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/notebooks/paddle-o…
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/notebooks/paddle-o…
 
 
 .. parsed-literal::
@@ -265,7 +266,7 @@ Download the Model for Text **Recognition**
 Load the Model for Text **Recognition** with Dynamic Shape
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Input to text recognition model refers to detected bounding boxes with
 different image sizes, for example, dynamic input shapes. Hence:
@@ -296,7 +297,7 @@ different image sizes, for example, dynamic input shapes. Hence:
 Preprocessing Image Functions for Text Detection and Recognition
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Define preprocessing functions for text detection and recognition: 1.
 Preprocessing for text detection: resize and normalize input images. 2.
@@ -312,7 +313,7 @@ with Chinese text) for easy batching in inference.
         Preprocess input image for text detection
     
         Parameters:
-            input_image: input image 
+            input_image: input image
             size: value for the image to be resized for text detection model
         """
         img = cv2.resize(input_image, (size, size))
@@ -333,7 +334,7 @@ with Chinese text) for easy batching in inference.
         Resize input image for text recognition
     
         Parameters:
-            img: bounding box image from text detection 
+            img: bounding box image from text detection
             max_wh_ratio: value for the resizing for text recognition model
         """
         rec_image_shape = [3, 48, 320]
@@ -349,7 +350,7 @@ with Chinese text) for easy batching in inference.
         else:
             resized_w = int(math.ceil(imgH * ratio))
         resized_image = cv2.resize(img, (resized_w, imgH))
-        resized_image = resized_image.astype('float32')
+        resized_image = resized_image.astype("float32")
         resized_image = resized_image.transpose((2, 0, 1)) / 255
         resized_image -= 0.5
         resized_image /= 0.5
@@ -363,22 +364,22 @@ with Chinese text) for easy batching in inference.
         Preprocessing of the detected bounding boxes for text recognition
     
         Parameters:
-            dt_boxes: detected bounding boxes from text detection 
-            frame: original input frame 
+            dt_boxes: detected bounding boxes from text detection
+            frame: original input frame
         """
         ori_im = frame.copy()
-        img_crop_list = [] 
+        img_crop_list = []
         for bno in range(len(dt_boxes)):
             tmp_box = copy.deepcopy(dt_boxes[bno])
             img_crop = processing.get_rotate_crop_image(ori_im, tmp_box)
             img_crop_list.append(img_crop)
-            
+    
         img_num = len(img_crop_list)
         # Calculate the aspect ratio of all text bars.
         width_list = []
         for img in img_crop_list:
             width_list.append(img.shape[1] / float(img.shape[0]))
-        
+    
         # Sorting can speed up the recognition process.
         indices = np.argsort(np.array(width_list))
         return img_crop_list, img_num, indices
@@ -389,7 +390,7 @@ with Chinese text) for easy batching in inference.
         Batch for text recognition
     
         Parameters:
-            img_crop_list: processed detected bounding box images 
+            img_crop_list: processed detected bounding box images
             img_num: number of bounding boxes from text detection
             indices: sorting for bounding boxes to speed up text recognition
             beg_img_no: the beginning number of bounding boxes for each batch of text recognition inference
@@ -414,7 +415,7 @@ with Chinese text) for easy batching in inference.
 Postprocessing Image for Text Detection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -423,20 +424,20 @@ Postprocessing Image for Text Detection
         Postprocess the results from text detection into bounding boxes
     
         Parameters:
-            frame: input image 
+            frame: input image
             det_results: inference results from text detection model
-        """   
+        """
         ori_im = frame.copy()
-        data = {'image': frame}
+        data = {"image": frame}
         data_resize = processing.DetResizeForTest(data)
         data_list = []
-        keep_keys = ['image', 'shape']
+        keep_keys = ["image", "shape"]
         for key in keep_keys:
             data_list.append(data_resize[key])
         img, shape_list = data_list
     
-        shape_list = np.expand_dims(shape_list, axis=0) 
-        pred = det_results[0]    
+        shape_list = np.expand_dims(shape_list, axis=0)
+        pred = det_results[0]
         if isinstance(pred, paddle.Tensor):
             pred = pred.numpy()
         segmentation = pred > 0.3
@@ -446,16 +447,16 @@ Postprocessing Image for Text Detection
             src_h, src_w, ratio_h, ratio_w = shape_list[batch_index]
             mask = segmentation[batch_index]
             boxes, scores = processing.boxes_from_bitmap(pred[batch_index], mask, src_w, src_h)
-            boxes_batch.append({'points': boxes})
+            boxes_batch.append({"points": boxes})
         post_result = boxes_batch
-        dt_boxes = post_result[0]['points']
-        dt_boxes = processing.filter_tag_det_res(dt_boxes, ori_im.shape)    
+        dt_boxes = post_result[0]["points"]
+        dt_boxes = processing.filter_tag_det_res(dt_boxes, ori_im.shape)
         return dt_boxes
 
 Main Processing Function for PaddleOCR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run ``paddleOCR`` function in different operations, either a webcam or a
 video file. See the list of procedures below:
@@ -470,12 +471,12 @@ video file. See the list of procedures below:
 
     # Download font and a character dictionary for printing OCR results.
     font_path = utils.download_file(
-        url='https://raw.githubusercontent.com/Halfish/lstm-ctc-ocr/master/fonts/simfang.ttf',
-        directory='fonts'
+        url="https://raw.githubusercontent.com/Halfish/lstm-ctc-ocr/master/fonts/simfang.ttf",
+        directory="fonts",
     )
     character_dictionary_path = utils.download_file(
-        url='https://raw.githubusercontent.com/WenmuZhou/PytorchOCR/master/torchocr/datasets/alphabets/ppocr_keys_v1.txt',
-        directory='fonts'
+        url="https://raw.githubusercontent.com/WenmuZhou/PytorchOCR/master/torchocr/datasets/alphabets/ppocr_keys_v1.txt",
+        directory="fonts",
     )
 
 
@@ -502,10 +503,10 @@ video file. See the list of procedures below:
         4. Visualize the results.
     
         Parameters:
-            source: The webcam number to feed the video stream with primary webcam set to "0", or the video path.  
+            source: The webcam number to feed the video stream with primary webcam set to "0", or the video path.
             flip: To be used by VideoPlayer function for flipping capture image.
             use_popup: False for showing encoded frames over this notebook, True for creating a popup window.
-            skip_first_frames: Number of frames to skip at the beginning of the video. 
+            skip_first_frames: Number of frames to skip at the beginning of the video.
         """
         # Create a video player to play with target fps.
         player = None
@@ -527,11 +528,16 @@ video file. See the list of procedures below:
                 # If the frame is larger than full HD, reduce size to improve the performance.
                 scale = 1280 / max(frame.shape)
                 if scale < 1:
-                    frame = cv2.resize(src=frame, dsize=None, fx=scale, fy=scale,
-                                       interpolation=cv2.INTER_AREA)
+                    frame = cv2.resize(
+                        src=frame,
+                        dsize=None,
+                        fx=scale,
+                        fy=scale,
+                        interpolation=cv2.INTER_AREA,
+                    )
                 # Preprocess the image for text detection.
                 test_image = image_preprocess(frame, 640)
-                    
+    
                 # Measure processing time for text detection.
                 start_time = time.time()
                 # Perform the inference step.
@@ -548,55 +554,53 @@ video file. See the list of procedures below:
                 processing_time_det = np.mean(processing_times) * 1000
     
                 # Preprocess detection results for recognition.
-                dt_boxes = processing.sorted_boxes(dt_boxes)  
+                dt_boxes = processing.sorted_boxes(dt_boxes)
                 batch_num = 6
                 img_crop_list, img_num, indices = prep_for_rec(dt_boxes, frame)
-                
+    
                 # For storing recognition results, include two parts:
-                # txts are the recognized text results, scores are the recognition confidence level. 
-                rec_res = [['', 0.0]] * img_num
-                txts = [] 
+                # txts are the recognized text results, scores are the recognition confidence level.
+                rec_res = [["", 0.0]] * img_num
+                txts = []
                 scores = []
     
                 for beg_img_no in range(0, img_num, batch_num):
-    
                     # Recognition starts from here.
-                    norm_img_batch = batch_text_box(
-                        img_crop_list, img_num, indices, beg_img_no, batch_num)
+                    norm_img_batch = batch_text_box(img_crop_list, img_num, indices, beg_img_no, batch_num)
     
-                    # Run inference for text recognition. 
+                    # Run inference for text recognition.
                     rec_results = rec_compiled_model([norm_img_batch])[rec_output_layer]
     
                     # Postprocessing recognition results.
                     postprocess_op = processing.build_post_process(processing.postprocess_params)
                     rec_result = postprocess_op(rec_results)
                     for rno in range(len(rec_result)):
-                        rec_res[indices[beg_img_no + rno]] = rec_result[rno]   
+                        rec_res[indices[beg_img_no + rno]] = rec_result[rno]
                     if rec_res:
-                        txts = [rec_res[i][0] for i in range(len(rec_res))] 
+                        txts = [rec_res[i][0] for i in range(len(rec_res))]
                         scores = [rec_res[i][1] for i in range(len(rec_res))]
-                                       
+    
                 image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
                 boxes = dt_boxes
                 # Draw text recognition results beside the image.
-                draw_img = processing.draw_ocr_box_txt(
-                    image,
-                    boxes,
-                    txts,
-                    scores,
-                    drop_score=0.5,
-                    font_path=str(font_path)
-                )
+                draw_img = processing.draw_ocr_box_txt(image, boxes, txts, scores, drop_score=0.5, font_path=str(font_path))
     
                 # Visualize the PaddleOCR results.
                 f_height, f_width = draw_img.shape[:2]
                 fps = 1000 / processing_time_det
-                cv2.putText(img=draw_img, text=f"Inference time: {processing_time_det:.1f}ms ({fps:.1f} FPS)", 
-                            org=(20, 40),fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=f_width / 1000,
-                            color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
-                
+                cv2.putText(
+                    img=draw_img,
+                    text=f"Inference time: {processing_time_det:.1f}ms ({fps:.1f} FPS)",
+                    org=(20, 40),
+                    fontFace=cv2.FONT_HERSHEY_COMPLEX,
+                    fontScale=f_width / 1000,
+                    color=(0, 0, 255),
+                    thickness=1,
+                    lineType=cv2.LINE_AA,
+                )
+    
                 # Use this workaround if there is flickering.
-                if use_popup: 
+                if use_popup:
                     draw_img = cv2.cvtColor(draw_img, cv2.COLOR_RGB2BGR)
                     cv2.imshow(winname=title, mat=draw_img)
                     key = cv2.waitKey(1)
@@ -606,14 +610,13 @@ video file. See the list of procedures below:
                 else:
                     # Encode numpy array to jpg.
                     draw_img = cv2.cvtColor(draw_img, cv2.COLOR_RGB2BGR)
-                    _, encoded_img = cv2.imencode(ext=".jpg", img=draw_img,
-                                                  params=[cv2.IMWRITE_JPEG_QUALITY, 100])
+                    _, encoded_img = cv2.imencode(ext=".jpg", img=draw_img, params=[cv2.IMWRITE_JPEG_QUALITY, 100])
                     # Create an IPython image.
                     i = display.Image(data=encoded_img)
                     # Display the image in this notebook.
                     display.clear_output(wait=True)
                     display.display(i)
-                
+    
         # ctrl-c
         except KeyboardInterrupt:
             print("Interrupted")
@@ -630,7 +633,7 @@ video file. See the list of procedures below:
 Run Live PaddleOCR with OpenVINO
 --------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use a webcam as the video input. By default, the primary webcam is set
 with ``source=0``. If you have multiple webcams, each one will be
@@ -656,7 +659,7 @@ Run live PaddleOCR:
     cam_id = 0
     video_file = "https://raw.githubusercontent.com/yoyowz/classification/master/images/test.mp4"
     
-    source = cam_id if USE_WEBCAM else video_file 
+    source = cam_id if USE_WEBCAM else video_file
     
     run_paddle_ocr(source, flip=False, use_popup=False)
 

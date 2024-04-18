@@ -17,37 +17,37 @@ Additionally, you can also upload a video file.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Preparation <#preparation>`__
+-  `Preparation <#Preparation>`__
 
-   -  `Install requirements <#install-requirements>`__
-   -  `Imports <#imports>`__
+   -  `Install requirements <#Install-requirements>`__
+   -  `Imports <#Imports>`__
 
--  `The Model <#the-model>`__
+-  `The Model <#The-Model>`__
 
-   -  `Download the Model <#download-the-model>`__
-   -  `Convert the Model <#convert-the-model>`__
-   -  `Load the Model <#load-the-model>`__
+   -  `Download the Model <#Download-the-Model>`__
+   -  `Convert the Model <#Convert-the-Model>`__
+   -  `Load the Model <#Load-the-Model>`__
 
--  `Processing <#processing>`__
+-  `Processing <#Processing>`__
 
-   -  `Process Results <#process-results>`__
-   -  `Main Processing Function <#main-processing-function>`__
+   -  `Process Results <#Process-Results>`__
+   -  `Main Processing Function <#Main-Processing-Function>`__
 
--  `Run <#run>`__
+-  `Run <#Run>`__
 
-   -  `Run Live Object Detection <#run-live-object-detection>`__
+   -  `Run Live Object Detection <#Run-Live-Object-Detection>`__
 
--  `References <#references>`__
+-  `References <#References>`__
 
 Preparation
 -----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -56,11 +56,13 @@ Install requirements
     %pip install -q opencv-python requests tqdm
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
 
 
 .. parsed-literal::
@@ -71,12 +73,10 @@ Install requirements
 .. parsed-literal::
 
     ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    datasets 2.18.0 requires huggingface-hub>=0.19.4, but you have huggingface-hub 0.17.3 which is incompatible.
-    diffusers 0.27.2 requires huggingface-hub>=0.20.2, but you have huggingface-hub 0.17.3 which is incompatible.
     magika 0.5.1 requires numpy<2.0,>=1.24; python_version >= "3.8" and python_version < "3.9", but you have numpy 1.23.5 which is incompatible.
-    mobileclip 0.1.0 requires torch==1.13.1, but you have torch 2.1.0+cpu which is incompatible.
-    mobileclip 0.1.0 requires torchvision==0.14.1, but you have torchvision 0.16.0+cpu which is incompatible.
-    optimum-intel 1.17.0.dev0+e79da77 requires transformers<4.40.0,>=4.36.0, but you have transformers 4.34.1 which is incompatible.
+    mobileclip 0.1.0 requires torch==1.13.1, but you have torch 2.2.2+cpu which is incompatible.
+    mobileclip 0.1.0 requires torchvision==0.14.1, but you have torchvision 0.17.2+cpu which is incompatible.
+    optimum-intel 1.17.0.dev0+aca2b6c requires transformers<4.40.0,>=4.36.0, but you have transformers 4.33.3 which is incompatible.
     
 
 .. parsed-literal::
@@ -93,14 +93,14 @@ Install requirements
 
 .. parsed-literal::
 
-    ('notebook_utils.py', <http.client.HTTPMessage at 0x7f0114f58700>)
+    21503
 
 
 
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -121,12 +121,12 @@ Imports
 The Model
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download the Model
 ~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use the ``download_file``, a function from the ``notebook_utils`` file.
 It automatically creates a directory structure and downloads the
@@ -171,7 +171,7 @@ Representation (OpenVINO IR).
 Convert the Model
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The pre-trained model is in TensorFlow format. To use it with OpenVINO,
 convert it to OpenVINO IR format, using `Model Conversion
@@ -189,11 +189,11 @@ converted, this step is skipped.
     trans_config_path = Path(ov_tf_front.__file__).parent / "ssd_v2_support.json"
     if not converted_model_path.exists():
         ov_model = mo.convert_model(
-            tf_model_path, 
-            compress_to_fp16=(precision == 'FP16'), 
+            tf_model_path,
+            compress_to_fp16=(precision == "FP16"),
             transformations_config=trans_config_path,
-            tensorflow_object_detection_api_pipeline_config=tf_model_path.parent / "pipeline.config", 
-            reverse_input_channels=True
+            tensorflow_object_detection_api_pipeline_config=tf_model_path.parent / "pipeline.config",
+            reverse_input_channels=True,
         )
         ov.save_model(ov_model, converted_model_path)
         del ov_model
@@ -207,7 +207,7 @@ converted, this step is skipped.
 Load the Model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Only a few lines of code are required to run the model. First,
 initialize OpenVINO Runtime. Then, read the network architecture and
@@ -226,8 +226,8 @@ best performance. For that purpose, just use ``AUTO``.
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -277,12 +277,12 @@ output.
 Processing
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Process Results
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, list all available classes and create colors for them. Then, in
 the post-process stage, transform boxes with normalized coordinates
@@ -296,18 +296,98 @@ threshold (0.5). Finally, draw boxes and labels inside them.
 
     # https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/
     classes = [
-        "background", "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train",
-        "truck", "boat", "traffic light", "fire hydrant", "street sign", "stop sign",
-        "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant",
-        "bear", "zebra", "giraffe", "hat", "backpack", "umbrella", "shoe", "eye glasses",
-        "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite",
-        "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle",
-        "plate", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
-        "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair",
-        "couch", "potted plant", "bed", "mirror", "dining table", "window", "desk", "toilet",
-        "door", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven",
-        "toaster", "sink", "refrigerator", "blender", "book", "clock", "vase", "scissors",
-        "teddy bear", "hair drier", "toothbrush", "hair brush"
+        "background",
+        "person",
+        "bicycle",
+        "car",
+        "motorcycle",
+        "airplane",
+        "bus",
+        "train",
+        "truck",
+        "boat",
+        "traffic light",
+        "fire hydrant",
+        "street sign",
+        "stop sign",
+        "parking meter",
+        "bench",
+        "bird",
+        "cat",
+        "dog",
+        "horse",
+        "sheep",
+        "cow",
+        "elephant",
+        "bear",
+        "zebra",
+        "giraffe",
+        "hat",
+        "backpack",
+        "umbrella",
+        "shoe",
+        "eye glasses",
+        "handbag",
+        "tie",
+        "suitcase",
+        "frisbee",
+        "skis",
+        "snowboard",
+        "sports ball",
+        "kite",
+        "baseball bat",
+        "baseball glove",
+        "skateboard",
+        "surfboard",
+        "tennis racket",
+        "bottle",
+        "plate",
+        "wine glass",
+        "cup",
+        "fork",
+        "knife",
+        "spoon",
+        "bowl",
+        "banana",
+        "apple",
+        "sandwich",
+        "orange",
+        "broccoli",
+        "carrot",
+        "hot dog",
+        "pizza",
+        "donut",
+        "cake",
+        "chair",
+        "couch",
+        "potted plant",
+        "bed",
+        "mirror",
+        "dining table",
+        "window",
+        "desk",
+        "toilet",
+        "door",
+        "tv",
+        "laptop",
+        "mouse",
+        "remote",
+        "keyboard",
+        "cell phone",
+        "microwave",
+        "oven",
+        "toaster",
+        "sink",
+        "refrigerator",
+        "blender",
+        "book",
+        "clock",
+        "vase",
+        "scissors",
+        "teddy bear",
+        "hair drier",
+        "toothbrush",
+        "hair brush",
     ]
     
     # Colors for the classes above (Rainbow Color Map).
@@ -327,18 +407,14 @@ threshold (0.5). Finally, draw boxes and labels inside them.
         scores = []
         for _, label, score, xmin, ymin, xmax, ymax in results:
             # Create a box with pixels coordinates from the box with normalized coordinates [0,1].
-            boxes.append(
-                tuple(map(int, (xmin * w, ymin * h, (xmax - xmin) * w, (ymax - ymin) * h)))
-            )
+            boxes.append(tuple(map(int, (xmin * w, ymin * h, (xmax - xmin) * w, (ymax - ymin) * h))))
             labels.append(int(label))
             scores.append(float(score))
     
         # Apply non-maximum suppression to get rid of many overlapping entities.
         # See https://paperswithcode.com/method/non-maximum-suppression
         # This algorithm returns indices of objects to keep.
-        indices = cv2.dnn.NMSBoxes(
-            bboxes=boxes, scores=scores, score_threshold=thresh, nms_threshold=0.6
-        )
+        indices = cv2.dnn.NMSBoxes(bboxes=boxes, scores=scores, score_threshold=thresh, nms_threshold=0.6)
     
         # If there are no boxes.
         if len(indices) == 0:
@@ -374,7 +450,7 @@ threshold (0.5). Finally, draw boxes and labels inside them.
 Main Processing Function
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run object detection on the specified source. Either a webcam or a video
 file.
@@ -386,16 +462,12 @@ file.
         player = None
         try:
             # Create a video player to play with target fps.
-            player = utils.VideoPlayer(
-                source=source, flip=flip, fps=30, skip_first_frames=skip_first_frames
-            )
+            player = utils.VideoPlayer(source=source, flip=flip, fps=30, skip_first_frames=skip_first_frames)
             # Start capturing.
             player.start()
             if use_popup:
                 title = "Press ESC to Exit"
-                cv2.namedWindow(
-                    winname=title, flags=cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE
-                )
+                cv2.namedWindow(winname=title, flags=cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE)
     
             processing_times = collections.deque()
             while True:
@@ -416,9 +488,7 @@ file.
                     )
     
                 # Resize the image and change dims to fit neural network input.
-                input_img = cv2.resize(
-                    src=frame, dsize=(width, height), interpolation=cv2.INTER_AREA
-                )
+                input_img = cv2.resize(src=frame, dsize=(width, height), interpolation=cv2.INTER_AREA)
                 # Create a batch of images (size = 1).
                 input_img = input_img[np.newaxis, ...]
     
@@ -463,9 +533,7 @@ file.
                         break
                 else:
                     # Encode numpy array to jpg.
-                    _, encoded_img = cv2.imencode(
-                        ext=".jpg", img=frame, params=[cv2.IMWRITE_JPEG_QUALITY, 100]
-                    )
+                    _, encoded_img = cv2.imencode(ext=".jpg", img=frame, params=[cv2.IMWRITE_JPEG_QUALITY, 100])
                     # Create an IPython image.
                     i = display.Image(data=encoded_img)
                     # Display the image in this notebook.
@@ -487,12 +555,12 @@ file.
 Run
 ---
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run Live Object Detection
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use a webcam as the video input. By default, the primary webcam is set
 with ``source=0``. If you have multiple webcams, each one will be
@@ -538,7 +606,7 @@ Run the object detection:
 References
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 1. `SSDLite
    MobileNetV2 <https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/ssdlite_mobilenet_v2>`__

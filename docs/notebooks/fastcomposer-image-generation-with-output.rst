@@ -29,19 +29,19 @@ different styles, actions, and contexts.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Install Prerequisites <#install-prerequisites>`__
+-  `Install Prerequisites <#Install-Prerequisites>`__
 -  `Convert models to OpenVINO Intermediate representation (IR)
-   format <#convert-models-to-openvino-intermediate-representation-ir-format>`__
+   format <#Convert-models-to-OpenVINO-Intermediate-representation-(IR)-format>`__
 
-   -  `Convert text_encoder <#convert-text_encoder>`__
-   -  `The Object Transform <#the-object-transform>`__
-   -  `The Image Encoder <#the-image-encoder>`__
-   -  `Postfuse module <#postfuse-module>`__
-   -  `Convert Unet <#convert-unet>`__
+   -  `Convert text_encoder <#Convert-text_encoder>`__
+   -  `The Object Transform <#The-Object-Transform>`__
+   -  `The Image Encoder <#The-Image-Encoder>`__
+   -  `Postfuse module <#Postfuse-module>`__
+   -  `Convert Unet <#Convert-Unet>`__
 
--  `Rebuild pipeline <#rebuild-pipeline>`__
--  `Inference <#inference>`__
--  `Run Gradio <#run-gradio>`__
+-  `Rebuild pipeline <#Rebuild-pipeline>`__
+-  `Inference <#Inference>`__
+-  `Run Gradio <#Run-Gradio>`__
 
 .. container:: alert alert-block alert-warning
 
@@ -52,13 +52,13 @@ Table of contents:
 Install Prerequisites
 ---------------------
 
-Install required packages.
+`back to top ⬆️ <#Table-of-contents:>`__ Install required packages.
 
 .. code:: ipython3
 
     %pip install -q --upgrade pip
     %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu torch torchvision
-    %pip install -q transformers  huggingface-hub accelerate "diffusers>=0.16.1" gradio
+    %pip install -q transformers  huggingface-hub accelerate "diffusers>=0.16.1" "gradio>=4.19"
     %pip install -q "openvino>=2023.1.0"
 
 
@@ -96,12 +96,12 @@ Download pretrained model.
     from huggingface_hub import hf_hub_download
     
     
-    model_path = hf_hub_download(repo_id='mit-han-lab/fastcomposer', filename='pytorch_model.bin')
+    model_path = hf_hub_download(repo_id="mit-han-lab/fastcomposer", filename="pytorch_model.bin")
 
 Convert models to OpenVINO Intermediate representation (IR) format
 ------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Define a configuration and make instance of ``FastComposerModel``.
 
@@ -116,7 +116,7 @@ Define a configuration and make instance of ``FastComposerModel``.
     @dataclass()
     class Config:
         finetuned_model_path = str(model_path)
-        image_encoder_name_or_path = 'openai/clip-vit-large-patch14'
+        image_encoder_name_or_path = "openai/clip-vit-large-patch14"
         localization_layers = 5
         mask_loss = False
         mask_loss_prob = 0.5
@@ -124,7 +124,7 @@ Define a configuration and make instance of ``FastComposerModel``.
         object_localization = False
         object_localization_weight = 0.01
         object_resolution = 256
-        pretrained_model_name_or_path = 'runwayml/stable-diffusion-v1-5'
+        pretrained_model_name_or_path = "runwayml/stable-diffusion-v1-5"
         revision = None
     
     
@@ -173,7 +173,7 @@ So, convert the models into OpenVINO IR format.
 Convert text_encoder
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model components are PyTorch modules, that can be converted with
 ``ov.convert_model`` function directly. We also use ``ov.save_model``
@@ -193,7 +193,7 @@ function.
             with torch.no_grad():
                 converted_model = ov.convert_model(model, example_input=example_input)
             ov.save_model(converted_model, xml_path)
-            
+    
             # cleanup memory
             torch._C._jit_clear_class_registry()
             torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
@@ -210,7 +210,7 @@ padded to the maximum length accepted by the model.
 
 .. code:: ipython3
 
-    text_encoder_ir_xml_path = Path('models/text_encoder_ir.xml')
+    text_encoder_ir_xml_path = Path("models/text_encoder_ir.xml")
     example_input = torch.zeros((1, 77), dtype=torch.int64)
     
     model.text_encoder.eval()
@@ -239,7 +239,7 @@ padded to the maximum length accepted by the model.
 The Object Transform
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 It pads an incoming user image to square and resize it. An input is a
 tensor of size [3, height, width].
@@ -268,7 +268,7 @@ tensor of size [3, height, width].
         )
     )
     
-    object_transforms_ir_xml_path = Path('models/object_transforms_ir.xml')
+    object_transforms_ir_xml_path = Path("models/object_transforms_ir.xml")
     example_input = torch.zeros([3, 1500, 1453], dtype=torch.uint8)
     
     object_transforms.eval()
@@ -289,7 +289,7 @@ tensor of size [3, height, width].
 The Image Encoder
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The image encoder is a CLIP (Contrastive Language-Image Pretraining)
 Image Encoder. It takes a transformed image from the previous step as
@@ -297,7 +297,7 @@ input and transforms it into a high-dimensional vector or embeddings.
 
 .. code:: ipython3
 
-    image_encoder_ir_xml_path = Path('models/image_encoder_ir.xml')
+    image_encoder_ir_xml_path = Path("models/image_encoder_ir.xml")
     example_input = torch.zeros((1, 2, 3, 256, 256), dtype=torch.float32)
     
     model.image_encoder.eval()
@@ -316,7 +316,7 @@ input and transforms it into a high-dimensional vector or embeddings.
 Postfuse module
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 On this step it is employed a multilayer perceptron (MLP) to augment the
 text embeddings with visual features extracted from the reference
@@ -326,13 +326,13 @@ MLP.
 
 .. code:: ipython3
 
-    postfuse_module_ir_xml_path = Path('models/postfuse_module_ir.xml')
+    postfuse_module_ir_xml_path = Path("models/postfuse_module_ir.xml")
     
     example_input = [
         torch.zeros((1, 77, 768), dtype=torch.float32),
         torch.zeros((1, 2, 1, 768), dtype=torch.float32),
         torch.zeros((1, 77), dtype=torch.bool),
-        torch.zeros((1,), dtype=torch.int64)
+        torch.zeros((1,), dtype=torch.int64),
     ]
     
     model.postfuse_module.eval()
@@ -344,19 +344,19 @@ MLP.
 Convert Unet
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 U-Net model gradually denoises latent image representation guided by
 text encoder hidden state.
 
 .. code:: ipython3
 
-    unet_ir_xml_path = Path('models/unet_ir.xml')
+    unet_ir_xml_path = Path("models/unet_ir.xml")
     
     example_input = [
         torch.zeros((8, 4, 64, 64), dtype=torch.float32),
         torch.zeros((), dtype=torch.int64),
-        torch.zeros((8, 77, 768), dtype=torch.float32)
+        torch.zeros((8, 77, 768), dtype=torch.float32),
     ]
     model.unet.eval()
     convert(model.unet, unet_ir_xml_path, example_input)
@@ -397,7 +397,7 @@ text encoder hidden state.
 Rebuild pipeline
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Also, it needs to modify some internal FastComposer entities, to use
 OpenVINO models. First of all, how to get results. For example, to
@@ -421,7 +421,6 @@ convert outputs from numpy to torch types.
         library implements for all the pipelines (such as downloading or saving, running on a particular device, etc.)
         """
     
-    
         @torch.no_grad()
         def _tokenize_and_mask_noun_phrases_ends(self, caption):
             input_ids = self.special_tokenizer.encode(caption)
@@ -441,23 +440,25 @@ convert outputs from numpy to torch types.
             if len(clean_input_ids) > max_len:
                 clean_input_ids = clean_input_ids[:max_len]
             else:
-                clean_input_ids = clean_input_ids + [self.tokenizer.pad_token_id] * (
-                    max_len - len(clean_input_ids)
-                )
+                clean_input_ids = clean_input_ids + [self.tokenizer.pad_token_id] * (max_len - len(clean_input_ids))
     
             if len(noun_phrase_end_mask) > max_len:
                 noun_phrase_end_mask = noun_phrase_end_mask[:max_len]
             else:
-                noun_phrase_end_mask = noun_phrase_end_mask + [False] * (
-                    max_len - len(noun_phrase_end_mask)
-                )
+                noun_phrase_end_mask = noun_phrase_end_mask + [False] * (max_len - len(noun_phrase_end_mask))
     
             clean_input_ids = torch.tensor(clean_input_ids, dtype=torch.long)
             noun_phrase_end_mask = torch.tensor(noun_phrase_end_mask, dtype=torch.bool)
             return clean_input_ids.unsqueeze(0), noun_phrase_end_mask.unsqueeze(0)
     
         @torch.no_grad()
-        def _encode_augmented_prompt(self, prompt: str, reference_images: List[Image.Image], device: torch.device, weight_dtype: torch.dtype):
+        def _encode_augmented_prompt(
+            self,
+            prompt: str,
+            reference_images: List[Image.Image],
+            device: torch.device,
+            weight_dtype: torch.dtype,
+        ):
             # TODO: check this
             # encode reference images
             object_pixel_values = []
@@ -478,12 +479,7 @@ convert outputs from numpy to torch types.
             num_objects = image_token_mask.sum(dim=1)
     
             text_embeds = torch.from_numpy(self.text_encoder(input_ids)[0])
-            augmented_prompt_embeds = self.postfuse_module([
-                text_embeds,
-                object_embeds,
-                image_token_mask,
-                num_objects
-            ])[0]
+            augmented_prompt_embeds = self.postfuse_module([text_embeds, object_embeds, image_token_mask, num_objects])[0]
             return torch.from_numpy(augmented_prompt_embeds)
     
         def _encode_prompt(
@@ -492,7 +488,7 @@ convert outputs from numpy to torch types.
             device,
             num_images_per_prompt,
             do_classifier_free_guidance,
-            negative_prompt=None
+            negative_prompt=None,
         ):
             r"""
             Encodes the prompt into text encoder hidden states.
@@ -530,12 +526,8 @@ convert outputs from numpy to torch types.
             text_input_ids = text_inputs.input_ids
             untruncated_ids = self.tokenizer(prompt, padding="longest", return_tensors="pt").input_ids
     
-            if untruncated_ids.shape[-1] >= text_input_ids.shape[-1] and not torch.equal(
-                text_input_ids, untruncated_ids
-            ):
-                removed_text = self.tokenizer.batch_decode(
-                    untruncated_ids[:, self.tokenizer.model_max_length - 1 : -1]
-                )
+            if untruncated_ids.shape[-1] >= text_input_ids.shape[-1] and not torch.equal(text_input_ids, untruncated_ids):
+                removed_text = self.tokenizer.batch_decode(untruncated_ids[:, self.tokenizer.model_max_length - 1 : -1])
                 print(
                     "The following part of your input was truncated because CLIP can only handle sequences up to"
                     f" {self.tokenizer.model_max_length} tokens: {removed_text}"
@@ -555,10 +547,7 @@ convert outputs from numpy to torch types.
                 if negative_prompt is None:
                     uncond_tokens = [""] * batch_size
                 elif type(prompt) is not type(negative_prompt):
-                    raise TypeError(
-                        f"`negative_prompt` should be the same type to `prompt`, but got {type(negative_prompt)} !="
-                        f" {type(prompt)}."
-                    )
+                    raise TypeError(f"`negative_prompt` should be the same type to `prompt`, but got {type(negative_prompt)} !=" f" {type(prompt)}.")
                 elif isinstance(negative_prompt, str):
                     uncond_tokens = [negative_prompt]
                 elif batch_size != len(negative_prompt):
@@ -602,7 +591,6 @@ convert outputs from numpy to torch types.
     
             return prompt_embeds
     
-    
         @torch.no_grad()
         def __call__(
             self,
@@ -625,7 +613,7 @@ convert outputs from numpy to torch types.
             cross_attention_kwargs: Optional[Dict[str, Any]] = None,
             alpha_: float = 0.7,
             reference_subject_images: List[Image.Image] = None,
-            augmented_prompt_embeds: Optional[torch.FloatTensor] = None
+            augmented_prompt_embeds: Optional[torch.FloatTensor] = None,
         ):
             r"""
             Function invoked when calling the pipeline for generation.
@@ -719,8 +707,9 @@ convert outputs from numpy to torch types.
                 negative_prompt_embeds,
             )
     
-            assert (prompt is not None and reference_subject_images is not None) or (prompt_embeds is not None and augmented_prompt_embeds is not None),  \
-                "Prompt and reference subject images or prompt_embeds and augmented_prompt_embeds must be provided."
+            assert (prompt is not None and reference_subject_images is not None) or (
+                prompt_embeds is not None and augmented_prompt_embeds is not None
+            ), "Prompt and reference subject images or prompt_embeds and augmented_prompt_embeds must be provided."
     
             # 2. Define call parameters
             if prompt is not None and isinstance(prompt, str):
@@ -779,56 +768,44 @@ convert outputs from numpy to torch types.
             (
                 null_prompt_embeds,
                 text_prompt_embeds,
-                augmented_prompt_embeds
+                augmented_prompt_embeds,
             ) = prompt_embeds.chunk(3)
     
             # 7. Denoising loop
             num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
             with self.progress_bar(total=num_inference_steps) as progress_bar:
                 for i, t in enumerate(timesteps):
-                    latent_model_input = (
-                        torch.cat([latents] * 2) if do_classifier_free_guidance else latents
-                    )
+                    latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
                     latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
     
                     if i <= start_subject_conditioning_step:
-                        current_prompt_embeds = torch.cat(
-                            [null_prompt_embeds, text_prompt_embeds], dim=0
-                        )
+                        current_prompt_embeds = torch.cat([null_prompt_embeds, text_prompt_embeds], dim=0)
                     else:
-                        current_prompt_embeds = torch.cat(
-                            [null_prompt_embeds, augmented_prompt_embeds], dim=0
-                        )
+                        current_prompt_embeds = torch.cat([null_prompt_embeds, augmented_prompt_embeds], dim=0)
     
                     # predict the noise residual
-                    noise_pred = self.unet([
-                        latent_model_input,
-                        t,
-                        current_prompt_embeds,
-                        # cross_attention_kwargs
-                    ],
+                    noise_pred = self.unet(
+                        [
+                            latent_model_input,
+                            t,
+                            current_prompt_embeds,
+                            # cross_attention_kwargs
+                        ],
                     )[0]
                     noise_pred = torch.from_numpy(noise_pred)
-    
     
                     # perform guidance
                     if do_classifier_free_guidance:
                         noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
-                        noise_pred = noise_pred_uncond + guidance_scale * (
-                            noise_pred_text - noise_pred_uncond
-                        )
+                        noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
                     else:
                         assert 0, "Not Implemented"
     
                     # compute the previous noisy sample x_t -> x_t-1
-                    latents = self.scheduler.step(
-                        noise_pred, t, latents, **extra_step_kwargs
-                    ).prev_sample
+                    latents = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs).prev_sample
     
                     # call the callback, if provided
-                    if i == len(timesteps) - 1 or (
-                        (i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0
-                    ):
+                    if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
                         progress_bar.update()
                         if callback is not None and i % callback_steps == 0:
                             callback(i, t, latents)
@@ -841,9 +818,7 @@ convert outputs from numpy to torch types.
                 image = self.decode_latents(latents)
     
                 # 9. Run safety checker
-                image, has_nsfw_concept = self.run_safety_checker(
-                    image, device, prompt_embeds.dtype
-                )
+                image, has_nsfw_concept = self.run_safety_checker(image, device, prompt_embeds.dtype)
     
                 # 10. Convert to PIL
                 image = self.numpy_to_pil(image)
@@ -852,9 +827,7 @@ convert outputs from numpy to torch types.
                 image = self.decode_latents(latents)
     
                 # 9. Run safety checker
-                image, has_nsfw_concept = self.run_safety_checker(
-                    image, device, prompt_embeds.dtype
-                )
+                image, has_nsfw_concept = self.run_safety_checker(image, device, prompt_embeds.dtype)
     
             # Offload last model to CPU
             if hasattr(self, "final_offload_hook") and self.final_offload_hook is not None:
@@ -863,9 +836,7 @@ convert outputs from numpy to torch types.
             if not return_dict:
                 return (image, has_nsfw_concept)
     
-            return StableDiffusionPipelineOutput(
-                images=image, nsfw_content_detected=has_nsfw_concept
-            )
+            return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept)
 
 And replace all model in the pipeline by converted models.
 
@@ -876,13 +847,13 @@ And replace all model in the pipeline by converted models.
     
     
     def create_pipeline(
-            args,
-            *,
-            text_encoder,
-            image_encoder,
-            unet,
-            object_transforms,
-            postfuse_module,
+        args,
+        *,
+        text_encoder,
+        image_encoder,
+        unet,
+        object_transforms,
+        postfuse_module,
     ):
         weight_dtype = torch.float32
     
@@ -894,9 +865,7 @@ And replace all model in the pipeline by converted models.
         tokenizer.add_tokens(["img"], special_tokens=True)
         image_token_id = tokenizer.convert_tokens_to_ids("img")
     
-        pipe = StableDiffusionFastCompposerPipeline.from_pretrained(
-            args.pretrained_model_name_or_path, torch_dtype=weight_dtype
-        )
+        pipe = StableDiffusionFastCompposerPipeline.from_pretrained(args.pretrained_model_name_or_path, torch_dtype=weight_dtype)
     
         pipe.object_transforms = object_transforms
         pipe.unet = unet
@@ -937,10 +906,7 @@ And replace all model in the pipeline by converted models.
             if len(image) == 0:
                 return [], "You need to upload at least one image."
     
-            num_subject_in_text = (
-                np.array(self.model.special_tokenizer.encode(prompt))
-                == self.model.image_token_id
-            ).sum()
+            num_subject_in_text = (np.array(self.model.special_tokenizer.encode(prompt)) == self.model.image_token_id).sum()
             if num_subject_in_text != len(image):
                 return (
                     [],
@@ -968,7 +934,6 @@ And replace all model in the pipeline by converted models.
                 "run successfully",
             )
 
-
 .. code:: ipython3
 
     import ipywidgets as widgets
@@ -976,8 +941,8 @@ And replace all model in the pipeline by converted models.
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -1027,7 +992,7 @@ And replace all model in the pipeline by converted models.
 Inference
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 And now it is possible to make inference. You can provide 1 or 2 images
 (``image1`` and ``image2``). If you want to provide only one image pass
@@ -1037,10 +1002,10 @@ that correlates with input images.
 
 .. code:: ipython3
 
-    image1 = Image.open('fastcomposer/data/newton_einstein/einstein/0.png')
-    image2 = Image.open('fastcomposer/data/newton_einstein/newton/0.png')
-    prompt = 'A man img and a man img sitting in a park'
-    negative_prompt = '((((ugly)))), (((duplicate))), ((morbid)), ((mutilated)), [out of frame], extra fingers, mutated hands, ((poorly drawn hands)), ((poorly drawn face)), (((mutation))), (((deformed))), ((ugly)), blurry, ((bad anatomy)), (((bad proportions))), ((extra limbs)), cloned face, (((disfigured))). out of frame, ugly, extra limbs, (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), ((missing legs)), (((extra arms))), (((extra legs))), mutated hands, (fused fingers), (too many fingers), (((long neck)))'
+    image1 = Image.open("fastcomposer/data/newton_einstein/einstein/0.png")
+    image2 = Image.open("fastcomposer/data/newton_einstein/newton/0.png")
+    prompt = "A man img and a man img sitting in a park"
+    negative_prompt = "((((ugly)))), (((duplicate))), ((morbid)), ((mutilated)), [out of frame], extra fingers, mutated hands, ((poorly drawn hands)), ((poorly drawn face)), (((mutation))), (((deformed))), ((ugly)), blurry, ((bad anatomy)), (((bad proportions))), ((extra limbs)), cloned face, (((disfigured))). out of frame, ugly, extra limbs, (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), ((missing legs)), (((extra arms))), (((extra legs))), mutated hands, (fused fingers), (too many fingers), (((long neck)))"
     alpha_ = 0.7
     num_images = 1  # each extra image requires ~11GB of free memory
     num_steps = 50
@@ -1057,7 +1022,7 @@ that correlates with input images.
         guidance_scale,
         alpha_,
         num_steps,
-        num_images
+        num_images,
     )
 
 
@@ -1093,7 +1058,7 @@ to display them.
 Run Gradio
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Also, it is possible to run with Gradio
 
@@ -1139,7 +1104,7 @@ Also, it is possible to run with Gradio
                     negative_prompt = gr.Text(
                         value="((((ugly)))), (((duplicate))), ((morbid)), ((mutilated)), [out of frame], extra fingers, mutated hands, ((poorly drawn hands)), ((poorly drawn face)), (((mutation))), (((deformed))), ((ugly)), blurry, ((bad anatomy)), (((bad proportions))), ((extra limbs)), cloned face, (((disfigured))). out of frame, ugly, extra limbs, (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), ((missing legs)), (((extra arms))), (((extra legs))), mutated hands, (fused fingers), (too many fingers), (((long neck)))",
                         label="Negative Prompt",
-                        info='Features that you want to avoid.',
+                        info="Features that you want to avoid.",
                     )
                     alpha_ = gr.Slider(
                         label="alpha",
@@ -1196,9 +1161,7 @@ Also, it is possible to run with Gradio
                 num_steps,
                 num_images,
             ]
-            run_button.click(
-                fn=wrapped_model.inference, inputs=inputs, outputs=[result, error_message]
-            )
+            run_button.click(fn=wrapped_model.inference, inputs=inputs, outputs=[result, error_message])
         return demo
     
     

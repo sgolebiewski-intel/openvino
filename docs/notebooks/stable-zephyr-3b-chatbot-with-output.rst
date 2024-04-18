@@ -41,21 +41,21 @@ opportunity for processing model cache state.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Convert model to OpenVINO Intermediate Representation (IR) and
    compress model weights to INT4 using
-   NNCF <#convert-model-to-openvino-intermediate-representation-ir-and-compress-model-weights-to-int4-using-nncf>`__
+   NNCF <#Convert-model-to-OpenVINO-Intermediate-Representation-(IR)-and-compress-model-weights-to-INT4-using-NNCF>`__
 -  `Apply stateful transformation for automatic handling model
-   state <#apply-stateful-transformation-for-automatic-handling-model-state>`__
--  `Select device for inference <#select-device-for-inference>`__
--  `Estimate model performance <#estimate-model-performance>`__
--  `Using model with Optimum Intel <#using-model-with-optimum-intel>`__
--  `Interactive chatbot demo <#interactive-chatbot-demo>`__
+   state <#Apply-stateful-transformation-for-automatic-handling-model-state>`__
+-  `Select device for inference <#Select-device-for-inference>`__
+-  `Estimate model performance <#Estimate-model-performance>`__
+-  `Using model with Optimum Intel <#Using-model-with-Optimum-Intel>`__
+-  `Interactive chatbot demo <#Interactive-chatbot-demo>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For starting work, we should install required packages first
 
@@ -78,12 +78,12 @@ For starting work, we should install required packages first
     %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu -r ./openvino.genai/llm_bench/python/requirements.txt
     %pip uninstall -q -y openvino openvino-dev openvino-nightly
     %pip install -q openvino-nightly
-    %pip install -q gradio
+    %pip install -q "gradio>=4.19"
 
 Convert model to OpenVINO Intermediate Representation (IR) and compress model weights to INT4 using NNCF
 --------------------------------------------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 llm_bench provides conversion script for converting LLMS into OpenVINO
 IR format compatible with Optimum-Intel. It also allows to compress
@@ -100,7 +100,7 @@ performance even more but introduces a minor drop in prediction quality.
 Apply stateful transformation for automatic handling model state
 ----------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Stable Zephyr is a decoder-only transformer model and generates text
 token by token in an autoregressive fashion. Since the output side is
@@ -139,7 +139,7 @@ that
 
 .. code:: ipython3
 
-    stateful_model_path = Path("stable-zephyr-3b-stateful/pytorch/dldt/compressed_weights/OV_FP16-4BIT_DEFAULT") 
+    stateful_model_path = Path("stable-zephyr-3b-stateful/pytorch/dldt/compressed_weights/OV_FP16-4BIT_DEFAULT")
     
     convert_script = genai_llm_bench / "convert.py"
     
@@ -189,7 +189,7 @@ that
 Select device for inference
 ---------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -219,7 +219,7 @@ Select device for inference
 Estimate model performance
 --------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 openvino.genai / llm_bench / python / benchmark.py script allow to
 estimate text generation pipeline inference on specific input prompt
@@ -284,11 +284,11 @@ with given number of maximum generated tokens.
 Compare with model without state
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    stateless_model_path = Path("stable-zephyr-3b-stateless/pytorch/dldt/compressed_weights/OV_FP16-4BIT_DEFAULT") 
+    stateless_model_path = Path("stable-zephyr-3b-stateless/pytorch/dldt/compressed_weights/OV_FP16-4BIT_DEFAULT")
     
     if not (stateless_model_path / "openvino_model.xml").exists():
         !python $convert_script --model_id stabilityai/stable-zephyr-3b --precision FP16 --compress_weights 4BIT_DEFAULT --output stable-zephyr-3b-stateless --force_convert --disable-stateful
@@ -409,7 +409,7 @@ Compare with model without state
 Using model with Optimum Intel
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Running model with Optimum-Intel API required following steps: 1.
 register normalized config for model 2. create instance of
@@ -425,12 +425,16 @@ sequence of generated token ids that should be decoded using a tokenizer
     from optimum.intel.openvino import OVModelForCausalLM
     from transformers import AutoConfig
     
-    ov_model = OVModelForCausalLM.from_pretrained(stateful_model_path, config=AutoConfig.from_pretrained(stateful_model_path, trust_remote_code=True), device=device.value)
+    ov_model = OVModelForCausalLM.from_pretrained(
+        stateful_model_path,
+        config=AutoConfig.from_pretrained(stateful_model_path, trust_remote_code=True),
+        device=device.value,
+    )
 
 Interactive chatbot demo
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 | Now, our model ready to use. Let’s see it in action. We will use
   Gradio interface for interaction with model. Put text message into
@@ -513,7 +517,7 @@ You can modify them in ``Advanced generation options`` section.
     model_configuration = {
         "start_message": f"<|system|>\n {DEFAULT_SYSTEM_PROMPT }<|endoftext|>",
         "history_template": "<|user|>\n{user}<|endoftext|><|assistant|>\n{assistant}<|endoftext|>",
-        "current_message_template": '<|user|>\n{user}<|endoftext|><|assistant|>\n{assistant}',
+        "current_message_template": "<|user|>\n{user}<|endoftext|><|assistant|>\n{assistant}",
     }
     history_template = model_configuration["history_template"]
     current_message_template = model_configuration["current_message_template"]
@@ -528,9 +532,7 @@ You can modify them in ``Advanced generation options`` section.
         ["Can you explain to me briefly what is Python programming language?"],
         ["Explain the plot of Cinderella in a sentence."],
         ["What are some common mistakes to avoid when writing code?"],
-        [
-            "Write a 100-word blog post on “Benefits of Artificial Intelligence and OpenVINO“"
-        ],
+        ["Write a 100-word blog post on “Benefits of Artificial Intelligence and OpenVINO“"],
     ]
     
     max_new_tokens = 256
@@ -540,9 +542,7 @@ You can modify them in ``Advanced generation options`` section.
         def __init__(self, token_ids):
             self.token_ids = token_ids
     
-        def __call__(
-            self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
-        ) -> bool:
+        def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
             for stop_id in self.token_ids:
                 if input_ids[0][-1] == stop_id:
                     return True
@@ -571,9 +571,8 @@ You can modify them in ``Advanced generation options`` section.
         return partial_text
     
     
-    text_processor = model_configuration.get(
-        "partial_text_processor", default_partial_text_processor
-    )
+    text_processor = model_configuration.get("partial_text_processor", default_partial_text_processor)
+    
     
     def convert_history_to_text(history: List[Tuple[str, str]]):
         """
@@ -583,14 +582,7 @@ You can modify them in ``Advanced generation options`` section.
         Returns:
           history in text format
         """
-        text = start_message + "".join(
-            [
-                "".join(
-                    [history_template.format(num=round, user=item[0], assistant=item[1])]
-                )
-                for round, item in enumerate(history[:-1])
-            ]
-        )
+        text = start_message + "".join(["".join([history_template.format(num=round, user=item[0], assistant=item[1])]) for round, item in enumerate(history[:-1])])
         text += "".join(
             [
                 "".join(
@@ -645,9 +637,7 @@ You can modify them in ``Advanced generation options`` section.
             history = [history[-1]]
             messages = convert_history_to_text(history)
             input_ids = tok(messages, return_tensors="pt", **tokenizer_kwargs).input_ids
-        streamer = TextIteratorStreamer(
-            tok, timeout=30.0, skip_prompt=True, skip_special_tokens=True
-        )
+        streamer = TextIteratorStreamer(tok, timeout=30.0, skip_prompt=True, skip_special_tokens=True)
         generate_kwargs = dict(
             input_ids=input_ids,
             max_new_tokens=max_new_tokens,
@@ -759,9 +749,7 @@ You can modify them in ``Advanced generation options`` section.
                                 interactive=True,
                                 info="Penalize repetition — 1.0 to disable.",
                             )
-        gr.Examples(
-            examples, inputs=msg, label="Click on any example and press the 'Submit' button"
-        )
+        gr.Examples(examples, inputs=msg, label="Click on any example and press the 'Submit' button")
     
         submit_event = msg.submit(
             fn=user,

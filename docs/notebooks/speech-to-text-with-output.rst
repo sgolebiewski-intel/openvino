@@ -14,41 +14,41 @@ Zoo <https://github.com/openvinotoolkit/open_model_zoo/>`__.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Settings <#settings>`__
+-  `Imports <#Imports>`__
+-  `Settings <#Settings>`__
 -  `Download and Convert Public
-   Model <#download-and-convert-public-model>`__
+   Model <#Download-and-Convert-Public-Model>`__
 
-   -  `Download Model <#download-model>`__
+   -  `Download Model <#Download-Model>`__
 
--  `Audio Processing <#audio-processing>`__
+-  `Audio Processing <#Audio-Processing>`__
 
-   -  `Define constants <#define-constants>`__
-   -  `Available Audio Formats <#available-audio-formats>`__
-   -  `Load Audio File <#load-audio-file>`__
-   -  `Visualize Audio File <#visualize-audio-file>`__
-   -  `Change Type of Data <#change-type-of-data>`__
-   -  `Convert Audio to Mel Spectrum <#convert-audio-to-mel-spectrum>`__
+   -  `Define constants <#Define-constants>`__
+   -  `Available Audio Formats <#Available-Audio-Formats>`__
+   -  `Load Audio File <#Load-Audio-File>`__
+   -  `Visualize Audio File <#Visualize-Audio-File>`__
+   -  `Change Type of Data <#Change-Type-of-Data>`__
+   -  `Convert Audio to Mel Spectrum <#Convert-Audio-to-Mel-Spectrum>`__
    -  `Run Conversion from Audio to Mel
-      Format <#run-conversion-from-audio-to-mel-format>`__
-   -  `Visualize Mel Spectrogram <#visualize-mel-spectrogram>`__
-   -  `Adjust Mel scale to Input <#adjust-mel-scale-to-input>`__
+      Format <#Run-Conversion-from-Audio-to-Mel-Format>`__
+   -  `Visualize Mel Spectrogram <#Visualize-Mel-Spectrogram>`__
+   -  `Adjust Mel scale to Input <#Adjust-Mel-scale-to-Input>`__
 
--  `Load the Model <#load-the-model>`__
+-  `Load the Model <#Load-the-Model>`__
 
-   -  `Do Inference <#do-inference>`__
-   -  `Read Output <#read-output>`__
-   -  `Implementation of Decoding <#implementation-of-decoding>`__
-   -  `Run Decoding and Print Output <#run-decoding-and-print-output>`__
+   -  `Do Inference <#Do-Inference>`__
+   -  `Read Output <#Read-Output>`__
+   -  `Implementation of Decoding <#Implementation-of-Decoding>`__
+   -  `Run Decoding and Print Output <#Run-Decoding-and-Print-Output>`__
 
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    %pip install -q "librosa>=0.8.1" "matplotlib<3.8" "openvino-dev>=2024.0.0" "numpy<1.24" "ruamel.yaml"
+    %pip install -q "librosa>=0.8.1" "scipy" "matplotlib<3.8" "openvino-dev>=2024.0.0" "numpy<1.24" "ruamel.yaml" "torch" "tqdm"
 
 .. code:: ipython3
 
@@ -64,18 +64,21 @@ Imports
     import numpy as np
     import scipy
     import openvino as ov
+    
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     from notebook_utils import download_file
 
 Settings
 --------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In this part, all variables used in the notebook are set.
 
@@ -91,7 +94,7 @@ In this part, all variables used in the notebook are set.
 Download and Convert Public Model
 ---------------------------------
 
-If it is your first run, models
+`back to top ⬆️ <#Table-of-contents:>`__ If it is your first run, models
 will be downloaded and converted here. It my take a few minutes. Use
 ``omz_downloader`` and ``omz_converter``, which are command-line tools
 from the ``openvino-dev`` package.
@@ -99,7 +102,7 @@ from the ``openvino-dev`` package.
 Download Model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ``omz_downloader`` tool automatically creates a directory structure
 and downloads the selected model. This step is skipped if the model is
@@ -110,8 +113,8 @@ Representation (OpenVINO IR).
 .. code:: ipython3
 
     # Check if a model is already downloaded (to the download directory).
-    path_to_model_weights = Path(f'{download_folder}/public/{model_name}/models')
-    downloaded_model_file = list(path_to_model_weights.glob('*.pth'))
+    path_to_model_weights = Path(f"{download_folder}/public/{model_name}/models")
+    downloaded_model_file = list(path_to_model_weights.glob("*.pth"))
     
     if not path_to_model_weights.is_dir() or len(downloaded_model_file) == 0:
         download_command = f"omz_downloader --name {model_name} --output_dir {download_folder} --precision {precision}"
@@ -121,10 +124,10 @@ Representation (OpenVINO IR).
 
 .. code:: ipython3
 
-    def convert_model(model_path:Path, converted_model_path:Path):
+    def convert_model(model_path: Path, converted_model_path: Path):
         """
         helper function for converting QuartzNet model to IR
-        The function accepts path to directory with dowloaded packages, weights and configs using OMZ downloader, 
+        The function accepts path to directory with dowloaded packages, weights and configs using OMZ downloader,
         initialize model and convert to OpenVINO model and serialize it to IR.
         Params:
           model_path: path to model modules, weights and configs downloaded via omz_downloader
@@ -134,51 +137,58 @@ Representation (OpenVINO IR).
         """
         # add model path to PYTHONPATH for access to downloaded modules
         sys.path.append(str(model_path))
-        
+    
         # import necessary classes
         from ruamel.yaml import YAML
     
         from nemo.collections.asr import JasperEncoder, JasperDecoderForCTC
         from nemo.core import NeuralModuleFactory, DeviceType
     
-        YAML = YAML(typ='safe')
+        YAML = YAML(typ="safe")
     
         # utility fornction fr replacing 1d convolutions to 2d for better efficiency
         def convert_to_2d(model):
             for name, l in model.named_children():
                 layer_type = l.__class__.__name__
-                if layer_type == 'Conv1d':
-                    new_layer = nn.Conv2d(l.in_channels, l.out_channels,
-                                          (1, l.kernel_size[0]), (1, l.stride[0]),
-                                          (0, l.padding[0]), (1, l.dilation[0]),
-                                          l.groups, False if l.bias is None else True, l.padding_mode)
+                if layer_type == "Conv1d":
+                    new_layer = nn.Conv2d(
+                        l.in_channels,
+                        l.out_channels,
+                        (1, l.kernel_size[0]),
+                        (1, l.stride[0]),
+                        (0, l.padding[0]),
+                        (1, l.dilation[0]),
+                        l.groups,
+                        False if l.bias is None else True,
+                        l.padding_mode,
+                    )
                     params = l.state_dict()
-                    params['weight'] = params['weight'].unsqueeze(2)
+                    params["weight"] = params["weight"].unsqueeze(2)
                     new_layer.load_state_dict(params)
                     setattr(model, name, new_layer)
-                elif layer_type == 'BatchNorm1d':
+                elif layer_type == "BatchNorm1d":
                     new_layer = nn.BatchNorm2d(l.num_features, l.eps)
                     new_layer.load_state_dict(l.state_dict())
                     new_layer.eval()
                     setattr(model, name, new_layer)
                 else:
                     convert_to_2d(l)
-        
+    
         # model class
         class QuartzNet(torch.nn.Module):
             def __init__(self, model_config, encoder_weights, decoder_weights):
                 super().__init__()
-                with open(model_config, 'r') as config:
+                with open(model_config, "r") as config:
                     model_args = YAML.load(config)
                 _ = NeuralModuleFactory(placement=DeviceType.CPU)
     
-                encoder_params = model_args['init_params']['encoder_params']['init_params']
+                encoder_params = model_args["init_params"]["encoder_params"]["init_params"]
                 self.encoder = JasperEncoder(**encoder_params)
-                self.encoder.load_state_dict(torch.load(encoder_weights, map_location='cpu'))
+                self.encoder.load_state_dict(torch.load(encoder_weights, map_location="cpu"))
     
-                decoder_params = model_args['init_params']['decoder_params']['init_params']
+                decoder_params = model_args["init_params"]["decoder_params"]["init_params"]
                 self.decoder = JasperDecoderForCTC(**decoder_params)
-                self.decoder.load_state_dict(torch.load(decoder_weights, map_location='cpu'))
+                self.decoder.load_state_dict(torch.load(decoder_weights, map_location="cpu"))
     
                 self.encoder._prepare_for_deployment()
                 self.decoder._prepare_for_deployment()
@@ -192,7 +202,7 @@ Representation (OpenVINO IR).
     
                 shape = i_log_probs.shape
                 return i_log_probs.reshape(shape[0], shape[1], shape[3])
-        
+    
         # path to configs and weights for creating model instane
         model_config = model_path / ".nemo_tmp/module.yaml"
         encoder_weights = model_path / ".nemo_tmp/JasperEncoder.pt"
@@ -209,8 +219,8 @@ Representation (OpenVINO IR).
 .. code:: ipython3
 
     # Check if a model is already converted (in the model directory).
-    path_to_converted_weights = Path(f'{model_folder}/public/{model_name}/{precision}/{model_name}.bin')
-    path_to_converted_model = Path(f'{model_folder}/public/{model_name}/{precision}/{model_name}.xml')
+    path_to_converted_weights = Path(f"{model_folder}/public/{model_name}/{precision}/{model_name}.bin")
+    path_to_converted_model = Path(f"{model_folder}/public/{model_name}/{precision}/{model_name}.xml")
     
     if not path_to_converted_weights.is_file():
         downloaded_model_path = Path("output/public/quartznet-15x5-en/models")
@@ -235,14 +245,14 @@ Representation (OpenVINO IR).
 Audio Processing
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now that the model is converted, load an audio file.
 
 Define constants
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, locate an audio file and define the alphabet used by the model.
 This tutorial uses the Latin alphabet beginning with a space symbol and
@@ -257,7 +267,7 @@ could be any other character.
 Available Audio Formats
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 There are multiple supported audio formats that can be used with the
 model:
@@ -270,7 +280,7 @@ model:
 Load Audio File
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load the file after checking a file extension. Pass ``sr`` (stands for a
 ``sampling rate``) as an additional parameter. The model supports files
@@ -278,10 +288,10 @@ with a ``sampling rate`` of 16 kHz.
 
 .. code:: ipython3
 
-    # Download the audio from the openvino_notebooks storage 
+    # Download the audio from the openvino_notebooks storage
     file_name = download_file(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/audio/" + audio_file_name,
-        directory=data_folder
+        directory=data_folder,
     )
     
     audio, sampling_rate = librosa.load(path=str(file_name), sr=16000)
@@ -309,7 +319,7 @@ Now, you can play your audio file.
 Visualize Audio File
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 You can visualize how your audio file presents on a wave plot and
 spectrogram.
@@ -317,12 +327,12 @@ spectrogram.
 .. code:: ipython3
 
     plt.figure()
-    librosa.display.waveshow(y=audio, sr=sampling_rate, max_points=50000, x_axis='time', offset=0.0);
+    librosa.display.waveshow(y=audio, sr=sampling_rate, max_points=50000, x_axis="time", offset=0.0)
     plt.show()
     specto_audio = librosa.stft(audio)
     specto_audio = librosa.amplitude_to_db(np.abs(specto_audio), ref=np.max)
     print(specto_audio.shape)
-    librosa.display.specshow(specto_audio, sr=sampling_rate, x_axis='time', y_axis='hz');
+    librosa.display.specshow(specto_audio, sr=sampling_rate, x_axis="time", y_axis="hz");
 
 
 
@@ -341,7 +351,7 @@ spectrogram.
 Change Type of Data
 ~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The file loaded in the previous step may contain data in ``float`` type
 with a range of values between -1 and 1. To generate a viable input,
@@ -351,13 +361,13 @@ multiply each value by the max value of ``int16`` and convert it to
 .. code:: ipython3
 
     if max(np.abs(audio)) <= 1:
-        audio = (audio * (2**15 - 1))
+        audio = audio * (2**15 - 1)
     audio = audio.astype(np.int16)
 
 Convert Audio to Mel Spectrum
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Next, convert the pre-pre-processed audio to `Mel
 Spectrum <https://medium.com/analytics-vidhya/understanding-the-mel-spectrogram-fca2afa2ce53>`__.
@@ -375,8 +385,17 @@ article <https://towardsdatascience.com/audio-deep-learning-made-simple-part-2-w
         win_length = round(sampling_rate * 0.02)
     
         # Based on the previously calculated window length, run short-time Fourier transform.
-        spec = np.abs(librosa.core.spectrum.stft(preemphased, n_fft=512, hop_length=round(sampling_rate * 0.01),
-                      win_length=win_length, center=True, window=scipy.signal.windows.hann(win_length), pad_mode='reflect'))
+        spec = np.abs(
+            librosa.core.spectrum.stft(
+                preemphased,
+                n_fft=512,
+                hop_length=round(sampling_rate * 0.01),
+                win_length=win_length,
+                center=True,
+                window=scipy.signal.windows.hann(win_length),
+                pad_mode="reflect",
+            )
+        )
     
         # Create mel filter-bank, produce transformation matrix to project current values onto Mel-frequency bins.
         mel_basis = librosa.filters.mel(sr=sampling_rate, n_fft=512, n_mels=64, fmin=0.0, fmax=8000.0, htk=False)
@@ -385,7 +404,7 @@ article <https://towardsdatascience.com/audio-deep-learning-made-simple-part-2-w
     
     def mel_to_input(mel_basis, spec, padding=16):
         # Convert to a logarithmic scale.
-        log_melspectrum = np.log(np.dot(mel_basis, np.power(spec, 2)) + 2 ** -24)
+        log_melspectrum = np.log(np.dot(mel_basis, np.power(spec, 2)) + 2**-24)
     
         # Normalize the output.
         normalized = (log_melspectrum - log_melspectrum.mean(1)[:, None]) / (log_melspectrum.std(1)[:, None] + 1e-5)
@@ -399,7 +418,7 @@ article <https://towardsdatascience.com/audio-deep-learning-made-simple-part-2-w
 Run Conversion from Audio to Mel Format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In this step, convert a current audio file into `Mel
 scale <https://en.wikipedia.org/wiki/Mel_scale>`__.
@@ -411,7 +430,7 @@ scale <https://en.wikipedia.org/wiki/Mel_scale>`__.
 Visualize Mel Spectrogram
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For more information about Mel spectrogram, refer to this
 `article <https://towardsdatascience.com/getting-to-know-the-mel-spectrogram-31bca3e2d9d0>`__.
@@ -420,10 +439,10 @@ presents filter bank for converting Hz to Mels.
 
 .. code:: ipython3
 
-    librosa.display.specshow(data=spec, sr=sampling_rate, x_axis='time', y_axis='log');
-    plt.show();
-    librosa.display.specshow(data=mel_basis, sr=sampling_rate, x_axis='linear');
-    plt.ylabel('Mel filter');
+    librosa.display.specshow(data=spec, sr=sampling_rate, x_axis="time", y_axis="log")
+    plt.show()
+    librosa.display.specshow(data=mel_basis, sr=sampling_rate, x_axis="linear")
+    plt.ylabel("Mel filter");
 
 
 
@@ -437,7 +456,7 @@ presents filter bank for converting Hz to Mels.
 Adjust Mel scale to Input
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Before reading the network, make sure that the input is ready.
 
@@ -448,7 +467,7 @@ Before reading the network, make sure that the input is ready.
 Load the Model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, you can read and load the network.
 
@@ -481,8 +500,8 @@ Select device from dropdown list
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -499,9 +518,7 @@ Select device from dropdown list
 
 .. code:: ipython3
 
-    model = core.read_model(
-        model=f"{model_folder}/public/{model_name}/{precision}/{model_name}.xml"
-    )
+    model = core.read_model(model=f"{model_folder}/public/{model_name}/{precision}/{model_name}.xml")
     model_input_layer = model.input(0)
     shape = model_input_layer.partial_shape
     shape[2] = -1
@@ -511,7 +528,7 @@ Select device from dropdown list
 Do Inference
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Everything is set up. Now, the only thing that remains is passing input
 to the previously loaded network and running inference.
@@ -523,7 +540,7 @@ to the previously loaded network and running inference.
 Read Output
 ~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 After inference, you need to reach out the output. The default output
 format for ``QuartzNet 15x5`` are per-frame probabilities (after
@@ -555,7 +572,7 @@ The last step is getting symbols from corresponding indexes in charlist.
 Implementation of Decoding
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To decode previously explained output, you need the `Connectionist
 Temporal Classification (CTC)
@@ -571,12 +588,12 @@ function. This solution will remove consecutive letters from the output.
             if previous_letter_id != letter_index != blank_id:
                 transcription.append(alphabet[letter_index])
             previous_letter_id = letter_index
-        return ''.join(transcription)
+        return "".join(transcription)
 
 Run Decoding and Print Output
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 

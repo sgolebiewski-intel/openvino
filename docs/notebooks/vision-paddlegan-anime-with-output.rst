@@ -17,46 +17,46 @@ documentation <https://github.com/PaddlePaddle/PaddleGAN/blob/develop/docs/en_US
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Preparation <#preparation>`__
+-  `Preparation <#Preparation>`__
 
-   -  `Install requirements <#install-requirements>`__
-   -  `Imports <#imports>`__
-   -  `Settings <#settings>`__
-   -  `Functions <#functions>`__
+   -  `Install requirements <#Install-requirements>`__
+   -  `Imports <#Imports>`__
+   -  `Settings <#Settings>`__
+   -  `Functions <#Functions>`__
 
--  `Inference on PaddleGAN Model <#inference-on-paddlegan-model>`__
+-  `Inference on PaddleGAN Model <#Inference-on-PaddleGAN-Model>`__
 
    -  `Show Inference Results on PaddleGAN
-      model <#show-inference-results-on-paddlegan-model>`__
+      model <#Show-Inference-Results-on-PaddleGAN-model>`__
 
 -  `Model Conversion to ONNX and OpenVINO
-   IR <#model-conversion-to-onnx-and-openvino-ir>`__
+   IR <#Model-Conversion-to-ONNX-and-OpenVINO-IR>`__
 
-   -  `Convert to ONNX <#convert-to-onnx>`__
-   -  `Convert to OpenVINO IR <#convert-to-openvino-ir>`__
+   -  `Convert to ONNX <#Convert-to-ONNX>`__
+   -  `Convert to OpenVINO IR <#Convert-to-OpenVINO-IR>`__
 
 -  `Show Inference Results on OpenVINO IR and PaddleGAN
-   Models <#show-inference-results-on-openvino-ir-and-paddlegan-models>`__
+   Models <#Show-Inference-Results-on-OpenVINO-IR-and-PaddleGAN-Models>`__
 
    -  `Create Postprocessing
-      Functions <#create-postprocessing-functions>`__
+      Functions <#Create-Postprocessing-Functions>`__
    -  `Do Inference on OpenVINO IR
-      Model <#do-inference-on-openvino-ir-model>`__
+      Model <#Do-Inference-on-OpenVINO-IR-Model>`__
 
-      -  `Select inference device <#select-inference-device>`__
+      -  `Select inference device <#Select-inference-device>`__
 
--  `Performance Comparison <#performance-comparison>`__
--  `References <#references>`__
+-  `Performance Comparison <#Performance-Comparison>`__
+-  `References <#References>`__
 
 Preparation
 -----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install requirements
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -72,7 +72,7 @@ Install requirements
     else:
         %pip install -q "matplotlib>=3.4,<3.7"
     
-    %pip install -q opencv-python scikit-learn scikit-image
+    %pip install -q opencv-python scikit-learn "scikit-image>=0.19.2"
     %pip install -q "imageio==2.9.0" "imageio-ffmpeg" "numba>=0.53.1" easydict munch natsort
 
 
@@ -144,7 +144,7 @@ Install requirements
 Imports
 ~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -152,7 +152,7 @@ Imports
     import time
     import os
     from pathlib import Path
-    import urllib.request
+    import requests
     
     import cv2
     import matplotlib.pyplot as plt
@@ -190,7 +190,7 @@ Imports
 Settings
 ~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -207,7 +207,7 @@ Settings
 Functions
 ~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -224,7 +224,7 @@ Functions
 Inference on PaddleGAN Model
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The PaddleGAN
 `documentation <https://github.com/PaddlePaddle/PaddleGAN/blob/develop/docs/en_US/tutorials/animegan.md>`__
@@ -241,13 +241,13 @@ source of the function.
 
 .. parsed-literal::
 
-    [04/10 00:45:19] ppgan INFO: Found /opt/home/k8sworker/.cache/ppgan/animeganv2_hayao.pdparams
+    [04/18 01:23:57] ppgan INFO: Found /opt/home/k8sworker/.cache/ppgan/animeganv2_hayao.pdparams
 
 
 .. code:: ipython3
 
     # In a Jupyter Notebook, ?? shows the source and docstring
-    predictor.run??
+    ??predictor.run
 
 The ``AnimeGANPredictor.run()`` method works as follow:
 
@@ -277,10 +277,12 @@ cell.
     image_path = Path("./data/coco_bricks.png")
     # fetch the image from the web
     image_path.parent.mkdir(parents=True, exist_ok=True)
-    urllib.request.urlretrieve(
+    r = requests.get(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco_bricks.png",
-        image_path
     )
+    
+    with image_path.open("wb") as f:
+        f.write(r.content)
     
     image = cv2.cvtColor(cv2.imread(str(image_path), flags=cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
     
@@ -292,7 +294,7 @@ cell.
     input_tensor = paddle.to_tensor(transformed_image[None, ::])
     
     if PADDLEGAN_INFERENCE:
-        # Step 3. Do inference. 
+        # Step 3. Do inference.
         predictor.generator.eval()
         with paddle.no_grad():
             result = predictor.generator(input_tensor)
@@ -322,7 +324,7 @@ cell.
 Show Inference Results on PaddleGAN model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -341,7 +343,7 @@ Show Inference Results on PaddleGAN model
 Model Conversion to ONNX and OpenVINO IR
 ----------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Convert the PaddleGAN model to OpenVINO IR by first converting PaddleGAN
 to ONNX with ``paddle2onnx`` and then converting the ONNX model to
@@ -350,7 +352,7 @@ OpenVINO IR with model conversion API.
 Convert to ONNX
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Exporting to ONNX requires specifying an input shape with PaddlePaddle
 ``InputSpec`` and calling ``paddle.onnx.export``. Then, check the input
@@ -382,29 +384,29 @@ succeeds, the output of the next cell will include
 
 .. parsed-literal::
 
-    2024-04-10 00:45:27 [INFO]	Static PaddlePaddle model saved in model/paddle_model_static_onnx_temp_dir.
+    2024-04-18 01:24:06 [INFO]	Static PaddlePaddle model saved in model/paddle_model_static_onnx_temp_dir.
 
 
 .. parsed-literal::
 
     [Paddle2ONNX] Start to parse PaddlePaddle model...
     [Paddle2ONNX] Model file path: model/paddle_model_static_onnx_temp_dir/model.pdmodel
-    [Paddle2ONNX] Paramters file path: model/paddle_model_static_onnx_temp_dir/model.pdiparams
+    [Paddle2ONNX] Parameters file path: model/paddle_model_static_onnx_temp_dir/model.pdiparams
     [Paddle2ONNX] Start to parsing Paddle model...
     [Paddle2ONNX] Use opset_version = 11 for ONNX export.
     [Paddle2ONNX] PaddlePaddle model is exported as ONNX format now.
-    2024-04-10 00:45:27 [INFO]	ONNX model saved in model/paddlegan_anime.onnx.
+    2024-04-18 01:24:06 [INFO]	ONNX model saved in model/paddlegan_anime.onnx.
 
 
 .. parsed-literal::
 
-    I0410 00:45:27.561754 3027673 program_interpreter.cc:212] New Executor is Running.
+    I0418 01:24:06.033911 64719 program_interpreter.cc:212] New Executor is Running.
 
 
 Convert to OpenVINO IR
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The OpenVINO IR format enables storing the preprocessing normalization
 in the model file. It is then no longer necessary to normalize input
@@ -412,7 +414,7 @@ images manually. See the transforms that the ``.run()`` method used:
 
 .. code:: ipython3
 
-    predictor.__init__??
+    ??predictor.__init__
 
 .. code:: ipython3
 
@@ -469,7 +471,7 @@ API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
 Show Inference Results on OpenVINO IR and PaddleGAN Models
 ----------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 If the conversion is successful, the output of model conversion API in
 the cell above will show *SUCCESS*, and the OpenVINO IR model will be
@@ -483,15 +485,15 @@ do and extract them.
 Create Postprocessing Functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-
-.. code:: ipython3
-
-    predictor.adjust_brightness??
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
-    predictor.calc_avg_brightness??
+    ??predictor.adjust_brightness
+
+.. code:: ipython3
+
+    ??predictor.calc_avg_brightness
 
 The average brightness is computed by a `standard
 formula <https://www.w3.org/TR/AERT/#color-contrast>`__. To adjust the
@@ -529,7 +531,7 @@ OpenVINO IR model
 Do Inference on OpenVINO IR Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Load the OpenVINO IR model and do inference, following the same steps as
 for the PaddleGAN model. For more information about inference on
@@ -543,7 +545,7 @@ input shapes, results may differ from the PaddleGAN results.
 Select inference device
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -554,8 +556,8 @@ select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -591,8 +593,8 @@ select device from dropdown list for running inference using OpenVINO
     resized_image = cv2.resize(image, (target_width, target_height))
     input_image = resized_image.transpose(2, 0, 1)[None, :, :, :]
     # Normalize the image
-    input_mean = np.array([127.5,127.5,127.5]).reshape(1, 3, 1, 1)
-    input_scale = np.array([127.5,127.5,127.5]).reshape(1, 3, 1, 1)
+    input_mean = np.array([127.5, 127.5, 127.5]).reshape(1, 3, 1, 1)
+    input_scale = np.array([127.5, 127.5, 127.5]).reshape(1, 3, 1, 1)
     input_image = (input_image - input_mean) / input_scale
     
     # Step 3. Do inference.
@@ -638,7 +640,7 @@ select device from dropdown list for running inference using OpenVINO
 Performance Comparison
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Measure the time it takes to do inference on an image. This gives an
 indication of performance. It is not a perfect measure. Since the
@@ -654,14 +656,11 @@ measure inference on one image. For more accurate benchmarking, use
         compiled_model([input_image])
     end = time.perf_counter()
     time_ir = end - start
-    print(
-        f"OpenVINO IR model in OpenVINO Runtime/CPU: {time_ir/NUM_IMAGES:.3f} "
-        f"seconds per image, FPS: {NUM_IMAGES/time_ir:.2f}"
-    )
+    print(f"OpenVINO IR model in OpenVINO Runtime/CPU: {time_ir/NUM_IMAGES:.3f} " f"seconds per image, FPS: {NUM_IMAGES/time_ir:.2f}")
     
     ## `PADDLEGAN_INFERENCE` is defined in the "Inference on PaddleGAN model" section above.
     ## Uncomment the next line to enable a performance comparison with the PaddleGAN model
-    ## if you disabled it earlier. 
+    ## if you disabled it earlier.
     
     # PADDLEGAN_INFERENCE = True
     
@@ -672,26 +671,23 @@ measure inference on one image. For more accurate benchmarking, use
                 predictor.generator(input_tensor)
             end = time.perf_counter()
             time_paddle = end - start
-        print(
-            f"PaddleGAN model on CPU: {time_paddle/NUM_IMAGES:.3f} seconds per image, "
-            f"FPS: {NUM_IMAGES/time_paddle:.2f}"
-        )
+        print(f"PaddleGAN model on CPU: {time_paddle/NUM_IMAGES:.3f} seconds per image, " f"FPS: {NUM_IMAGES/time_paddle:.2f}")
 
 
 .. parsed-literal::
 
-    OpenVINO IR model in OpenVINO Runtime/CPU: 0.419 seconds per image, FPS: 2.39
+    OpenVINO IR model in OpenVINO Runtime/CPU: 0.416 seconds per image, FPS: 2.40
 
 
 .. parsed-literal::
 
-    PaddleGAN model on CPU: 6.075 seconds per image, FPS: 0.16
+    PaddleGAN model on CPU: 6.032 seconds per image, FPS: 0.17
 
 
 References
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 -  `PaddleGAN <https://github.com/PaddlePaddle/PaddleGAN>`__
 -  `Paddle2ONNX <https://github.com/PaddlePaddle/paddle2onnx>`__

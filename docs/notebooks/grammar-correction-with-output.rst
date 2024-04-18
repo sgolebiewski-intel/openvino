@@ -48,27 +48,27 @@ It consists of the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `How does it work? <#how-does-it-work>`__
--  `Prerequisites <#prerequisites>`__
--  `Download and Convert Models <#download-and-convert-models>`__
+-  `How does it work? <#How-does-it-work?>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Download and Convert Models <#Download-and-Convert-Models>`__
 
-   -  `Select inference device <#select-inference-device>`__
-   -  `Grammar Checker <#grammar-checker>`__
-   -  `Grammar Corrector <#grammar-corrector>`__
+   -  `Select inference device <#Select-inference-device>`__
+   -  `Grammar Checker <#Grammar-Checker>`__
+   -  `Grammar Corrector <#Grammar-Corrector>`__
 
--  `Prepare Demo Pipeline <#prepare-demo-pipeline>`__
--  `Quantization <#quantization>`__
+-  `Prepare Demo Pipeline <#Prepare-Demo-Pipeline>`__
+-  `Quantization <#Quantization>`__
 
-   -  `Run Quantization <#run-quantization>`__
+   -  `Run Quantization <#Run-Quantization>`__
    -  `Compare model size, performance and
-      accuracy <#compare-model-size-performance-and-accuracy>`__
+      accuracy <#Compare-model-size,-performance-and-accuracy>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 How does it work?
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 A Grammatical Error Correction task can be thought of as a
 sequence-to-sequence task where a model is trained to take a
@@ -120,7 +120,7 @@ Now that we know more about FLAN-T5 and RoBERTa, let us get started. 🚀
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, we need to install the `Hugging Face
 Optimum <https://huggingface.co/docs/transformers/index>`__ library
@@ -132,7 +132,7 @@ documentation <https://huggingface.co/docs/optimum/intel/inference>`__.
 
 .. code:: ipython3
 
-    %pip install -q "torch>=2.1.0" "git+https://github.com/huggingface/optimum-intel.git" "openvino>=2024.0.0" onnx gradio "transformers>=4.33.0" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "torch>=2.1.0" "git+https://github.com/huggingface/optimum-intel.git" "openvino>=2024.0.0" onnx tqdm "gradio>=4.19" "transformers>=4.33.0" --extra-index-url https://download.pytorch.org/whl/cpu
     %pip install -q "nncf>=2.9.0" datasets jiwer
 
 
@@ -145,7 +145,7 @@ documentation <https://huggingface.co/docs/optimum/intel/inference>`__.
 Download and Convert Models
 ---------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Optimum Intel can be used to load optimized models from the `Hugging
 Face Hub <https://huggingface.co/docs/optimum/intel/hf.co/models>`__ and
@@ -201,7 +201,7 @@ Tokenizer class and pipelines API are compatible with Optimum models.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -214,8 +214,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -233,7 +233,7 @@ select device from dropdown list for running inference using OpenVINO
 Grammar Checker
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -272,7 +272,11 @@ Hugging Face inference pipelines in this
 .. code:: ipython3
 
     input_text = "They are moved by salar energy"
-    grammar_checker_pipe = pipeline("text-classification", model=grammar_checker_model, tokenizer=grammar_checker_tokenizer)
+    grammar_checker_pipe = pipeline(
+        "text-classification",
+        model=grammar_checker_model,
+        tokenizer=grammar_checker_tokenizer,
+    )
     result = grammar_checker_pipe(input_text)[0]
     print(f"input text: {input_text}")
     print(f'predicted label: {"contains_errors" if result["label"] == "LABEL_1" else "no errors"}')
@@ -291,7 +295,7 @@ Great! Looks like the model can detect errors in the sample.
 Grammar Corrector
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The steps for loading the Grammar Corrector model are very similar,
 except for the model class that is used. Because FLAN-T5 is a
@@ -345,13 +349,17 @@ to run it.
 
 .. code:: ipython3
 
-    grammar_corrector_pipe = pipeline("text2text-generation", model=grammar_corrector_model, tokenizer=grammar_corrector_tokenizer)
+    grammar_corrector_pipe = pipeline(
+        "text2text-generation",
+        model=grammar_corrector_model,
+        tokenizer=grammar_corrector_tokenizer,
+    )
 
 .. code:: ipython3
 
     result = grammar_corrector_pipe(input_text)[0]
-    print(f"input text:     {input_text}") 
-    print(f'generated text: {result["generated_text"]}') 
+    print(f"input text:     {input_text}")
+    print(f'generated text: {result["generated_text"]}')
 
 
 .. parsed-literal::
@@ -365,7 +373,7 @@ Nice! The result looks pretty good!
 Prepare Demo Pipeline
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now let us put everything together and create the pipeline for grammar
 correction. The pipeline accepts input text, verifies its correctness,
@@ -416,7 +424,12 @@ several steps:
         return sentence_batches
     
     
-    def correct_text(text: str, checker: transformers.pipelines.Pipeline, corrector: transformers.pipelines.Pipeline, separator: str = " ") -> str:
+    def correct_text(
+        text: str,
+        checker: transformers.pipelines.Pipeline,
+        corrector: transformers.pipelines.Pipeline,
+        separator: str = " ",
+    ) -> str:
         """
         Correct the grammar in a string of text using a text-classification and text-generation pipeline.
     
@@ -436,9 +449,7 @@ several steps:
         corrected_text = []
     
         # Iterate through the sentence batches
-        for batch in tqdm(
-            sentence_batches, total=len(sentence_batches), desc="correcting text.."
-        ):
+        for batch in tqdm(sentence_batches, total=len(sentence_batches), desc="correcting text.."):
             # Join the sentences in the batch into a single string
             raw_text = " ".join(batch)
     
@@ -446,9 +457,7 @@ several steps:
             results = checker(raw_text)
     
             # Only correct the text if the results of the text-classification are not LABEL_1 or are LABEL_1 with a score below 0.9
-            if results[0]["label"] != "LABEL_1" or (
-                results[0]["label"] == "LABEL_1" and results[0]["score"] < 0.9
-            ):
+            if results[0]["label"] != "LABEL_1" or (results[0]["label"] == "LABEL_1" and results[0]["score"] < 0.9):
                 # Correct the text using the text-generation pipeline
                 corrected_batch = corrector(raw_text)
                 corrected_text.append(corrected_batch[0]["generated_text"])
@@ -482,8 +491,8 @@ Let us see it in action.
 
 .. code:: ipython3
 
-    print(f"input text:     {default_text}\n") 
-    print(f'generated text: {corrected_text}')
+    print(f"input text:     {default_text}\n")
+    print(f"generated text: {corrected_text}")
 
 
 .. parsed-literal::
@@ -496,7 +505,7 @@ Let us see it in action.
 Quantization
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding quantization layers into model
@@ -525,7 +534,7 @@ improve model inference speed.
 
     to_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -543,7 +552,7 @@ improve model inference speed.
 Run Quantization
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Below we retrieve the quantized model. Please see ``utils.py`` for
 source code. Quantization is relatively time-consuming and will take
@@ -551,14 +560,21 @@ some time to complete.
 
 .. code:: ipython3
 
-    from utils import get_quantized_pipeline
+    from utils import get_quantized_pipeline, CALIBRATION_DATASET_SIZE
     
     grammar_corrector_pipe_fp32 = grammar_corrector_pipe
     grammar_corrector_pipe_int8 = None
     if to_quantize.value:
         quantized_model_path = Path("quantized_decoder_with_past") / "openvino_model.xml"
-        grammar_corrector_pipe_int8 = get_quantized_pipeline(grammar_corrector_pipe_fp32, grammar_corrector_tokenizer, core, grammar_corrector_dir,
-                                                             quantized_model_path, device.value)
+        grammar_corrector_pipe_int8 = get_quantized_pipeline(
+            grammar_corrector_pipe_fp32,
+            grammar_corrector_tokenizer,
+            core,
+            grammar_corrector_dir,
+            quantized_model_path,
+            device.value,
+            calibration_dataset_size=CALIBRATION_DATASET_SIZE,
+        )
 
 
 
@@ -676,7 +692,7 @@ model and original FP32 model should be almost the same.
     if to_quantize.value:
         corrected_text_int8 = correct_text(default_text, grammar_checker_pipe, grammar_corrector_pipe_int8)
         print(f"Input text:                   {default_text}\n")
-        print(f'Generated text by INT8 model: {corrected_text_int8}')
+        print(f"Generated text by INT8 model: {corrected_text_int8}")
 
 
 
@@ -695,7 +711,7 @@ model and original FP32 model should be almost the same.
 Compare model size, performance and accuracy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 First, we compare file size of ``FP32`` and ``INT8`` models.
 
@@ -704,7 +720,10 @@ First, we compare file size of ``FP32`` and ``INT8`` models.
     from utils import calculate_compression_rate
     
     if to_quantize.value:
-        model_size_fp32, model_size_int8 = calculate_compression_rate(grammar_corrector_dir / "openvino_decoder_with_past_model.xml", quantized_model_path)
+        model_size_fp32, model_size_int8 = calculate_compression_rate(
+            grammar_corrector_dir / "openvino_decoder_with_past_model.xml",
+            quantized_model_path,
+        )
 
 
 .. parsed-literal::
@@ -767,7 +786,7 @@ where WER is Word Error Rate metric.
 Interactive demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -777,13 +796,13 @@ Interactive demo
     
     def correct(text, quantized, progress=gr.Progress(track_tqdm=True)):
         grammar_corrector = grammar_corrector_pipe_int8 if quantized else grammar_corrector_pipe
-        
+    
         start_time = time.perf_counter()
         corrected_text = correct_text(text, grammar_checker_pipe, grammar_corrector)
         end_time = time.perf_counter()
-        
+    
         return corrected_text, f"{end_time - start_time:.2f}"
-        
+    
     
     def create_demo_block(quantized: bool, show_model_type: bool):
         model_type = (" optimized" if quantized else " original") if show_model_type else ""
@@ -799,7 +818,11 @@ Interactive demo
             gr.Examples(examples=[default_text], inputs=[input_text])
         with gr.Row():
             button = gr.Button(f"Run{model_type}")
-            button.click(correct, inputs=[input_text, gr.Number(quantized, visible=False)], outputs=[output_text, correction_time])
+            button.click(
+                correct,
+                inputs=[input_text, gr.Number(quantized, visible=False)],
+                outputs=[output_text, correction_time],
+            )
     
     
     with gr.Blocks() as demo:

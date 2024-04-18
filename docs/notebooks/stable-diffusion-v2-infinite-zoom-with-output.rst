@@ -75,39 +75,39 @@ Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
 -  `Stable Diffusion v2 Infinite Zoom
-   Showcase <#stable-diffusion-v2-infinite-zoom-showcase>`__
+   Showcase <#Stable-Diffusion-v2-Infinite-Zoom-Showcase>`__
 
    -  `Stable Diffusion Text guided
-      Inpainting <#stable-diffusion-text-guided-inpainting>`__
+      Inpainting <#Stable-Diffusion-Text-guided-Inpainting>`__
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 
    -  `Stable Diffusion in Diffusers
-      library <#stable-diffusion-in-diffusers-library>`__
+      library <#Stable-Diffusion-in-Diffusers-library>`__
    -  `Convert models to OpenVINO Intermediate representation (IR)
-      format <#convert-models-to-openvino-intermediate-representation-ir-format>`__
-   -  `Prepare Inference pipeline <#prepare-inference-pipeline>`__
-   -  `Zoom Video Generation <#zoom-video-generation>`__
-   -  `Configure Inference Pipeline <#configure-inference-pipeline>`__
-   -  `Select inference device <#select-inference-device>`__
+      format <#Convert-models-to-OpenVINO-Intermediate-representation-(IR)-format>`__
+   -  `Prepare Inference pipeline <#Prepare-Inference-pipeline>`__
+   -  `Zoom Video Generation <#Zoom-Video-Generation>`__
+   -  `Configure Inference Pipeline <#Configure-Inference-Pipeline>`__
+   -  `Select inference device <#Select-inference-device>`__
    -  `Run Infinite Zoom video
-      generation <#run-infinite-zoom-video-generation>`__
+      generation <#Run-Infinite-Zoom-video-generation>`__
 
 Stable Diffusion v2 Infinite Zoom Showcase
 ------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In this tutorial we consider how to use Stable Diffusion v2 model for
 generation sequence of images for infinite zoom video effect. To do
 this, we will need
-`stabilityai/stable-diffusion-2-inpainting <https://huggingface.co/stabilityai/stable-diffusion-2-inpainting>`__
+```stabilityai/stable-diffusion-2-inpainting`` <https://huggingface.co/stabilityai/stable-diffusion-2-inpainting>`__
 model.
 
 Stable Diffusion Text guided Inpainting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In image editing, inpainting is a process of restoring missing parts of
 pictures. Most commonly applied to reconstructing old deteriorated
@@ -143,24 +143,24 @@ Out video based on our prompt.
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 install required packages
 
 .. code:: ipython3
 
-    %pip install -q "diffusers>=0.14.0" "transformers>=4.25.1" gradio "openvino>=2023.1.0" "torch>=2.1" --extra-index-url https://download.pytorch.org/whl/cpu
+    %pip install -q "diffusers>=0.14.0" "transformers>=4.25.1" "gradio>=4.19" "openvino>=2023.1.0" "torch>=2.1" Pillow opencv-python --extra-index-url https://download.pytorch.org/whl/cpu
 
 Stable Diffusion in Diffusers library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To work with Stable Diffusion v2, we will use Hugging Face
 `Diffusers <https://github.com/huggingface/diffusers>`__ library. To
 experiment with Stable Diffusion models for Inpainting use case,
 Diffusers exposes the
-`StableDiffusionInpaintPipeline <https://huggingface.co/docs/diffusers/using-diffusers/conditional_image_generation>`__
+```StableDiffusionInpaintPipeline`` <https://huggingface.co/docs/diffusers/using-diffusers/conditional_image_generation>`__
 similar to the `other Diffusers
 pipelines <https://huggingface.co/docs/diffusers/api/pipelines/overview>`__.
 The code below demonstrates how to create
@@ -208,7 +208,7 @@ The code below demonstrates how to create
 Convert models to OpenVINO Intermediate representation (IR) format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Conversion part of model stayed remain as in `Text-to-Image generation
 notebook <./stable-diffusion-v2-text-to-image.ipynb>`__. Except U-Net
@@ -237,11 +237,11 @@ channel resized mask.
         torch.jit._state._clear_class_state()
     
     
-    def convert_encoder(text_encoder: torch.nn.Module, ir_path:Path):
+    def convert_encoder(text_encoder: torch.nn.Module, ir_path: Path):
         """
-        Convert Text Encoder model to IR. 
-        Function accepts pipeline, prepares example inputs for conversion 
-        Parameters: 
+        Convert Text Encoder model to IR.
+        Function accepts pipeline, prepares example inputs for conversion
+        Parameters:
             text_encoder (torch.nn.Module): text encoder PyTorch model
             ir_path (Path): File for storing model
         Returns:
@@ -258,19 +258,25 @@ channel resized mask.
                 ov_model = ov.convert_model(
                     text_encoder,  # model instance
                     example_input=input_ids,  # example inputs for model tracing
-                    input=([1,77],)  # input shape for conversion
+                    input=([1, 77],),  # input shape for conversion
                 )
                 ov.save_model(ov_model, ir_path)
                 del ov_model
                 cleanup_torchscript_cache()
-            print('Text Encoder successfully converted to IR')
+            print("Text Encoder successfully converted to IR")
     
-            
-    def convert_unet(unet:torch.nn.Module, ir_path:Path, num_channels:int = 4, width:int = 64, height:int = 64):
+    
+    def convert_unet(
+        unet: torch.nn.Module,
+        ir_path: Path,
+        num_channels: int = 4,
+        width: int = 64,
+        height: int = 64,
+    ):
         """
-        Convert Unet model to IR format. 
-        Function accepts pipeline, prepares example inputs for conversion 
-        Parameters: 
+        Convert Unet model to IR format.
+        Function accepts pipeline, prepares example inputs for conversion
+        Parameters:
             unet (torch.nn.Module): UNet PyTorch model
             ir_path (Path): File for storing model
             num_channels (int, optional, 4): number of input channels
@@ -279,10 +285,7 @@ channel resized mask.
         Returns:
             None
         """
-        dtype_mapping = {
-            torch.float32: ov.Type.f32,
-            torch.float64: ov.Type.f64
-        }
+        dtype_mapping = {torch.float32: ov.Type.f32, torch.float64: ov.Type.f64}
         if not ir_path.exists():
             # prepare inputs
             encoder_hidden_state = torch.ones((2, 77, 1024))
@@ -298,23 +301,19 @@ channel resized mask.
                 input_info.append((shape, element_type))
     
             with torch.no_grad():
-                ov_model = ov.convert_model(
-                    unet, 
-                    example_input=dummy_inputs,
-                    input=input_info
-                )
+                ov_model = ov.convert_model(unet, example_input=dummy_inputs, input=input_info)
             ov.save_model(ov_model, ir_path)
             del ov_model
             cleanup_torchscript_cache()
-            print('U-Net successfully converted to IR')
+            print("U-Net successfully converted to IR")
     
     
-    def convert_vae_encoder(vae: torch.nn.Module, ir_path: Path, width:int = 512, height:int = 512):
+    def convert_vae_encoder(vae: torch.nn.Module, ir_path: Path, width: int = 512, height: int = 512):
         """
-        Convert VAE model to IR format. 
-        VAE model, creates wrapper class for export only necessary for inference part, 
-        prepares example inputs for onversion 
-        Parameters: 
+        Convert VAE model to IR format.
+        VAE model, creates wrapper class for export only necessary for inference part,
+        prepares example inputs for onversion
+        Parameters:
             vae (torch.nn.Module): VAE PyTorch model
             ir_path (Path): File for storing model
             width (int, optional, 512): input width
@@ -322,6 +321,7 @@ channel resized mask.
         Returns:
             None
         """
+    
         class VAEEncoderWrapper(torch.nn.Module):
             def __init__(self, vae):
                 super().__init__()
@@ -335,26 +335,27 @@ channel resized mask.
             vae_encoder.eval()
             image = torch.zeros((1, 3, width, height))
             with torch.no_grad():
-                ov_model = ov.convert_model(vae_encoder, example_input=image, input=([1,3, width, height],))
+                ov_model = ov.convert_model(vae_encoder, example_input=image, input=([1, 3, width, height],))
             ov.save_model(ov_model, ir_path)
             del ov_model
             cleanup_torchscript_cache()
-            print('VAE encoder successfully converted to IR')
+            print("VAE encoder successfully converted to IR")
     
     
-    def convert_vae_decoder(vae: torch.nn.Module, ir_path: Path, width:int = 64, height:int = 64):
+    def convert_vae_decoder(vae: torch.nn.Module, ir_path: Path, width: int = 64, height: int = 64):
         """
-        Convert VAE decoder model to IR format. 
-        Function accepts VAE model, creates wrapper class for export only necessary for inference part, 
-        prepares example inputs for conversion 
-        Parameters: 
-            vae (torch.nn.Module): VAE model 
+        Convert VAE decoder model to IR format.
+        Function accepts VAE model, creates wrapper class for export only necessary for inference part,
+        prepares example inputs for conversion
+        Parameters:
+            vae (torch.nn.Module): VAE model
             ir_path (Path): File for storing model
             width (int, optional, 64): input width
             height (int, optional, 64): input height
         Returns:
             None
         """
+    
         class VAEDecoderWrapper(torch.nn.Module):
             def __init__(self, vae):
                 super().__init__()
@@ -369,11 +370,11 @@ channel resized mask.
     
             vae_decoder.eval()
             with torch.no_grad():
-                ov_model = ov.convert_model(vae_decoder, example_input=latents, input=([1,4, width, height],))
+                ov_model = ov.convert_model(vae_decoder, example_input=latents, input=([1, 4, width, height],))
             ov.save_model(ov_model, ir_path)
             del ov_model
             cleanup_torchscript_cache()
-            print('VAE decoder successfully converted to IR')
+            print("VAE decoder successfully converted to IR")
 
 .. code:: ipython3
 
@@ -395,7 +396,7 @@ channel resized mask.
 
 .. code:: ipython3
 
-    UNET_OV_PATH_INPAINT = sd2_inpainting_model_dir / 'unet.xml'
+    UNET_OV_PATH_INPAINT = sd2_inpainting_model_dir / "unet.xml"
     if not UNET_OV_PATH_INPAINT.exists():
         convert_unet(unet_inpaint, UNET_OV_PATH_INPAINT, num_channels=9, width=64, height=64)
         del unet_inpaint
@@ -413,14 +414,14 @@ channel resized mask.
 
 .. code:: ipython3
 
-    VAE_ENCODER_OV_PATH_INPAINT = sd2_inpainting_model_dir / 'vae_encoder.xml'
+    VAE_ENCODER_OV_PATH_INPAINT = sd2_inpainting_model_dir / "vae_encoder.xml"
     
     if not VAE_ENCODER_OV_PATH_INPAINT.exists():
         convert_vae_encoder(vae_inpaint, VAE_ENCODER_OV_PATH_INPAINT, 512, 512)
     else:
         print(f"VAE encoder will be loaded from {VAE_ENCODER_OV_PATH_INPAINT}")
     
-    VAE_DECODER_OV_PATH_INPAINT = sd2_inpainting_model_dir / 'vae_decoder.xml'
+    VAE_DECODER_OV_PATH_INPAINT = sd2_inpainting_model_dir / "vae_decoder.xml"
     if not VAE_DECODER_OV_PATH_INPAINT.exists():
         convert_vae_decoder(vae_inpaint, VAE_DECODER_OV_PATH_INPAINT, 64, 64)
     else:
@@ -439,7 +440,7 @@ channel resized mask.
 Prepare Inference pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 As it was discussed previously, Inpainting inference pipeline is based
 on Text-to-Image inference pipeline with addition mask processing step.
@@ -459,7 +460,7 @@ We will reuse ``OVStableDiffusionPipeline`` basic utilities in
     from diffusers.schedulers import DDIMScheduler, LMSDiscreteScheduler, PNDMScheduler
     
     
-    def prepare_mask_and_masked_image(image:PIL.Image.Image, mask:PIL.Image.Image):
+    def prepare_mask_and_masked_image(image: PIL.Image.Image, mask: PIL.Image.Image):
         """
         Prepares a pair (image, mask) to be consumed by the Stable Diffusion pipeline. This means that those inputs will be
         converted to ``np.array`` with shapes ``batch x channels x height x width`` where ``channels`` is ``3`` for the
@@ -588,11 +589,7 @@ We will reuse ``OVStableDiffusionPipeline`` basic utilities in
             masked_image_latents = latents * 0.18215
     
             mask = np.concatenate([mask] * 2) if do_classifier_free_guidance else mask
-            masked_image_latents = (
-                np.concatenate([masked_image_latents] * 2)
-                if do_classifier_free_guidance
-                else masked_image_latents
-            )
+            masked_image_latents = np.concatenate([masked_image_latents] * 2) if do_classifier_free_guidance else masked_image_latents
             return mask, masked_image_latents
     
         def __call__(
@@ -653,9 +650,7 @@ We will reuse ``OVStableDiffusionPipeline`` basic utilities in
             # prepare mask
             mask, masked_image = prepare_mask_and_masked_image(image, mask_image)
             # set timesteps
-            accepts_offset = "offset" in set(
-                inspect.signature(self.scheduler.set_timesteps).parameters.keys()
-            )
+            accepts_offset = "offset" in set(inspect.signature(self.scheduler.set_timesteps).parameters.keys())
             extra_set_kwargs = {}
             if accepts_offset:
                 extra_set_kwargs["offset"] = 1
@@ -676,34 +671,22 @@ We will reuse ``OVStableDiffusionPipeline`` basic utilities in
             # eta (η) is only used with the DDIMScheduler, it will be ignored for other schedulers.
             # eta corresponds to η in DDIM paper: https://arxiv.org/abs/2010.02502
             # and should be between [0, 1]
-            accepts_eta = "eta" in set(
-                inspect.signature(self.scheduler.step).parameters.keys()
-            )
+            accepts_eta = "eta" in set(inspect.signature(self.scheduler.step).parameters.keys())
             extra_step_kwargs = {}
             if accepts_eta:
                 extra_step_kwargs["eta"] = eta
     
             for t in self.progress_bar(timesteps):
                 # expand the latents if we are doing classifier free guidance
-                latent_model_input = (
-                    np.concatenate([latents] * 2)
-                    if do_classifier_free_guidance
-                    else latents
-                )
+                latent_model_input = np.concatenate([latents] * 2) if do_classifier_free_guidance else latents
                 latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
-                latent_model_input = np.concatenate(
-                    [latent_model_input, mask, masked_image_latents], axis=1
-                )
+                latent_model_input = np.concatenate([latent_model_input, mask, masked_image_latents], axis=1)
                 # predict the noise residual
-                noise_pred = self.unet(
-                    [latent_model_input, np.array(t, dtype=np.float32), text_embeddings]
-                )[self._unet_output]
+                noise_pred = self.unet([latent_model_input, np.array(t, dtype=np.float32), text_embeddings])[self._unet_output]
                 # perform guidance
                 if do_classifier_free_guidance:
                     noise_pred_uncond, noise_pred_text = noise_pred[0], noise_pred[1]
-                    noise_pred = noise_pred_uncond + guidance_scale * (
-                        noise_pred_text - noise_pred_uncond
-                    )
+                    noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
     
                 # compute the previous noisy sample x_t -> x_t-1
                 latents = self.scheduler.step(
@@ -718,7 +701,13 @@ We will reuse ``OVStableDiffusionPipeline`` basic utilities in
             image = self.postprocess_image(image, meta, output_type)
             return {"sample": image}
     
-        def _encode_prompt(self, prompt:Union[str, List[str]], num_images_per_prompt:int = 1, do_classifier_free_guidance:bool = True, negative_prompt:Union[str, List[str]] = None):
+        def _encode_prompt(
+            self,
+            prompt: Union[str, List[str]],
+            num_images_per_prompt: int = 1,
+            do_classifier_free_guidance: bool = True,
+            negative_prompt: Union[str, List[str]] = None,
+        ):
             """
             Encodes the prompt into text encoder hidden states.
     
@@ -742,16 +731,13 @@ We will reuse ``OVStableDiffusionPipeline`` basic utilities in
             )
             text_input_ids = text_inputs.input_ids
     
-            text_embeddings = self.text_encoder(
-                text_input_ids)[self._text_encoder_output]
+            text_embeddings = self.text_encoder(text_input_ids)[self._text_encoder_output]
     
             # duplicate text embeddings for each generation per prompt
             if num_images_per_prompt != 1:
                 bs_embed, seq_len, _ = text_embeddings.shape
-                text_embeddings = np.tile(
-                    text_embeddings, (1, num_images_per_prompt, 1))
-                text_embeddings = np.reshape(
-                    text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
+                text_embeddings = np.tile(text_embeddings, (1, num_images_per_prompt, 1))
+                text_embeddings = np.reshape(text_embeddings, (bs_embed * num_images_per_prompt, seq_len, -1))
     
             # get unconditional embeddings for classifier free guidance
             if do_classifier_free_guidance:
@@ -785,10 +771,10 @@ We will reuse ``OVStableDiffusionPipeline`` basic utilities in
     
             return text_embeddings
     
-        def prepare_latents(self, latent_timestep:torch.Tensor = None):
+        def prepare_latents(self, latent_timestep: torch.Tensor = None):
             """
             Function for getting initial latents for starting generation
-            
+    
             Parameters:
                 latent_timestep (torch.Tensor, *optional*, None):
                     Predicted by scheduler initial step for image generation, required for latent image mixing with nosie
@@ -803,11 +789,11 @@ We will reuse ``OVStableDiffusionPipeline`` basic utilities in
                 noise = noise * self.scheduler.sigmas[0].numpy()
             return noise, {}
     
-        def postprocess_image(self, image:np.ndarray, meta:Dict, output_type:str = "pil"):
+        def postprocess_image(self, image: np.ndarray, meta: Dict, output_type: str = "pil"):
             """
-            Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required), 
+            Postprocessing for decoded image. Takes generated image decoded by VAE decoder, unpad it to initila image size (if required),
             normalize and convert to [0, 255] pixels range. Optionally, convertes it from np.ndarray to PIL.Image format
-            
+    
             Parameters:
                 image (np.ndarray):
                     Generated image
@@ -833,25 +819,23 @@ We will reuse ``OVStableDiffusionPipeline`` basic utilities in
                 image = self.numpy_to_pil(image)
                 if "src_height" in meta:
                     orig_height, orig_width = meta["src_height"], meta["src_width"]
-                    image = [img.resize((orig_width, orig_height),
-                                        PIL.Image.Resampling.LANCZOS) for img in image]
+                    image = [img.resize((orig_width, orig_height), PIL.Image.Resampling.LANCZOS) for img in image]
             else:
                 if "src_height" in meta:
                     orig_height, orig_width = meta["src_height"], meta["src_width"]
-                    image = [cv2.resize(img, (orig_width, orig_width))
-                             for img in image]
+                    image = [cv2.resize(img, (orig_width, orig_width)) for img in image]
             return image
     
-        def get_timesteps(self, num_inference_steps:int, strength:float):
+        def get_timesteps(self, num_inference_steps: int, strength: float):
             """
             Helper function for getting scheduler timesteps for generation
             In case of image-to-image generation, it updates number of steps according to strength
-            
+    
             Parameters:
                num_inference_steps (int):
                   number of inference steps for generation
                strength (float):
-                   value between 0.0 and 1.0, that controls the amount of noise that is added to the input image. 
+                   value between 0.0 and 1.0, that controls the amount of noise that is added to the input image.
                    Values that approach 1.0 allow for lots of variations but will also produce images that are not semantically consistent with the input.
             """
             # get the original timestep using init_timestep
@@ -860,12 +844,12 @@ We will reuse ``OVStableDiffusionPipeline`` basic utilities in
             t_start = max(num_inference_steps - init_timestep, 0)
             timesteps = self.scheduler.timesteps[t_start:]
     
-            return timesteps, num_inference_steps - t_start 
+            return timesteps, num_inference_steps - t_start
 
 Zoom Video Generation
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For achieving zoom effect, we will use inpainting to expand images
 beyond their original borders. We run our
@@ -894,20 +878,22 @@ generation is finished, we record frames in reversed order.
 .. code:: ipython3
 
     from tqdm import trange
+    
+    
     def generate_video(
-        pipe:OVStableDiffusionInpaintingPipeline,
-        prompt:Union[str, List[str]],
-        negative_prompt:Union[str, List[str]],
-        guidance_scale:float = 7.5,
-        num_inference_steps:int = 20,
-        num_frames:int = 20,
-        mask_width:int = 128,
-        seed:int = 9999,
-        zoom_in:bool = False,
+        pipe: OVStableDiffusionInpaintingPipeline,
+        prompt: Union[str, List[str]],
+        negative_prompt: Union[str, List[str]],
+        guidance_scale: float = 7.5,
+        num_inference_steps: int = 20,
+        num_frames: int = 20,
+        mask_width: int = 128,
+        seed: int = 9999,
+        zoom_in: bool = False,
     ):
         """
         Zoom video generation function
-        
+    
         Parameters:
           pipe (OVStableDiffusionInpaintingPipeline): inpainting pipeline.
           prompt (str or List[str]): The prompt or prompts to guide the image generation.
@@ -933,7 +919,7 @@ generation is finished, we record frames in reversed order.
         mask_image = np.array(current_image)[:, :, 3]
         mask_image = PIL.Image.fromarray(255 - mask_image).convert("RGB")
         current_image = current_image.convert("RGB")
-        pipe.set_progress_bar_config(desc='Generating initial image...')
+        pipe.set_progress_bar_config(desc="Generating initial image...")
         init_images = pipe(
             prompt=prompt,
             negative_prompt=negative_prompt,
@@ -953,7 +939,10 @@ generation is finished, we record frames in reversed order.
         current_image = init_images[0]
         all_frames = []
         all_frames.append(current_image)
-        for i in trange(num_outpainting_steps, desc=f'Generating {num_outpainting_steps} additional images...'):
+        for i in trange(
+            num_outpainting_steps,
+            desc=f"Generating {num_outpainting_steps} additional images...",
+        ):
             prev_image_fix = current_image
     
             prev_image = shrink_and_paste_on_blank(current_image, mask_width)
@@ -1008,12 +997,12 @@ generation is finished, we record frames in reversed order.
 
 .. code:: ipython3
 
-    def shrink_and_paste_on_blank(current_image:PIL.Image.Image, mask_width:int):
+    def shrink_and_paste_on_blank(current_image: PIL.Image.Image, mask_width: int):
         """
         Decreases size of current_image by mask_width pixels from each side,
         then adds a mask_width width transparent frame,
         so that the image the function returns is the same size as the input.
-        
+    
         Parameters:
             current_image (PIL.Image): input image to transform
             mask_width (int): width in pixels to shrink from each side
@@ -1034,18 +1023,16 @@ generation is finished, we record frames in reversed order.
         blank_image[:, :, 3] = 1
     
         # paste shrinked onto blank
-        blank_image[
-            mask_width : height - mask_width, mask_width : width - mask_width, :
-        ] = prev_image
+        blank_image[mask_width : height - mask_width, mask_width : width - mask_width, :] = prev_image
         prev_image = PIL.Image.fromarray(blank_image)
     
         return prev_image
     
     
-    def image_grid(imgs:List[PIL.Image.Image], rows:int, cols:int):
+    def image_grid(imgs: List[PIL.Image.Image], rows: int, cols: int):
         """
         Insert images to grid
-        
+    
         Parameters:
             imgs (List[PIL.Image.Image]): list of images for making grid
             rows (int): number of rows in grid
@@ -1063,10 +1050,16 @@ generation is finished, we record frames in reversed order.
         return grid
     
     
-    def write_video(file_path:str, frames:List[PIL.Image.Image], fps:float, reversed_order:bool = True, gif:bool = True):
+    def write_video(
+        file_path: str,
+        frames: List[PIL.Image.Image],
+        fps: float,
+        reversed_order: bool = True,
+        gif: bool = True,
+    ):
         """
         Writes frames to an mp4 video file and optionaly to gif
-        
+    
         Parameters:
             file_path (str): Path to output video, must end with .mp4
             frames (List of PIL.Image): list of frames
@@ -1102,7 +1095,7 @@ generation is finished, we record frames in reversed order.
 Configure Inference Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Configuration steps: 1. Load models on device 2. Configure tokenizer and
 scheduler 3. Create instance of ``OVStableDiffusionInpaintingPipeline``
@@ -1112,12 +1105,12 @@ class
 
     core = ov.Core()
     
-    tokenizer = CLIPTokenizer.from_pretrained('openai/clip-vit-large-patch14')
+    tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
 
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -1127,8 +1120,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -1165,12 +1158,13 @@ select device from dropdown list for running inference using OpenVINO
 Run Infinite Zoom video generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import gradio as gr
     from socket import gethostbyname, gethostname
+    
     
     def generate(
         prompt,
@@ -1225,9 +1219,9 @@ Run Infinite Zoom video generation
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="https://372deef95f8b1d0168.gradio.live" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 
 
 

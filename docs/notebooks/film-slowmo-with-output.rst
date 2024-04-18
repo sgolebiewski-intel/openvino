@@ -41,30 +41,30 @@ a model source.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Prepare images <#prepare-images>`__
--  `Load the model <#load-the-model>`__
--  `Infer the model <#infer-the-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Prepare images <#Prepare-images>`__
+-  `Load the model <#Load-the-model>`__
+-  `Infer the model <#Infer-the-model>`__
 
    -  `Single middle frame
-      interpolation <#single-middle-frame-interpolation>`__
-   -  `Recursive frame generation <#recursive-frame-generation>`__
+      interpolation <#Single-middle-frame-interpolation>`__
+   -  `Recursive frame generation <#Recursive-frame-generation>`__
 
 -  `Convert the model to OpenVINO
-   IR <#convert-the-model-to-openvino-ir>`__
--  `Inference <#inference>`__
+   IR <#Convert-the-model-to-OpenVINO-IR>`__
+-  `Inference <#Inference>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
    -  `Single middle frame
-      interpolation <#single-middle-frame-interpolation>`__
-   -  `Recursive frame generation <#recursive-frame-generation>`__
+      interpolation <#Single-middle-frame-interpolation>`__
+   -  `Recursive frame generation <#Recursive-frame-generation>`__
 
--  `Interactive inference <#interactive-inference>`__
+-  `Interactive inference <#Interactive-inference>`__
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -77,9 +77,9 @@ Prerequisites
     %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version <= '3.8'" # macOS x86
     %pip install -q "tensorflow>=2.5; sys_platform != 'darwin' and python_version > '3.8'"
     %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform != 'darwin' and python_version <= '3.8'"
-        
     
-    %pip install -q tensorflow_hub tf_keras numpy "opencv-python" tqdm gradio Pillow "openvino>=2023.2.0"
+    
+    %pip install -q tensorflow_hub tf_keras numpy "opencv-python" tqdm "gradio>=4.19" Pillow "openvino>=2023.2.0"
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -102,12 +102,12 @@ Prerequisites
 .. code:: ipython3
 
     from pathlib import Path
-    from urllib.request import urlretrieve
+    import requests
     from typing import Optional, Generator
     from datetime import datetime
     import gc
     
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
     os.environ["TF_USE_LEGACY_KERAS"] = "1"
     os.environ["TFHUB_CACHE_DIR"] = str(Path("./tfhub_modules").resolve())
     
@@ -128,7 +128,7 @@ Prerequisites
     DATA_PATH = Path("data")
     IMAGES = {
         "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/c3ddf65f-95ec-44ca-9ed4-3ef2d8f4b47e": Path("data/one.jpg"),
-        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/6d21f1ce-69eb-41b5-aedd-6e3c29013b30": Path("data/two.jpg")
+        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/6d21f1ce-69eb-41b5-aedd-6e3c29013b30": Path("data/two.jpg"),
     }
     OUTPUT_VIDEO_PATH = DATA_PATH / "output.webm"
     OV_OUTPUT_VIDEO_PATH = DATA_PATH / "ov_output.webm"
@@ -140,7 +140,7 @@ Prerequisites
 Prepare images
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download images and cast them to NumPy arrays to provide as model
 inputs.
@@ -152,23 +152,27 @@ inputs.
         result = result[np.newaxis, ...]  # add batch dim
         return result
     
+    
     def prepare_input(img_url: str):
         if not IMAGES[img_url].exists():
-            urlretrieve(img_url, IMAGES[img_url])
+            r = requests.get(img_url)
+            with IMAGES[img_url].open("wb") as f:
+                f.write(r.content)
         filename = str(IMAGES[img_url])
         img = cv2.imread(filename)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = np.array(img)
         img = preprocess_np_frame(img)
-        
+    
         return img
+    
     
     input_images = [prepare_input(url) for url in IMAGES]
     
     input = {
         "x0": input_images[0],
         "x1": input_images[1],
-        "time": np.array([[0.5]], dtype=np.float32)
+        "time": np.array([[0.5]], dtype=np.float32),
     }
 
 .. code:: ipython3
@@ -189,7 +193,7 @@ inputs.
 Load the model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model is loaded using ``tensorflow_hub.KerasLayer`` function. Then, we
 specify shapes of input tensors to cast loaded object to
@@ -216,12 +220,12 @@ Hub <https://tfhub.dev/google/film/1>`__.
 Infer the model
 ---------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Single middle frame interpolation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -233,7 +237,7 @@ Single middle frame interpolation
 
     def draw(img1, mid_img, img2):
         title2img = {"First frame": img1, "Interpolated frame": mid_img, "Last frame": img2}
-        plt.figure(figsize=(16,8), layout="tight")
+        plt.figure(figsize=(16, 8), layout="tight")
         for i, (title, img) in enumerate(title2img.items()):
             ax = plt.subplot(1, 3, i + 1)
             ax.set_title(title)
@@ -252,7 +256,7 @@ Single middle frame interpolation
 Recursive frame generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The process will take as input 2 original frames (first and last) and
 generate a midpoint frame. Then, it will repeat itself for pairs “first
@@ -294,9 +298,7 @@ generating :math:`2^t-1` images.
                 yield from self._recursive_generator(frame1, mid_frame, num_recursions - 1, bar)
                 yield from self._recursive_generator(mid_frame, frame2, num_recursions - 1, bar)
     
-        def interpolate_recursively(
-            self, frame1: np.ndarray, frame2: np.ndarray, times_to_interpolate: int
-        ) -> Generator[np.ndarray, None, None]:
+        def interpolate_recursively(self, frame1: np.ndarray, frame2: np.ndarray, times_to_interpolate: int) -> Generator[np.ndarray, None, None]:
             """Generates interpolated frames by repeatedly interpolating the midpoint.
     
             Args:
@@ -317,7 +319,7 @@ generating :math:`2^t-1` images.
 .. code:: ipython3
 
     def save_as_video(frames: Generator[np.ndarray, None, None], width: int, height: int, filename: Path):
-        out = cv2.VideoWriter(str(filename), cv2.VideoWriter_fourcc(*'VP90'), 30, (width, height))
+        out = cv2.VideoWriter(str(filename), cv2.VideoWriter_fourcc(*"VP90"), 30, (width, height))
         for frame in frames:
             img = frame[0]
             img = np.clip(img, 0, 1)
@@ -330,7 +332,7 @@ generating :math:`2^t-1` images.
 .. code:: ipython3
 
     height, width = input_images[0][0].shape[:2]
-    interpolator = Interpolator(film_model) 
+    interpolator = Interpolator(film_model)
     frames = interpolator.interpolate_recursively(input_images[0], input_images[1], 5)
     save_as_video(frames, width, height, OUTPUT_VIDEO_PATH)
 
@@ -365,7 +367,7 @@ generating :math:`2^t-1` images.
 Convert the model to OpenVINO IR
 --------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To convert a TensorFlow Keras Model to OpenVINO Intermediate
 Representation (IR), call the ``openvino.convert_model()`` function and
@@ -393,12 +395,12 @@ object to disk using the ``openvino.save_model()`` function.
 Inference
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -409,8 +411,8 @@ select device from dropdown list for running inference using OpenVINO
     core = ov.Core()
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     device
@@ -431,7 +433,7 @@ select device from dropdown list for running inference using OpenVINO
 Single middle frame interpolation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model output has multiple tensors, including auxiliary inference data.
 The main output tensor - interpolated image - is stored at “image” key.
@@ -456,7 +458,7 @@ Model returned intermediate image. Let’s see what it is.
 Recursive frame generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now let’s create a smooth video by recursively generating frames between
 initial, middle and final images.
@@ -499,7 +501,7 @@ initial, middle and final images.
 Interactive inference
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -511,17 +513,24 @@ Interactive inference
         save_as_video(frames, width, height, filename)
         return filename
     
+    
     demo = gr.Interface(
         generate,
         [
             gr.Image(label="First image"),
             gr.Image(label="Last image"),
-            gr.Slider(1, 8, step=1, label="Times to interpolate", info="""Controls the number of times the frame interpolator is invoked.
-            The output will be the interpolation video with (2^value + 1) frames, fps of 30.""")
+            gr.Slider(
+                1,
+                8,
+                step=1,
+                label="Times to interpolate",
+                info="""Controls the number of times the frame interpolator is invoked.
+            The output will be the interpolation video with (2^value + 1) frames, fps of 30.""",
+            ),
         ],
         gr.Video(),
         examples=[[*IMAGES.values(), 5]],
-        allow_flagging="never"
+        allow_flagging="never",
     )
     try:
         demo.queue().launch(debug=False)

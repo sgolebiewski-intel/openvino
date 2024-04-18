@@ -39,30 +39,30 @@ The notebook contains the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Instantiate model <#instantiate-model>`__
--  `Run PyTorch model inference <#run-pytorch-model-inference>`__
+-  `Instantiate model <#Instantiate-model>`__
+-  `Run PyTorch model inference <#Run-PyTorch-model-inference>`__
 -  `Convert model to OpenVINO Intermediate Representation (IR)
-   format. <#convert-model-to-openvino-intermediate-representation-ir-format->`__
--  `Run OpenVINO model <#run-openvino-model>`__
+   format. <#Convert-model-to-OpenVINO-Intermediate-Representation-(IR)-format.>`__
+-  `Run OpenVINO model <#Run-OpenVINO-model>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Quantize model to INT8 using
-   NNCF <#quantize-model-to-int8-using-nncf>`__
+   NNCF <#Quantize-model-to-INT8-using-NNCF>`__
 
-   -  `Prepare datasets <#prepare-datasets>`__
-   -  `Perform quantization <#perform-quantization>`__
-   -  `Run quantized OpenVINO model <#run-quantized-openvino-model>`__
-   -  `Compare File Size <#compare-file-size>`__
+   -  `Prepare datasets <#Prepare-datasets>`__
+   -  `Perform quantization <#Perform-quantization>`__
+   -  `Run quantized OpenVINO model <#Run-quantized-OpenVINO-model>`__
+   -  `Compare File Size <#Compare-File-Size>`__
    -  `Compare inference time of the FP16 IR and quantized
-      models <#compare-inference-time-of-the-fp16-ir-and-quantized-models>`__
+      models <#Compare-inference-time-of-the-FP16-IR-and-quantized-models>`__
 
--  `Interactive demo <#interactive-demo>`__
+-  `Interactive demo <#Interactive-demo>`__
 
 Instantiate model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 CLIP (Contrastive Language-Image Pre-Training) is a neural network
 trained on various (image, text) pairs. It can be instructed in natural
@@ -101,7 +101,14 @@ tokenizer and preparing the images.
 
 .. code:: ipython3
 
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu gradio "openvino>=2023.1.0" "transformers[torch]>=4.30" "datasets" "nncf>=2.6.0" "torch>=2.1"
+    import platform
+    
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "gradio>=4.19" "openvino>=2023.1.0" "transformers[torch]>=4.30" "datasets" "nncf>=2.6.0" "torch>=2.1" Pillow
+    
+    if platform.system() != "Windows":
+        %pip install -q "matplotlib>=3.4"
+    else:
+        %pip install -q "matplotlib>=3.4,<3.7"
 
 
 .. parsed-literal::
@@ -136,7 +143,7 @@ tokenizer and preparing the images.
     from PIL import Image
     
     
-    def visualize_result(image:Image, labels:List[str], probs:np.ndarray, top:int = 5):
+    def visualize_result(image: Image, labels: List[str], probs: np.ndarray, top: int = 5):
         """
         Utility function for visualization classification results
         params:
@@ -148,7 +155,7 @@ tokenizer and preparing the images.
           None
         """
         plt.figure(figsize=(64, 64))
-        top_labels = np.argsort(-probs)[:min(top, probs.shape[0])]
+        top_labels = np.argsort(-probs)[: min(top, probs.shape[0])]
         top_probs = probs[top_labels]
         plt.subplot(8, 8, 1)
         plt.imshow(image)
@@ -163,11 +170,10 @@ tokenizer and preparing the images.
         plt.yticks(y, [labels[index] for index in top_labels])
         plt.xlabel("probability")
 
-
 Run PyTorch model inference
 ---------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To perform classification, define labels and load an image in RGB
 format. To give the model wider text context and improve guidance, we
@@ -181,25 +187,37 @@ similarity score for the final result.
 
 .. code:: ipython3
 
-    from urllib.request import urlretrieve
+    import requests
     from pathlib import Path
     
     
     sample_path = Path("data/coco.jpg")
     sample_path.parent.mkdir(parents=True, exist_ok=True)
-    urlretrieve(
-        "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg",
-        sample_path,
-    )
+    r = requests.get("https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg")
+    
+    with sample_path.open("wb") as f:
+        f.write(r.content)
+    
     image = Image.open(sample_path)
     
-    input_labels = ['cat', 'dog', 'wolf', 'tiger', 'man', 'horse', 'frog', 'tree', 'house', 'computer']
+    input_labels = [
+        "cat",
+        "dog",
+        "wolf",
+        "tiger",
+        "man",
+        "horse",
+        "frog",
+        "tree",
+        "house",
+        "computer",
+    ]
     text_descriptions = [f"This is a photo of a {label}" for label in input_labels]
     
     inputs = processor(text=text_descriptions, images=[image], return_tensors="pt", padding=True)
     
     results = model(**inputs)
-    logits_per_image = results['logits_per_image']  # this is the image-text similarity score
+    logits_per_image = results["logits_per_image"]  # this is the image-text similarity score
     probs = logits_per_image.softmax(dim=1).detach().numpy()  # we can take the softmax to get the label probabilities
     visualize_result(image, input_labels, probs[0])
 
@@ -211,7 +229,7 @@ similarity score for the final result.
 Convert model to OpenVINO Intermediate Representation (IR) format.
 ------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For best results with OpenVINO, it is recommended to convert the model
 to OpenVINO IR format. OpenVINO supports PyTorch via Model conversion
@@ -226,7 +244,7 @@ save it on disk for the next usage with ``ov.save_model``.
 
     import openvino as ov
     
-    fp16_model_path = Path('clip-vit-base-patch16.xml')
+    fp16_model_path = Path("clip-vit-base-patch16.xml")
     model.config.torchscript = True
     
     if not fp16_model_path.exists():
@@ -236,7 +254,7 @@ save it on disk for the next usage with ``ov.save_model``.
 Run OpenVINO model
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The steps for making predictions with the OpenVINO CLIP model are
 similar to the PyTorch model. Let us check the model result using the
@@ -252,7 +270,7 @@ same input data from the example above with PyTorch.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -262,8 +280,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -299,7 +317,7 @@ Great! Looks like we got the same result.
 Quantize model to INT8 using NNCF
 ---------------------------------
 
-## Quantize model to INT8 using
+`back to top ⬆️ <#Table-of-contents:>`__ ## Quantize model to INT8 using
 NNCF
 
 The goal of this part of tutorial is to demonstrate how to speed up the
@@ -328,7 +346,7 @@ inference faster. The optimization process contains the following steps:
 
     to_quantize = widgets.Checkbox(
         value=True,
-        description='Quantization',
+        description="Quantization",
         disabled=False,
     )
     
@@ -346,17 +364,17 @@ inference faster. The optimization process contains the following steps:
 .. code:: ipython3
 
     # Fetch skip_kernel_extension module
-    urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py',
-        filename='skip_kernel_extension.py'
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
     )
+    open("skip_kernel_extension.py", "w").write(r.text)
     
     %load_ext skip_kernel_extension
 
 Prepare datasets
 ~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The `Conceptual
 Captions <https://ai.google.com/research/ConceptualCaptions/>`__ dataset
@@ -507,7 +525,7 @@ model.
 Perform quantization
 ~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Create a quantized model from the pre-trained ``FP16`` model.
 
@@ -627,7 +645,7 @@ Create a quantized model from the pre-trained ``FP16`` model.
 Run quantized OpenVINO model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The steps for making predictions with the quantized OpenVINO CLIP model
 are similar to the PyTorch model. Let us check the model result using
@@ -656,7 +674,7 @@ Nice! Results looks similar to fp16 model results before quantization.
 Compare File Size
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -681,7 +699,7 @@ Compare File Size
 Compare inference time of the FP16 IR and quantized models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To measure the inference
+`back to top ⬆️ <#Table-of-contents:>`__ To measure the inference
 performance of the ``FP16`` and ``INT8`` models, we use median inference
 time on calibration dataset. So we can approximately estimate the speed
 up of the dynamic quantized models.
@@ -724,7 +742,7 @@ up of the dynamic quantized models.
 Interactive demo
 ----------------
 
-## Interactive demo
+`back to top ⬆️ <#Table-of-contents:>`__ ## Interactive demo
 
 Now, it is your turn! You can provide your own image and comma-separated
 list of labels for zero-shot classification.
@@ -737,10 +755,11 @@ example, ``cat,dog,bird``)
 
     import gradio as gr
     
-    model_path = Path('clip-vit-base-patch16-int8.xml')
+    model_path = Path("clip-vit-base-patch16-int8.xml")
     if not model_path.exists():
-        model_path = Path('clip-vit-base-patch16.xml')
+        model_path = Path("clip-vit-base-patch16.xml")
     compiled_model = core.compile_model(model_path, device.value)
+    
     
     def classify(image, text):
         """Classify image using classes listing.
@@ -755,7 +774,7 @@ example, ``cat,dog,bird``)
         inputs = processor(text=text_descriptions, images=[image], return_tensors="np", padding=True)
         ov_logits_per_image = compiled_model(dict(inputs))[0]
         probs = softmax(ov_logits_per_image, axis=1)[0]
-        
+    
         return {label: float(prob) for label, prob in zip(labels, probs)}
     
     

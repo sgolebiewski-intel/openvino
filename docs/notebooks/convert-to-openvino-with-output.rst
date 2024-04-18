@@ -7,23 +7,23 @@ format to OpenVINO Intermediate Representation (IR).
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `OpenVINO IR format <#openvino-ir-format>`__
--  `Fetching example models <#fetching-example-models>`__
--  `Conversion <#conversion>`__
+-  `OpenVINO IR format <#OpenVINO-IR-format>`__
+-  `Fetching example models <#Fetching-example-models>`__
+-  `Conversion <#Conversion>`__
 
-   -  `Setting Input Shapes <#setting-input-shapes>`__
-   -  `Compressing a Model to FP16 <#compressing-a-model-to-fp16>`__
-   -  `Convert Models from memory <#convert-models-from-memory>`__
+   -  `Setting Input Shapes <#Setting-Input-Shapes>`__
+   -  `Compressing a Model to FP16 <#Compressing-a-Model-to-FP16>`__
+   -  `Convert Models from memory <#Convert-Models-from-memory>`__
 
 -  `Migration from Legacy conversion
-   API <#migration-from-legacy-conversion-api>`__
+   API <#Migration-from-Legacy-conversion-API>`__
 
-   -  `Specifying Layout <#specifying-layout>`__
-   -  `Changing Model Layout <#changing-model-layout>`__
+   -  `Specifying Layout <#Specifying-Layout>`__
+   -  `Changing Model Layout <#Changing-Model-Layout>`__
    -  `Specifying Mean and Scale
-      Values <#specifying-mean-and-scale-values>`__
-   -  `Reversing Input Channels <#reversing-input-channels>`__
-   -  `Cutting Off Parts of a Model <#cutting-off-parts-of-a-model>`__
+      Values <#Specifying-Mean-and-Scale-Values>`__
+   -  `Reversing Input Channels <#Reversing-Input-Channels>`__
+   -  `Cutting Off Parts of a Model <#Cutting-Off-Parts-of-a-Model>`__
 
 .. code:: ipython3
 
@@ -35,7 +35,7 @@ Table of contents:
 
 .. parsed-literal::
 
-    Requirement already satisfied: pip in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (24.0)
+    Requirement already satisfied: pip in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (24.0)
 
 
 .. parsed-literal::
@@ -51,7 +51,7 @@ Table of contents:
 OpenVINO IR format
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 OpenVINO `Intermediate Representation
 (IR) <https://docs.openvino.ai/2024/documentation/openvino-ir-format.html>`__
@@ -139,7 +139,7 @@ documentation.
 Fetching example models
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 This notebook uses two models for conversion examples:
 
@@ -168,18 +168,12 @@ NLP model from Hugging Face and export it in ONNX format:
     ONNX_NLP_MODEL_PATH = MODEL_DIRECTORY_PATH / "distilbert.onnx"
     
     # download model
-    hf_model = AutoModelForSequenceClassification.from_pretrained(
-        "distilbert-base-uncased-finetuned-sst-2-english"
-    )
+    hf_model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
     # initialize tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(
-        "distilbert-base-uncased-finetuned-sst-2-english"
-    )
+    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
     
     # get model onnx config function for output feature format sequence-classification
-    model_kind, model_onnx_config = FeaturesManager.check_supported_model_or_raise(
-        hf_model, feature="sequence-classification"
-    )
+    model_kind, model_onnx_config = FeaturesManager.check_supported_model_or_raise(hf_model, feature="sequence-classification")
     # fill onnx config based on pytorch model config
     onnx_config = model_onnx_config(hf_model.config)
     
@@ -195,19 +189,19 @@ NLP model from Hugging Face and export it in ONNX format:
 
 .. parsed-literal::
 
-    2024-04-09 22:51:30.497155: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-09 22:51:30.531394: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-17 23:27:23.489620: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-17 23:27:23.524697: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-04-09 22:51:31.160333: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-17 23:27:24.035165: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/distilbert/modeling_distilbert.py:246: TracerWarning: torch.tensor results are registered as constants in the trace. You can safely ignore this warning if you use this function to create tensors out of constant variables that would be the same every time you call this function. In any other case, this might cause the trace to be incorrect.
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/distilbert/modeling_distilbert.py:246: TracerWarning: torch.tensor results are registered as constants in the trace. You can safely ignore this warning if you use this function to create tensors out of constant variables that would be the same every time you call this function. In any other case, this might cause the trace to be incorrect.
       mask, torch.tensor(torch.finfo(scores.dtype).min)
 
 
@@ -430,9 +424,7 @@ Convert PyTorch model to ONNX format:
     else:
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore")
-            torch.onnx.export(
-                model=pytorch_model, args=torch.randn(1, 3, 224, 224), f=ONNX_CV_MODEL_PATH
-            )
+            torch.onnx.export(model=pytorch_model, args=torch.randn(1, 3, 224, 224), f=ONNX_CV_MODEL_PATH)
         print(f"ONNX model exported to {ONNX_CV_MODEL_PATH}")
 
 
@@ -444,7 +436,7 @@ Convert PyTorch model to ONNX format:
 Conversion
 ----------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To convert a model to OpenVINO IR, use the following API:
 
@@ -493,7 +485,7 @@ To convert a model to OpenVINO IR, use the following API:
 Setting Input Shapes
 ^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model conversion is supported for models with dynamic input shapes that
 contain undefined dimensions. However, if the shape of data is not going
@@ -510,9 +502,7 @@ documentation.
 
     import openvino as ov
     
-    ov_model = ov.convert_model(
-        ONNX_NLP_MODEL_PATH, input=[("input_ids", [1, 128]), ("attention_mask", [1, 128])]
-    )
+    ov_model = ov.convert_model(ONNX_NLP_MODEL_PATH, input=[("input_ids", [1, 128]), ("attention_mask", [1, 128])])
 
 .. code:: ipython3
 
@@ -549,9 +539,7 @@ conversion API parameter as ``-1`` or ``?`` when using ``ovc``:
 
     import openvino as ov
     
-    ov_model = ov.convert_model(
-        ONNX_NLP_MODEL_PATH, input=[("input_ids", [1, -1]), ("attention_mask", [1, -1])]
-    )
+    ov_model = ov.convert_model(ONNX_NLP_MODEL_PATH, input=[("input_ids", [1, -1]), ("attention_mask", [1, -1])])
 
 .. code:: ipython3
 
@@ -594,7 +582,11 @@ sequence length dimension:
     sequence_length_dim = ov.Dimension(10, 128)
     
     ov_model = ov.convert_model(
-        ONNX_NLP_MODEL_PATH, input=[("input_ids", [1, sequence_length_dim]), ("attention_mask", [1, sequence_length_dim])]
+        ONNX_NLP_MODEL_PATH,
+        input=[
+            ("input_ids", [1, sequence_length_dim]),
+            ("attention_mask", [1, sequence_length_dim]),
+        ],
     )
 
 .. code:: ipython3
@@ -625,7 +617,7 @@ sequence length dimension:
 Compressing a Model to FP16
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 By default model weights compressed to FP16 format when saving OpenVINO
 model to IR. This saves up to 2x storage space for the model file and in
@@ -637,7 +629,7 @@ disabled by setting ``compress_to_fp16`` flag to ``False``:
     import openvino as ov
     
     ov_model = ov.convert_model(ONNX_NLP_MODEL_PATH)
-    ov.save_model(ov_model, MODEL_DIRECTORY_PATH / 'distilbert.xml', compress_to_fp16=False)
+    ov.save_model(ov_model, MODEL_DIRECTORY_PATH / "distilbert.xml", compress_to_fp16=False)
 
 .. code:: ipython3
 
@@ -661,7 +653,7 @@ disabled by setting ``compress_to_fp16`` flag to ``False``:
 Convert Models from memory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Model conversion API supports passing original framework Python object
 directly. More details can be found in
@@ -695,25 +687,25 @@ frameworks conversion guides.
     os.environ["TFHUB_CACHE_DIR"] = str(Path("./tfhub_modules").resolve())
     
     model = hub.load("https://www.kaggle.com/models/google/movenet/frameworks/TensorFlow2/variations/singlepose-lightning/versions/4")
-    movenet = model.signatures['serving_default']
+    movenet = model.signatures["serving_default"]
     
     ov_model = ov.convert_model(movenet)
 
 
 .. parsed-literal::
 
-    2024-04-09 22:51:50.191112: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
-    2024-04-09 22:51:50.191144: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:168] retrieving CUDA diagnostic information for host: iotg-dev-workstation-07
-    2024-04-09 22:51:50.191149: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:175] hostname: iotg-dev-workstation-07
-    2024-04-09 22:51:50.191326: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:199] libcuda reported version is: 470.223.2
-    2024-04-09 22:51:50.191343: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:203] kernel reported version is: 470.182.3
-    2024-04-09 22:51:50.191347: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
+    2024-04-17 23:27:44.237192: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
+    2024-04-17 23:27:44.237227: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:168] retrieving CUDA diagnostic information for host: iotg-dev-workstation-07
+    2024-04-17 23:27:44.237231: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:175] hostname: iotg-dev-workstation-07
+    2024-04-17 23:27:44.237454: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:199] libcuda reported version is: 470.223.2
+    2024-04-17 23:27:44.237472: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:203] kernel reported version is: 470.182.3
+    2024-04-17 23:27:44.237475: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
 
 
 Migration from Legacy conversion API
 ------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In the 2023.1 OpenVINO release OpenVINO Model Conversion API was
 introduced with the corresponding Python API: ``openvino.convert_model``
@@ -732,7 +724,7 @@ Preprocessing API.
 Specifying Layout
 ^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Layout defines the meaning of dimensions in a shape and can be specified
 for both inputs and outputs. Some preprocessing requires to set input
@@ -754,7 +746,7 @@ Resnet50 model that was exported to the ONNX format:
     ov_model = ov.convert_model(ONNX_CV_MODEL_PATH)
     
     prep = ov.preprocess.PrePostProcessor(ov_model)
-    prep.input('input.1').model().set_layout(ov.Layout("nchw"))
+    prep.input("input.1").model().set_layout(ov.Layout("nchw"))
     ov_model = prep.build()
 
 .. code:: ipython3
@@ -776,7 +768,7 @@ Resnet50 model that was exported to the ONNX format:
 Changing Model Layout
 ^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Transposing of matrices/tensors is a typical operation in Deep Learning
 - you may have a BMP image ``640x480``, which is an array of
@@ -794,8 +786,8 @@ and the layout of an original model:
     ov_model = ov.convert_model(ONNX_CV_MODEL_PATH)
     
     prep = ov.preprocess.PrePostProcessor(ov_model)
-    prep.input('input.1').tensor().set_layout(ov.Layout("nhwc"))
-    prep.input('input.1').model().set_layout(ov.Layout("nchw"))
+    prep.input("input.1").tensor().set_layout(ov.Layout("nhwc"))
+    prep.input("input.1").model().set_layout(ov.Layout("nchw"))
     ov_model = prep.build()
 
 .. code:: ipython3
@@ -806,14 +798,12 @@ and the layout of an original model:
     ov_model = mo.convert_model(ONNX_CV_MODEL_PATH, layout="nchw->nhwc")
     
     # alternatively use source_layout and target_layout parameters
-    ov_model = mo.convert_model(
-        ONNX_CV_MODEL_PATH, source_layout="nchw", target_layout="nhwc"
-    )
+    ov_model = mo.convert_model(ONNX_CV_MODEL_PATH, source_layout="nchw", target_layout="nhwc")
 
 Specifying Mean and Scale Values
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Using Preprocessing API ``mean`` and ``scale`` values can be set. Using
 these API, model embeds the corresponding preprocessing block for
@@ -851,7 +841,7 @@ more examples.
 Reversing Input Channels
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Sometimes, input images for your application can be of the ``RGB`` (or
 ``BGR``) format, and the model is trained on images of the ``BGR`` (or
@@ -867,8 +857,8 @@ the color channels before inference.
     ov_model = ov.convert_model(ONNX_CV_MODEL_PATH)
     
     prep = ov.preprocess.PrePostProcessor(ov_model)
-    prep.input('input.1').tensor().set_layout(ov.Layout("nchw"))
-    prep.input('input.1').preprocess().reverse_channels()
+    prep.input("input.1").tensor().set_layout(ov.Layout("nchw"))
+    prep.input("input.1").preprocess().reverse_channels()
     ov_model = prep.build()
 
 .. code:: ipython3
@@ -881,7 +871,7 @@ the color channels before inference.
 Cutting Off Parts of a Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Cutting model inputs and outputs from a model is no longer available in
 the new conversion API. Instead, we recommend performing the cut in the

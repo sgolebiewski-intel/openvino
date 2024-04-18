@@ -41,49 +41,41 @@ below.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
+-  `Prerequisites <#Prerequisites>`__
 -  `Get Pytorch model and OpenVINO IR
-   model <#get-pytorch-model-and-openvino-ir-model>`__
+   model <#Get-Pytorch-model-and-OpenVINO-IR-model>`__
 
    -  `Define validator and data
-      loader <#define-validator-and-data-loader>`__
+      loader <#Define-validator-and-data-loader>`__
    -  `Prepare calibration and validation
-      datasets <#prepare-calibration-and-validation-datasets>`__
-   -  `Prepare validation function <#prepare-validation-function>`__
+      datasets <#Prepare-calibration-and-validation-datasets>`__
+   -  `Prepare validation function <#Prepare-validation-function>`__
 
 -  `Run quantization with accuracy
-   control <#run-quantization-with-accuracy-control>`__
+   control <#Run-quantization-with-accuracy-control>`__
 -  `Compare Accuracy and Performance of the Original and Quantized
-   Models <#compare-accuracy-and-performance-of-the-original-and-quantized-models>`__
+   Models <#Compare-Accuracy-and-Performance-of-the-Original-and-Quantized-Models>`__
 
 Prerequisites
 ^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Install necessary packages.
 
 .. code:: ipython3
 
-    %pip install -q "openvino>=2023.1.0"
-    %pip install -q "nncf>=2.6.0"
-    %pip install -q "ultralytics==8.0.43" --extra-index-url https://download.pytorch.org/whl/cpu
-
-
-.. parsed-literal::
-
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-
+    %pip install -q "openvino>=2024.0.0"
+    %pip install -q "nncf>=2.9.0"
+    %pip install -q "ultralytics==8.1.42" tqdm --extra-index-url https://download.pytorch.org/whl/cpu
 
 Get Pytorch model and OpenVINO IR model
 ---------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Generally, PyTorch models represent an instance of the
-`torch.nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
+```torch.nn.Module`` <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
 class, initialized by a state dictionary with model weights. We will use
 the YOLOv8 nano model (also known as ``yolov8n``) pre-trained on a COCO
 dataset, which is available in this
@@ -105,14 +97,14 @@ we do not need to do these steps manually.
     from pathlib import Path
     
     from ultralytics import YOLO
-    from ultralytics.yolo.cfg import get_cfg
-    from ultralytics.yolo.data.utils import check_det_dataset
-    from ultralytics.yolo.engine.validator import BaseValidator as Validator
-    from ultralytics.yolo.utils import DEFAULT_CFG
-    from ultralytics.yolo.utils import ops
-    from ultralytics.yolo.utils.metrics import ConfusionMatrix
+    from ultralytics.cfg import get_cfg
+    from ultralytics.data.utils import check_det_dataset
+    from ultralytics.engine.validator import BaseValidator as Validator
+    from ultralytics.utils import DEFAULT_CFG
+    from ultralytics.utils import ops
+    from ultralytics.utils.metrics import ConfusionMatrix
     
-    ROOT = os.path.abspath('')
+    ROOT = os.path.abspath("")
     
     MODEL_NAME = "yolov8n-seg"
     
@@ -123,11 +115,13 @@ we do not need to do these steps manually.
 .. code:: ipython3
 
     # Fetch the notebook utils script from the openvino_notebooks repo
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     
     from notebook_utils import download_file
 
@@ -135,10 +129,12 @@ we do not need to do these steps manually.
 
     from zipfile import ZipFile
     
+    from ultralytics.data.utils import DATASETS_DIR
+    
     DATA_URL = "https://www.ultralytics.com/assets/coco128-seg.zip"
     CFG_URL = "https://raw.githubusercontent.com/ultralytics/ultralytics/8ebe94d1e928687feaa1fee6d5668987df5e43be/ultralytics/datasets/coco128-seg.yaml"  # last compatible format with ultralytics 8.0.43
     
-    OUT_DIR = Path('./datasets')
+    OUT_DIR = DATASETS_DIR
     
     DATA_PATH = OUT_DIR / "coco128-seg.zip"
     CFG_PATH = OUT_DIR / "coco128-seg.yaml"
@@ -147,19 +143,19 @@ we do not need to do these steps manually.
     download_file(CFG_URL, CFG_PATH.name, CFG_PATH.parent)
     
     if not (OUT_DIR / "coco128/labels").exists():
-        with ZipFile(DATA_PATH , "r") as zip_ref:
+        with ZipFile(DATA_PATH, "r") as zip_ref:
             zip_ref.extractall(OUT_DIR)
 
 
 .. parsed-literal::
 
-    'datasets/coco128-seg.zip' already exists.
+    '/home/maleksandr/test_notebooks/ultrali/datasets/coco128-seg.zip' already exists.
 
 
 
 .. parsed-literal::
 
-    datasets/coco128-seg.yaml:   0%|          | 0.00/0.98k [00:00<?, ?B/s]
+    /home/maleksandr/test_notebooks/ultrali/datasets/coco128-seg.yaml:   0%|          | 0.00/0.98k [00:00<?, ?B/s]
 
 
 Load model.
@@ -178,7 +174,7 @@ Load model.
 Define validator and data loader
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The original model repository uses a ``Validator`` wrapper, which
 represents the accuracy validation pipeline. It creates dataloader and
@@ -192,12 +188,16 @@ validator class instance.
 
 .. code:: ipython3
 
-    validator = model.ValidatorClass(args)
+    from ultralytics.data.converter import coco80_to_coco91_class
+    
+    
+    validator = model.task_map[model.task]["validator"](args=args)
     validator.data = check_det_dataset(args.data)
-    data_loader = validator.get_dataloader("datasets/coco128-seg", 1)
+    validator.stride = 3
+    data_loader = validator.get_dataloader(OUT_DIR / "coco128-seg", 1)
     
     validator.is_coco = True
-    validator.class_map = ops.coco80_to_coco91_class()
+    validator.class_map = coco80_to_coco91_class()
     validator.names = model.model.names
     validator.metrics.names = validator.names
     validator.nc = model.model.model[-1].nc
@@ -205,17 +205,10 @@ validator class instance.
     validator.process = ops.process_mask
     validator.plot_masks = []
 
-
-.. parsed-literal::
-
-    val: Scanning datasets/coco128-seg/labels/train2017... 126 images, 2 backgrounds, 0 corrupt: 100%|██████████| 128/128 [00:00<00:00, 964.99it/s]
-    val: New cache created: datasets/coco128-seg/labels/train2017.cache
-
-
 Prepare calibration and validation datasets
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We can use one dataset as calibration and validation datasets. Name it
 ``quantization_dataset``.
@@ -237,13 +230,13 @@ We can use one dataset as calibration and validation datasets. Name it
 
 .. parsed-literal::
 
-    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, tensorflow, onnx, openvino
+    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, openvino
 
 
 Prepare validation function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -258,11 +251,11 @@ Prepare validation function
         validation_loader: torch.utils.data.DataLoader,
         validator: Validator,
         num_samples: int = None,
-        log=True
+        log=True,
     ) -> float:
         validator.seen = 0
         validator.jdict = []
-        validator.stats = []
+        validator.stats = dict(tp_m=[], tp=[], conf=[], pred_cls=[], target_cls=[])
         validator.batch_i = 1
         validator.confusion_matrix = ConfusionMatrix(nc=validator.nc)
         num_outputs = len(compiled_model.outputs)
@@ -290,7 +283,7 @@ Prepare validation function
             stats_metrics = stats["metrics/mAP50-95(M)"]
         if log:
             print(f"Validate: dataset length = {counter}, metric value = {stats_metrics:.3f}")
-        
+    
         return stats_metrics
     
     
@@ -299,7 +292,7 @@ Prepare validation function
 Run quantization with accuracy control
 --------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 You should provide the calibration dataset and the validation dataset.
 It can be the same dataset. - parameter ``max_drop`` defines the
@@ -327,19 +320,8 @@ value 25 to speed up the execution.
         max_drop=0.01,
         preset=nncf.QuantizationPreset.MIXED,
         subset_size=128,
-        advanced_accuracy_restorer_parameters=AdvancedAccuracyRestorerParameters(
-            ranking_subset_size=25
-        ),
+        advanced_accuracy_restorer_parameters=AdvancedAccuracyRestorerParameters(ranking_subset_size=25),
     )
-
-
-.. parsed-literal::
-
-    2024-02-28 13:33:46.187903: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-02-28 13:33:46.189894: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
-    2024-02-28 13:33:46.226943: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-02-28 13:33:46.942396: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 
@@ -361,6 +343,12 @@ value 25 to speed up the execution.
     <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
     </pre>
 
+
+
+.. parsed-literal::
+
+    /home/maleksandr/test_notebooks/ultrali/openvino_notebooks/notebooks/quantizing-model-with-accuracy-control/venv/lib/python3.10/site-packages/nncf/experimental/tensor/tensor.py:84: RuntimeWarning: invalid value encountered in multiply
+      return Tensor(self.data * unwrap_tensor_data(other))
 
 
 
@@ -388,19 +376,19 @@ value 25 to speed up the execution.
 
     INFO:nncf:Validation of initial model was started
     INFO:nncf:Elapsed Time: 00:00:00
-    INFO:nncf:Elapsed Time: 00:00:05
-    INFO:nncf:Metric of initial model: 0.36611468358574506
+    INFO:nncf:Elapsed Time: 00:00:03
+    INFO:nncf:Metric of initial model: 0.3651327608484117
     INFO:nncf:Collecting values for each data item using the initial model
-    INFO:nncf:Elapsed Time: 00:00:06
+    INFO:nncf:Elapsed Time: 00:00:04
     INFO:nncf:Validation of quantized model was started
     INFO:nncf:Elapsed Time: 00:00:00
-    INFO:nncf:Elapsed Time: 00:00:05
-    INFO:nncf:Metric of quantized model: 0.3406029678292
+    INFO:nncf:Elapsed Time: 00:00:03
+    INFO:nncf:Metric of quantized model: 0.34040251506886543
     INFO:nncf:Collecting values for each data item using the quantized model
-    INFO:nncf:Elapsed Time: 00:00:06
-    INFO:nncf:Accuracy drop: 0.02551171575654504 (absolute)
-    INFO:nncf:Accuracy drop: 0.02551171575654504 (absolute)
-    INFO:nncf:Total number of quantized operations in the model: 91
+    INFO:nncf:Elapsed Time: 00:00:04
+    INFO:nncf:Accuracy drop: 0.024730245779546245 (absolute)
+    INFO:nncf:Accuracy drop: 0.024730245779546245 (absolute)
+    INFO:nncf:Total number of quantized operations in the model: 92
     INFO:nncf:Number of parallel workers to rank quantized operations: 1
     INFO:nncf:ORIGINAL metric is used to rank quantizers
 
@@ -428,29 +416,106 @@ value 25 to speed up the execution.
 
 .. parsed-literal::
 
-    INFO:nncf:Elapsed Time: 00:02:25
+    INFO:nncf:Elapsed Time: 00:01:38
     INFO:nncf:Changing the scope of quantizer nodes was started
+    INFO:nncf:Reverted 1 operations to the floating-point precision: 
+    	__module.model.4.m.0.cv2.conv/aten::_convolution/Convolution
+    INFO:nncf:Accuracy drop with the new quantization scope is 0.023408466397916217 (absolute)
+    INFO:nncf:Reverted 1 operations to the floating-point precision: 
+    	__module.model.18.m.0.cv2.conv/aten::_convolution/Convolution
+    INFO:nncf:Accuracy drop with the new quantization scope is 0.024749654890442174 (absolute)
+    INFO:nncf:Re-calculating ranking scores for remaining groups
+
+
+
+.. parsed-literal::
+
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
+
+
+.. parsed-literal::
+
+    INFO:nncf:Elapsed Time: 00:01:36
+    INFO:nncf:Reverted 1 operations to the floating-point precision: 
+    	__module.model.22.proto.cv3.conv/aten::_convolution/Convolution
+    INFO:nncf:Accuracy drop with the new quantization scope is 0.023229513575966754 (absolute)
     INFO:nncf:Reverted 2 operations to the floating-point precision: 
-    	/model.22/Add_11
-    	/model.22/Sub_1
-    INFO:nncf:Accuracy drop with the new quantization scope is 0.013524778006655136 (absolute)
+    	__module.model.22/aten::add/Add_6
+    	__module.model.22/aten::sub/Subtract
+    INFO:nncf:Accuracy drop with the new quantization scope is 0.02425608378963906 (absolute)
+    INFO:nncf:Re-calculating ranking scores for remaining groups
+
+
+
+.. parsed-literal::
+
+    Output()
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+
+
+
+
+.. raw:: html
+
+    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+    </pre>
+
+
+
+.. parsed-literal::
+
+    INFO:nncf:Elapsed Time: 00:01:35
     INFO:nncf:Reverted 1 operations to the floating-point precision: 
-    	/model.22/Mul_5
-    INFO:nncf:Accuracy drop with the new quantization scope is 0.011937545450662279 (absolute)
-    INFO:nncf:Reverted 1 operations to the floating-point precision: 
-    	/model.2/cv1/conv/Conv/WithoutBiases
-    INFO:nncf:Algorithm completed: achieved required accuracy drop 0.00905169821338292 (absolute)
-    INFO:nncf:4 out of 91 were reverted back to the floating-point precision:
-    	/model.22/Add_11
-    	/model.22/Sub_1
-    	/model.22/Mul_5
-    	/model.2/cv1/conv/Conv/WithoutBiases
+    	__module.model.6.m.0.cv2.conv/aten::_convolution/Convolution
+    INFO:nncf:Accuracy drop with the new quantization scope is 0.023297881500256024 (absolute)
+    INFO:nncf:Reverted 2 operations to the floating-point precision: 
+    	__module.model.12.cv2.conv/aten::_convolution/Convolution
+    	__module.model.12.m.0.cv1.conv/aten::_convolution/Convolution
+    INFO:nncf:Accuracy drop with the new quantization scope is 0.021779128052922092 (absolute)
+    INFO:nncf:Reverted 2 operations to the floating-point precision: 
+    	__module.model.7.conv/aten::_convolution/Convolution
+    	__module.model.12.cv1.conv/aten::_convolution/Convolution
+    INFO:nncf:Accuracy drop with the new quantization scope is 0.01696486517685941 (absolute)
+    INFO:nncf:Reverted 2 operations to the floating-point precision: 
+    	__module.model.22/aten::add/Add_7
+    	__module.model.22/aten::sub/Subtract_1
+    INFO:nncf:Algorithm completed: achieved required accuracy drop 0.005923437521415831 (absolute)
+    INFO:nncf:9 out of 92 were reverted back to the floating-point precision:
+    	__module.model.4.m.0.cv2.conv/aten::_convolution/Convolution
+    	__module.model.22.proto.cv3.conv/aten::_convolution/Convolution
+    	__module.model.6.m.0.cv2.conv/aten::_convolution/Convolution
+    	__module.model.12.cv2.conv/aten::_convolution/Convolution
+    	__module.model.12.m.0.cv1.conv/aten::_convolution/Convolution
+    	__module.model.7.conv/aten::_convolution/Convolution
+    	__module.model.12.cv1.conv/aten::_convolution/Convolution
+    	__module.model.22/aten::add/Add_7
+    	__module.model.22/aten::sub/Subtract_1
 
 
 Compare Accuracy and Performance of the Original and Quantized Models
 ---------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now we can compare metrics of the Original non-quantized OpenVINO IR
 model and Quantized OpenVINO IR model to make sure that the ``max_drop``
@@ -464,8 +529,8 @@ is not exceeded.
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -476,7 +541,7 @@ is not exceeded.
 
 .. parsed-literal::
 
-    Dropdown(description='Device:', index=1, options=('CPU', 'AUTO'), value='AUTO')
+    Dropdown(description='Device:', index=4, options=('CPU', 'GPU.0', 'GPU.1', 'GPU.2', 'AUTO'), value='AUTO')
 
 
 
@@ -484,6 +549,8 @@ is not exceeded.
 
     core = ov.Core()
     ov_config = {}
+    if device.value != "CPU":
+        quantized_model.reshape({0: [1, 3, 640, 640]})
     if "GPU" in device.value or ("AUTO" in device.value and "GPU" in core.available_devices):
         ov_config = {"GPU_DISABLE_WINOGRAD_CONVOLUTION": "YES"}
     quantized_compiled_model = core.compile_model(quantized_model, device.value, ov_config)
@@ -493,8 +560,8 @@ is not exceeded.
     quantized_result = validation_ac(quantized_compiled_model, data_loader, validator)
     
     
-    print(f'[Original OpenVINO]: {pt_result:.4f}')
-    print(f'[Quantized OpenVINO]: {quantized_result:.4f}')
+    print(f"[Original OpenVINO]: {pt_result:.4f}")
+    print(f"[Quantized OpenVINO]: {quantized_result:.4f}")
 
 
 .. parsed-literal::
@@ -510,12 +577,13 @@ And compare performance.
 .. code:: ipython3
 
     from pathlib import Path
+    
     # Set model directory
     MODEL_DIR = Path("model")
     MODEL_DIR.mkdir(exist_ok=True)
     
-    ir_model_path = MODEL_DIR / 'ir_model.xml'
-    quantized_model_path = MODEL_DIR / 'quantized_model.xml'
+    ir_model_path = MODEL_DIR / "ir_model.xml"
+    quantized_model_path = MODEL_DIR / "quantized_model.xml"
     
     # Save models to use them in the commandline banchmark app
     ov.save_model(ov_model, ir_model_path, compress_to_fp16=False)
@@ -534,39 +602,39 @@ And compare performance.
     [Step 2/11] Loading OpenVINO Runtime
     [ WARNING ] Default duration 120 seconds is used for unknown device AUTO
     [ INFO ] OpenVINO:
-    [ INFO ] Build ................................. 2024.1.0-14589-0ef2fab3490
+    [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
     [ INFO ] 
     [ INFO ] Device info:
     [ INFO ] AUTO
-    [ INFO ] Build ................................. 2024.1.0-14589-0ef2fab3490
+    [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
     [ INFO ] 
     [ INFO ] 
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
     [ INFO ] Loading model files
-    [ INFO ] Read model took 17.83 ms
+    [ INFO ] Read model took 13.54 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
-    [ INFO ]     images (node: images) : f32 / [...] / [?,3,?,?]
+    [ INFO ]     x (node: x) : f32 / [...] / [?,3,?,?]
     [ INFO ] Model outputs:
-    [ INFO ]     output0 (node: output0) : f32 / [...] / [?,116,?]
-    [ INFO ]     output1 (node: output1) : f32 / [...] / [?,32,8..,8..]
+    [ INFO ]     ***NO_NAME*** (node: __module.model.22/aten::cat/Concat_8) : f32 / [...] / [?,116,16..]
+    [ INFO ]     input.199 (node: __module.model.22.cv4.2.1.act/aten::silu_/Swish_37) : f32 / [...] / [?,32,8..,8..]
     [Step 5/11] Resizing model to match image sizes and given batch
     [ INFO ] Model batch size: 1
-    [ INFO ] Reshaping model: 'images': [1,3,640,640]
-    [ INFO ] Reshape model took 13.50 ms
+    [ INFO ] Reshaping model: 'x': [1,3,640,640]
+    [ INFO ] Reshape model took 8.56 ms
     [Step 6/11] Configuring input of the model
     [ INFO ] Model inputs:
-    [ INFO ]     images (node: images) : u8 / [N,C,H,W] / [1,3,640,640]
+    [ INFO ]     x (node: x) : u8 / [N,C,H,W] / [1,3,640,640]
     [ INFO ] Model outputs:
-    [ INFO ]     output0 (node: output0) : f32 / [...] / [1,116,8400]
-    [ INFO ]     output1 (node: output1) : f32 / [...] / [1,32,160,160]
+    [ INFO ]     ***NO_NAME*** (node: __module.model.22/aten::cat/Concat_8) : f32 / [...] / [1,116,8400]
+    [ INFO ]     input.199 (node: __module.model.22.cv4.2.1.act/aten::silu_/Swish_37) : f32 / [...] / [1,32,160,160]
     [Step 7/11] Loading the model to the device
-    [ INFO ] Compile model took 320.32 ms
+    [ INFO ] Compile model took 437.16 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
-    [ INFO ]   NETWORK_NAME: torch_jit
+    [ INFO ]   NETWORK_NAME: Model0
     [ INFO ]   EXECUTION_DEVICES: ['CPU']
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
     [ INFO ]   OPTIMAL_NUMBER_OF_INFER_REQUESTS: 12
@@ -584,7 +652,7 @@ And compare performance.
     [ INFO ]     INFERENCE_PRECISION_HINT: <Type: 'float32'>
     [ INFO ]     KV_CACHE_PRECISION: <Type: 'float16'>
     [ INFO ]     LOG_LEVEL: Level.NO
-    [ INFO ]     NETWORK_NAME: torch_jit
+    [ INFO ]     NETWORK_NAME: Model0
     [ INFO ]     NUM_STREAMS: 12
     [ INFO ]     OPTIMAL_NUMBER_OF_INFER_REQUESTS: 12
     [ INFO ]     PERFORMANCE_HINT: THROUGHPUT
@@ -594,21 +662,21 @@ And compare performance.
     [ INFO ]   MODEL_PRIORITY: Priority.MEDIUM
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
-    [ WARNING ] No input files were given for input 'images'!. This input will be filled with random values!
-    [ INFO ] Fill input 'images' with random values 
+    [ WARNING ] No input files were given for input 'x'!. This input will be filled with random values!
+    [ INFO ] Fill input 'x' with random values 
     [Step 10/11] Measuring performance (Start inference asynchronously, 12 inference requests, limits: 120000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-    [ INFO ] First inference took 44.16 ms
+    [ INFO ] First inference took 46.51 ms
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            14820 iterations
-    [ INFO ] Duration:         120139.10 ms
+    [ INFO ] Count:            16872 iterations
+    [ INFO ] Duration:         120117.37 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        95.27 ms
-    [ INFO ]    Average:       97.10 ms
-    [ INFO ]    Min:           72.93 ms
-    [ INFO ]    Max:           164.81 ms
-    [ INFO ] Throughput:   123.36 FPS
+    [ INFO ]    Median:        85.10 ms
+    [ INFO ]    Average:       85.27 ms
+    [ INFO ]    Min:           53.55 ms
+    [ INFO ]    Max:           108.50 ms
+    [ INFO ] Throughput:   140.46 FPS
 
 
 .. code:: ipython3
@@ -624,39 +692,39 @@ And compare performance.
     [Step 2/11] Loading OpenVINO Runtime
     [ WARNING ] Default duration 120 seconds is used for unknown device AUTO
     [ INFO ] OpenVINO:
-    [ INFO ] Build ................................. 2024.1.0-14589-0ef2fab3490
+    [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
     [ INFO ] 
     [ INFO ] Device info:
     [ INFO ] AUTO
-    [ INFO ] Build ................................. 2024.1.0-14589-0ef2fab3490
+    [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
     [ INFO ] 
     [ INFO ] 
     [Step 3/11] Setting device configuration
     [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
     [Step 4/11] Reading model files
     [ INFO ] Loading model files
-    [ INFO ] Read model took 28.33 ms
+    [ INFO ] Read model took 20.52 ms
     [ INFO ] Original model I/O parameters:
     [ INFO ] Model inputs:
-    [ INFO ]     images (node: images) : f32 / [...] / [?,3,?,?]
+    [ INFO ]     x (node: x) : f32 / [...] / [?,3,?,?]
     [ INFO ] Model outputs:
-    [ INFO ]     output0 (node: output0) : f32 / [...] / [?,116,?]
-    [ INFO ]     output1 (node: output1) : f32 / [...] / [?,32,8..,8..]
+    [ INFO ]     ***NO_NAME*** (node: __module.model.22/aten::cat/Concat_8) : f32 / [...] / [?,116,16..]
+    [ INFO ]     input.199 (node: __module.model.22.cv4.2.1.act/aten::silu_/Swish_37) : f32 / [...] / [?,32,8..,8..]
     [Step 5/11] Resizing model to match image sizes and given batch
     [ INFO ] Model batch size: 1
-    [ INFO ] Reshaping model: 'images': [1,3,640,640]
-    [ INFO ] Reshape model took 17.60 ms
+    [ INFO ] Reshaping model: 'x': [1,3,640,640]
+    [ INFO ] Reshape model took 11.74 ms
     [Step 6/11] Configuring input of the model
     [ INFO ] Model inputs:
-    [ INFO ]     images (node: images) : u8 / [N,C,H,W] / [1,3,640,640]
+    [ INFO ]     x (node: x) : u8 / [N,C,H,W] / [1,3,640,640]
     [ INFO ] Model outputs:
-    [ INFO ]     output0 (node: output0) : f32 / [...] / [1,116,8400]
-    [ INFO ]     output1 (node: output1) : f32 / [...] / [1,32,160,160]
+    [ INFO ]     ***NO_NAME*** (node: __module.model.22/aten::cat/Concat_8) : f32 / [...] / [1,116,8400]
+    [ INFO ]     input.199 (node: __module.model.22.cv4.2.1.act/aten::silu_/Swish_37) : f32 / [...] / [1,32,160,160]
     [Step 7/11] Loading the model to the device
-    [ INFO ] Compile model took 605.73 ms
+    [ INFO ] Compile model took 711.53 ms
     [Step 8/11] Querying optimal runtime parameters
     [ INFO ] Model:
-    [ INFO ]   NETWORK_NAME: torch_jit
+    [ INFO ]   NETWORK_NAME: Model0
     [ INFO ]   EXECUTION_DEVICES: ['CPU']
     [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
     [ INFO ]   OPTIMAL_NUMBER_OF_INFER_REQUESTS: 12
@@ -674,7 +742,7 @@ And compare performance.
     [ INFO ]     INFERENCE_PRECISION_HINT: <Type: 'float32'>
     [ INFO ]     KV_CACHE_PRECISION: <Type: 'float16'>
     [ INFO ]     LOG_LEVEL: Level.NO
-    [ INFO ]     NETWORK_NAME: torch_jit
+    [ INFO ]     NETWORK_NAME: Model0
     [ INFO ]     NUM_STREAMS: 12
     [ INFO ]     OPTIMAL_NUMBER_OF_INFER_REQUESTS: 12
     [ INFO ]     PERFORMANCE_HINT: THROUGHPUT
@@ -684,19 +752,19 @@ And compare performance.
     [ INFO ]   MODEL_PRIORITY: Priority.MEDIUM
     [ INFO ]   LOADED_FROM_CACHE: False
     [Step 9/11] Creating infer requests and preparing input tensors
-    [ WARNING ] No input files were given for input 'images'!. This input will be filled with random values!
-    [ INFO ] Fill input 'images' with random values 
+    [ WARNING ] No input files were given for input 'x'!. This input will be filled with random values!
+    [ INFO ] Fill input 'x' with random values 
     [Step 10/11] Measuring performance (Start inference asynchronously, 12 inference requests, limits: 120000 ms duration)
     [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-    [ INFO ] First inference took 22.24 ms
+    [ INFO ] First inference took 35.64 ms
     [Step 11/11] Dumping statistics report
     [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            33624 iterations
-    [ INFO ] Duration:         120057.46 ms
+    [ INFO ] Count:            33564 iterations
+    [ INFO ] Duration:         120059.16 ms
     [ INFO ] Latency:
-    [ INFO ]    Median:        41.97 ms
-    [ INFO ]    Average:       42.70 ms
-    [ INFO ]    Min:           31.11 ms
-    [ INFO ]    Max:           86.51 ms
-    [ INFO ] Throughput:   280.07 FPS
+    [ INFO ]    Median:        42.72 ms
+    [ INFO ]    Average:       42.76 ms
+    [ INFO ]    Min:           23.29 ms
+    [ INFO ]    Max:           67.71 ms
+    [ INFO ] Throughput:   279.56 FPS
 

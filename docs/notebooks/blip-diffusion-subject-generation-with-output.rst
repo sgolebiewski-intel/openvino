@@ -12,51 +12,51 @@ subject-driven generation and editing applications.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#prerequisites>`__
--  `Load the model <#load-the-model>`__
--  `Infer the original model <#infer-the-original-model>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Load the model <#Load-the-model>`__
+-  `Infer the original model <#Infer-the-original-model>`__
 
    -  `Zero-Shot subject-driven
-      generation <#zero-shot-subject-driven-generation>`__
+      generation <#Zero-Shot-subject-driven-generation>`__
    -  `Controlled subject-driven generation
-      (Canny-edge) <#controlled-subject-driven-generation-canny-edge>`__
+      (Canny-edge) <#Controlled-subject-driven-generation-(Canny-edge)>`__
    -  `Controlled subject-driven generation
-      (Scribble) <#controlled-subject-driven-generation-scribble>`__
+      (Scribble) <#Controlled-subject-driven-generation-(Scribble)>`__
 
 -  `Convert the model to OpenVINO Intermediate Representation
-   (IR) <#convert-the-model-to-openvino-intermediate-representation-ir>`__
+   (IR) <#Convert-the-model-to-OpenVINO-Intermediate-Representation-(IR)>`__
 
-   -  `Q-Former <#q-former>`__
-   -  `Text encoder <#text-encoder>`__
-   -  `ControlNet <#controlnet>`__
-   -  `UNet <#unet>`__
-   -  `Variational Autoencoder (VAE) <#variational-autoencoder-vae>`__
-   -  `Select inference device <#select-inference-device>`__
+   -  `Q-Former <#Q-Former>`__
+   -  `Text encoder <#Text-encoder>`__
+   -  `ControlNet <#ControlNet>`__
+   -  `UNet <#UNet>`__
+   -  `Variational Autoencoder (VAE) <#Variational-Autoencoder-(VAE)>`__
+   -  `Select inference device <#Select-inference-device>`__
 
--  `Inference <#inference>`__
+-  `Inference <#Inference>`__
 
    -  `Zero-Shot subject-driven
-      generation <#zero-shot-subject-driven-generation>`__
+      generation <#Zero-Shot-subject-driven-generation>`__
    -  `Controlled subject-driven generation
-      (Canny-edge) <#controlled-subject-driven-generation-canny-edge>`__
+      (Canny-edge) <#Controlled-subject-driven-generation-(Canny-edge)>`__
    -  `Controlled subject-driven generation
-      (Scribble) <#controlled-subject-driven-generation-scribble>`__
+      (Scribble) <#Controlled-subject-driven-generation-(Scribble)>`__
 
--  `Interactive inference <#interactive-inference>`__
+-  `Interactive inference <#Interactive-inference>`__
 
 .. |image0| image:: https://github.com/salesforce/LAVIS/raw/main/projects/blip-diffusion/teaser-website.png
 
 Prerequisites
 -------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     import platform
     
-    %pip install -q "openvino>=2023.1.0" Pillow gradio
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "torch>=2.1.0" transformers accelerate controlnet_aux "diffusers>=0.23.0" "peft==0.6.2"
+    %pip install -q "openvino>=2023.1.0" Pillow "gradio>=4.19"
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "torch>=2.1.0" "transformers>=4.36" accelerate controlnet_aux "diffusers>=0.23.0" "peft==0.6.2"
     
     if platform.system() != "Windows":
         %pip install -q "matplotlib>=3.4"
@@ -76,7 +76,6 @@ Prerequisites
     import gc
     from typing import List, Optional, Union
     from functools import partial
-    from urllib.request import urlretrieve
     
     import diffusers
     import torch
@@ -109,13 +108,9 @@ Prerequisites
     DATA_DIR = Path("data")
     DOG_IMG_URL = "https://huggingface.co/datasets/ayushtues/blipdiffusion_images/resolve/main/dog.jpg"
     DOG_IMG_PATH = DATA_DIR / "dog.jpg"
-    KETTLE_IMG_URL = (
-        "https://huggingface.co/datasets/ayushtues/blipdiffusion_images/resolve/main/kettle.jpg"
-    )
+    KETTLE_IMG_URL = "https://huggingface.co/datasets/ayushtues/blipdiffusion_images/resolve/main/kettle.jpg"
     KETTLE_IMG_PATH = DATA_DIR / "kettle.jpg"
-    FLOWER_IMG_URL = (
-        "https://huggingface.co/datasets/ayushtues/blipdiffusion_images/resolve/main/flower.jpg"
-    )
+    FLOWER_IMG_URL = "https://huggingface.co/datasets/ayushtues/blipdiffusion_images/resolve/main/flower.jpg"
     FLOWER_IMG_PATH = DATA_DIR / "flower.jpg"
     BAG_IMG_URL = "https://huggingface.co/lllyasviel/sd-controlnet-scribble/resolve/main/images/bag.png"
     BAG_IMG_PATH = DATA_DIR / "bag.jpg"
@@ -126,7 +121,7 @@ Prerequisites
 Load the model
 --------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We use Hugging Face ``diffusers`` library to load the model using
 ``from_pretrained`` method.
@@ -134,9 +129,7 @@ We use Hugging Face ``diffusers`` library to load the model using
 .. code:: ipython3
 
     pipe = diffusers.pipelines.BlipDiffusionPipeline.from_pretrained("ayushtues/blipdiffusion")
-    pipe_controlnet = diffusers.pipelines.BlipDiffusionControlNetPipeline.from_pretrained(
-        "ayushtues/blipdiffusion-controlnet"
-    )
+    pipe_controlnet = diffusers.pipelines.BlipDiffusionControlNetPipeline.from_pretrained("ayushtues/blipdiffusion-controlnet")
 
 
 .. parsed-literal::
@@ -163,21 +156,28 @@ We use Hugging Face ``diffusers`` library to load the model using
 
 .. code:: ipython3
 
+    import requests
+    
     # Download images
-    urlretrieve(DOG_IMG_URL, DOG_IMG_PATH)
-    urlretrieve(KETTLE_IMG_URL, KETTLE_IMG_PATH)
-    urlretrieve(FLOWER_IMG_URL, FLOWER_IMG_PATH)
-    urlretrieve(BAG_IMG_URL, BAG_IMG_PATH);
+    
+    IMAGE_URLS = [DOG_IMG_PATH, KETTLE_IMG_URL, FLOWER_IMG_URL, BAG_IMG_URL]
+    IMAGE_PATHS = [DOG_IMG_PATH, KETTLE_IMG_PATH, FLOWER_IMG_PATH, BAG_IMG_PATH]
+    
+    for url, img_path in zip(IMAGE_URLS, IMAGE_PATHS):
+        r = requests.get(url)
+    
+        with img_path.open("wb") as f:
+            f.write(r.content)
 
 Infer the original model
 ------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Zero-Shot subject-driven generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The pipeline takes a subject image and prompt text as input. The output
 is an image containing the subject with conditions from the prompt
@@ -232,7 +232,7 @@ is an image containing the subject with conditions from the prompt
 Controlled subject-driven generation (Canny-edge)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The `Canny edge
 detector <https://en.wikipedia.org/wiki/Canny_edge_detector>`__ is a
@@ -290,7 +290,7 @@ description.
         "Conditioning image": cond_image,
         "Canny-edge mask": cldm_cond_image[0],
         "Style image": style_image,
-        "Output": output[0][0]
+        "Output": output[0][0],
     }
     
     plt.figure(figsize=(16, 4), layout="tight")
@@ -308,7 +308,7 @@ description.
 Controlled subject-driven generation (Scribble)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `Holistically-Nested Edge
 Detection <https://arxiv.org/pdf/1504.06375.pdf>`__ (HED) is a deep
@@ -363,7 +363,7 @@ edge map is the final output of HED and input of our diffusion model.
         "Conditioning image": bag_img,
         "Scribble mask": cldm_cond_image[0],
         "Style image": style_image,
-        "Output": output[0][0]
+        "Output": output[0][0],
     }
     plt.figure(figsize=(16, 4), layout="tight")
     for i, (title, img) in enumerate(title2img.items()):
@@ -380,7 +380,7 @@ edge map is the final output of HED and input of our diffusion model.
 Convert the model to OpenVINO Intermediate Representation (IR)
 --------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 BLIP-Diffusion pipeline has the following structure:
 
@@ -472,7 +472,7 @@ we clean after every conversion.
 Q-Former
 ~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Q-Former was introduced in
 `BLIP-2 <https://arxiv.org/pdf/2301.12597.pdf>`__ paper and is a
@@ -534,9 +534,7 @@ Original QFormer model takes raw text as input, so we redefine the
     
             # We can provide a self-attention mask of dimensions [batch_size, from_seq_length, to_seq_length]
             # ourselves in which case we just need to make it broadcastable to all heads.
-            extended_attention_mask = self.get_extended_attention_mask(
-                attention_mask, input_shape, device
-            )
+            extended_attention_mask = self.get_extended_attention_mask(attention_mask, input_shape, device)
     
             # If a 2D or 3D attention mask is provided for the cross-attention
             # we need to make broadcastable to [batch_size, num_heads, seq_length, seq_length]
@@ -544,7 +542,11 @@ Original QFormer model takes raw text as input, so we redefine the
                 if isinstance(encoder_hidden_states, list):
                     encoder_batch_size, encoder_sequence_length, _ = encoder_hidden_states[0].size()
                 else:
-                    encoder_batch_size, encoder_sequence_length, _ = encoder_hidden_states.size()
+                    (
+                        encoder_batch_size,
+                        encoder_sequence_length,
+                        _,
+                    ) = encoder_hidden_states.size()
                 encoder_hidden_shape = (encoder_batch_size, encoder_sequence_length)
                 encoder_attention_mask = torch.ones(encoder_hidden_shape, device=device)
                 encoder_extended_attention_mask = self.invert_attention_mask(encoder_attention_mask)
@@ -599,7 +601,7 @@ Original QFormer model takes raw text as input, so we redefine the
 Text encoder
 ~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 BLIP-Diffusion pipeline uses CLIP text encoder, the default encoder for
 Stable Diffusion-based models. The only difference is it allows for an
@@ -651,7 +653,7 @@ embeddings, and interact with them using self-attention.
 ControlNet
 ~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The ControlNet model was introduced in `Adding Conditional Control to
 Text-to-Image Diffusion
@@ -697,7 +699,7 @@ segmentation maps, and keypoints for pose detection.
 UNet
 ~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The `UNet <https://huggingface.co/papers/1505.04597>`__ model is one of
 the most important components of a diffusion system because it
@@ -732,13 +734,13 @@ facilitates the actual diffusion process.
     
     class UnetWrapper(torch.nn.Module):
         def __init__(
-            self, 
-            unet, 
-            sample_dtype=torch.float32, 
-            timestep_dtype=torch.int64, 
-            encoder_hidden_states=torch.float32, 
-            down_block_additional_residuals=torch.float32, 
-            mid_block_additional_residual=torch.float32
+            self,
+            unet,
+            sample_dtype=torch.float32,
+            timestep_dtype=torch.int64,
+            encoder_hidden_states=torch.float32,
+            down_block_additional_residuals=torch.float32,
+            mid_block_additional_residual=torch.float32,
         ):
             super().__init__()
             self.unet = unet
@@ -749,12 +751,12 @@ facilitates the actual diffusion process.
             self.mid_block_additional_residual_dtype = mid_block_additional_residual
     
         def forward(
-            self, 
-            sample:torch.Tensor, 
-            timestep:torch.Tensor, 
-            encoder_hidden_states:torch.Tensor, 
-            down_block_additional_residuals:Tuple[torch.Tensor],  
-            mid_block_additional_residual:torch.Tensor
+            self,
+            sample: torch.Tensor,
+            timestep: torch.Tensor,
+            encoder_hidden_states: torch.Tensor,
+            down_block_additional_residuals: Tuple[torch.Tensor],
+            mid_block_additional_residual: torch.Tensor,
         ):
             sample.to(self.sample_dtype)
             timestep.to(self.timestep_dtype)
@@ -762,12 +764,13 @@ facilitates the actual diffusion process.
             down_block_additional_residuals = [res.to(self.down_block_additional_residuals_dtype) for res in down_block_additional_residuals]
             mid_block_additional_residual.to(self.mid_block_additional_residual_dtype)
             return self.unet(
-                sample, 
-                timestep, 
-                encoder_hidden_states, 
-                down_block_additional_residuals=down_block_additional_residuals, 
-                mid_block_additional_residual=mid_block_additional_residual
+                sample,
+                timestep,
+                encoder_hidden_states,
+                down_block_additional_residuals=down_block_additional_residuals,
+                mid_block_additional_residual=mid_block_additional_residual,
             )
+    
     
     def flatten_inputs(inputs):
         flat_inputs = []
@@ -814,7 +817,7 @@ facilitates the actual diffusion process.
 Variational Autoencoder (VAE)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The variational autoencoder (VAE) model with KL loss was introduced in
 `Auto-Encoding Variational
@@ -855,7 +858,7 @@ decoder in separate ``torch.nn.Module``.
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -913,7 +916,7 @@ select device from dropdown list for running inference using OpenVINO
 Inference
 ---------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1026,9 +1029,7 @@ Inference
                 prompt_strength=prompt_strength,
                 prompt_reps=prompt_reps,
             )
-            qformer_input = self.qformer_tokenizer(
-                source_subject_category, return_tensors="pt", padding=True
-            )
+            qformer_input = self.qformer_tokenizer(source_subject_category, return_tensors="pt", padding=True)
             query_embeds = self.qformer(
                 image_input=reference_image,
                 text_input_ids=qformer_input.input_ids,
@@ -1081,9 +1082,7 @@ Inference
                 # expand the latents if we are doing classifier free guidance
                 do_classifier_free_guidance = guidance_scale > 1.0
     
-                latent_model_input = (
-                    torch.cat([latents] * 2) if do_classifier_free_guidance else latents
-                )
+                latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
                 if conditioning_image:
                     controlnet_output = self.controlnet(
                         [
@@ -1095,7 +1094,9 @@ Inference
                     )
                 noise_pred = (
                     self.unet(
-                        sample=latent_model_input, timestep=t, encoder_hidden_states=text_embeddings
+                        sample=latent_model_input,
+                        timestep=t,
+                        encoder_hidden_states=text_embeddings,
                     )
                     if not conditioning_image
                     else self.unet_controlnet(
@@ -1109,9 +1110,7 @@ Inference
                 # perform guidance
                 if do_classifier_free_guidance:
                     noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
-                    noise_pred = noise_pred_uncond + guidance_scale * (
-                        noise_pred_text - noise_pred_uncond
-                    )
+                    noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
     
                 latents = self.scheduler.step(
                     noise_pred,
@@ -1148,9 +1147,7 @@ Inference
             return text_embeddings
     
     
-    OvBlipDiffusionPipeline.prepare_control_image = (
-        diffusers.pipelines.BlipDiffusionControlNetPipeline.prepare_control_image
-    )
+    OvBlipDiffusionPipeline.prepare_control_image = diffusers.pipelines.BlipDiffusionControlNetPipeline.prepare_control_image
     OvBlipDiffusionPipeline._build_prompt = diffusers.pipelines.BlipDiffusionPipeline._build_prompt
     OvBlipDiffusionPipeline.prepare_latents = diffusers.pipelines.BlipDiffusionPipeline.prepare_latents
 
@@ -1161,7 +1158,7 @@ Inference
 Zero-Shot subject-driven generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1172,7 +1169,7 @@ Zero-Shot subject-driven generation
         tgt_subject,
         guidance_scale=guidance_scale,
         num_inference_steps=num_inference_steps,
-        neg_prompt=negative_prompt
+        neg_prompt=negative_prompt,
     )
 
 
@@ -1200,7 +1197,7 @@ Zero-Shot subject-driven generation
 Controlled subject-driven generation (Canny-edge)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1243,7 +1240,7 @@ Controlled subject-driven generation (Canny-edge)
         "Conditioning image": cond_image,
         "Canny-edge mask": cldm_cond_image[0],
         "Style image": style_image,
-        "Output": output[0]
+        "Output": output[0],
     }
     
     plt.figure(figsize=(16, 4), layout="tight")
@@ -1261,7 +1258,7 @@ Controlled subject-driven generation (Canny-edge)
 Controlled subject-driven generation (Scribble)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1301,7 +1298,7 @@ Controlled subject-driven generation (Scribble)
         "Conditioning image": bag_img,
         "Scribble mask": cldm_cond_image[0],
         "Style image": style_image,
-        "Output": output[0]
+        "Output": output[0],
     }
     plt.figure(figsize=(16, 4), layout="tight")
     for i, (title, img) in enumerate(title2img.items()):
@@ -1318,7 +1315,7 @@ Controlled subject-driven generation (Scribble)
 Interactive inference
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -1419,9 +1416,21 @@ Interactive inference
                     inputs = [
                         gr.Textbox(label="Prompt"),
                         gr.Image(label="Reference image", type="pil"),
-                        gr.Textbox(label="Source subject category", info="String description of a subject that defines the style"),
-                        gr.Textbox(label="Target subject category", info="String description of a subject to generate"),
-                        gr.Slider(1.1, 10, value=7.5, label="Guidance scale", info="Higher guidance scale encourages to generate images that are closely linked to the text `prompt`, usually at the expense of lower image quality"),
+                        gr.Textbox(
+                            label="Source subject category",
+                            info="String description of a subject that defines the style",
+                        ),
+                        gr.Textbox(
+                            label="Target subject category",
+                            info="String description of a subject to generate",
+                        ),
+                        gr.Slider(
+                            1.1,
+                            10,
+                            value=7.5,
+                            label="Guidance scale",
+                            info="Higher guidance scale encourages to generate images that are closely linked to the text `prompt`, usually at the expense of lower image quality",
+                        ),
                         gr.Slider(1, 100, value=50, label="Number of inference steps"),
                         gr.Slider(0, 1_000_000, value=0, label="Random seed"),
                         gr.Textbox(label="Negative prompt"),
@@ -1451,10 +1460,22 @@ Interactive inference
                     inputs = [
                         gr.Textbox(label="Prompt"),
                         gr.Image(label="Reference image", type="pil"),
-                        gr.Textbox(label="Source subject category", info="String description of a subject that defines the style"),
-                        gr.Textbox(label="Target subject category", info="String description of a subject to generate"),
+                        gr.Textbox(
+                            label="Source subject category",
+                            info="String description of a subject that defines the style",
+                        ),
+                        gr.Textbox(
+                            label="Target subject category",
+                            info="String description of a subject to generate",
+                        ),
                         gr.Image(label="Conditioning image", type="pil"),
-                        gr.Slider(1.1, 10, value=7.5, label="Guidance scale", info="Higher guidance scale encourages to generate images that are closely linked to the text `prompt`, usually at the expense of lower image quality"),
+                        gr.Slider(
+                            1.1,
+                            10,
+                            value=7.5,
+                            label="Guidance scale",
+                            info="Higher guidance scale encourages to generate images that are closely linked to the text `prompt`, usually at the expense of lower image quality",
+                        ),
                         gr.Slider(1, 100, value=50, label="Number of inference steps"),
                         gr.Slider(0, 1_000_000, value=0, label="Random seed"),
                         gr.Textbox(label="Negative prompt"),
@@ -1485,10 +1506,22 @@ Interactive inference
                     inputs = [
                         gr.Textbox(label="Prompt"),
                         gr.Image(label="Reference image", type="pil"),
-                        gr.Textbox(label="Source subject category", info="String description of a subject that defines the style"),
-                        gr.Textbox(label="Target subject category", info="String description of a subject to generate"),
+                        gr.Textbox(
+                            label="Source subject category",
+                            info="String description of a subject that defines the style",
+                        ),
+                        gr.Textbox(
+                            label="Target subject category",
+                            info="String description of a subject to generate",
+                        ),
                         gr.Image(label="Conditioning image", type="pil"),
-                        gr.Slider(1.1, 10, value=7.5, label="Guidance scale", info="Higher guidance scale encourages to generate images that are closely linked to the text `prompt`, usually at the expense of lower image quality"),
+                        gr.Slider(
+                            1.1,
+                            10,
+                            value=7.5,
+                            label="Guidance scale",
+                            info="Higher guidance scale encourages to generate images that are closely linked to the text `prompt`, usually at the expense of lower image quality",
+                        ),
                         gr.Slider(1, 100, value=50, label="Number of inference steps"),
                         gr.Slider(0, 1_000_000, value=0, label="Random seed"),
                         gr.Textbox(label="Negative prompt"),

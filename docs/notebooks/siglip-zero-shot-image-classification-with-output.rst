@@ -27,22 +27,22 @@ model to perform zero-shot image classification.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Instantiate model <#instantiate-model>`__
--  `Run PyTorch model inference <#run-pytorch-model-inference>`__
+-  `Instantiate model <#Instantiate-model>`__
+-  `Run PyTorch model inference <#Run-PyTorch-model-inference>`__
 -  `Convert model to OpenVINO Intermediate Representation (IR)
-   format <#convert-model-to-openvino-intermediate-representation-ir-format>`__
--  `Run OpenVINO model <#run-openvino-model>`__
+   format <#Convert-model-to-OpenVINO-Intermediate-Representation-(IR)-format>`__
+-  `Run OpenVINO model <#Run-OpenVINO-model>`__
 -  `Apply post-training quantization using
-   NNCF <#apply-post-training-quantization-using-nncf>`__
+   NNCF <#Apply-post-training-quantization-using-NNCF>`__
 
-   -  `Prepare dataset <#prepare-dataset>`__
-   -  `Quantize model <#quantize-model>`__
-   -  `Run quantized OpenVINO model <#run-quantized-openvino-model>`__
-   -  `Compare File Size <#compare-file-size>`__
+   -  `Prepare dataset <#Prepare-dataset>`__
+   -  `Quantize model <#Quantize-model>`__
+   -  `Run quantized OpenVINO model <#Run-quantized-OpenVINO-model>`__
+   -  `Compare File Size <#Compare-File-Size>`__
    -  `Compare inference time of the FP16 IR and quantized
-      models <#compare-inference-time-of-the-fp16-ir-and-quantized-models>`__
+      models <#Compare-inference-time-of-the-FP16-IR-and-quantized-models>`__
 
--  `Interactive inference <#interactive-inference>`__
+-  `Interactive inference <#Interactive-inference>`__
 
 .. |Colab| image:: https://colab.research.google.com/assets/colab-badge.svg
    :target: https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/siglip-zero-shot-image-classification/siglip-zero-shot-image-classification.ipynb
@@ -50,7 +50,7 @@ Table of contents:
 Instantiate model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The SigLIP model was proposed in `Sigmoid Loss for Language Image
 Pre-Training <https://arxiv.org/abs/2303.15343>`__. SigLIP proposes to
@@ -89,13 +89,30 @@ tokenizer and preparing the images.
 
 .. code:: ipython3
 
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu gradio "openvino>=2023.3.0" "transformers>=4.37" "torch>=2.1" sentencepiece protobuf scipy datasets nncf
+    import platform
+    
+    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "gradio>=4.19" "openvino>=2023.3.0" "transformers>=4.37" "torch>=2.1" Pillow sentencepiece protobuf scipy datasets nncf
+    
+    if platform.system() != "Windows":
+        %pip install -q "matplotlib>=3.4"
+    else:
+        %pip install -q "matplotlib>=3.4,<3.7"
 
 
 .. parsed-literal::
 
     WARNING: typer 0.12.3 does not provide the extra 'all'
     
+
+.. parsed-literal::
+
+    DEPRECATION: pytorch-lightning 1.6.5 has a non-standard dependency specifier torch>=1.8.*. pip 24.1 will enforce this behaviour change. A possible replacement is to upgrade to a newer version of pytorch-lightning or contact the author to suggest that they release a version with a conforming dependency specifiers. Discussion can be found at https://github.com/pypa/pip/issues/12063
+    
+
+.. parsed-literal::
+
+    Note: you may need to restart the kernel to use updated packages.
+
 
 .. parsed-literal::
 
@@ -117,20 +134,20 @@ tokenizer and preparing the images.
 
 .. parsed-literal::
 
-    2024-04-10 00:07:06.193151: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-10 00:07:06.228126: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-04-18 00:44:12.841205: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-04-18 00:44:12.876405: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
 
 .. parsed-literal::
 
-    2024-04-10 00:07:06.817564: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-04-18 00:44:13.472113: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 Run PyTorch model inference
 ---------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To perform classification, define labels and load an image in RGB
 format. To give the model wider text context and improve guidance, we
@@ -182,19 +199,32 @@ similarity score for the final result.
 
 .. code:: ipython3
 
-    from urllib.request import urlretrieve
+    import requests
     from pathlib import Path
     import torch
     from PIL import Image
     
     image_path = Path("test_image.jpg")
-    urlretrieve(
+    r = requests.get(
         "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg",
-        image_path,
     )
+    
+    with image_path.open("wb") as f:
+        f.write(r.content)
     image = Image.open(image_path)
     
-    input_labels = ['cat', 'dog', 'wolf', 'tiger', 'man', 'horse', 'frog', 'tree', 'house', 'computer']
+    input_labels = [
+        "cat",
+        "dog",
+        "wolf",
+        "tiger",
+        "man",
+        "horse",
+        "frog",
+        "tree",
+        "house",
+        "computer",
+    ]
     text_descriptions = [f"This is a photo of a {label}" for label in input_labels]
     
     inputs = processor(text=text_descriptions, images=[image], padding="max_length", return_tensors="pt")
@@ -203,7 +233,7 @@ similarity score for the final result.
         model.config.torchscript = False
         results = model(**inputs)
     
-    logits_per_image = results['logits_per_image']  # this is the image-text similarity score
+    logits_per_image = results["logits_per_image"]  # this is the image-text similarity score
     
     probs = logits_per_image.softmax(dim=1).detach().numpy()
     visualize_result(image, input_labels, probs[0])
@@ -221,7 +251,7 @@ similarity score for the final result.
 Convert model to OpenVINO Intermediate Representation (IR) format
 -----------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For best results with OpenVINO, it is recommended to convert the model
 to OpenVINO IR format. OpenVINO supports PyTorch via Model conversion
@@ -251,22 +281,22 @@ object ready to load on the device and start making predictions.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/siglip/modeling_siglip.py:362: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/siglip/modeling_siglip.py:362: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attn_weights.size() != (batch_size, self.num_heads, q_len, k_v_seq_len):
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/siglip/modeling_siglip.py:380: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/siglip/modeling_siglip.py:380: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if attn_output.size() != (batch_size, self.num_heads, q_len, self.head_dim):
 
 
 Run OpenVINO model
 ------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The steps for making predictions with the OpenVINO SigLIP model are
 similar to the PyTorch model. Let us check the model result using the
@@ -282,8 +312,8 @@ Select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -330,7 +360,7 @@ Great! Looks like we got the same result.
 Apply post-training quantization using NNCF
 -------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
 post-training quantization by adding the quantization layers into the
@@ -348,7 +378,7 @@ The optimization process contains the following steps:
 Prepare dataset
 ~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The `Conceptual
 Captions <https://ai.google.com/research/ConceptualCaptions/>`__ dataset
@@ -361,7 +391,9 @@ model.
     from io import BytesIO
     from PIL import Image
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
+    
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    
     
     def check_text_data(data):
         """
@@ -373,6 +405,7 @@ model.
             return all(isinstance(x, str) for x in data)
         return False
     
+    
     def get_pil_from_url(url):
         """
         Downloads and converts an image from a URL to a PIL Image object.
@@ -380,6 +413,7 @@ model.
         response = requests.get(url, verify=False, timeout=20)
         image = Image.open(BytesIO(response.content))
         return image.convert("RGB")
+    
     
     def collate_fn(example, image_column="image_url", text_column="caption"):
         """
@@ -404,8 +438,13 @@ model.
         except Exception:
             return None
     
-        inputs = processor(text=example[text_column], images=[image], return_tensors="pt", padding="max_length")
-        if inputs['input_ids'].shape[1] > model.config.text_config.max_position_embeddings:
+        inputs = processor(
+            text=example[text_column],
+            images=[image],
+            return_tensors="pt",
+            padding="max_length",
+        )
+        if inputs["input_ids"].shape[1] > model.config.text_config.max_position_embeddings:
             return None
         return inputs
 
@@ -414,6 +453,7 @@ model.
     import torch
     from datasets import load_dataset
     from tqdm.notebook import tqdm
+    
     
     def prepare_calibration_data(dataloader, init_steps):
         """
@@ -455,7 +495,7 @@ model.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/datasets/load.py:1461: FutureWarning: The repository for conceptual_captions contains custom code which must be executed to correctly load the dataset. You can inspect the repository content at https://hf.co/datasets/conceptual_captions
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/datasets/load.py:1461: FutureWarning: The repository for conceptual_captions contains custom code which must be executed to correctly load the dataset. You can inspect the repository content at https://hf.co/datasets/conceptual_captions
     You can avoid this message in future by passing the argument `trust_remote_code=True`.
     Passing `trust_remote_code=True` will be mandatory to load this dataset from the next major release of `datasets`.
       warnings.warn(
@@ -475,7 +515,7 @@ model.
 Quantize model
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Create a quantized model from the pre-trained ``FP16`` model.
 
@@ -490,9 +530,7 @@ Create a quantized model from the pre-trained ``FP16`` model.
     nncf.set_log_level(logging.ERROR)
     
     if len(calibration_data) == 0:
-        raise RuntimeError(
-            'Calibration dataset is empty. Please check internet connection and try to download images manually.'
-        )
+        raise RuntimeError("Calibration dataset is empty. Please check internet connection and try to download images manually.")
     
     calibration_dataset = nncf.Dataset(calibration_data)
     quantized_ov_model = nncf.quantize(
@@ -599,7 +637,7 @@ in the NNCF repository for more information.
 Run quantized OpenVINO model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The steps for making predictions with the quantized OpenVINO SigLIP
 model are similar to the PyTorch model.
@@ -609,7 +647,18 @@ model are similar to the PyTorch model.
     from scipy.special import softmax
     
     
-    input_labels = ['cat', 'dog', 'wolf', 'tiger', 'man', 'horse', 'frog', 'tree', 'house', 'computer']
+    input_labels = [
+        "cat",
+        "dog",
+        "wolf",
+        "tiger",
+        "man",
+        "horse",
+        "frog",
+        "tree",
+        "house",
+        "computer",
+    ]
     text_descriptions = [f"This is a photo of a {label}" for label in input_labels]
     
     inputs = processor(text=text_descriptions, images=[image], return_tensors="pt", padding="max_length")
@@ -633,16 +682,16 @@ model are similar to the PyTorch model.
 Compare File Size
 ~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
     from pathlib import Path
     
-    fp16_model_path = 'siglip-base-patch16-224.xml'
+    fp16_model_path = "siglip-base-patch16-224.xml"
     ov.save_model(ov_model, fp16_model_path)
     
-    int8_model_path = 'siglip-base-patch16-224_int8.xml'
+    int8_model_path = "siglip-base-patch16-224_int8.xml"
     ov.save_model(quantized_ov_model, int8_model_path)
     
     fp16_ir_model_size = Path(fp16_model_path).with_suffix(".bin").stat().st_size / 1024 / 1024
@@ -662,7 +711,7 @@ Compare File Size
 Compare inference time of the FP16 IR and quantized models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To measure the inference performance of the ``FP16`` and ``INT8``
 models, we use median inference time on calibration dataset. So we can
@@ -675,6 +724,7 @@ approximately estimate the speed up of the dynamic quantized models.
 .. code:: ipython3
 
     import time
+    
     
     def calculate_inference_time(model_path, calibration_data):
         model = ov.compile_model(model_path, device.value)
@@ -697,13 +747,13 @@ approximately estimate the speed up of the dynamic quantized models.
 
 .. parsed-literal::
 
-    Performance speed up: 2.091
+    Performance speed up: 2.117
 
 
 Interactive inference
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, it is your turn! You can provide your own image and comma-separated
 list of labels for zero-shot classification. Feel free to upload an
@@ -763,7 +813,7 @@ field, using comma as the separator (for example, ``cat,dog,bird``)
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="1000" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

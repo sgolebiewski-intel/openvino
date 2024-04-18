@@ -24,37 +24,37 @@ In this tutorial, we consider how to use MobileCLIP to implement a
 visual content search engine for finding relevant frames in video. ####
 Table of contents:
 
--  `Prerequisites <#prerequisites>`__
--  `Select model <#select-model>`__
--  `Run model inference <#run-model-inference>`__
+-  `Prerequisites <#Prerequisites>`__
+-  `Select model <#Select-model>`__
+-  `Run model inference <#Run-model-inference>`__
 
-   -  `Prepare image gallery <#prepare-image-gallery>`__
-   -  `Prepare model <#prepare-model>`__
-   -  `Perform search <#perform-search>`__
+   -  `Prepare image gallery <#Prepare-image-gallery>`__
+   -  `Prepare model <#Prepare-model>`__
+   -  `Perform search <#Perform-search>`__
 
 -  `Convert Model to OpenVINO Intermediate Representation
-   format <#convert-model-to-openvino-intermediate-representation-format>`__
--  `Run OpenVINO model inference <#run-openvino-model-inference>`__
+   format <#Convert-Model-to-OpenVINO-Intermediate-Representation-format>`__
+-  `Run OpenVINO model inference <#Run-OpenVINO-model-inference>`__
 
    -  `Select device for image
-      encoder <#select-device-for-image-encoder>`__
+      encoder <#Select-device-for-image-encoder>`__
    -  `Select device for text
-      encoder <#select-device-for-text-encoder>`__
-   -  `Perform search <#perform-search>`__
+      encoder <#Select-device-for-text-encoder>`__
+   -  `Perform search <#Perform-search>`__
 
--  `Interactive Demo <#interactive-demo>`__
+-  `Interactive Demo <#Interactive-Demo>`__
 
 Prerequisites
 -------------
 
-## Prerequisites
+`back to top ⬆️ <#Table-of-contents:>`__ ## Prerequisites
 
 .. code:: ipython3
 
     from pathlib import Path
     
     repo_dir = Path("./ml-mobileclip")
-                    
+    
     if not repo_dir.exists():
         !git clone https://github.com/apple/ml-mobileclip.git
 
@@ -67,143 +67,18 @@ Prerequisites
 .. parsed-literal::
 
     remote: Enumerating objects: 45, done.[K
-    remote: Counting objects:   2% (1/45)[K
-remote: Counting objects:   4% (2/45)[K
-remote: Counting objects:   6% (3/45)[K
-remote: Counting objects:   8% (4/45)[K
-remote: Counting objects:  11% (5/45)[K
-remote: Counting objects:  13% (6/45)[K
-remote: Counting objects:  15% (7/45)[K
-remote: Counting objects:  17% (8/45)[K
-remote: Counting objects:  20% (9/45)[K
-remote: Counting objects:  22% (10/45)[K
-remote: Counting objects:  24% (11/45)[K
-remote: Counting objects:  26% (12/45)[K
-remote: Counting objects:  28% (13/45)[K
-remote: Counting objects:  31% (14/45)[K
-remote: Counting objects:  33% (15/45)[K
-remote: Counting objects:  35% (16/45)[K
-remote: Counting objects:  37% (17/45)[K
-remote: Counting objects:  40% (18/45)[K
-remote: Counting objects:  42% (19/45)[K
-remote: Counting objects:  44% (20/45)[K
-remote: Counting objects:  46% (21/45)[K
-remote: Counting objects:  48% (22/45)[K
-remote: Counting objects:  51% (23/45)[K
-remote: Counting objects:  53% (24/45)[K
-remote: Counting objects:  55% (25/45)[K
-remote: Counting objects:  57% (26/45)[K
-remote: Counting objects:  60% (27/45)[K
-remote: Counting objects:  62% (28/45)[K
-remote: Counting objects:  64% (29/45)[K
-remote: Counting objects:  66% (30/45)[K
-remote: Counting objects:  68% (31/45)[K
-remote: Counting objects:  71% (32/45)[K
-remote: Counting objects:  73% (33/45)[K
-remote: Counting objects:  75% (34/45)[K
-remote: Counting objects:  77% (35/45)[K
-remote: Counting objects:  80% (36/45)[K
-remote: Counting objects:  82% (37/45)[K
-remote: Counting objects:  84% (38/45)[K
-remote: Counting objects:  86% (39/45)[K
-remote: Counting objects:  88% (40/45)[K
-remote: Counting objects:  91% (41/45)[K
-remote: Counting objects:  93% (42/45)[K
-remote: Counting objects:  95% (43/45)[K
-remote: Counting objects:  97% (44/45)[K
-remote: Counting objects: 100% (45/45)[K
-remote: Counting objects: 100% (45/45), done.[K
-    remote: Compressing objects:   2% (1/36)[K
-remote: Compressing objects:   5% (2/36)[K
-remote: Compressing objects:   8% (3/36)[K
-remote: Compressing objects:  11% (4/36)[K
-remote: Compressing objects:  13% (5/36)[K
-remote: Compressing objects:  16% (6/36)[K
-remote: Compressing objects:  19% (7/36)[K
-remote: Compressing objects:  22% (8/36)[K
-remote: Compressing objects:  25% (9/36)[K
-remote: Compressing objects:  27% (10/36)[K
-remote: Compressing objects:  30% (11/36)[K
-remote: Compressing objects:  33% (12/36)[K
-remote: Compressing objects:  36% (13/36)[K
-remote: Compressing objects:  38% (14/36)[K
-remote: Compressing objects:  41% (15/36)[K
-remote: Compressing objects:  44% (16/36)[K
-remote: Compressing objects:  47% (17/36)[K
-remote: Compressing objects:  50% (18/36)[K
-remote: Compressing objects:  52% (19/36)[K
-remote: Compressing objects:  55% (20/36)[K
-remote: Compressing objects:  58% (21/36)[K
-remote: Compressing objects:  61% (22/36)[K
-remote: Compressing objects:  63% (23/36)[K
-remote: Compressing objects:  66% (24/36)[K
-remote: Compressing objects:  69% (25/36)[K
-remote: Compressing objects:  72% (26/36)[K
-remote: Compressing objects:  75% (27/36)[K
-remote: Compressing objects:  77% (28/36)[K
-remote: Compressing objects:  80% (29/36)[K
-remote: Compressing objects:  83% (30/36)[K
-remote: Compressing objects:  86% (31/36)[K
-remote: Compressing objects:  88% (32/36)[K
-remote: Compressing objects:  91% (33/36)[K
-remote: Compressing objects:  94% (34/36)[K
-remote: Compressing objects:  97% (35/36)[K
-remote: Compressing objects: 100% (36/36)[K
-remote: Compressing objects: 100% (36/36), done.[K
-    Unpacking objects:   2% (1/45)
-Unpacking objects:   4% (2/45)
-Unpacking objects:   6% (3/45)
-Unpacking objects:   8% (4/45)
-Unpacking objects:  11% (5/45)
-Unpacking objects:  13% (6/45)
-Unpacking objects:  15% (7/45)
-Unpacking objects:  17% (8/45)
-Unpacking objects:  20% (9/45)
-Unpacking objects:  22% (10/45)
-Unpacking objects:  24% (11/45)
-Unpacking objects:  26% (12/45)
+    remote: Counting objects:   2% (1/45)[Kremote: Counting objects:   4% (2/45)[Kremote: Counting objects:   6% (3/45)[Kremote: Counting objects:   8% (4/45)[Kremote: Counting objects:  11% (5/45)[Kremote: Counting objects:  13% (6/45)[Kremote: Counting objects:  15% (7/45)[Kremote: Counting objects:  17% (8/45)[Kremote: Counting objects:  20% (9/45)[Kremote: Counting objects:  22% (10/45)[Kremote: Counting objects:  24% (11/45)[Kremote: Counting objects:  26% (12/45)[Kremote: Counting objects:  28% (13/45)[Kremote: Counting objects:  31% (14/45)[Kremote: Counting objects:  33% (15/45)[Kremote: Counting objects:  35% (16/45)[Kremote: Counting objects:  37% (17/45)[Kremote: Counting objects:  40% (18/45)[Kremote: Counting objects:  42% (19/45)[Kremote: Counting objects:  44% (20/45)[Kremote: Counting objects:  46% (21/45)[Kremote: Counting objects:  48% (22/45)[Kremote: Counting objects:  51% (23/45)[Kremote: Counting objects:  53% (24/45)[Kremote: Counting objects:  55% (25/45)[Kremote: Counting objects:  57% (26/45)[Kremote: Counting objects:  60% (27/45)[Kremote: Counting objects:  62% (28/45)[Kremote: Counting objects:  64% (29/45)[Kremote: Counting objects:  66% (30/45)[Kremote: Counting objects:  68% (31/45)[Kremote: Counting objects:  71% (32/45)[Kremote: Counting objects:  73% (33/45)[Kremote: Counting objects:  75% (34/45)[Kremote: Counting objects:  77% (35/45)[Kremote: Counting objects:  80% (36/45)[Kremote: Counting objects:  82% (37/45)[Kremote: Counting objects:  84% (38/45)[Kremote: Counting objects:  86% (39/45)[Kremote: Counting objects:  88% (40/45)[Kremote: Counting objects:  91% (41/45)[Kremote: Counting objects:  93% (42/45)[Kremote: Counting objects:  95% (43/45)[Kremote: Counting objects:  97% (44/45)[Kremote: Counting objects: 100% (45/45)[Kremote: Counting objects: 100% (45/45), done.[K
+    remote: Compressing objects:   2% (1/36)[Kremote: Compressing objects:   5% (2/36)[Kremote: Compressing objects:   8% (3/36)[Kremote: Compressing objects:  11% (4/36)[Kremote: Compressing objects:  13% (5/36)[Kremote: Compressing objects:  16% (6/36)[Kremote: Compressing objects:  19% (7/36)[Kremote: Compressing objects:  22% (8/36)[Kremote: Compressing objects:  25% (9/36)[Kremote: Compressing objects:  27% (10/36)[Kremote: Compressing objects:  30% (11/36)[Kremote: Compressing objects:  33% (12/36)[Kremote: Compressing objects:  36% (13/36)[Kremote: Compressing objects:  38% (14/36)[Kremote: Compressing objects:  41% (15/36)[Kremote: Compressing objects:  44% (16/36)[Kremote: Compressing objects:  47% (17/36)[Kremote: Compressing objects:  50% (18/36)[Kremote: Compressing objects:  52% (19/36)[Kremote: Compressing objects:  55% (20/36)[Kremote: Compressing objects:  58% (21/36)[Kremote: Compressing objects:  61% (22/36)[Kremote: Compressing objects:  63% (23/36)[Kremote: Compressing objects:  66% (24/36)[Kremote: Compressing objects:  69% (25/36)[Kremote: Compressing objects:  72% (26/36)[Kremote: Compressing objects:  75% (27/36)[Kremote: Compressing objects:  77% (28/36)[Kremote: Compressing objects:  80% (29/36)[Kremote: Compressing objects:  83% (30/36)[Kremote: Compressing objects:  86% (31/36)[Kremote: Compressing objects:  88% (32/36)[Kremote: Compressing objects:  91% (33/36)[Kremote: Compressing objects:  94% (34/36)[Kremote: Compressing objects:  97% (35/36)[Kremote: Compressing objects: 100% (36/36)[Kremote: Compressing objects: 100% (36/36), done.[K
+    Unpacking objects:   2% (1/45)Unpacking objects:   4% (2/45)Unpacking objects:   6% (3/45)Unpacking objects:   8% (4/45)Unpacking objects:  11% (5/45)Unpacking objects:  13% (6/45)
+
+.. parsed-literal::
+
+    Unpacking objects:  15% (7/45)Unpacking objects:  17% (8/45)Unpacking objects:  20% (9/45)Unpacking objects:  22% (10/45)Unpacking objects:  24% (11/45)Unpacking objects:  26% (12/45)
 
 .. parsed-literal::
 
     remote: Total 45 (delta 9), reused 44 (delta 8), pack-reused 0[K
-
-
-.. parsed-literal::
-
-    Unpacking objects:  28% (13/45)
-Unpacking objects:  31% (14/45)
-Unpacking objects:  33% (15/45)
-Unpacking objects:  35% (16/45)
-Unpacking objects:  37% (17/45)
-Unpacking objects:  40% (18/45)
-Unpacking objects:  42% (19/45)
-Unpacking objects:  44% (20/45)
-Unpacking objects:  46% (21/45)
-Unpacking objects:  48% (22/45)
-Unpacking objects:  51% (23/45)
-Unpacking objects:  53% (24/45)
-Unpacking objects:  55% (25/45)
-Unpacking objects:  57% (26/45)
-Unpacking objects:  60% (27/45)
-Unpacking objects:  62% (28/45)
-Unpacking objects:  64% (29/45)
-Unpacking objects:  66% (30/45)
-Unpacking objects:  68% (31/45)
-Unpacking objects:  71% (32/45)
-Unpacking objects:  73% (33/45)
-Unpacking objects:  75% (34/45)
-Unpacking objects:  77% (35/45)
-Unpacking objects:  80% (36/45)
-Unpacking objects:  82% (37/45)
-Unpacking objects:  84% (38/45)
-Unpacking objects:  86% (39/45)
-Unpacking objects:  88% (40/45)
-Unpacking objects:  91% (41/45)
-Unpacking objects:  93% (42/45)
-Unpacking objects:  95% (43/45)
-Unpacking objects:  97% (44/45)
-Unpacking objects: 100% (45/45)
-Unpacking objects: 100% (45/45), 428.50 KiB | 3.06 MiB/s, done.
+    Unpacking objects:  28% (13/45)Unpacking objects:  31% (14/45)Unpacking objects:  33% (15/45)Unpacking objects:  35% (16/45)Unpacking objects:  37% (17/45)Unpacking objects:  40% (18/45)Unpacking objects:  42% (19/45)Unpacking objects:  44% (20/45)Unpacking objects:  46% (21/45)Unpacking objects:  48% (22/45)Unpacking objects:  51% (23/45)Unpacking objects:  53% (24/45)Unpacking objects:  55% (25/45)Unpacking objects:  57% (26/45)Unpacking objects:  60% (27/45)Unpacking objects:  62% (28/45)Unpacking objects:  64% (29/45)Unpacking objects:  66% (30/45)Unpacking objects:  68% (31/45)Unpacking objects:  71% (32/45)Unpacking objects:  73% (33/45)Unpacking objects:  75% (34/45)Unpacking objects:  77% (35/45)Unpacking objects:  80% (36/45)Unpacking objects:  82% (37/45)Unpacking objects:  84% (38/45)Unpacking objects:  86% (39/45)Unpacking objects:  88% (40/45)Unpacking objects:  91% (41/45)Unpacking objects:  93% (42/45)Unpacking objects:  95% (43/45)Unpacking objects:  97% (44/45)Unpacking objects: 100% (45/45)Unpacking objects: 100% (45/45), 428.50 KiB | 3.04 MiB/s, done.
 
 
 .. code:: ipython3
@@ -212,7 +87,7 @@ Unpacking objects: 100% (45/45), 428.50 KiB | 3.06 MiB/s, done.
     
     %pip install -q "clip-benchmark>=1.4.0" "datasets>=2.8.0" "open-clip-torch>=2.20.0" "timm>=0.9.5" "torch>=1.13.1" "torchvision>=0.14.1" --extra-index-url https://download.pytorch.org/whl/cpu
     
-    %pip install -q "openvino>=2024.0.0" "gradio" "matplotlib" "Pillow"  "altair" "pandas" "opencv-python"
+    %pip install -q "openvino>=2024.0.0" "gradio>=4.19" "matplotlib" "Pillow"  "altair" "pandas" "opencv-python" "tqdm"
 
 
 .. parsed-literal::
@@ -223,8 +98,8 @@ Unpacking objects: 100% (45/45), 428.50 KiB | 3.06 MiB/s, done.
 .. parsed-literal::
 
     ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    mobileclip 0.1.0 requires torch==1.13.1, but you have torch 2.1.0+cpu which is incompatible.
-    mobileclip 0.1.0 requires torchvision==0.14.1, but you have torchvision 0.16.0+cpu which is incompatible.
+    mobileclip 0.1.0 requires torch==1.13.1, but you have torch 2.2.2+cpu which is incompatible.
+    mobileclip 0.1.0 requires torchvision==0.14.1, but you have torchvision 0.17.2+cpu which is incompatible.
     
 
 .. parsed-literal::
@@ -245,7 +120,7 @@ Unpacking objects: 100% (45/45), 428.50 KiB | 3.06 MiB/s, done.
 Select model
 ------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For starting work, we should select model that will be used in our
 demonstration. By default, we will use the MobileCLIP model, but for
@@ -291,23 +166,71 @@ comparison purposes, you can select different models among:
     
     supported_models = {
         "MobileCLIP": {
-            "mobileclip_s0": {"model_name": "mobileclip_s0", "pretrained": model_dir / "mobileclip_s0.pt", "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileclip/mobileclip_s0.pt", "image_size": 256},
-            "mobileclip_s1": {"model_name": "mobileclip_s1", "pretrained": model_dir / "mobileclip_s1.pt", "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileclip/mobileclip_s1.pt", "image_size": 256},
-            "mobileclip_s2": {"model_name": "mobileclip_s0", "pretrained": model_dir / "mobileclip_s2.pt", "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileclip/mobileclip_s2.pt", "image_size": 256},
-            "mobileclip_b": {"model_name": "mobileclip_b", "pretrained": model_dir / "mobileclip_b.pt", "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileclip/mobileclip_b.pt", "image_size": 224},
-            "mobileclip_blt": {"model_name": "mobileclip_b", "pretrained": model_dir / "mobileclip_blt.pt", "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileclip/mobileclip_blt.pt", "image_size": 224},
+            "mobileclip_s0": {
+                "model_name": "mobileclip_s0",
+                "pretrained": model_dir / "mobileclip_s0.pt",
+                "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileclip/mobileclip_s0.pt",
+                "image_size": 256,
+            },
+            "mobileclip_s1": {
+                "model_name": "mobileclip_s1",
+                "pretrained": model_dir / "mobileclip_s1.pt",
+                "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileclip/mobileclip_s1.pt",
+                "image_size": 256,
+            },
+            "mobileclip_s2": {
+                "model_name": "mobileclip_s0",
+                "pretrained": model_dir / "mobileclip_s2.pt",
+                "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileclip/mobileclip_s2.pt",
+                "image_size": 256,
+            },
+            "mobileclip_b": {
+                "model_name": "mobileclip_b",
+                "pretrained": model_dir / "mobileclip_b.pt",
+                "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileclip/mobileclip_b.pt",
+                "image_size": 224,
+            },
+            "mobileclip_blt": {
+                "model_name": "mobileclip_b",
+                "pretrained": model_dir / "mobileclip_blt.pt",
+                "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileclip/mobileclip_blt.pt",
+                "image_size": 224,
+            },
         },
         "CLIP": {
-            "clip-vit-b-32": {"model_name": "ViT-B-32", "pretrained": "laion2b_s34b_b79k", "image_size": 224},
-            "clip-vit-b-16": {"image_name": "ViT-B-16", "pretrained": "openai", "image_size": 224},
-            "clip-vit-l-14": {"image_name": "ViT-L-14", "pretrained": "datacomp_xl_s13b_b90k", "image_size": 224},
-            "clip-vit-h-14": {"image_name": "ViT-H-14", "pretrained": "laion2b_s32b_b79k", "image_size": 224},
+            "clip-vit-b-32": {
+                "model_name": "ViT-B-32",
+                "pretrained": "laion2b_s34b_b79k",
+                "image_size": 224,
+            },
+            "clip-vit-b-16": {
+                "image_name": "ViT-B-16",
+                "pretrained": "openai",
+                "image_size": 224,
+            },
+            "clip-vit-l-14": {
+                "image_name": "ViT-L-14",
+                "pretrained": "datacomp_xl_s13b_b90k",
+                "image_size": 224,
+            },
+            "clip-vit-h-14": {
+                "image_name": "ViT-H-14",
+                "pretrained": "laion2b_s32b_b79k",
+                "image_size": 224,
+            },
         },
         "SigLIP": {
-            "siglip-vit-b-16": {"model_name": "ViT-B-16-SigLIP", "pretrained": "webli", "image_size": 224},
-            "siglip-vit-l-16": {"model_name": "ViT-L-16-SigLIP-256", "pretrained": "webli", "image_size": 256},
-        }
-        
+            "siglip-vit-b-16": {
+                "model_name": "ViT-B-16-SigLIP",
+                "pretrained": "webli",
+                "image_size": 224,
+            },
+            "siglip-vit-l-16": {
+                "model_name": "ViT-L-16-SigLIP-256",
+                "pretrained": "webli",
+                "image_size": 256,
+            },
+        },
     }
     
     
@@ -327,7 +250,11 @@ comparison purposes, you can select different models among:
 
     available_models = supported_models[model_type.value]
     
-    model_checkpoint = widgets.Dropdown(options=available_models.keys(), default=list(available_models), description="Model:")
+    model_checkpoint = widgets.Dropdown(
+        options=available_models.keys(),
+        default=list(available_models),
+        description="Model:",
+    )
     
     model_checkpoint
 
@@ -342,11 +269,13 @@ comparison purposes, you can select different models among:
 
 .. code:: ipython3
 
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     
     from notebook_utils import download_file
     
@@ -355,7 +284,7 @@ comparison purposes, you can select different models among:
 Run model inference
 -------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Now, let’s see model in action. We will try to find image, where some
 specific object is represented using embeddings. Embeddings are a
@@ -376,7 +305,7 @@ represent are.
 Prepare image gallery
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -386,7 +315,7 @@ Prepare image gallery
     from PIL import Image
     
     
-    def visualize_result(images:List, query:str = "", selected:List[int] = None):
+    def visualize_result(images: List, query: str = "", selected: List[int] = None):
         """
         Utility function for visualization classification results
         params:
@@ -396,9 +325,9 @@ Prepare image gallery
         returns:
           matplotlib.Figure
         """
-        figsize = (20, 5) 
-        fig, axs = plt.subplots(1, 4, figsize=figsize, sharex='all', sharey='all')
-        fig.patch.set_facecolor('white')
+        figsize = (20, 5)
+        fig, axs = plt.subplots(1, 4, figsize=figsize, sharex="all", sharey="all")
+        fig.patch.set_facecolor("white")
         list_axes = list(axs.flat)
         if query:
             fig.suptitle(query, fontsize=20)
@@ -411,15 +340,15 @@ Prepare image gallery
             a.imshow(images[idx])
             if selected is not None and idx not in selected:
                 mask = np.ones_like(np.array(images[idx]))
-                a.imshow(mask, 'jet', interpolation='none', alpha=0.75)
+                a.imshow(mask, "jet", interpolation="none", alpha=0.75)
         return fig
     
     
     images_urls = [
-        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/282ce53e-912d-41aa-ab48-2a001c022d74", 
+        "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/282ce53e-912d-41aa-ab48-2a001c022d74",
         "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/9bb40168-82b5-4b11-ada6-d8df104c736c",
         "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/0747b6db-12c3-4252-9a6a-057dcf8f3d4e",
-        "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco_bricks.png"
+        "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco_bricks.png",
     ]
     image_names = ["red_panda.png", "cat.png", "raccoon.png", "dog.png"]
     sample_path = Path("data")
@@ -432,7 +361,7 @@ Prepare image gallery
             download_file(image_url, filename=image_name, directory=sample_path)
         images.append(Image.open(image_path).convert("RGB").resize((640, 420)))
     
-    input_labels = ['cat']
+    input_labels = ["cat"]
     text_descriptions = [f"This is a photo of a {label}" for label in input_labels]
     
     visualize_result(images, "image gallery");
@@ -469,7 +398,7 @@ Prepare image gallery
 Prepare model
 ~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The code bellow download model weights, create model class instance and
 preprocessing utilities
@@ -505,7 +434,7 @@ preprocessing utilities
 Perform search
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -514,7 +443,6 @@ Perform search
     
     
     with torch.no_grad():
-    
         # calculate image embeddings
         image_encoding_start = time.perf_counter()
         image_features = model.encode_image(image_tensor)
@@ -539,8 +467,8 @@ Perform search
 
 .. parsed-literal::
 
-    Image encoding took 0.112 ms
-    Text encoding took 0.0102 ms
+    Image encoding took 0.109 ms
+    Text encoding took 0.0108 ms
 
 
 
@@ -550,7 +478,7 @@ Perform search
 Convert Model to OpenVINO Intermediate Representation format
 ------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 For best results with OpenVINO, it is recommended to convert the model
 to OpenVINO IR format. OpenVINO supports PyTorch via Model conversion
@@ -594,7 +522,11 @@ be used separately. Let’s convert each part to OpenVINO.
         if "mobileclip_s" in model_name:
             model.image_encoder.model.conv_exp.se.forward = types.MethodType(se_block_forward, model.image_encoder.model.conv_exp.se)
         model.forward = model.encode_image
-        ov_image_encoder = ov.convert_model(model, example_input=image_tensor, input=[-1, 3, image_tensor.shape[2], image_tensor.shape[3]])
+        ov_image_encoder = ov.convert_model(
+            model,
+            example_input=image_tensor,
+            input=[-1, 3, image_tensor.shape[2], image_tensor.shape[3]],
+        )
         ov.save_model(ov_image_encoder, image_encoder_path)
         del ov_image_encoder
         gc.collect()
@@ -614,19 +546,19 @@ be used separately. Let’s convert each part to OpenVINO.
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-655/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/mobileclip/modules/common/transformer.py:125: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/mobileclip/modules/common/transformer.py:125: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
       if seq_len != self.num_embeddings:
 
 
 Run OpenVINO model inference
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Select device for image encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -636,8 +568,8 @@ Select device for image encoder
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -660,7 +592,7 @@ Select device for image encoder
 Select device for text encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -683,7 +615,7 @@ Select device for text encoder
 Perform search
 ~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -706,8 +638,8 @@ Perform search
 
 .. parsed-literal::
 
-    Image encoding took 0.0308 ms
-    Text encoding took 0.006 ms
+    Image encoding took 0.0309 ms
+    Text encoding took 0.00586 ms
 
 
 
@@ -717,7 +649,7 @@ Perform search
 Interactive Demo
 ----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 In this part, you can try different supported by tutorial models in
 searching frames in the video by text query or image. Upload v
@@ -748,8 +680,16 @@ searching frames in the video by text query or image. Upload v
     available_converted_models = [model_file.name.split("_im_encoder")[0] for model_file in ov_models_dir.glob("*_im_encoder.xml")]
     available_devices = list(core.available_devices) + ["AUTO"]
     
-    download_file("https://github.com/intel-iot-devkit/sample-videos/raw/master/car-detection.mp4", directory=sample_path)
-    download_file("https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/video/Coco%20Walking%20in%20Berkeley.mp4", directory=sample_path, filename="coco.mp4")
+    download_file(
+        "https://github.com/intel-iot-devkit/sample-videos/raw/master/car-detection.mp4",
+        directory=sample_path,
+    )
+    download_file(
+        "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/video/Coco%20Walking%20in%20Berkeley.mp4",
+        directory=sample_path,
+        filename="coco.mp4",
+    )
+    
     
     def get_preprocess_and_tokenizer(model_name):
         if "mobileclip" in model_name:
@@ -773,7 +713,7 @@ searching frames in the video by text query or image. Upload v
             tokenizer = open_clip.get_tokenizer(model_configs[model_name]["model_name"])
     
         return preprocess, tokenizer
-            
+    
     
     def run(
         path: str,
@@ -785,18 +725,14 @@ searching frames in the video by text query or image. Upload v
         stride: int,
         batch_size: int,
     ):
-    
         assert path, "An input video should be provided"
-        assert (
-            text_search is not None or image_search is not None
-        ), "A text or image query should be provided"
+        assert text_search is not None or image_search is not None, "A text or image query should be provided"
         global current_model
         global current_device
         global preprocess
         global tokenizer
         global ov_compiled_image_encoder
         global ov_compiled_text_encoder
-    
     
         if current_model != model_name or device != current_device:
             ov_compiled_image_encoder = core.compile_model(ov_models_dir / f"{model_name}_im_encoder.xml", device)
@@ -806,10 +742,8 @@ searching frames in the video by text query or image. Upload v
             current_device = device
         # Load video
         dataset = LoadVideo(path, transforms=preprocess, vid_stride=stride)
-        dataloader = DataLoader(
-            dataset, batch_size=batch_size, shuffle=False, num_workers=0
-        )
-            
+        dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=0)
+    
         # Get image query features
         if image_search:
             image = preprocess(image_search).unsqueeze(0)
@@ -865,21 +799,20 @@ searching frames in the video by text query or image. Upload v
     
         selected_frames = np.argsort(-1 * np.array(matches_probs))[:20]
         matched_sorted_frames = [matches[idx] for idx in selected_frames]
-        
     
-        return lines + rule, matched_sorted_frames  # Only return up to 20 images to not crash the UI
+        return (
+            lines + rule,
+            matched_sorted_frames,
+        )  # Only return up to 20 images to not crash the UI
     
     
     class LoadVideo(Dataset):
         def __init__(self, path, transforms, vid_stride=1):
-    
             self.transforms = transforms
             self.vid_stride = vid_stride
             self.cur_frame = 0
             self.cap = cv2.VideoCapture(path)
-            self.total_frames = int(
-                self.cap.get(cv2.CAP_PROP_FRAME_COUNT) / self.vid_stride
-            )
+            self.total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT) / self.vid_stride)
     
         def __getitem__(self, _):
             # Read video
@@ -903,9 +836,8 @@ searching frames in the video by text query or image. Upload v
     
         def __len__(self):
             return self.total_frames
-                
-                    
-            
+    
+    
     desc_text = """
     Search the content's of a video with a text description.
     __Note__: Long videos (over a few minutes) may cause UI performance issues.
@@ -917,7 +849,11 @@ searching frames in the video by text query or image. Upload v
             gr.Video(label="Video"),
             gr.Textbox(label="Text Search Query"),
             gr.Image(label="Image Search Query", visible=False),
-            gr.Dropdown(label="Model", choices=available_converted_models, value=model_checkpoint.value),
+            gr.Dropdown(
+                label="Model",
+                choices=available_converted_models,
+                value=model_checkpoint.value,
+            ),
             gr.Dropdown(label="Device", choices=available_devices, value=device.value),
             gr.Slider(label="Threshold", maximum=1.0, value=0.2),
             gr.Slider(label="Frame-rate Stride", value=4, step=1),
@@ -925,7 +861,7 @@ searching frames in the video by text query or image. Upload v
         ],
         outputs=[
             gr.Plot(label="Similarity Plot"),
-            gr.Gallery(label="Matched Frames", columns=2, object_fit="contain", height="auto")
+            gr.Gallery(label="Matched Frames", columns=2, object_fit="contain", height="auto"),
         ],
         examples=[[sample_path / "car-detection.mp4", "white car"]],
         allow_flagging="never",
@@ -942,7 +878,11 @@ searching frames in the video by text query or image. Upload v
             gr.Video(label="Video"),
             gr.Textbox(label="Text Search Query", visible=False),
             gr.Image(label="Image Search Query", type="pil"),
-            gr.Dropdown(label="Model", choices=available_converted_models, value=model_checkpoint.value),
+            gr.Dropdown(
+                label="Model",
+                choices=available_converted_models,
+                value=model_checkpoint.value,
+            ),
             gr.Dropdown(label="Device", choices=available_devices, value=device.value),
             gr.Slider(label="Threshold", maximum=1.0, value=0.2),
             gr.Slider(label="Frame-rate Stride", value=4, step=1),
@@ -950,18 +890,18 @@ searching frames in the video by text query or image. Upload v
         ],
         outputs=[
             gr.Plot(label="Similarity Plot"),
-            gr.Gallery(label="Matched Frames", columns=2, object_fit="contain", height="auto")
+            gr.Gallery(label="Matched Frames", columns=2, object_fit="contain", height="auto"),
         ],
         allow_flagging="never",
-        examples=[[sample_path / "coco.mp4", None, sample_path / "dog.png"]]
+        examples=[[sample_path / "coco.mp4", None, sample_path / "dog.png"]],
     )
     demo = gr.TabbedInterface(
         interface_list=[text_app, image_app],
         tab_names=["Text Query Search", "Image Query Search"],
         title="CLIP Video Content Search",
     )
-        
-        
+    
+    
     try:
         demo.launch(debug=False)
     except Exception:
@@ -991,7 +931,7 @@ searching frames in the video by text query or image. Upload v
 
 
 
+.. raw:: html
 
-
-
+    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
 

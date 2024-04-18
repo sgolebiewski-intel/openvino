@@ -19,19 +19,19 @@ The structure is the same as the one for the input.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Downloading model <#downloading-model>`__
--  `Load and configure the model <#load-and-configure-the-model>`__
--  `Select inference device <#select-inference-device>`__
--  `Load tokenizers <#load-tokenizers>`__
--  `Perform translation <#perform-translation>`__
--  `Translate the sentence <#translate-the-sentence>`__
+-  `Downloading model <#Downloading-model>`__
+-  `Load and configure the model <#Load-and-configure-the-model>`__
+-  `Select inference device <#Select-inference-device>`__
+-  `Load tokenizers <#Load-tokenizers>`__
+-  `Perform translation <#Perform-translation>`__
+-  `Translate the sentence <#Translate-the-sentence>`__
 
-   -  `Test your translation <#test-your-translation>`__
+   -  `Test your translation <#Test-your-translation>`__
 
 .. code:: ipython3
 
     # # Install requirements
-    %pip install -q "openvino>=2023.1.0"
+    %pip install -q "openvino>=2023.1.0" tqdm
     %pip install -q tokenizers
 
 
@@ -55,17 +55,19 @@ Table of contents:
     from tokenizers import SentencePieceBPETokenizer
     
     # Fetch `notebook_utils` module
-    import urllib.request
-    urllib.request.urlretrieve(
-        url='https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py',
-        filename='notebook_utils.py'
+    import requests
+    
+    r = requests.get(
+        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
     )
+    
+    open("notebook_utils.py", "w").write(r.text)
     from notebook_utils import download_file
 
 Downloading model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The following command will download the model to the current directory.
 Make sure you have run ``pip install openvino-dev`` beforehand.
@@ -83,8 +85,16 @@ Make sure you have run ``pip install openvino-dev`` beforehand.
     src_tok_dir.mkdir(exist_ok=True)
     target_tok_dir.mkdir(exist_ok=True)
     
-    download_file(base_url + f'/{model_name}/{precision}/{model_name}.xml', f"{model_name}.xml", model_base_dir)
-    download_file(base_url + f'/{model_name}/{precision}/{model_name}.bin', f"{model_name}.bin", model_base_dir)
+    download_file(
+        base_url + f"/{model_name}/{precision}/{model_name}.xml",
+        f"{model_name}.xml",
+        model_base_dir,
+    )
+    download_file(
+        base_url + f"/{model_name}/{precision}/{model_name}.bin",
+        f"{model_name}.bin",
+        model_base_dir,
+    )
     download_file(f"{base_url}/{model_name}/tokenizer_src/merges.txt", "merges.txt", src_tok_dir)
     download_file(f"{base_url}/{model_name}/tokenizer_tgt/merges.txt", "merges.txt", target_tok_dir)
     download_file(f"{base_url}/{model_name}/tokenizer_src/vocab.json", "vocab.json", src_tok_dir)
@@ -130,7 +140,7 @@ Make sure you have run ``pip install openvino-dev`` beforehand.
 Load and configure the model
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The model is now available in the ``model/`` folder. Below, we load and
 configure its inputs and outputs.
@@ -147,7 +157,7 @@ configure its inputs and outputs.
 Select inference device
 -----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -159,8 +169,8 @@ select device from dropdown list for running inference using OpenVINO
     
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
-        value='AUTO',
-        description='Device:',
+        value="AUTO",
+        description="Device:",
         disabled=False,
     )
     
@@ -182,7 +192,7 @@ select device from dropdown list for running inference using OpenVINO
 Load tokenizers
 ---------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NLP models usually take a list of tokens as standard input. A token is a
 single word converted to some integer. To provide the proper input, we
@@ -199,19 +209,13 @@ Initialize the tokenizer for the input ``src_tokenizer`` and the output
 
 .. code:: ipython3
 
-    src_tokenizer = SentencePieceBPETokenizer.from_file(
-        str(src_tok_dir / 'vocab.json'),
-        str(src_tok_dir / 'merges.txt')
-    )
-    tgt_tokenizer = SentencePieceBPETokenizer.from_file(
-        str(target_tok_dir / 'vocab.json'),
-        str(target_tok_dir / 'merges.txt')
-    )
+    src_tokenizer = SentencePieceBPETokenizer.from_file(str(src_tok_dir / "vocab.json"), str(src_tok_dir / "merges.txt"))
+    tgt_tokenizer = SentencePieceBPETokenizer.from_file(str(target_tok_dir / "vocab.json"), str(target_tok_dir / "merges.txt"))
 
 Perform translation
 -------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The following function translates a sentence in English to German.
 
@@ -230,14 +234,13 @@ The following function translates a sentence in English to German.
         assert len(sentence) > 0
         tokens = src_tokenizer.encode(sentence).ids
         # Transform the tokenized sentence into the model's input format
-        tokens = [src_tokenizer.token_to_id('<s>')] + \
-            tokens + [src_tokenizer.token_to_id('</s>')]
+        tokens = [src_tokenizer.token_to_id("<s>")] + tokens + [src_tokenizer.token_to_id("</s>")]
         pad_length = max_tokens - len(tokens)
     
         # If the sentence size is less than the maximum allowed tokens,
         # fill the remaining tokens with '<pad>'.
         if pad_length > 0:
-            tokens = tokens + [src_tokenizer.token_to_id('<pad>')] * pad_length
+            tokens = tokens + [src_tokenizer.token_to_id("<pad>")] * pad_length
         assert len(tokens) == max_tokens, "input sentence is too long"
         encoded_sentence = np.array(tokens).reshape(1, -1)
     
@@ -251,8 +254,8 @@ The following function translates a sentence in English to German.
     
         # Remove <pad> tokens, as well as '<s>' and '</s>' tokens which mark the
         # beginning and ending of the sentence.
-        for s in ['</s>', '<s>', '<pad>']:
-            sentence = sentence.replace(s, '')
+        for s in ["</s>", "<s>", "<pad>"]:
+            sentence = sentence.replace(s, "")
     
         # Transform sentence into lower case and join words by a white space
         sentence = sentence.lower().split()
@@ -262,7 +265,7 @@ The following function translates a sentence in English to German.
 Translate the sentence
 ----------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 The following function is a basic loop that translates sentences.
 
@@ -283,8 +286,8 @@ The following function is a basic loop that translates sentences.
             start_time = time.perf_counter()
             translated = translate(input_sentence)
             end_time = time.perf_counter()
-            print(f'Translated: {translated}')
-            print(f'Time: {end_time - start_time:.2f}s')
+            print(f"Translated: {translated}")
+            print(f"Time: {end_time - start_time:.2f}s")
 
 .. code:: ipython3
 
@@ -294,7 +297,7 @@ The following function is a basic loop that translates sentences.
 Test your translation
 ~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Run the following cell with an English sentence to have it translated to
 German
@@ -302,7 +305,7 @@ German
 .. code:: ipython3
 
     sentence = "My name is openvino"
-    print(f'Translated: {translate(sentence)}')
+    print(f"Translated: {translate(sentence)}")
 
 
 .. parsed-literal::
