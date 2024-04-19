@@ -104,7 +104,7 @@ Here are code examples of how to use these methods with different model formats:
 
               For more details on conversion, refer to the
               :doc:`guide <convert-model-tensorflow>`
-              and an example `tutorial <https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/101-tensorflow-classification-to-openvino>`__
+              and an example `tutorial <https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/tensorflow-classification-to-openvino>`__
               on this topic.
 
             * The ``read_model()`` and ``compile_model()`` methods:
