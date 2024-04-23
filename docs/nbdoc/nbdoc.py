@@ -144,9 +144,9 @@ class NbProcessor:
             raise FileNotFoundError("all_notebooks_paths.txt is not found")
         else:
             with open(openvino_notebooks_ipynb_list, 'r+', encoding='cp437') as ipynb_file:
-                openvino_notebooks_paths_list = ipynb_file.readlines()
+                openvino_notebooks_paths_list = ipynb_file.read()
 
-        for notebook_file, in [nb for nb in os.listdir(self.nb_path) if verify_notebook_name(nb)]:
+        for notebook_file in [nb for nb in os.listdir(self.nb_path) if verify_notebook_name(nb)]:
 
             notebook_ipynb_ext = notebook_file[:-16] + ".ipynb"
             nb_path_match = [line for line in openvino_notebooks_paths_list.split('\n') if notebook_ipynb_ext in line]
