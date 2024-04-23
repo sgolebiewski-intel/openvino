@@ -150,21 +150,21 @@ class NbProcessor:
 
             notebook_ipynb_ext = notebook_file[:-16] + ".ipynb"
             nb_path_match = [line for line in openvino_notebooks_paths_list.split('\n') if notebook_ipynb_ext in line]
-            nb_path = ''.join(nb_path_match)
-            print("The nb_path for a notebook:", nb_path)
+            nb_repo_path = ''.join(nb_path_match)
+            print("The nb_path for a notebook:", nb_repo_path)
             notebook_item = '-'.join(notebook_file.split('-')[:-2])
             print("The notebook item in add-binder func:", notebook_item)
             local_install = ".. |installation_link| raw:: html\n\n   <a href='https://github.com/" + \
                 repo_owner + "/" + repo_name + "#-installation-guide' target='_blank' title='Install " + \
                 notebook_item + " locally'>local installation</a> \n\n"
             binder_badge = ".. raw:: html\n\n   <a href='" + notebooks_binder + \
-                nb_path + "' target='_blank' title='Launch " + notebook_item + \
+                nb_repo_path + "' target='_blank' title='Launch " + notebook_item + \
                 " in Binder'><img src='data:image/svg+xml;base64," + binder_image_base64 + "' class='notebook-badge' alt='Binder'></a>\n\n"
             colab_badge = ".. raw:: html\n\n   <a href='" + notebooks_colab + \
-                nb_path + "' target='_blank' title='Open " + notebook_item + \
+                nb_repo_path + "' target='_blank' title='Open " + notebook_item + \
                 " in Google Colab'><img src='data:image/svg+xml;base64," + colab_image_base64 + "' class='notebook-badge'alt='Google Colab'></a>\n\n"
             github_badge = ".. raw:: html\n\n   <a href='" + notebooks_repo + \
-                nb_path + "' target='_blank' title='View " + notebook_item + \
+                nb_repo_path + "' target='_blank' title='View " + notebook_item + \
                 " on Github'><img src='data:image/svg+xml;base64," + github_image_base64 + "' class='notebook-badge' alt='Github'></a><br><br>\n\n"
 
             binder_data = {
