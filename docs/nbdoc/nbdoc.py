@@ -138,7 +138,7 @@ class NbProcessor:
             if not os.path.exists(openvino_notebooks_ipynb_list):
                 raise FileNotFoundError("all_notebooks_paths.txt is not found")
             else:
-                ipynb_list = [x for x in openvino_notebooks_paths_list if re.match("notebooks/[0-9]{3}.*\.ipynb$", x)]
+                ipynb_list = [x for x in openvino_notebooks_paths_list if re.match("notebooks/.*?-.*\.ipynb$", x)]
                 notebook_with_ext = notebook_name[:-16] + ".ipynb"
                 matching_notebooks = [re.sub('[\n]', '', match) for match in ipynb_list if notebook_with_ext in match]
 
