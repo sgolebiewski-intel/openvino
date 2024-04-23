@@ -1,7 +1,7 @@
 from pathlib import Path
 import base64
 
-notebooks_path = "../notebooks"
+notebooks_path = "notebooks"
 repo_directory = "notebooks"
 repo_owner = "openvinotoolkit"
 repo_name = "openvino_notebooks"
