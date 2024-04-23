@@ -1,6 +1,6 @@
 # Building documentation with CMake
 
-**NOTE**: Instructions were tested inside container based on Ubuntu 22.04 docker image. 
+**NOTE**: Instructions were tested inside container based on Ubuntu 22.04 docker image.
 
 1. Clone the OpenVINO repository and setup its submodules
 ```
@@ -33,7 +33,7 @@ $ source env/bin/activate
 ```
 7. Build documentation using these commands:
 ```
-(env) $ cmake .. -DENABLE_DOCS=ON
+(env) $ cmake .. -DENABLE_DOCS=ON -DENABLE_NOTEBOOKS=ON -DENABLE_OMZ=OFF -DENABLE_OVMS=OFF
 (env) $ cmake --build . --target sphinx_docs
 ```
 Depending on the needs, following variables can be added to first cmake call:
