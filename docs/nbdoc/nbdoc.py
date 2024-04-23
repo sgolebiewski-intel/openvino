@@ -151,9 +151,8 @@ class NbProcessor:
             notebook_ipynb_ext = notebook_file[:-16] + ".ipynb"
             nb_path_match = [line for line in openvino_notebooks_paths_list.split('\n') if notebook_ipynb_ext in line]
             nb_repo_path = ''.join(nb_path_match)
-            print("The nb_path for a notebook:", nb_repo_path)
             notebook_item = '-'.join(notebook_file.split('-')[:-2])
-            print("The notebook item in add-binder func:", notebook_item)
+
             local_install = ".. |installation_link| raw:: html\n\n   <a href='https://github.com/" + \
                 repo_owner + "/" + repo_name + "#-installation-guide' target='_blank' title='Install " + \
                 notebook_item + " locally'>local installation</a> \n\n"
