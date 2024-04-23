@@ -37,8 +37,6 @@ import os
 import re
 import sys
 
-matching_notebooks_paths = []
-
 
 def fetch_binder_list(binder_list_file) -> list:
     """Function that fetches list of notebooks with binder buttons
@@ -127,25 +125,6 @@ class NbProcessor:
     def __init__(self, nb_path: str = notebooks_path):
         self.nb_path = nb_path
 
-        with open(openvino_notebooks_ipynb_list, 'r+', encoding='cp437') as ipynb_file:
-            openvino_notebooks_paths_list = ipynb_file.readlines()
-
-        for notebook_name in [
-            nb for nb in os.listdir(self.nb_path) if
-            verify_notebook_name(nb)
-        ]:
-
-            if not os.path.exists(openvino_notebooks_ipynb_list):
-                raise FileNotFoundError("all_notebooks_paths.txt is not found")
-            else:
-                ipynb_list = [x for x in openvino_notebooks_paths_list if re.match("notebooks/.*?-.*\.ipynb$", x)]
-                notebook_with_ext = notebook_name[:-16] + ".ipynb"
-                matching_notebooks = [re.sub('[\n]', '', match) for match in ipynb_list if notebook_with_ext in match]
-
-            if matching_notebooks is not None:
-                for n in matching_notebooks:
-                    matching_notebooks_paths.append(n)
-
     def add_binder(self, buttons_list: list, cbuttons_list: list, template_with_colab_and_binder: str = binder_colab_template, template_without_binder: str = no_binder_template):
         """A function working as an example of how to add Binder or Google Colab buttons to existing RST files.
 
@@ -161,11 +140,20 @@ class NbProcessor:
 
         """
 
-        for notebook_file, nb_path in zip([
-            nb for nb in os.listdir(self.nb_path) if verify_notebook_name(nb)
-        ], matching_notebooks_paths):
+        if not os.path.exists(openvino_notebooks_ipynb_list):
+            raise FileNotFoundError("all_notebooks_paths.txt is not found")
+        else:
+            with open(openvino_notebooks_ipynb_list, 'r+', encoding='cp437') as ipynb_file:
+                openvino_notebooks_paths_list = ipynb_file.readlines()
 
+        for notebook_file, in [nb for nb in os.listdir(self.nb_path) if verify_notebook_name(nb)]:
+
+            notebook_ipynb_ext = notebook_file[:-16] + ".ipynb"
+            nb_path_match = [line for line in openvino_notebooks_paths_list.split('\n') if notebook_ipynb_ext in line]
+            nb_path = ''.join(nb_path_match)
+            print("The nb_path for a notebook:", nb_path)
             notebook_item = '-'.join(notebook_file.split('-')[:-2])
+            print("The notebook item in add-binder func:", notebook_item)
             local_install = ".. |installation_link| raw:: html\n\n   <a href='https://github.com/" + \
                 repo_owner + "/" + repo_name + "#-installation-guide' target='_blank' title='Install " + \
                 notebook_item + " locally'>local installation</a> \n\n"
