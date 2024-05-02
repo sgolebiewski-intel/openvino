@@ -25,20 +25,20 @@ and datasets. It consists of the following steps:
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#imports>`__
--  `Settings <#settings>`__
--  `Prepare the Model <#prepare-the-model>`__
--  `Prepare the Dataset <#prepare-the-dataset>`__
+-  `Imports <#Imports>`__
+-  `Settings <#Settings>`__
+-  `Prepare the Model <#Prepare-the-Model>`__
+-  `Prepare the Dataset <#Prepare-the-Dataset>`__
 -  `Optimize model using NNCF Post-training Quantization
-   API <#optimize-model-using-nncf-post-training-quantization-api>`__
--  `Load and Test OpenVINO Model <#load-and-test-openvino-model>`__
+   API <#Optimize-model-using-NNCF-Post-training-Quantization-API>`__
+-  `Load and Test OpenVINO Model <#Load-and-Test-OpenVINO-Model>`__
 
-   -  `Select inference device <#select-inference-device>`__
+   -  `Select inference device <#Select-inference-device>`__
 
 -  `Compare F1-score of FP32 and INT8
-   models <#compare-f1-score-of-fp32-and-int8-models>`__
+   models <#Compare-F1-score-of-FP32-and-INT8-models>`__
 -  `Compare Performance of the Original, Converted and Quantized
-   Models <#compare-performance-of-the-original-converted-and-quantized-models>`__
+   Models <#Compare-Performance-of-the-Original,-Converted-and-Quantized-Models>`__
 
 .. code:: ipython3
 
@@ -50,22 +50,14 @@ Table of contents:
 .. parsed-literal::
 
     Note: you may need to restart the kernel to use updated packages.
-
-
-.. parsed-literal::
-
     Note: you may need to restart the kernel to use updated packages.
-
-
-.. parsed-literal::
-
     Note: you may need to restart the kernel to use updated packages.
 
 
 Imports
 -------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -98,14 +90,10 @@ Imports
 
 .. parsed-literal::
 
-    2024-04-18 00:02:10.199327: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-04-18 00:02:10.234239: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-05-02 00:19:25.383288: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-05-02 00:19:25.419353: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-
-
-.. parsed-literal::
-
-    2024-04-18 00:02:10.832965: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-05-02 00:19:26.021226: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 .. parsed-literal::
@@ -116,7 +104,7 @@ Imports
 Settings
 --------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -133,7 +121,7 @@ Settings
 Prepare the Model
 -----------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Perform the following:
 
@@ -207,19 +195,19 @@ PyTorch model formats are supported:
 
 .. parsed-literal::
 
-    WARNING:nncf:NNCF provides best results with torch==2.1.2, while current torch version is 2.2.2+cpu. If you encounter issues, consider switching to torch==2.1.2
+    WARNING:nncf:NNCF provides best results with torch==2.2.*, while current torch version is 2.3.0+cpu. If you encounter issues, consider switching to torch==2.2.*
 
 
 .. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
+    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-671/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4371: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
       warnings.warn(
 
 
 Prepare the Dataset
 -------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 We download the `General Language Understanding Evaluation
 (GLUE) <https://gluebenchmark.com/>`__ dataset for the MRPC task from
@@ -248,7 +236,7 @@ tokenizer from HuggingFace.
 Optimize model using NNCF Post-training Quantization API
 --------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 `NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
 advanced algorithms for Neural Networks inference optimization in
@@ -326,10 +314,6 @@ The optimization process contains the following steps:
 .. parsed-literal::
 
     INFO:nncf:36 ignored nodes were found by name in the NNCFGraph
-
-
-.. parsed-literal::
-
     INFO:nncf:50 ignored nodes were found by name in the NNCFGraph
 
 
@@ -383,7 +367,7 @@ The optimization process contains the following steps:
 Load and Test OpenVINO Model
 ----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 To load and test converted model, perform the following:
 
@@ -395,7 +379,7 @@ To load and test converted model, perform the following:
 Select inference device
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 select device from dropdown list for running inference using OpenVINO
 
@@ -456,7 +440,7 @@ changing ``sample_idx`` to another value (from 0 to 407).
 Compare F1-score of FP32 and INT8 models
 ----------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -492,23 +476,15 @@ Compare F1-score of FP32 and INT8 models
 .. parsed-literal::
 
     Checking the accuracy of the original model:
-
-
-.. parsed-literal::
-
     F1 score: 0.9019
     Checking the accuracy of the quantized model:
-
-
-.. parsed-literal::
-
     F1 score: 0.8969
 
 
 Compare Performance of the Original, Converted and Quantized Models
 -------------------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Compare the original PyTorch model with OpenVINO converted and quantized
 models (``FP32``, ``INT8``) to see the difference in performance. It is
@@ -556,17 +532,9 @@ Frames Per Second (FPS) for images.
 
 .. parsed-literal::
 
-    PyTorch model on CPU: 0.075 seconds per sentence, SPS: 13.34
-
-
-.. parsed-literal::
-
-    IR FP32 model in OpenVINO Runtime/AUTO: 0.020 seconds per sentence, SPS: 48.84
-
-
-.. parsed-literal::
-
-    OpenVINO IR INT8 model in OpenVINO Runtime/AUTO: 0.009 seconds per sentence, SPS: 113.21
+    PyTorch model on CPU: 0.073 seconds per sentence, SPS: 13.69
+    IR FP32 model in OpenVINO Runtime/AUTO: 0.021 seconds per sentence, SPS: 48.25
+    OpenVINO IR INT8 model in OpenVINO Runtime/AUTO: 0.009 seconds per sentence, SPS: 109.51
 
 
 Finally, measure the inference performance of OpenVINO ``FP32`` and
@@ -596,21 +564,21 @@ in OpenVINO.
     [Step 2/11] Loading OpenVINO Runtime
     [ WARNING ] Default duration 120 seconds is used for unknown device device.value
     [ INFO ] OpenVINO:
-    [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
+    [ INFO ] Build ................................. 2024.1.0-15008-f4afc983258-releases/2024/1
     [ INFO ] 
     [ INFO ] Device info:
     [ INFO ] 
     [ INFO ] 
     [Step 3/11] Setting device configuration
     [ ERROR ] Exception from src/inference/src/cpp/core.cpp:216:
-    Exception from src/inference/src/dev/core_impl.cpp:556:
+    Exception from src/inference/src/dev/core_impl.cpp:566:
     Device with "device" name is not registered in the OpenVINO Runtime
     
     Traceback (most recent call last):
-      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/tools/benchmark/main.py", line 166, in main
+      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-671/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/tools/benchmark/main.py", line 166, in main
         supported_properties = benchmark.core.get_property(device, properties.supported_properties())
     RuntimeError: Exception from src/inference/src/cpp/core.cpp:216:
-    Exception from src/inference/src/dev/core_impl.cpp:556:
+    Exception from src/inference/src/dev/core_impl.cpp:566:
     Device with "device" name is not registered in the OpenVINO Runtime
     
     
@@ -629,21 +597,21 @@ in OpenVINO.
     [Step 2/11] Loading OpenVINO Runtime
     [ WARNING ] Default duration 120 seconds is used for unknown device device.value
     [ INFO ] OpenVINO:
-    [ INFO ] Build ................................. 2024.0.0-14509-34caeefd078-releases/2024/0
+    [ INFO ] Build ................................. 2024.1.0-15008-f4afc983258-releases/2024/1
     [ INFO ] 
     [ INFO ] Device info:
     [ INFO ] 
     [ INFO ] 
     [Step 3/11] Setting device configuration
     [ ERROR ] Exception from src/inference/src/cpp/core.cpp:216:
-    Exception from src/inference/src/dev/core_impl.cpp:556:
+    Exception from src/inference/src/dev/core_impl.cpp:566:
     Device with "device" name is not registered in the OpenVINO Runtime
     
     Traceback (most recent call last):
-      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-661/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/tools/benchmark/main.py", line 166, in main
+      File "/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-671/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/openvino/tools/benchmark/main.py", line 166, in main
         supported_properties = benchmark.core.get_property(device, properties.supported_properties())
     RuntimeError: Exception from src/inference/src/cpp/core.cpp:216:
-    Exception from src/inference/src/dev/core_impl.cpp:556:
+    Exception from src/inference/src/dev/core_impl.cpp:566:
     Device with "device" name is not registered in the OpenVINO Runtime
     
     
