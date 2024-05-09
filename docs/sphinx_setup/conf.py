@@ -108,7 +108,6 @@ html_theme_options = {
     # "footer_items": ["footer_info"],
     "show_prev_next": False,
 }
-locale.admonitionlabels['seealso'] = 'Additional Resources'
 
 pydata_sphinx_theme.shortcuts['github_url'] = ("squalus-github", "GitHub")
 
