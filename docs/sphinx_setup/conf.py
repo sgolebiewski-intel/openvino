@@ -12,6 +12,7 @@ import shutil
 from sphinx.util import logging
 from json import JSONDecodeError
 from sphinx.ext.autodoc import ClassDocumenter
+import pydata_sphinx_theme
 
 project = 'OpenVINO™'
 copyright = '2024, Intel®'
@@ -107,6 +108,9 @@ html_theme_options = {
     # "footer_items": ["footer_info"],
     "show_prev_next": False,
 }
+locale.admonitionlabels['seealso'] = 'Additional Resources'
+
+pydata_sphinx_theme.shortcuts['github_url'] = ("squalus-github", "GitHub")
 
 snippet_root = os.getenv("SNIPPET_ROOT", "")
 
