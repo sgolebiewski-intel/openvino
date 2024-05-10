@@ -12,7 +12,6 @@ import shutil
 from sphinx.util import logging
 from json import JSONDecodeError
 from sphinx.ext.autodoc import ClassDocumenter
-import pydata_sphinx_theme
 
 project = 'OpenVINO™'
 copyright = '2024, Intel®'
@@ -109,14 +108,6 @@ html_theme_options = {
     "show_prev_next": False,
 }
 
-#pydata_sphinx_theme.shortcuts['github_url'] = ("squalus-github", "GitHub")
-
-pydata_sphinx_theme.shortcuts = [
-    ("twitter_url", "fa-brands fa-square-twitter", "Twitter"),
-    ("bitbucket_url", "fa-brands fa-bitbucket", "Bitbucket"),
-    ("gitlab_url", "fa-brands fa-square-gitlab", "GitLab"),
-    ("github_url", "squalus-github", "GitHub"),
-]
 
 snippet_root = os.getenv("SNIPPET_ROOT", "")
 

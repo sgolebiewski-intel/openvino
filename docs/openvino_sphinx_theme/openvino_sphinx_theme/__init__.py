@@ -8,9 +8,16 @@ from docutils.parsers import rst
 from pathlib import Path
 from sphinx.util import logging
 from .directives.code import DoxygenSnippet, Scrollbox, Nodescrollbox, visit_scrollbox, depart_scrollbox
+import pydata_sphinx_theme
 
 SPHINX_LOGGER = logging.getLogger(__name__)
 
+shortcuts = [
+    ("twitter_url", "fa-brands fa-square-twitter", "Twitter"),
+    ("bitbucket_url", "fa-brands fa-bitbucket", "Bitbucket"),
+    ("gitlab_url", "fa-brands fa-square-gitlab", "GitLab"),
+    ("github_url", "squalus-github", "GitHub"),
+]
 
 def setup_edit_url(app, pagename, templatename, context, doctree):
     """Add a function that jinja can access for returning the edit URL of a page."""
