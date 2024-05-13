@@ -278,5 +278,3 @@ class ParsedLiteral(Directive):
         node.line = self.content_offset + 1
         self.add_name(node)
         return [node] + messages
-            raise self.error('Content block expected for the "%s" directive; '
-                             'none found.' % self.name)
