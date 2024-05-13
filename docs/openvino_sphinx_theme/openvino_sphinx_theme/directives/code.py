@@ -261,7 +261,8 @@ class ParsedLiteral(Directive):
         has no content.
         """
         if not self.content:
-            logger.warning(__('No content found for the "%s" directive; '),
+            logger.warning(__('Content block expected for the "%s" directive; '
+                              'none found.'),
                            self.name, type='literals', subtype='no_content')
 
     option_spec = {'class': directives.class_option,
@@ -277,3 +278,5 @@ class ParsedLiteral(Directive):
         node.line = self.content_offset + 1
         self.add_name(node)
         return [node] + messages
+            raise self.error('Content block expected for the "%s" directive; '
+                             'none found.' % self.name)
