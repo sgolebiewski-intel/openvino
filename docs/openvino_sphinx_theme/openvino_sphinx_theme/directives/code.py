@@ -1,16 +1,18 @@
 import os.path
 from pathlib import Path
-import sys
 from sphinx.directives.code import LiteralInclude, LiteralIncludeReader, container_wrapper
 from sphinx.util import logging
 from docutils.parsers.rst import Directive, directives
+
 from typing import List, Tuple
 from docutils.nodes import Node
 from docutils import nodes
 from sphinx.util import parselinenos
-import requests
+
+from docutils.parsers.rst.roles import set_classes
+from sphinx.locale import __
 import re
-import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -250,3 +252,28 @@ class Showcase(Directive):
         if self.content:
             self.state.nested_parse(self.content, self.content_offset, node)
         return [node]
+
+class ParsedLiteral(Directive):
+
+    def check_content(self):
+        """
+        A function to trigger a warning when the directive
+        has no content.
+        """
+        if not self.content:
+            logger.warning(__('No content found for the "%s" directive; '),
+                           self.name, type='literals', subtype='no_content')
+
+    option_spec = {'class': directives.class_option,
+                   'name': directives.unchanged}
+    has_content = True
+
+    def run(self):
+        set_classes(self.options)
+        self.check_content()
+        text = '\n'.join(self.content)
+        text_nodes, messages = self.state.inline_text(text, self.lineno)
+        node = nodes.literal_block(text, '', *text_nodes, **self.options)
+        node.line = self.content_offset + 1
+        self.add_name(node)
+        return [node] + messages

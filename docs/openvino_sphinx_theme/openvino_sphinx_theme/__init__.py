@@ -7,7 +7,7 @@ import jinja2
 from docutils.parsers import rst
 from pathlib import Path
 from sphinx.util import logging
-from .directives.code import DoxygenSnippet, Scrollbox, Nodescrollbox, visit_scrollbox, depart_scrollbox
+from .directives.code import DoxygenSnippet, Scrollbox, Nodescrollbox, visit_scrollbox, depart_scrollbox, ParsedLiteral
 
 SPHINX_LOGGER = logging.getLogger(__name__)
 
@@ -98,6 +98,7 @@ def setup(app):
     app.connect('env-before-read-docs', read_doxygen_configs)
     app.add_html_theme('openvino_sphinx_theme', theme_path)
     rst.directives.register_directive('doxygensnippet', DoxygenSnippet)
+    rst.directives.register_directive('parsed-literal', ParsedLiteral)
     rst.directives.register_directive('scrollbox', Scrollbox)
     app.add_node(
         Nodescrollbox,
