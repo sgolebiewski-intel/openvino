@@ -263,7 +263,7 @@ class ParsedLiteral(Directive):
         if not self.content:
             logger.error(__('Content block expected for the "%s" directive; '
                               'none found.'),
-                           self.name, type='literals', subtype='no_content')
+                           self.name, type='misc', subtype='no_content_block')
 
     option_spec = {'class': directives.class_option,
                    'name': directives.unchanged}
