@@ -24,23 +24,23 @@ download time.
 Table of contents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports and Settings <#imports-and-settings>`__
--  `Dataset Preprocessing <#dataset-preprocessing>`__
--  `Define a Floating-Point Model <#define-a-floating-point-model>`__
+-  `Imports and Settings <#Imports-and-Settings>`__
+-  `Dataset Preprocessing <#Dataset-Preprocessing>`__
+-  `Define a Floating-Point Model <#Define-a-Floating-Point-Model>`__
 -  `Pre-train a Floating-Point
-   Model <#pre-train-a-floating-point-model>`__
+   Model <#Pre-train-a-Floating-Point-Model>`__
 -  `Create and Initialize
-   Quantization <#create-and-initialize-quantization>`__
--  `Fine-tune the Compressed Model <#fine-tune-the-compressed-model>`__
+   Quantization <#Create-and-Initialize-Quantization>`__
+-  `Fine-tune the Compressed Model <#Fine-tune-the-Compressed-Model>`__
 -  `Export Models to OpenVINO Intermediate Representation
-   (IR) <#export-models-to-openvino-intermediate-representation-ir>`__
+   (IR) <#Export-Models-to-OpenVINO-Intermediate-Representation-(IR)>`__
 -  `Benchmark Model Performance by Computing Inference
-   Time <#benchmark-model-performance-by-computing-inference-time>`__
+   Time <#Benchmark-Model-Performance-by-Computing-Inference-Time>`__
 
 Imports and Settings
 --------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Import NNCF and all auxiliary packages from your Python code. Set a name
 for the model, input image size, used batch size, and the learning rate.
@@ -119,10 +119,10 @@ models will be stored.
 
 .. parsed-literal::
 
-    2024-05-07 01:47:25.270742: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-05-07 01:47:25.306846: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+    2024-05-14 02:25:10.921230: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+    2024-05-14 02:25:10.957736: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
     To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-05-07 01:47:25.932780: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+    2024-05-14 02:25:11.580814: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
 
 .. parsed-literal::
@@ -131,13 +131,13 @@ models will be stored.
     Downloading data from https://storage.openvinotoolkit.org/repositories/nncf/openvino_notebook_ckpts/305_resnet18_imagenette_fp32_v1.h5
     134604992/134604992 [==============================] - 3s 0us/step
     Absolute path where the model weights are saved:
-     /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-674/.workspace/scm/ov-notebook/notebooks/tensorflow-quantization-aware-training/model/ResNet-18_fp32.h5
+     /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-679/.workspace/scm/ov-notebook/notebooks/tensorflow-quantization-aware-training/model/ResNet-18_fp32.h5
 
 
 Dataset Preprocessing
 ---------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Download and prepare Imagenette 160px dataset. - Number of classes: 10 -
 Download size: 94.18 MiB
@@ -164,17 +164,17 @@ Download size: 94.18 MiB
 
 .. parsed-literal::
 
-    2024-05-07 01:47:33.528687: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
-    2024-05-07 01:47:33.528720: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:168] retrieving CUDA diagnostic information for host: iotg-dev-workstation-07
-    2024-05-07 01:47:33.528724: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:175] hostname: iotg-dev-workstation-07
-    2024-05-07 01:47:33.528876: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:199] libcuda reported version is: 470.223.2
-    2024-05-07 01:47:33.528891: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:203] kernel reported version is: 470.182.3
-    2024-05-07 01:47:33.528895: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
-    2024-05-07 01:47:33.631589: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_1' with dtype string and shape [1]
+    2024-05-14 02:25:19.734141: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
+    2024-05-14 02:25:19.734172: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:168] retrieving CUDA diagnostic information for host: iotg-dev-workstation-07
+    2024-05-14 02:25:19.734176: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:175] hostname: iotg-dev-workstation-07
+    2024-05-14 02:25:19.734326: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:199] libcuda reported version is: 470.223.2
+    2024-05-14 02:25:19.734341: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:203] kernel reported version is: 470.182.3
+    2024-05-14 02:25:19.734344: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
+    2024-05-14 02:25:19.855764: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_1' with dtype string and shape [1]
     	 [[{{node Placeholder/_1}}]]
-    2024-05-07 01:47:33.631913: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_0' with dtype string and shape [1]
-    	 [[{{node Placeholder/_0}}]]
-    2024-05-07 01:47:33.713868: W tensorflow/core/kernels/data/cache_dataset_ops.cc:856] The calling iterator did not fully read the dataset being cached. In order to avoid unexpected truncation of the dataset, the partially cached contents of the dataset  will be discarded. This can happen if you have an input pipeline similar to `dataset.cache().take(k).repeat()`. You should use `dataset.take(k).cache().repeat()` instead.
+    2024-05-14 02:25:19.856088: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_2' with dtype string and shape [1]
+    	 [[{{node Placeholder/_2}}]]
+    2024-05-14 02:25:19.952696: W tensorflow/core/kernels/data/cache_dataset_ops.cc:856] The calling iterator did not fully read the dataset being cached. In order to avoid unexpected truncation of the dataset, the partially cached contents of the dataset  will be discarded. This can happen if you have an input pipeline similar to `dataset.cache().take(k).repeat()`. You should use `dataset.take(k).cache().repeat()` instead.
 
 
 
@@ -200,7 +200,7 @@ Download size: 94.18 MiB
 Define a Floating-Point Model
 -----------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 .. code:: ipython3
 
@@ -288,7 +288,7 @@ Define a Floating-Point Model
 Pre-train a Floating-Point Model
 --------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Using NNCF for model compression assumes that the user has a pre-trained
 model and a training pipeline.
@@ -318,15 +318,15 @@ model and a training pipeline.
 
 .. parsed-literal::
 
-    2024-05-07 01:47:34.605284: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_4' with dtype int64 and shape [1]
+    2024-05-14 02:25:20.925687: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_3' with dtype int64 and shape [1]
+    	 [[{{node Placeholder/_3}}]]
+    2024-05-14 02:25:20.926376: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_4' with dtype int64 and shape [1]
     	 [[{{node Placeholder/_4}}]]
-    2024-05-07 01:47:34.605669: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_1' with dtype string and shape [1]
-    	 [[{{node Placeholder/_1}}]]
 
 
 .. parsed-literal::
 
-    4/4 [==============================] - 1s 257ms/sample - loss: 0.9807 - acc@1: 0.8220
+    4/4 [==============================] - 1s 254ms/sample - loss: 0.9807 - acc@1: 0.8220
     
     Accuracy of FP32 model: 0.822
 
@@ -334,7 +334,7 @@ model and a training pipeline.
 Create and Initialize Quantization
 ----------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 NNCF enables compression-aware training by integrating into regular
 training pipelines. The framework is designed so that modifications to
@@ -372,13 +372,13 @@ scenario and requires only 3 modifications.
 
 .. parsed-literal::
 
-    2024-05-07 01:47:37.452823: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_0' with dtype string and shape [1]
+    2024-05-14 02:25:23.773813: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_0' with dtype string and shape [1]
     	 [[{{node Placeholder/_0}}]]
-    2024-05-07 01:47:37.453203: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_1' with dtype string and shape [1]
-    	 [[{{node Placeholder/_1}}]]
-    2024-05-07 01:47:38.389786: W tensorflow/core/kernels/data/cache_dataset_ops.cc:856] The calling iterator did not fully read the dataset being cached. In order to avoid unexpected truncation of the dataset, the partially cached contents of the dataset  will be discarded. This can happen if you have an input pipeline similar to `dataset.cache().take(k).repeat()`. You should use `dataset.take(k).cache().repeat()` instead.
-    2024-05-07 01:47:39.042062: W tensorflow/core/kernels/data/cache_dataset_ops.cc:856] The calling iterator did not fully read the dataset being cached. In order to avoid unexpected truncation of the dataset, the partially cached contents of the dataset  will be discarded. This can happen if you have an input pipeline similar to `dataset.cache().take(k).repeat()`. You should use `dataset.take(k).cache().repeat()` instead.
-    2024-05-07 01:47:47.077962: W tensorflow/core/kernels/data/cache_dataset_ops.cc:856] The calling iterator did not fully read the dataset being cached. In order to avoid unexpected truncation of the dataset, the partially cached contents of the dataset  will be discarded. This can happen if you have an input pipeline similar to `dataset.cache().take(k).repeat()`. You should use `dataset.take(k).cache().repeat()` instead.
+    2024-05-14 02:25:23.774191: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_3' with dtype int64 and shape [1]
+    	 [[{{node Placeholder/_3}}]]
+    2024-05-14 02:25:24.759909: W tensorflow/core/kernels/data/cache_dataset_ops.cc:856] The calling iterator did not fully read the dataset being cached. In order to avoid unexpected truncation of the dataset, the partially cached contents of the dataset  will be discarded. This can happen if you have an input pipeline similar to `dataset.cache().take(k).repeat()`. You should use `dataset.take(k).cache().repeat()` instead.
+    2024-05-14 02:25:25.419829: W tensorflow/core/kernels/data/cache_dataset_ops.cc:856] The calling iterator did not fully read the dataset being cached. In order to avoid unexpected truncation of the dataset, the partially cached contents of the dataset  will be discarded. This can happen if you have an input pipeline similar to `dataset.cache().take(k).repeat()`. You should use `dataset.take(k).cache().repeat()` instead.
+    2024-05-14 02:25:33.515142: W tensorflow/core/kernels/data/cache_dataset_ops.cc:856] The calling iterator did not fully read the dataset being cached. In order to avoid unexpected truncation of the dataset, the partially cached contents of the dataset  will be discarded. This can happen if you have an input pipeline similar to `dataset.cache().take(k).repeat()`. You should use `dataset.take(k).cache().repeat()` instead.
 
 
 Evaluate the new model on the validation set after initialization of
@@ -404,13 +404,13 @@ demonstrated here.
 
 .. parsed-literal::
 
-    4/4 [==============================] - 1s 299ms/sample - loss: 0.9766 - acc@1: 0.8120
+    4/4 [==============================] - 1s 302ms/sample - loss: 0.9766 - acc@1: 0.8120
 
 
 Fine-tune the Compressed Model
 ------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 At this step, a regular fine-tuning process is applied to further
 improve quantized model accuracy. Normally, several epochs of tuning are
@@ -439,10 +439,10 @@ training pipeline are required. Here is a simple example.
     
     Accuracy of INT8 model after initialization: 0.812
     Epoch 1/2
-    101/101 [==============================] - 48s 412ms/step - loss: 0.7134 - acc@1: 0.9299
+    101/101 [==============================] - 49s 415ms/step - loss: 0.7134 - acc@1: 0.9299
     Epoch 2/2
-    101/101 [==============================] - 42s 413ms/step - loss: 0.6807 - acc@1: 0.9489
-    4/4 [==============================] - 1s 142ms/sample - loss: 0.9760 - acc@1: 0.8160
+    101/101 [==============================] - 42s 415ms/step - loss: 0.6807 - acc@1: 0.9489
+    4/4 [==============================] - 1s 145ms/sample - loss: 0.9760 - acc@1: 0.8160
     
     Accuracy of INT8 model after fine-tuning: 0.816
     
@@ -452,7 +452,7 @@ training pipeline are required. Here is a simple example.
 Export Models to OpenVINO Intermediate Representation (IR)
 ----------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Use model conversion Python API to convert the models to OpenVINO IR.
 
@@ -488,7 +488,7 @@ Executing this command may take a while.
 Benchmark Model Performance by Computing Inference Time
 -------------------------------------------------------
 
-
+`back to top ⬆️ <#Table-of-contents:>`__
 
 Finally, measure the inference performance of the ``FP32`` and ``INT8``
 models, using `Benchmark
@@ -552,10 +552,10 @@ Please select a benchmarking device using the dropdown list:
 .. parsed-literal::
 
     Benchmark FP32 model (IR)
-    [ INFO ] Throughput:   2811.20 FPS
+    [ INFO ] Throughput:   2829.49 FPS
     
     Benchmark INT8 model (IR)
-    [ INFO ] Throughput:   11037.70 FPS
+    [ INFO ] Throughput:   11053.66 FPS
 
 
 Show Device Information for reference.
