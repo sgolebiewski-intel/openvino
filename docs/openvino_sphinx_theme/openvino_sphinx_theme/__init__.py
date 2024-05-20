@@ -8,17 +8,9 @@ from docutils.parsers import rst
 from pathlib import Path
 from sphinx.util import logging
 from .directives.code import DoxygenSnippet, Scrollbox, Nodescrollbox, visit_scrollbox, depart_scrollbox
-import pydata_sphinx_theme
+from pydata_sphinx_theme import utils
 
 SPHINX_LOGGER = logging.getLogger(__name__)
-
-
-pydata_sphinx_theme.shortcuts = [
-    ("twitter_url", "fa-brands fa-square-twitter", "Twitter"),
-    ("bitbucket_url", "fa-brands fa-bitbucket", "Bitbucket"),
-    ("gitlab_url", "fa-brands fa-square-gitlab", "GitLab"),
-    ("github_url", "squalus-github", "GitHub"),
-]
 
 
 def setup_edit_url(app, pagename, templatename, context, doctree):
@@ -96,6 +88,32 @@ def read_doxygen_configs(app, env, docnames):
         except (JSONDecodeError, FileNotFoundError):
             app.config.html_context['doxygen_mapping_file'] = dict()
 
+def update_config(app):
+    shortcuts = [
+        ("twitter_url", "fa-brands fa-square-twitter", "Twitter"),
+        ("bitbucket_url", "fa-brands fa-bitbucket", "Bitbucket"),
+        ("gitlab_url", "fa-brands fa-square-gitlab", "GitLab"),
+        ("github_url", "fa-brands fa-squalus-github", "GitHub"),
+    ]
+
+    theme_options = utils.get_theme_options_dict(app)
+    icon_links = theme_options.get("icon_links", [])
+
+    for url, icon, name in shortcuts:
+        if theme_options.get(url):
+            # This defaults to an empty list so we can always insert
+            icon_links.insert(
+                0,
+                {
+                    "url": theme_options.get(url),
+                    "icon": icon,
+                    "name": name,
+                    "type": "fontawesome",
+                },
+            )
+    theme_options["icon_links"] = icon_links
+
+
 
 def setup(app):
     theme_path = get_theme_path()
@@ -104,6 +122,7 @@ def setup(app):
     app.config.templates_path.append(templates_path)
     app.config.html_static_path.append(static_path)
     app.connect("html-page-context", setup_edit_url, priority=sys.maxsize)
+    app.connect("html-page-context", update_config)
     app.connect('env-before-read-docs', read_doxygen_configs)
     app.add_html_theme('openvino_sphinx_theme', theme_path)
     rst.directives.register_directive('doxygensnippet', DoxygenSnippet)
