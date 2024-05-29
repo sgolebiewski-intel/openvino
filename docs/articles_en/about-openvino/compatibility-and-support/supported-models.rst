@@ -32,6 +32,6 @@ Supported Models
    :class: modeldata
    :name: id-of-table
    :header-rows: 1
-   :file: ../../sphinx_setup/_static/models.csv
+   :file: ../../../_static/models.csv
 
 
