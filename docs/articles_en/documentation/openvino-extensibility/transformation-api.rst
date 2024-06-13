@@ -37,7 +37,7 @@ Every port is associated with a node, allowing access to the node it belongs to,
 
 Take a look at the code example:
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_model_snippets.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/ov_model_snippets.cpp
    :language: cpp
    :fragment: [ov:ports_example]
 
@@ -52,7 +52,7 @@ Let's review a replacement case where a Negative operation is replaced with Mult
 
 .. image:: ../../assets/images/ov_replace_node.png
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_model_snippets.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/ov_model_snippets.cpp
    :language: cpp
    :fragment: [ov:replace_node]
 
@@ -60,7 +60,7 @@ Let's review a replacement case where a Negative operation is replaced with Mult
 
 The alternative way to do the same replacement is the following:
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_model_snippets.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/ov_model_snippets.cpp
    :language: cpp
    :fragment: [ov:manual_replace]
 
@@ -68,13 +68,13 @@ Another transformation example is insertion. Let's insert an additional Relu nod
 
 .. image:: ../../assets/images/ov_insert_node.png
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_model_snippets.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/ov_model_snippets.cpp
    :language: cpp
    :fragment: [ov:insert_node]
 
 The alternative way of inserting a node is to make a copy of the node and use ``ov::replace_node()``:
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_model_snippets.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/ov_model_snippets.cpp
    :language: cpp
    :fragment: [ov:insert_node_with_copy]
 
@@ -85,7 +85,7 @@ Another type of node replacement is elimination of a node.
 
 To eliminate a node, OpenVINO provides a method that considers all limitations of the OpenVINO Runtime.
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_model_snippets.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/ov_model_snippets.cpp
    :language: cpp
    :fragment: [ov:eliminate_node]
 
@@ -125,7 +125,7 @@ To develop a transformation, follow these transformation rules:
 Each ``ov::Node`` has a unique name and a friendly name. In transformations, only the friendly name matters because it represents the name from the model's perspective.
 To prevent losing the friendly name when replacing a node with another node or a subgraph, the original friendly name is set to the last node in the replacing subgraph. See the example below.
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_model_snippets.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/ov_model_snippets.cpp
    :language: cpp
    :fragment: [ov:replace_friendly_name]
 
@@ -140,7 +140,7 @@ In most cases, transformations have the following types: 1:1 (replace node with 
 Currently, there is no mechanism that automatically detects transformation types, so this runtime information needs to be propagated manually. See the example below:
 
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_model_snippets.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/ov_model_snippets.cpp
    :language: cpp
    :fragment: [ov:copy_runtime_info]
 
@@ -154,7 +154,7 @@ When a transformation has multiple fusions or decompositions, ``ov::copy_runtime
 If your transformation inserts constant sub-graphs that need to be folded, do not forget to use ``ov::pass::ConstantFolding()`` after your transformation or call constant folding directly for operation.
 The example below shows how constant subgraph can be constructed.
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_model_snippets.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/ov_model_snippets.cpp
    :language: cpp
    :fragment: [ov:constant_subgraph]
 
@@ -162,7 +162,7 @@ Manual constant folding is more preferable than ``ov::pass::ConstantFolding()`` 
 
 Below you can find an example of manual constant folding:
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/template_pattern_transformation.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/template_pattern_transformation.cpp
    :language: cpp
    :fragment: [manual_constant_folding]
 
@@ -191,13 +191,13 @@ In addition, ``ov::pass::Manager`` has extended debug capabilities (find more in
 
 The example below shows basic usage of ``ov::pass::Manager``
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/template_pattern_transformation.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/template_pattern_transformation.cpp
    :language: cpp
    :fragment: [matcher_pass:manager3]
 
 Another example shows how multiple matcher passes can be united into single GraphRewrite.
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/template_pattern_transformation.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/template_pattern_transformation.cpp
    :language: cpp
    :fragment: [matcher_pass:manager2]
 

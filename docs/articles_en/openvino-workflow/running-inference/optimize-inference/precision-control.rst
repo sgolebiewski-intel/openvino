@@ -60,14 +60,14 @@ Code examples:
    .. tab-item:: Python
       :sync: py
 
-      .. doxygensnippet:: docs/articles_en/assets/snippets/ov_execution_mode.py
+      .. doxygensnippet:: ../../../../../docs/articles_en/assets/snippets/ov_execution_mode.py
          :language: python
          :fragment: [ov:execution_mode:part0]
 
    .. tab-item:: C++
       :sync: cpp
 
-      .. doxygensnippet:: docs/articles_en/assets/snippets/ov_execution_mode.cpp
+      .. doxygensnippet:: ../../../../../docs/articles_en/assets/snippets/ov_execution_mode.cpp
          :language: cpp
          :fragment: [ov:execution_mode:part0]
 

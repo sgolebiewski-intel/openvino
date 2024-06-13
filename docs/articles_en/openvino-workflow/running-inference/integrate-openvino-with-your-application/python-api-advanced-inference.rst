@@ -23,7 +23,7 @@ Direct Inference with ``CompiledModel``
 The ``CompiledModel`` class provides the ``__call__`` method that runs a single synchronous inference using the given model. In addition to a compact code, all future calls to ``CompiledModel.__call__`` will result in less overhead, as the object reuses the already created ``InferRequest``.
 
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_python_inference.py
+.. doxygensnippet:: ../../../../../docs/articles_en/assets/snippets/ov_python_inference.py
    :language: python
    :fragment: [direct_inference]
 
@@ -41,7 +41,7 @@ instances with the "zero-copy" approach, reducing overhead of setting inputs
 to minimum. For outputs this feature creates numpy views on data. Example usage:
 
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_python_inference.py
+.. doxygensnippet:: ../../../../../docs/articles_en/assets/snippets/ov_python_inference.py
    :language: python
    :fragment: [shared_memory_inference]
 
@@ -68,7 +68,7 @@ For example, ``InferRequest.start_async`` releases the GIL and provides non-bloc
 It is beneficial to process other calls while waiting to finish compute-intensive inference.
 Example usage:
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_python_inference.py
+.. doxygensnippet:: ../../../../../docs/articles_en/assets/snippets/ov_python_inference.py
    :language: python
    :fragment: [hiding_latency]
 
@@ -89,7 +89,7 @@ synchronous calls. "Postponed Return" could be applied when:
 * data return is not required at all. For example, models are being chained with the pure ``Tensor`` interface.
 
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/ov_python_inference.py
+.. doxygensnippet:: ../../../../../docs/articles_en/assets/snippets/ov_python_inference.py
    :language: python
    :fragment: [no_return_inference]
 

@@ -145,14 +145,14 @@ perform multi-threading scheduling based on the limited available CPU.
    .. tab-item:: Python
       :sync: py
 
-      .. doxygensnippet:: docs/articles_en/assets/snippets/multi_threading.py
+      .. doxygensnippet:: ../../../../../../docs/articles_en/assets/snippets/multi_threading.py
          :language: python
          :fragment: [ov:intel_cpu:multi_threading:part0]
 
    .. tab-item:: C++
       :sync: cpp
 
-      .. doxygensnippet:: docs/articles_en/assets/snippets/multi_threading.cpp
+      .. doxygensnippet:: ../../../../../../docs/articles_en/assets/snippets/multi_threading.cpp
          :language: cpp
          :fragment: [ov:intel_cpu:multi_threading:part0]
 
@@ -172,14 +172,14 @@ are executed in parallel.
    .. tab-item:: Python
       :sync: py
 
-      .. doxygensnippet:: docs/articles_en/assets/snippets/multi_threading.py
+      .. doxygensnippet:: ../../../../../../docs/articles_en/assets/snippets/multi_threading.py
          :language: python
          :fragment: [ov:intel_cpu:multi_threading:part1]
 
    .. tab-item:: C++
       :sync: cpp
 
-      .. doxygensnippet:: docs/articles_en/assets/snippets/multi_threading.cpp
+      .. doxygensnippet:: ../../../../../../docs/articles_en/assets/snippets/multi_threading.cpp
          :language: cpp
          :fragment: [ov:intel_cpu:multi_threading:part1]
 

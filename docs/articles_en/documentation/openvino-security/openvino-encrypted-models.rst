@@ -29,7 +29,7 @@ Loading Encrypted Models
 
 The OpenVINO Runtime requires model decryption before loading. Allocate a temporary memory block for model decryption and use the ``ov::Core::read_model`` method to load the model from a memory buffer. For more information, see the ``ov::Core`` Class Reference Documentation.
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/protecting_model_guide.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/protecting_model_guide.cpp
     :language: cpp
     :fragment: part0
 
@@ -39,7 +39,7 @@ Use the ``ov::Core::read_model`` to set model representations and weights respec
 
 Currently there is no way to read external weights from memory for ONNX models. The ``ov::Core::read_model(const std::string& model, const Tensor& weights)`` method should be called with ``weights`` passed as an empty ``ov::Tensor``.
 
-.. doxygensnippet:: docs/articles_en/assets/snippets/protecting_model_guide.cpp
+.. doxygensnippet:: ../../../../docs/articles_en/assets/snippets/protecting_model_guide.cpp
     :language: cpp
     :fragment: part1
 
