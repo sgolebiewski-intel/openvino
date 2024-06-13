@@ -96,7 +96,7 @@ Discontinued:
          .. tab-item:: Python
             :sync: py
 
-            .. doxygensnippet:: docs/articles_en/assets/snippets/export_compiled_model.py
+            .. doxygensnippet:: docs/articles_en/assets/snippets/export_compiled_model_ir.py
                :language: python
                :fragment: [export_compiled_model]
 
