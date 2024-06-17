@@ -43,7 +43,7 @@ class DoxygenSnippet(LiteralInclude):
             else:
                 rel_filename, filename = self.env.relfn2path(self.arguments[0])
             self.env.note_dependency(rel_filename)
-            
+
 
             if not os.path.exists(filename):
                 raise self.error('The "%s" snippet file does not exist '
@@ -52,9 +52,9 @@ class DoxygenSnippet(LiteralInclude):
                 reader = LiteralIncludeReader(filename, self.options, self.config)
                 text, lines = reader.read(location=location)
                 retnode = nodes.literal_block(text, text, source=filename)  # type: Element
-                retnode['force'] = 'force' in self.options
-                self.set_source_info(retnode)
                 if retnode:
+                    retnode['force'] = 'force' in self.options
+                    self.set_source_info(retnode)
                     if self.options.get('diff'):  # if diff is set, set udiff
                         retnode['language'] = 'udiff'
                     elif 'language' in self.options:
