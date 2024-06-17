@@ -42,41 +42,43 @@ class DoxygenSnippet(LiteralInclude):
                 filename = os.path.join(doxygen_snippet_root, rel_filename)
             else:
                 rel_filename, filename = self.env.relfn2path(self.arguments[0])
-                logger.error(__('The %s snippet file does not exit, '
-                                'or the specified path is invalid.'), filename)
             self.env.note_dependency(rel_filename)
 
-            reader = LiteralIncludeReader(filename, self.options, self.config)
-            text, lines = reader.read(location=location)
+            if not os.path.exists(filename):
+                logger.error(__('The %s snippet file does not exit, '
+                                'or the specified path is invalid.'), filename)
+            else:
+                reader = LiteralIncludeReader(filename, self.options, self.config)
+                text, lines = reader.read(location=location)
 
-            retnode = nodes.literal_block(text, text, source=filename)  # type: Element
-            retnode['force'] = 'force' in self.options
-            self.set_source_info(retnode)
-            if self.options.get('diff'):  # if diff is set, set udiff
-                retnode['language'] = 'udiff'
-            elif 'language' in self.options:
-                retnode['language'] = self.options['language']
-            if ('linenos' in self.options or 'lineno-start' in self.options or
-                    'lineno-match' in self.options):
-                retnode['linenos'] = True
-            retnode['classes'] += self.options.get('class', [])
-            extra_args = retnode['highlight_args'] = {}
-            if 'emphasize-lines' in self.options:
-                hl_lines = parselinenos(self.options['emphasize-lines'], lines)
-                if any(i >= lines for i in hl_lines):
-                    logger.warning(__('line number spec is out of range(1-%d): %r') %
-                                   (lines, self.options['emphasize-lines']),
-                                   location=location)
-                extra_args['hl_lines'] = [x + 1 for x in hl_lines if x < lines]
-            extra_args['linenostart'] = reader.lineno_start
+                retnode = nodes.literal_block(text, text, source=filename)  # type: Element
+                retnode['force'] = 'force' in self.options
+                self.set_source_info(retnode)
+                if self.options.get('diff'):  # if diff is set, set udiff
+                    retnode['language'] = 'udiff'
+                elif 'language' in self.options:
+                    retnode['language'] = self.options['language']
+                if ('linenos' in self.options or 'lineno-start' in self.options or
+                        'lineno-match' in self.options):
+                    retnode['linenos'] = True
+                retnode['classes'] = self.options.get('class', [])
+                extra_args = retnode['highlight_args'] = {}
+                if 'emphasize-lines' in self.options:
+                    hl_lines = parselinenos(self.options['emphasize-lines'], lines)
+                    if any(i >= lines for i in hl_lines):
+                        logger.warning(__('line number spec is out of range(1-%d): %r') %
+                                       (lines, self.options['emphasize-lines']),
+                                       location=location)
+                    extra_args['hl_lines'] = [x + 1 for x in hl_lines if x < lines]
+                extra_args['linenostart'] = reader.lineno_start
 
-            if 'caption' in self.options:
-                caption = self.options['caption'] or self.arguments[0]
-                retnode = container_wrapper(self, retnode, caption)
+                if 'caption' in self.options:
+                    caption = self.options['caption'] or self.arguments[0]
+                    retnode = container_wrapper(self, retnode, caption)
 
-            # retnode will be note_implicit_target that is linked from caption and numref.
-            # when options['name'] is provided, it should be primary ID.
-            self.add_name(retnode)
+                # retnode will be note_implicit_target that is linked from caption and numref.
+                # when options['name'] is provided, it should be primary ID.
+                self.add_name(retnode)
 
             return [retnode]
         except Exception as exc:
