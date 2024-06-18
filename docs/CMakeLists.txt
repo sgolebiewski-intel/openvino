@@ -120,7 +120,7 @@ function(build_docs)
     add_custom_target(sphinx_docs
                       DEPENDS preprocess_docs
                       COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green "STARTED sphinx documentation build"
-                      COMMAND sphinx-build -j auto -w ${DOCS_BUILD_DIR}/sphinx.log -b html ${SPHINX_SOURCE_DIR} ${SPHINX_OUTPUT}
+                      COMMAND sphinx-build -j auto -n -w ${DOCS_BUILD_DIR}/sphinx.log -b html ${SPHINX_SOURCE_DIR} ${SPHINX_OUTPUT}
                       COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green "FINISHED sphinx documentation build"
                       WORKING_DIRECTORY ${SPHINX_SOURCE_DIR}
                       VERBATIM)
