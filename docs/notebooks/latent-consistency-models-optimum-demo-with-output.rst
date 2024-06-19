@@ -63,7 +63,7 @@ Install required packages
 .. code:: ipython3
 
     import warnings
-    
+
     warnings.filterwarnings("ignore")
 
 Showing Info Available Devices
@@ -79,19 +79,21 @@ you have integrated GPU (iGPU) and discrete GPU (dGPU), it will show
 If you just have either an iGPU or dGPU that will be assigned to
 ``"GPU"``
 
-Note: For more details about GPU with OpenVINO visit this
-`link <https://docs.openvino.ai/2024/get-started/configurations/configurations-intel-gpu.html>`__.
-If you have been facing any issue in Ubuntu 20.04 or Windows 11 read
-this
-`blog <https://blog.openvino.ai/blog-posts/install-gpu-drivers-windows-ubuntu>`__.
+.. note::
+
+   For more details about GPU with OpenVINO visit this
+   `link <https://docs.openvino.ai/2024/get-started/configurations/configurations-intel-gpu.html>`__.
+   If you have been facing any issue in Ubuntu 20.04 or Windows 11 read
+   this
+   `blog <https://blog.openvino.ai/blog-posts/install-gpu-drivers-windows-ubuntu>`__.
 
 .. code:: ipython3
 
     import openvino as ov
-    
+
     core = ov.Core()
     devices = core.available_devices
-    
+
     for device in devices:
         device_name = core.get_property(device, "FULL_DEVICE_NAME")
         print(f"{device}: {device_name}")
@@ -115,7 +117,7 @@ https://huggingface.co/docs/diffusers/en/api/pipelines/latent_consistency_models
 
     from diffusers import LatentConsistencyModelPipeline
     import gc
-    
+
     pipeline = LatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
 
 
@@ -136,7 +138,7 @@ https://huggingface.co/docs/diffusers/en/api/pipelines/latent_consistency_models
 .. code:: ipython3
 
     prompt = "A cute squirrel in the forest, portrait, 8k"
-    
+
     image = pipeline(prompt=prompt, num_inference_steps=4, guidance_scale=8.0, height=512, width=512).images[0]
     image.save("image_standard_pipeline.png")
     image
@@ -165,16 +167,16 @@ Select inference device for text-to-image generation
 .. code:: ipython3
 
     import ipywidgets as widgets
-    
+
     core = ov.Core()
-    
+
     device = widgets.Dropdown(
         options=core.available_devices + ["AUTO"],
         value="CPU",
         description="Device:",
         disabled=False,
     )
-    
+
     device
 
 
@@ -206,13 +208,13 @@ and there is no need to do it manually
 
     from optimum.intel.openvino import OVLatentConsistencyModelPipeline
     from pathlib import Path
-    
+
     if not Path("./openvino_ir").exists():
         ov_pipeline = OVLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7", height=512, width=512, export=True, compile=False)
         ov_pipeline.save_pretrained("./openvino_ir")
     else:
         ov_pipeline = OVLatentConsistencyModelPipeline.from_pretrained("./openvino_ir", export=False, compile=False)
-    
+
     ov_pipeline.reshape(batch_size=1, height=512, width=512, num_images_per_prompt=1)
 
 
@@ -316,7 +318,7 @@ and there is no need to do it manually
 .. code:: ipython3
 
     prompt = "A cute squirrel in the forest, portrait, 8k"
-    
+
     image_ov = ov_pipeline(prompt=prompt, num_inference_steps=4, guidance_scale=8.0, height=512, width=512).images[0]
     image_ov.save("image_opt.png")
     image_ov
