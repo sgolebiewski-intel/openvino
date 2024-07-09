@@ -102,7 +102,7 @@ def format_heading(level, text):
     underlining = ["=", "-", "~",][
         level - 1
     ] * len(text)
-    return "%s\n%s\n\n" % (text, underlining)
+    return "%s\n%s\n\n" % (text.replace("Group", ""), underlining)
 
 
 def format_directive(package_type, package, args):
@@ -122,7 +122,7 @@ def get_compound_data(compound, args, hide=True):
     try:
         title = index.findall('.//title')[0].text
     except IndexError:
-        title = compound.findtext("name")    
+        title = compound.findtext("name")
     refs = []
     for ing in root.iter('innergroup'):
         refs.append((ing.text, ing.get('refid') + '.rst'))
