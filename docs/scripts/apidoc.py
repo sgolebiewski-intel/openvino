@@ -102,7 +102,7 @@ def format_heading(level, text):
     underlining = ["=", "-", "~",][
         level - 1
     ] * len(text)
-    return "%s\n%s\n\n" % (text.replace("Group", ""), underlining)
+    return "%s\n%s\n\n" % (text.replace("Group ", ""), underlining)
 
 
 def format_directive(package_type, package, args):
