@@ -122,13 +122,13 @@ def get_compound_data(compound, args, hide=True):
     try:
         title = index.findall('.//title')[0].text
     except IndexError:
-        title = compound.findtext("name")    
+        title = compound.findtext("name")
     refs = []
     for ing in root.iter('innergroup'):
-        refs.append((ing.text, ing.get('refid') + '.rst'))
+        refs.append((ing.text, ing.get('refid')))
     for inc in root.iter('innerclass'):
         if ' ' not in inc.text:
-            refs.append((inc.text, inc.get('refid') + '.rst'))
+            refs.append((inc.text, inc.get('refid')))
     if refs:
         result =  ".. toctree::\n"
         if hide:
