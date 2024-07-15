@@ -1,511 +1,511 @@
-Convert of TensorFlow Hub models to OpenVINO Intermediate Representation (IR)
+ConvertofTensorFlowHubmodelstoOpenVINOIntermediateRepresentation(IR)
 =============================================================================
 
-|Colab| |Binder|
+|Colab||Binder|
 
-This tutorial demonstrates step-by-step instructions on how to convert
-models loaded from TensorFlow Hub using OpenVINO Runtime.
+Thistutorialdemonstratesstep-by-stepinstructionsonhowtoconvert
+modelsloadedfromTensorFlowHubusingOpenVINORuntime.
 
-`TensorFlow Hub <https://tfhub.dev/>`__ is a library and online platform
-developed by Google that simplifies machine learning model reuse and
-sharing. It serves as a repository of pre-trained models, embeddings,
-and reusable components, allowing researchers and developers to access
-and integrate state-of-the-art machine learning models into their own
-projects with ease. TensorFlow Hub provides a diverse range of models
-for various tasks like image classification, text embedding, and more.
-It streamlines the process of incorporating these models into TensorFlow
-workflows, fostering collaboration and accelerating the development of
-AI applications. This centralized hub enhances model accessibility and
-promotes the rapid advancement of machine learning capabilities across
-the community.
+`TensorFlowHub<https://tfhub.dev/>`__isalibraryandonlineplatform
+developedbyGooglethatsimplifiesmachinelearningmodelreuseand
+sharing.Itservesasarepositoryofpre-trainedmodels,embeddings,
+andreusablecomponents,allowingresearchersanddeveloperstoaccess
+andintegratestate-of-the-artmachinelearningmodelsintotheirown
+projectswithease.TensorFlowHubprovidesadiverserangeofmodels
+forvarioustaskslikeimageclassification,textembedding,andmore.
+ItstreamlinestheprocessofincorporatingthesemodelsintoTensorFlow
+workflows,fosteringcollaborationandacceleratingthedevelopmentof
+AIapplications.Thiscentralizedhubenhancesmodelaccessibilityand
+promotestherapidadvancementofmachinelearningcapabilitiesacross
+thecommunity.
 
-You have the flexibility to run this tutorial notebook in its entirety
-or selectively execute specific sections, as each section operates
+Youhavetheflexibilitytorunthistutorialnotebookinitsentirety
+orselectivelyexecutespecificsections,aseachsectionoperates
 independently.
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Install required packages <#Install-required-packages>`__
--  `Image classification <#Image-classification>`__
+-`Installrequiredpackages<#install-required-packages>`__
+-`Imageclassification<#image-classification>`__
 
-   -  `Import libraries <#Import-libraries>`__
-   -  `Download the classifier <#Download-the-classifier>`__
-   -  `Download a single image to try the model
-      on <#Download-a-single-image-to-try-the-model-on>`__
-   -  `Convert model to OpenVINO IR <#Convert-model-to-OpenVINO-IR>`__
-   -  `Select inference device <#Select-inference-device>`__
-   -  `Inference <#Inference>`__
+-`Importlibraries<#import-libraries>`__
+-`Downloadtheclassifier<#download-the-classifier>`__
+-`Downloadasingleimagetotrythemodel
+on<#download-a-single-image-to-try-the-model-on>`__
+-`ConvertmodeltoOpenVINOIR<#convert-model-to-openvino-ir>`__
+-`Selectinferencedevice<#select-inference-device>`__
+-`Inference<#inference>`__
 
--  `Image style transfer <#Image-style-transfer>`__
+-`Imagestyletransfer<#image-style-transfer>`__
 
-   -  `Install required packages <#Install-required-packages>`__
-   -  `Load the model <#Load-the-model>`__
-   -  `Convert the model to OpenVINO
-      IR <#Convert-the-model-to-OpenVINO-IR>`__
-   -  `Select inference device <#Select-inference-device>`__
-   -  `Inference <#Inference>`__
+-`Installrequiredpackages<#install-required-packages>`__
+-`Loadthemodel<#load-the-model>`__
+-`ConvertthemodeltoOpenVINO
+IR<#convert-the-model-to-openvino-ir>`__
+-`Selectinferencedevice<#select-inference-device>`__
+-`Inference<#inference>`__
 
-.. |Colab| image:: https://colab.research.google.com/assets/colab-badge.svg
-   :target: https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/tensorflow-hub/tensorflow-hub.ipynb
-.. |Binder| image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2Ftensorflow-hub%2Ftensorflow-hub.ipynb
+..|Colab|image::https://colab.research.google.com/assets/colab-badge.svg
+:target:https://colab.research.google.com/github/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/tensorflow-hub/tensorflow-hub.ipynb
+..|Binder|image::https://mybinder.org/badge_logo.svg
+:target:https://mybinder.org/v2/gh/eaidova/openvino_notebooks_binder.git/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fopenvinotoolkit%252Fopenvino_notebooks%26urlpath%3Dtree%252Fopenvino_notebooks%252Fnotebooks%2Ftensorflow-hub%2Ftensorflow-hub.ipynb
 
-Install required packages
+Installrequiredpackages
 -------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    import platform
-    
-    %pip install -q pillow numpy
-    %pip install -q "openvino>=2023.2.0" "opencv-python"
-    
-    if platform.system() != "Windows":
-        %pip install -q "matplotlib>=3.4"
-    else:
-        %pip install -q "matplotlib>=3.4,<3.7"
-    
-    %pip install -q "tensorflow-macos>=2.5; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version > '3.8'" # macOS M1 and M2
-    %pip install -q "tensorflow-macos>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine == 'arm64' and python_version <= '3.8'" # macOS M1 and M2
-    %pip install -q "tensorflow>=2.5; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version > '3.8'" # macOS x86
-    %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform == 'darwin' and platform_machine != 'arm64' and python_version <= '3.8'" # macOS x86
-    %pip install -q "tensorflow>=2.5; sys_platform != 'darwin' and python_version > '3.8'"
-    %pip install -q "tensorflow>=2.5,<=2.12.0; sys_platform != 'darwin' and python_version <= '3.8'"
-    %pip install -q tf_keras tensorflow_hub
+importplatform
 
+%pipinstall-qpillownumpy
+%pipinstall-q"openvino>=2023.2.0""opencv-python"
 
-.. parsed-literal::
+ifplatform.system()!="Windows":
+%pipinstall-q"matplotlib>=3.4"
+else:
+%pipinstall-q"matplotlib>=3.4,<3.7"
 
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
+%pipinstall-q"tensorflow-macos>=2.5;sys_platform=='darwin'andplatform_machine=='arm64'andpython_version>'3.8'"#macOSM1andM2
+%pipinstall-q"tensorflow-macos>=2.5,<=2.12.0;sys_platform=='darwin'andplatform_machine=='arm64'andpython_version<='3.8'"#macOSM1andM2
+%pipinstall-q"tensorflow>=2.5;sys_platform=='darwin'andplatform_machine!='arm64'andpython_version>'3.8'"#macOSx86
+%pipinstall-q"tensorflow>=2.5,<=2.12.0;sys_platform=='darwin'andplatform_machine!='arm64'andpython_version<='3.8'"#macOSx86
+%pipinstall-q"tensorflow>=2.5;sys_platform!='darwin'andpython_version>'3.8'"
+%pipinstall-q"tensorflow>=2.5,<=2.12.0;sys_platform!='darwin'andpython_version<='3.8'"
+%pipinstall-qtf_kerastensorflow_hub
 
 
-Image classification
+..parsed-literal::
+
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+
+
+Imageclassification
 --------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-We will use the `MobileNet_v2 <https://arxiv.org/abs/1704.04861>`__
-image classification model from `TensorFlow Hub <https://tfhub.dev/>`__.
+Wewillusethe`MobileNet_v2<https://arxiv.org/abs/1704.04861>`__
+imageclassificationmodelfrom`TensorFlowHub<https://tfhub.dev/>`__.
 
-MobileNetV2 is a compact and efficient deep learning architecture
-designed for mobile and embedded devices, developed by Google
-researchers. It builds on the success of the original MobileNet by
-introducing improvements in both speed and accuracy. MobileNetV2 employs
-a streamlined architecture with inverted residual blocks, making it
-highly efficient for real-time applications while minimizing
-computational resources. This network excels in tasks like image
-classification, object detection, and image segmentation, offering a
-balance between model size and performance. MobileNetV2 has become a
-popular choice for on-device AI applications, enabling faster and more
-efficient deep learning inference on smartphones and edge devices.
+MobileNetV2isacompactandefficientdeeplearningarchitecture
+designedformobileandembeddeddevices,developedbyGoogle
+researchers.ItbuildsonthesuccessoftheoriginalMobileNetby
+introducingimprovementsinbothspeedandaccuracy.MobileNetV2employs
+astreamlinedarchitecturewithinvertedresidualblocks,makingit
+highlyefficientforreal-timeapplicationswhileminimizing
+computationalresources.Thisnetworkexcelsintaskslikeimage
+classification,objectdetection,andimagesegmentation,offeringa
+balancebetweenmodelsizeandperformance.MobileNetV2hasbecomea
+popularchoiceforon-deviceAIapplications,enablingfasterandmore
+efficientdeeplearninginferenceonsmartphonesandedgedevices.
 
-More information about model can be found on `Model page on TensorFlow
-Hub <https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5>`__
+Moreinformationaboutmodelcanbefoundon`ModelpageonTensorFlow
+Hub<https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5>`__
 
-Import libraries
+Importlibraries
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    from pathlib import Path
-    import os
-    import requests
-    
-    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-    os.environ["TF_USE_LEGACY_KERAS"] = "1"
-    os.environ["TFHUB_CACHE_DIR"] = str(Path("./tfhub_modules").resolve())
-    
-    import tensorflow_hub as hub
-    import tensorflow as tf
-    import PIL
-    import numpy as np
-    import matplotlib.pyplot as plt
-    
-    import openvino as ov
-    
-    tf.get_logger().setLevel("ERROR")
+frompathlibimportPath
+importos
+importrequests
 
-.. code:: ipython3
+os.environ["TF_CPP_MIN_LOG_LEVEL"]="2"
+os.environ["TF_USE_LEGACY_KERAS"]="1"
+os.environ["TFHUB_CACHE_DIR"]=str(Path("./tfhub_modules").resolve())
 
-    IMAGE_SHAPE = (224, 224)
-    IMAGE_URL, IMAGE_PATH = (
-        "https://storage.googleapis.com/download.tensorflow.org/example_images/grace_hopper.jpg",
-        "data/grace_hopper.jpg",
-    )
-    MODEL_URL, MODEL_PATH = (
-        "https://www.kaggle.com/models/google/mobilenet-v1/frameworks/tensorFlow2/variations/100-224-classification/versions/2",
-        "models/mobilenet_v2_100_224.xml",
-    )
+importtensorflow_hubashub
+importtensorflowastf
+importPIL
+importnumpyasnp
+importmatplotlib.pyplotasplt
 
-Download the classifier
+importopenvinoasov
+
+tf.get_logger().setLevel("ERROR")
+
+..code::ipython3
+
+IMAGE_SHAPE=(224,224)
+IMAGE_URL,IMAGE_PATH=(
+"https://storage.googleapis.com/download.tensorflow.org/example_images/grace_hopper.jpg",
+"data/grace_hopper.jpg",
+)
+MODEL_URL,MODEL_PATH=(
+"https://www.kaggle.com/models/google/mobilenet-v1/frameworks/tensorFlow2/variations/100-224-classification/versions/2",
+"models/mobilenet_v2_100_224.xml",
+)
+
+Downloadtheclassifier
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__ Select a MobileNetV2
-pre-trained model `from TensorFlow
-Hub <https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5>`__
-and wrap it as a Keras layer with ``hub.KerasLayer``.
+`backtotop⬆️<#table-of-contents>`__SelectaMobileNetV2
+pre-trainedmodel`fromTensorFlow
+Hub<https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5>`__
+andwrapitasaKeraslayerwith``hub.KerasLayer``.
 
-.. code:: ipython3
+..code::ipython3
 
-    model = hub.KerasLayer(MODEL_URL, input_shape=IMAGE_SHAPE + (3,))
-
-
-.. parsed-literal::
-
-    2024-07-13 04:05:09.169100: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
-    2024-07-13 04:05:09.169274: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
+model=hub.KerasLayer(MODEL_URL,input_shape=IMAGE_SHAPE+(3,))
 
 
-Download a single image to try the model on
+..parsed-literal::
+
+2024-07-1304:05:09.169100:Etensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266]failedcalltocuInit:CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE:forwardcompatibilitywasattemptedonnonsupportedHW
+2024-07-1304:05:09.169274:Etensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312]kernelversion470.182.3doesnotmatchDSOversion470.223.2--cannotfindworkingdevicesinthisconfiguration
+
+
+Downloadasingleimagetotrythemodelon
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__ The input ``images`` are
-expected to have color values in the range [0,1], following the `common
-image input
-conventions <https://www.tensorflow.org/hub/common_signatures/images#input>`__.
-For this model, the size of the input images is fixed to ``height`` x
-``width`` = 224 x 224 pixels.
+`backtotop⬆️<#table-of-contents>`__Theinput``images``are
+expectedtohavecolorvaluesintherange[0,1],followingthe`common
+imageinput
+conventions<https://www.tensorflow.org/hub/common_signatures/images#input>`__.
+Forthismodel,thesizeoftheinputimagesisfixedto``height``x
+``width``=224x224pixels.
 
-.. code:: ipython3
+..code::ipython3
 
-    Path(IMAGE_PATH).parent.mkdir(parents=True, exist_ok=True)
-    
-    r = requests.get(IMAGE_URL)
-    with Path(IMAGE_PATH).open("wb") as f:
-        f.write(r.content)
-    grace_hopper = PIL.Image.open(IMAGE_PATH).resize(IMAGE_SHAPE)
-    grace_hopper
+Path(IMAGE_PATH).parent.mkdir(parents=True,exist_ok=True)
 
-
-
-
-.. image:: tensorflow-hub-with-output_files/tensorflow-hub-with-output_11_0.png
-
-
-
-Normalize the image to [0,1] range.
-
-.. code:: ipython3
-
-    grace_hopper = np.array(grace_hopper) / 255.0
-    grace_hopper.shape
+r=requests.get(IMAGE_URL)
+withPath(IMAGE_PATH).open("wb")asf:
+f.write(r.content)
+grace_hopper=PIL.Image.open(IMAGE_PATH).resize(IMAGE_SHAPE)
+grace_hopper
 
 
 
 
-.. parsed-literal::
-
-    (224, 224, 3)
+..image::tensorflow-hub-with-output_files/tensorflow-hub-with-output_11_0.png
 
 
 
-Convert model to OpenVINO IR
+Normalizetheimageto[0,1]range.
+
+..code::ipython3
+
+grace_hopper=np.array(grace_hopper)/255.0
+grace_hopper.shape
+
+
+
+
+..parsed-literal::
+
+(224,224,3)
+
+
+
+ConvertmodeltoOpenVINOIR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-We will convert the loaded model to OpenVINO IR using
-``ov.convert_model`` function. We pass the model object to it, no
-additional arguments required. Then, we save the model to disk using
-``ov.save_model`` function.
+WewillconverttheloadedmodeltoOpenVINOIRusing
+``ov.convert_model``function.Wepassthemodelobjecttoit,no
+additionalargumentsrequired.Then,wesavethemodeltodiskusing
+``ov.save_model``function.
 
-.. code:: ipython3
+..code::ipython3
 
-    if not Path(MODEL_PATH).exists():
-        converted_model = ov.convert_model(model)
-        ov.save_model(converted_model, MODEL_PATH)
+ifnotPath(MODEL_PATH).exists():
+converted_model=ov.convert_model(model)
+ov.save_model(converted_model,MODEL_PATH)
 
-Select inference device
+Selectinferencedevice
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-select device from dropdown list for running inference using OpenVINO
+selectdevicefromdropdownlistforrunninginferenceusingOpenVINO
 
-.. code:: ipython3
+..code::ipython3
 
-    import ipywidgets as widgets
-    
-    core = ov.Core()
-    
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="AUTO",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+importipywidgetsaswidgets
 
+core=ov.Core()
 
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="AUTO",
+description="Device:",
+disabled=False,
+)
 
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', index=1, options=('CPU', 'AUTO'), value='AUTO')
+device
 
 
 
-.. code:: ipython3
 
-    compiled_model = core.compile_model(MODEL_PATH, device_name=device.value)
+..parsed-literal::
+
+Dropdown(description='Device:',index=1,options=('CPU','AUTO'),value='AUTO')
+
+
+
+..code::ipython3
+
+compiled_model=core.compile_model(MODEL_PATH,device_name=device.value)
 
 Inference
 ~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Add a batch dimension (with ``np.newaxis``) and pass the image to the
+Addabatchdimension(with``np.newaxis``)andpasstheimagetothe
 model:
 
-.. code:: ipython3
+..code::ipython3
 
-    output = compiled_model(grace_hopper[np.newaxis, ...])[0]
-    output.shape
-
-
-
-
-.. parsed-literal::
-
-    (1, 1001)
-
-
-
-The result is a 1001-element vector of logits, rating the probability of
-each class for the image.
-
-The top class ID can be found with ``np.argmax``:
-
-.. code:: ipython3
-
-    predicted_class = np.argmax(output[0], axis=-1)
-    predicted_class
+output=compiled_model(grace_hopper[np.newaxis,...])[0]
+output.shape
 
 
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    653
-
-
-
-Take the ``predicted_class`` ID (such as ``653``) and fetch the ImageNet
-dataset labels to decode the predictions:
-
-.. code:: ipython3
-
-    labels_path = tf.keras.utils.get_file(
-        "ImageNetLabels.txt",
-        "https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt",
-    )
-    imagenet_labels = np.array(open(labels_path).read().splitlines())
-    plt.imshow(grace_hopper)
-    plt.axis("off")
-    predicted_class_name = imagenet_labels[predicted_class]
-    _ = plt.title("Prediction: " + predicted_class_name.title())
+(1,1001)
 
 
 
-.. image:: tensorflow-hub-with-output_files/tensorflow-hub-with-output_26_0.png
+Theresultisa1001-elementvectoroflogits,ratingtheprobabilityof
+eachclassfortheimage.
+
+ThetopclassIDcanbefoundwith``np.argmax``:
+
+..code::ipython3
+
+predicted_class=np.argmax(output[0],axis=-1)
+predicted_class
 
 
-Image style transfer
+
+
+..parsed-literal::
+
+653
+
+
+
+Takethe``predicted_class``ID(suchas``653``)andfetchtheImageNet
+datasetlabelstodecodethepredictions:
+
+..code::ipython3
+
+labels_path=tf.keras.utils.get_file(
+"ImageNetLabels.txt",
+"https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt",
+)
+imagenet_labels=np.array(open(labels_path).read().splitlines())
+plt.imshow(grace_hopper)
+plt.axis("off")
+predicted_class_name=imagenet_labels[predicted_class]
+_=plt.title("Prediction:"+predicted_class_name.title())
+
+
+
+..image::tensorflow-hub-with-output_files/tensorflow-hub-with-output_26_0.png
+
+
+Imagestyletransfer
 --------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-We will use `arbitrary image stylization
-model <https://arxiv.org/abs/1705.06830>`__ from `TensorFlow
-Hub <https://tfhub.dev>`__.
+Wewilluse`arbitraryimagestylization
+model<https://arxiv.org/abs/1705.06830>`__from`TensorFlow
+Hub<https://tfhub.dev>`__.
 
-The model contains conditional instance normalization (CIN) layers
+Themodelcontainsconditionalinstancenormalization(CIN)layers
 
-The CIN network consists of two main components: a feature extractor and
-a stylization module. The feature extractor extracts a set of features
-from the content image. The stylization module then uses these features
-to generate a stylized image.
+TheCINnetworkconsistsoftwomaincomponents:afeatureextractorand
+astylizationmodule.Thefeatureextractorextractsasetoffeatures
+fromthecontentimage.Thestylizationmodulethenusesthesefeatures
+togenerateastylizedimage.
 
-The stylization module is a stack of convolutional layers. Each
-convolutional layer is followed by a CIN layer. The CIN layer takes the
-features from the previous layer and the CIN parameters from the style
-image as input and produces a new set of features as output.
+Thestylizationmoduleisastackofconvolutionallayers.Each
+convolutionallayerisfollowedbyaCINlayer.TheCINlayertakesthe
+featuresfromthepreviouslayerandtheCINparametersfromthestyle
+imageasinputandproducesanewsetoffeaturesasoutput.
 
-The output of the stylization module is a stylized image. The stylized
-image has the same content as the original content image, but the style
-has been transferred from the style image.
+Theoutputofthestylizationmoduleisastylizedimage.Thestylized
+imagehasthesamecontentastheoriginalcontentimage,butthestyle
+hasbeentransferredfromthestyleimage.
 
-The CIN network is able to stylize images in real time because it is
-very efficient.
+TheCINnetworkisabletostylizeimagesinrealtimebecauseitis
+veryefficient.
 
-More model information can be found on `Model page on TensorFlow
-Hub <https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2>`__.
+Moremodelinformationcanbefoundon`ModelpageonTensorFlow
+Hub<https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2>`__.
 
-.. code:: ipython3
+..code::ipython3
 
-    import os
-    
-    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-    os.environ["TF_USE_LEGACY_KERAS"] = "1"
-    os.environ["TFHUB_CACHE_DIR"] = str(Path("./tfhub_modules").resolve())
-    from pathlib import Path
-    
-    import openvino as ov
-    
-    import tensorflow_hub as hub
-    import tensorflow as tf
-    import cv2
-    import numpy as np
-    import matplotlib.pyplot as plt
+importos
 
-.. code:: ipython3
+os.environ["TF_CPP_MIN_LOG_LEVEL"]="2"
+os.environ["TF_CPP_MIN_LOG_LEVEL"]="2"
+os.environ["TF_USE_LEGACY_KERAS"]="1"
+os.environ["TFHUB_CACHE_DIR"]=str(Path("./tfhub_modules").resolve())
+frompathlibimportPath
 
-    CONTENT_IMAGE_URL = "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/525babb8-1289-45f8-a3a5-e248f74dfb24"
-    CONTENT_IMAGE_PATH = "./data/YellowLabradorLooking_new.jpg"
-    
-    STYLE_IMAGE_URL = "https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/c212233d-9a33-4979-b8f9-2a94a529026e"
-    STYLE_IMAGE_PATH = "./data/Vassily_Kandinsky%2C_1913_-_Composition_7.jpg"
-    
-    MODEL_URL = "https://www.kaggle.com/models/google/arbitrary-image-stylization-v1/frameworks/tensorFlow1/variations/256/versions/2"
-    MODEL_PATH = "./models/arbitrary-image-stylization-v1-256.xml"
+importopenvinoasov
 
-Load the model
+importtensorflow_hubashub
+importtensorflowastf
+importcv2
+importnumpyasnp
+importmatplotlib.pyplotasplt
+
+..code::ipython3
+
+CONTENT_IMAGE_URL="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/525babb8-1289-45f8-a3a5-e248f74dfb24"
+CONTENT_IMAGE_PATH="./data/YellowLabradorLooking_new.jpg"
+
+STYLE_IMAGE_URL="https://github.com/openvinotoolkit/openvino_notebooks/assets/29454499/c212233d-9a33-4979-b8f9-2a94a529026e"
+STYLE_IMAGE_PATH="./data/Vassily_Kandinsky%2C_1913_-_Composition_7.jpg"
+
+MODEL_URL="https://www.kaggle.com/models/google/arbitrary-image-stylization-v1/frameworks/tensorFlow1/variations/256/versions/2"
+MODEL_PATH="./models/arbitrary-image-stylization-v1-256.xml"
+
+Loadthemodel
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-We load the model from TensorFlow Hub using ``hub.KerasLayer``. Since
-the model has multiple inputs (content image and style image), we need
-to build it by calling with placeholders and wrap in ``tf.keras.Model``
+WeloadthemodelfromTensorFlowHubusing``hub.KerasLayer``.Since
+themodelhasmultipleinputs(contentimageandstyleimage),weneed
+tobuilditbycallingwithplaceholdersandwrapin``tf.keras.Model``
 function.
 
-.. code:: ipython3
+..code::ipython3
 
-    inputs = {
-        "placeholder": tf.keras.layers.Input(shape=(None, None, 3)),
-        "placeholder_1": tf.keras.layers.Input(shape=(None, None, 3)),
-    }
-    model = hub.KerasLayer(MODEL_URL, signature="serving_default", signature_outputs_as_dict=True)  # define the signature to allow passing inputs as a dictionary
-    outputs = model(inputs)
-    model = tf.keras.Model(inputs=inputs, outputs=outputs)
+inputs={
+"placeholder":tf.keras.layers.Input(shape=(None,None,3)),
+"placeholder_1":tf.keras.layers.Input(shape=(None,None,3)),
+}
+model=hub.KerasLayer(MODEL_URL,signature="serving_default",signature_outputs_as_dict=True)#definethesignaturetoallowpassinginputsasadictionary
+outputs=model(inputs)
+model=tf.keras.Model(inputs=inputs,outputs=outputs)
 
-Convert the model to OpenVINO IR
+ConvertthemodeltoOpenVINOIR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-We convert the loaded model to OpenVINO IR using ``ov.convert_model``
-function. We pass our model to the function, no additional arguments
-needed. After converting, we save the model to disk using
-``ov.save_model`` function.
+WeconverttheloadedmodeltoOpenVINOIRusing``ov.convert_model``
+function.Wepassourmodeltothefunction,noadditionalarguments
+needed.Afterconverting,wesavethemodeltodiskusing
+``ov.save_model``function.
 
-.. code:: ipython3
+..code::ipython3
 
-    if not Path(MODEL_PATH).exists():
-        Path(MODEL_PATH).parent.mkdir(parents=True, exist_ok=True)
-        converted_model = ov.convert_model(model)
-        ov.save_model(converted_model, MODEL_PATH)
+ifnotPath(MODEL_PATH).exists():
+Path(MODEL_PATH).parent.mkdir(parents=True,exist_ok=True)
+converted_model=ov.convert_model(model)
+ov.save_model(converted_model,MODEL_PATH)
 
-Select inference device
+Selectinferencedevice
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-select device from dropdown list for running inference using OpenVINO
+selectdevicefromdropdownlistforrunninginferenceusingOpenVINO
 
-.. code:: ipython3
+..code::ipython3
 
-    import ipywidgets as widgets
-    
-    core = ov.Core()
-    
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="AUTO",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+importipywidgetsaswidgets
 
+core=ov.Core()
 
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="AUTO",
+description="Device:",
+disabled=False,
+)
 
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', index=1, options=('CPU', 'AUTO'), value='AUTO')
+device
 
 
 
-.. code:: ipython3
 
-    compiled_model = core.compile_model(MODEL_PATH, device_name=device.value)
+..parsed-literal::
+
+Dropdown(description='Device:',index=1,options=('CPU','AUTO'),value='AUTO')
+
+
+
+..code::ipython3
+
+compiled_model=core.compile_model(MODEL_PATH,device_name=device.value)
 
 Inference
 ~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    if not Path(STYLE_IMAGE_PATH).exists():
-        r = requests.get(STYLE_IMAGE_URL)
-        with open(STYLE_IMAGE_PATH, "wb") as f:
-            f.write(r.content)
-    if not Path(CONTENT_IMAGE_PATH).exists():
-        r = requests.get(CONTENT_IMAGE_URL)
-        with open(CONTENT_IMAGE_PATH, "wb") as f:
-            f.write(r.content)
-    
-    
-    def load_image(dst):
-        image = cv2.imread(dst)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert image color to RGB space
-        image = image / 255  # Normalize to [0, 1] interval
-        image = image.astype(np.float32)
-        return image
-
-.. code:: ipython3
-
-    content_image = load_image(CONTENT_IMAGE_PATH)
-    style_image = load_image(STYLE_IMAGE_PATH)
-    style_image = cv2.resize(style_image, (256, 256))  # model was trained on 256x256 images
-
-.. code:: ipython3
-
-    result = compiled_model([content_image[np.newaxis, ...], style_image[np.newaxis, ...]])[0]
-
-.. code:: ipython3
-
-    title2img = {
-        "Source image": content_image,
-        "Reference style": style_image,
-        "Result": result[0],
-    }
-    plt.figure(figsize=(12, 12))
-    for i, (title, img) in enumerate(title2img.items()):
-        ax = plt.subplot(1, 3, i + 1)
-        ax.set_title(title)
-        plt.imshow(img)
-        plt.axis("off")
+ifnotPath(STYLE_IMAGE_PATH).exists():
+r=requests.get(STYLE_IMAGE_URL)
+withopen(STYLE_IMAGE_PATH,"wb")asf:
+f.write(r.content)
+ifnotPath(CONTENT_IMAGE_PATH).exists():
+r=requests.get(CONTENT_IMAGE_URL)
+withopen(CONTENT_IMAGE_PATH,"wb")asf:
+f.write(r.content)
 
 
+defload_image(dst):
+image=cv2.imread(dst)
+image=cv2.cvtColor(image,cv2.COLOR_BGR2RGB)#ConvertimagecolortoRGBspace
+image=image/255#Normalizeto[0,1]interval
+image=image.astype(np.float32)
+returnimage
 
-.. image:: tensorflow-hub-with-output_files/tensorflow-hub-with-output_43_0.png
+..code::ipython3
+
+content_image=load_image(CONTENT_IMAGE_PATH)
+style_image=load_image(STYLE_IMAGE_PATH)
+style_image=cv2.resize(style_image,(256,256))#modelwastrainedon256x256images
+
+..code::ipython3
+
+result=compiled_model([content_image[np.newaxis,...],style_image[np.newaxis,...]])[0]
+
+..code::ipython3
+
+title2img={
+"Sourceimage":content_image,
+"Referencestyle":style_image,
+"Result":result[0],
+}
+plt.figure(figsize=(12,12))
+fori,(title,img)inenumerate(title2img.items()):
+ax=plt.subplot(1,3,i+1)
+ax.set_title(title)
+plt.imshow(img)
+plt.axis("off")
+
+
+
+..image::tensorflow-hub-with-output_files/tensorflow-hub-with-output_43_0.png
 

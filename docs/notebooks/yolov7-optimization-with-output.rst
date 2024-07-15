@@ -1,1359 +1,1359 @@
-Convert and Optimize YOLOv7 with OpenVINO™
+ConvertandOptimizeYOLOv7withOpenVINO™
 ==========================================
 
-The YOLOv7 algorithm is making big waves in the computer vision and
-machine learning communities. It is a real-time object detection
-algorithm that performs image recognition tasks by taking an image as
-input and then predicting bounding boxes and class probabilities for
-each object in the image.
+TheYOLOv7algorithmismakingbigwavesinthecomputervisionand
+machinelearningcommunities.Itisareal-timeobjectdetection
+algorithmthatperformsimagerecognitiontasksbytakinganimageas
+inputandthenpredictingboundingboxesandclassprobabilitiesfor
+eachobjectintheimage.
 
-YOLO stands for “You Only Look Once”, it is a popular family of
-real-time object detection algorithms. The original YOLO object detector
-was first released in 2016. Since then, different versions and variants
-of YOLO have been proposed, each providing a significant increase in
-performance and efficiency. YOLOv7 is next stage of evolution of YOLO
-models family, which provides a greatly improved real-time object
-detection accuracy without increasing the inference costs. More details
-about its realization can be found in original model
-`paper <https://arxiv.org/abs/2207.02696>`__ and
-`repository <https://github.com/WongKinYiu/yolov7>`__
+YOLOstandsfor“YouOnlyLookOnce”,itisapopularfamilyof
+real-timeobjectdetectionalgorithms.TheoriginalYOLOobjectdetector
+wasfirstreleasedin2016.Sincethen,differentversionsandvariants
+ofYOLOhavebeenproposed,eachprovidingasignificantincreasein
+performanceandefficiency.YOLOv7isnextstageofevolutionofYOLO
+modelsfamily,whichprovidesagreatlyimprovedreal-timeobject
+detectionaccuracywithoutincreasingtheinferencecosts.Moredetails
+aboutitsrealizationcanbefoundinoriginalmodel
+`paper<https://arxiv.org/abs/2207.02696>`__and
+`repository<https://github.com/WongKinYiu/yolov7>`__
 
-Real-time object detection is often used as a key component in computer
-vision systems. Applications that use real-time object detection models
-include video analytics, robotics, autonomous vehicles, multi-object
-tracking and object counting, medical image analysis, and many others.
+Real-timeobjectdetectionisoftenusedasakeycomponentincomputer
+visionsystems.Applicationsthatusereal-timeobjectdetectionmodels
+includevideoanalytics,robotics,autonomousvehicles,multi-object
+trackingandobjectcounting,medicalimageanalysis,andmanyothers.
 
-This tutorial demonstrates step-by-step instructions on how to run and
-optimize PyTorch YOLO V7 with OpenVINO.
+Thistutorialdemonstratesstep-by-stepinstructionsonhowtorunand
+optimizePyTorchYOLOV7withOpenVINO.
 
-The tutorial consists of the following steps:
+Thetutorialconsistsofthefollowingsteps:
 
--  Prepare PyTorch model
--  Download and prepare dataset
--  Validate original model
--  Convert PyTorch model to ONNX
--  Convert ONNX model to OpenVINO IR
--  Validate converted model
--  Prepare and run optimization pipeline
--  Compare accuracy of the FP32 and quantized models.
--  Compare performance of the FP32 and quantized models.
+-PreparePyTorchmodel
+-Downloadandpreparedataset
+-Validateoriginalmodel
+-ConvertPyTorchmodeltoONNX
+-ConvertONNXmodeltoOpenVINOIR
+-Validateconvertedmodel
+-Prepareandrunoptimizationpipeline
+-CompareaccuracyoftheFP32andquantizedmodels.
+-CompareperformanceoftheFP32andquantizedmodels.
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Get Pytorch model <#Get-Pytorch-model>`__
--  `Prerequisites <#Prerequisites>`__
--  `Check model inference <#Check-model-inference>`__
--  `Export to ONNX <#Export-to-ONNX>`__
--  `Convert ONNX Model to OpenVINO Intermediate Representation
-   (IR) <#Convert-ONNX-Model-to-OpenVINO-Intermediate-Representation-(IR)>`__
--  `Verify model inference <#Verify-model-inference>`__
+-`GetPytorchmodel<#get-pytorch-model>`__
+-`Prerequisites<#prerequisites>`__
+-`Checkmodelinference<#check-model-inference>`__
+-`ExporttoONNX<#export-to-onnx>`__
+-`ConvertONNXModeltoOpenVINOIntermediateRepresentation
+(IR)<#convert-onnx-model-to-openvino-intermediate-representation-ir>`__
+-`Verifymodelinference<#verify-model-inference>`__
 
-   -  `Preprocessing <#Preprocessing>`__
-   -  `Postprocessing <#Postprocessing>`__
-   -  `Select inference device <#Select-inference-device>`__
+-`Preprocessing<#preprocessing>`__
+-`Postprocessing<#postprocessing>`__
+-`Selectinferencedevice<#select-inference-device>`__
 
--  `Verify model accuracy <#Verify-model-accuracy>`__
+-`Verifymodelaccuracy<#verify-model-accuracy>`__
 
-   -  `Download dataset <#Download-dataset>`__
-   -  `Create dataloader <#Create-dataloader>`__
-   -  `Define validation function <#Define-validation-function>`__
+-`Downloaddataset<#download-dataset>`__
+-`Createdataloader<#create-dataloader>`__
+-`Definevalidationfunction<#define-validation-function>`__
 
--  `Optimize model using NNCF Post-training Quantization
-   API <#Optimize-model-using-NNCF-Post-training-Quantization-API>`__
--  `Validate Quantized model
-   inference <#Validate-Quantized-model-inference>`__
--  `Validate quantized model
-   accuracy <#Validate-quantized-model-accuracy>`__
--  `Compare Performance of the Original and Quantized
-   Models <#Compare-Performance-of-the-Original-and-Quantized-Models>`__
+-`OptimizemodelusingNNCFPost-trainingQuantization
+API<#optimize-model-using-nncf-post-training-quantization-api>`__
+-`ValidateQuantizedmodel
+inference<#validate-quantized-model-inference>`__
+-`Validatequantizedmodel
+accuracy<#validate-quantized-model-accuracy>`__
+-`ComparePerformanceoftheOriginalandQuantized
+Models<#compare-performance-of-the-original-and-quantized-models>`__
 
-Get Pytorch model
+GetPytorchmodel
 -----------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Generally, PyTorch models represent an instance of the
-```torch.nn.Module`` <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
-class, initialized by a state dictionary with model weights. We will use
-the YOLOv7 tiny model pre-trained on a COCO dataset, which is available
-in this `repo <https://github.com/WongKinYiu/yolov7>`__. Typical steps
-to obtain pre-trained model:
+Generally,PyTorchmodelsrepresentaninstanceofthe
+`torch.nn.Module<https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`__
+class,initializedbyastatedictionarywithmodelweights.Wewilluse
+theYOLOv7tinymodelpre-trainedonaCOCOdataset,whichisavailable
+inthis`repo<https://github.com/WongKinYiu/yolov7>`__.Typicalsteps
+toobtainpre-trainedmodel:
 
-1. Create instance of model class.
-2. Load checkpoint state dict, which contains pre-trained model weights.
-3. Turn model to evaluation for switching some operations to inference
-   mode.
+1.Createinstanceofmodelclass.
+2.Loadcheckpointstatedict,whichcontainspre-trainedmodelweights.
+3.Turnmodeltoevaluationforswitchingsomeoperationstoinference
+mode.
 
-In this case, the model creators provide a tool that enables converting
-the YOLOv7 model to ONNX, so we do not need to do these steps manually.
+Inthiscase,themodelcreatorsprovideatoolthatenablesconverting
+theYOLOv7modeltoONNX,sowedonotneedtodothesestepsmanually.
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    import platform
-    
-    %pip install -q "openvino>=2023.1.0" "nncf>=2.5.0" "opencv-python" "seaborn" "onnx" "Pillow" "pandas" "scikit-learn" "torch" "torchvision"  "PyYAML>=5.3.1" "tqdm" --extra-index-url https://download.pytorch.org/whl/cpu
-    
-    if platform.system() != "Windows":
-        %pip install -q "matplotlib>=3.4"
-    else:
-        %pip install -q "matplotlib>=3.4,<3.7"
+importplatform
 
+%pipinstall-q"openvino>=2023.1.0""nncf>=2.5.0""opencv-python""seaborn""onnx""Pillow""pandas""scikit-learn""torch""torchvision""PyYAML>=5.3.1""tqdm"--extra-index-urlhttps://download.pytorch.org/whl/cpu
 
-.. parsed-literal::
-
-    ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    descript-audiotools 0.7.2 requires protobuf<3.20,>=3.9.2, but you have protobuf 3.20.3 which is incompatible.
-    mobileclip 0.1.0 requires torch==1.13.1, but you have torch 2.3.1+cpu which is incompatible.
-    mobileclip 0.1.0 requires torchvision==0.14.1, but you have torchvision 0.18.1+cpu which is incompatible.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
+ifplatform.system()!="Windows":
+%pipinstall-q"matplotlib>=3.4"
+else:
+%pipinstall-q"matplotlib>=3.4,<3.7"
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    # Fetch `notebook_utils` module
-    import requests
-    
-    r = requests.get(
-        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
-    )
-    
-    open("notebook_utils.py", "w").write(r.text)
-    from notebook_utils import download_file
-
-.. code:: ipython3
-
-    # Clone YOLOv7 repo
-    from pathlib import Path
-    
-    if not Path("yolov7").exists():
-        !git clone https://github.com/WongKinYiu/yolov7
-    %cd yolov7
+ERROR:pip'sdependencyresolverdoesnotcurrentlytakeintoaccountallthepackagesthatareinstalled.Thisbehaviouristhesourceofthefollowingdependencyconflicts.
+descript-audiotools0.7.2requiresprotobuf<3.20,>=3.9.2,butyouhaveprotobuf3.20.3whichisincompatible.
+mobileclip0.1.0requirestorch==1.13.1,butyouhavetorch2.3.1+cpuwhichisincompatible.
+mobileclip0.1.0requirestorchvision==0.14.1,butyouhavetorchvision0.18.1+cpuwhichisincompatible.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
 
 
-.. parsed-literal::
+..code::ipython3
 
-    Cloning into 'yolov7'...
-    remote: Enumerating objects: 1197, done.[K
-    remote: Total 1197 (delta 0), reused 0 (delta 0), pack-reused 1197[K
-    Receiving objects: 100% (1197/1197), 74.23 MiB | 23.61 MiB/s, done.
-    Resolving deltas: 100% (520/520), done.
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/notebooks/yolov7-optimization/yolov7
+#Fetch`notebook_utils`module
+importrequests
+
+r=requests.get(
+url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
+)
+
+open("notebook_utils.py","w").write(r.text)
+fromnotebook_utilsimportdownload_file
+
+..code::ipython3
+
+#CloneYOLOv7repo
+frompathlibimportPath
+
+ifnotPath("yolov7").exists():
+!gitclonehttps://github.com/WongKinYiu/yolov7
+%cdyolov7
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    # Download pre-trained model weights
-    MODEL_LINK = "https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7-tiny.pt"
-    DATA_DIR = Path("data/")
-    MODEL_DIR = Path("model/")
-    MODEL_DIR.mkdir(exist_ok=True)
-    DATA_DIR.mkdir(exist_ok=True)
-    
-    download_file(MODEL_LINK, directory=MODEL_DIR, show_progress=True)
+Cloninginto'yolov7'...
+remote:Enumeratingobjects:1197,done.[K
+remote:Total1197(delta0),reused0(delta0),pack-reused1197[K
+Receivingobjects:100%(1197/1197),74.23MiB|23.61MiB/s,done.
+Resolvingdeltas:100%(520/520),done.
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/notebooks/yolov7-optimization/yolov7
 
 
+..code::ipython3
 
-.. parsed-literal::
+#Downloadpre-trainedmodelweights
+MODEL_LINK="https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7-tiny.pt"
+DATA_DIR=Path("data/")
+MODEL_DIR=Path("model/")
+MODEL_DIR.mkdir(exist_ok=True)
+DATA_DIR.mkdir(exist_ok=True)
 
-    model/yolov7-tiny.pt:   0%|          | 0.00/12.1M [00:00<?, ?B/s]
+download_file(MODEL_LINK,directory=MODEL_DIR,show_progress=True)
 
 
 
+..parsed-literal::
 
-.. parsed-literal::
-
-    PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/notebooks/yolov7-optimization/yolov7/model/yolov7-tiny.pt')
-
+model/yolov7-tiny.pt:0%||0.00/12.1M[00:00<?,?B/s]
 
 
-Check model inference
+
+
+..parsed-literal::
+
+PosixPath('/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/notebooks/yolov7-optimization/yolov7/model/yolov7-tiny.pt')
+
+
+
+Checkmodelinference
 ---------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-``detect.py`` script run pytorch model inference and save image as
+``detect.py``scriptrunpytorchmodelinferenceandsaveimageas
 result,
 
-.. code:: ipython3
+..code::ipython3
 
-    !python -W ignore detect.py --weights model/yolov7-tiny.pt --conf 0.25 --img-size 640 --source inference/images/horses.jpg
-
-
-.. parsed-literal::
-
-    Namespace(agnostic_nms=False, augment=False, classes=None, conf_thres=0.25, device='', exist_ok=False, img_size=640, iou_thres=0.45, name='exp', no_trace=False, nosave=False, project='runs/detect', save_conf=False, save_txt=False, source='inference/images/horses.jpg', update=False, view_img=False, weights=['model/yolov7-tiny.pt'])
-    YOLOR 🚀 v0.1-128-ga207844 torch 2.3.1+cpu CPU
-    
-    Fusing layers... 
-    Model Summary: 200 layers, 6219709 parameters, 229245 gradients, 13.7 GFLOPS
-     Convert model to Traced-model... 
-     traced_script_module saved! 
-     model is traced! 
-    
-    5 horses, Done. (77.8ms) Inference, (0.9ms) NMS
-     The image with the result is saved in: runs/detect/exp/horses.jpg
-    Done. (0.085s)
+!python-Wignoredetect.py--weightsmodel/yolov7-tiny.pt--conf0.25--img-size640--sourceinference/images/horses.jpg
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    from PIL import Image
-    
-    # visualize prediction result
-    Image.open("runs/detect/exp/horses.jpg")
+Namespace(agnostic_nms=False,augment=False,classes=None,conf_thres=0.25,device='',exist_ok=False,img_size=640,iou_thres=0.45,name='exp',no_trace=False,nosave=False,project='runs/detect',save_conf=False,save_txt=False,source='inference/images/horses.jpg',update=False,view_img=False,weights=['model/yolov7-tiny.pt'])
+YOLOR🚀v0.1-128-ga207844torch2.3.1+cpuCPU
+
+Fusinglayers...
+ModelSummary:200layers,6219709parameters,229245gradients,13.7GFLOPS
+ConvertmodeltoTraced-model...
+traced_script_modulesaved!
+modelistraced!
+
+5horses,Done.(77.8ms)Inference,(0.9ms)NMS
+Theimagewiththeresultissavedin:runs/detect/exp/horses.jpg
+Done.(0.085s)
 
 
+..code::ipython3
 
+fromPILimportImage
 
-.. image:: yolov7-optimization-with-output_files/yolov7-optimization-with-output_10_0.png
+#visualizepredictionresult
+Image.open("runs/detect/exp/horses.jpg")
 
 
 
-Export to ONNX
+
+..image::yolov7-optimization-with-output_files/yolov7-optimization-with-output_10_0.png
+
+
+
+ExporttoONNX
 --------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-To export an ONNX format of the model, we will use ``export.py`` script.
-Let us check its arguments.
+ToexportanONNXformatofthemodel,wewilluse``export.py``script.
+Letuscheckitsarguments.
 
-.. code:: ipython3
+..code::ipython3
 
-    !python export.py --help
-
-
-.. parsed-literal::
-
-    Import onnx_graphsurgeon failure: No module named 'onnx_graphsurgeon'
-    usage: export.py [-h] [--weights WEIGHTS] [--img-size IMG_SIZE [IMG_SIZE ...]]
-                     [--batch-size BATCH_SIZE] [--dynamic] [--dynamic-batch]
-                     [--grid] [--end2end] [--max-wh MAX_WH] [--topk-all TOPK_ALL]
-                     [--iou-thres IOU_THRES] [--conf-thres CONF_THRES]
-                     [--device DEVICE] [--simplify] [--include-nms] [--fp16]
-                     [--int8]
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      --weights WEIGHTS     weights path
-      --img-size IMG_SIZE [IMG_SIZE ...]
-                            image size
-      --batch-size BATCH_SIZE
-                            batch size
-      --dynamic             dynamic ONNX axes
-      --dynamic-batch       dynamic batch onnx for tensorrt and onnx-runtime
-      --grid                export Detect() layer grid
-      --end2end             export end2end onnx
-      --max-wh MAX_WH       None for tensorrt nms, int value for onnx-runtime nms
-      --topk-all TOPK_ALL   topk objects for every images
-      --iou-thres IOU_THRES
-                            iou threshold for NMS
-      --conf-thres CONF_THRES
-                            conf threshold for NMS
-      --device DEVICE       cuda device, i.e. 0 or 0,1,2,3 or cpu
-      --simplify            simplify onnx model
-      --include-nms         export end2end onnx
-      --fp16                CoreML FP16 half-precision export
-      --int8                CoreML INT8 quantization
+!pythonexport.py--help
 
 
-The most important parameters:
+..parsed-literal::
 
--  ``--weights`` - path to model weights checkpoint
--  ``--img-size`` - size of input image for onnx tracing
+Importonnx_graphsurgeonfailure:Nomodulenamed'onnx_graphsurgeon'
+usage:export.py[-h][--weightsWEIGHTS][--img-sizeIMG_SIZE[IMG_SIZE...]]
+[--batch-sizeBATCH_SIZE][--dynamic][--dynamic-batch]
+[--grid][--end2end][--max-whMAX_WH][--topk-allTOPK_ALL]
+[--iou-thresIOU_THRES][--conf-thresCONF_THRES]
+[--deviceDEVICE][--simplify][--include-nms][--fp16]
+[--int8]
 
-When exporting the ONNX model from PyTorch, there is an opportunity to
-setup configurable parameters for including post-processing results in
+optionalarguments:
+-h,--helpshowthishelpmessageandexit
+--weightsWEIGHTSweightspath
+--img-sizeIMG_SIZE[IMG_SIZE...]
+imagesize
+--batch-sizeBATCH_SIZE
+batchsize
+--dynamicdynamicONNXaxes
+--dynamic-batchdynamicbatchonnxfortensorrtandonnx-runtime
+--gridexportDetect()layergrid
+--end2endexportend2endonnx
+--max-whMAX_WHNonefortensorrtnms,intvalueforonnx-runtimenms
+--topk-allTOPK_ALLtopkobjectsforeveryimages
+--iou-thresIOU_THRES
+iouthresholdforNMS
+--conf-thresCONF_THRES
+confthresholdforNMS
+--deviceDEVICEcudadevice,i.e.0or0,1,2,3orcpu
+--simplifysimplifyonnxmodel
+--include-nmsexportend2endonnx
+--fp16CoreMLFP16half-precisionexport
+--int8CoreMLINT8quantization
+
+
+Themostimportantparameters:
+
+-``--weights``-pathtomodelweightscheckpoint
+-``--img-size``-sizeofinputimageforonnxtracing
+
+WhenexportingtheONNXmodelfromPyTorch,thereisanopportunityto
+setupconfigurableparametersforincludingpost-processingresultsin
 model:
 
--  ``--end2end`` - export full model to onnx including post-processing
--  ``--grid`` - export Detect layer as part of model
--  ``--topk-all`` - top k elements for all images
--  ``--iou-thres`` - intersection over union threshold for NMS
--  ``--conf-thres`` - minimal confidence threshold
--  ``--max-wh`` - max bounding box width and height for NMS
+-``--end2end``-exportfullmodeltoonnxincludingpost-processing
+-``--grid``-exportDetectlayeraspartofmodel
+-``--topk-all``-topkelementsforallimages
+-``--iou-thres``-intersectionoverunionthresholdforNMS
+-``--conf-thres``-minimalconfidencethreshold
+-``--max-wh``-maxboundingboxwidthandheightforNMS
 
-Including whole post-processing to model can help to achieve more
-performant results, but in the same time it makes the model less
-flexible and does not guarantee full accuracy reproducibility. It is the
-reason why we will add only ``--grid`` parameter to preserve original
-pytorch model result format. If you want to understand how to work with
-an end2end ONNX model, you can check this
-`notebook <https://github.com/WongKinYiu/yolov7/blob/main/tools/YOLOv7onnx.ipynb>`__.
+Includingwholepost-processingtomodelcanhelptoachievemore
+performantresults,butinthesametimeitmakesthemodelless
+flexibleanddoesnotguaranteefullaccuracyreproducibility.Itisthe
+reasonwhywewilladdonly``--grid``parametertopreserveoriginal
+pytorchmodelresultformat.Ifyouwanttounderstandhowtoworkwith
+anend2endONNXmodel,youcancheckthis
+`notebook<https://github.com/WongKinYiu/yolov7/blob/main/tools/YOLOv7onnx.ipynb>`__.
 
-.. code:: ipython3
+..code::ipython3
 
-    !python -W ignore export.py --weights model/yolov7-tiny.pt --grid
-
-
-.. parsed-literal::
-
-    Import onnx_graphsurgeon failure: No module named 'onnx_graphsurgeon'
-    Namespace(batch_size=1, conf_thres=0.25, device='cpu', dynamic=False, dynamic_batch=False, end2end=False, fp16=False, grid=True, img_size=[640, 640], include_nms=False, int8=False, iou_thres=0.45, max_wh=None, simplify=False, topk_all=100, weights='model/yolov7-tiny.pt')
-    YOLOR 🚀 v0.1-128-ga207844 torch 2.3.1+cpu CPU
-    
-    Fusing layers... 
-    Model Summary: 200 layers, 6219709 parameters, 6219709 gradients, 13.7 GFLOPS
-    
-    Starting TorchScript export with torch 2.3.1+cpu...
-    TorchScript export success, saved as model/yolov7-tiny.torchscript.pt
-    CoreML export failure: No module named 'coremltools'
-    
-    Starting TorchScript-Lite export with torch 2.3.1+cpu...
-    TorchScript-Lite export success, saved as model/yolov7-tiny.torchscript.ptl
-    
-    Starting ONNX export with onnx 1.16.1...
-    ONNX export success, saved as model/yolov7-tiny.onnx
-    
-    Export complete (2.69s). Visualize with https://github.com/lutzroeder/netron.
+!python-Wignoreexport.py--weightsmodel/yolov7-tiny.pt--grid
 
 
-Convert ONNX Model to OpenVINO Intermediate Representation (IR)
+..parsed-literal::
+
+Importonnx_graphsurgeonfailure:Nomodulenamed'onnx_graphsurgeon'
+Namespace(batch_size=1,conf_thres=0.25,device='cpu',dynamic=False,dynamic_batch=False,end2end=False,fp16=False,grid=True,img_size=[640,640],include_nms=False,int8=False,iou_thres=0.45,max_wh=None,simplify=False,topk_all=100,weights='model/yolov7-tiny.pt')
+YOLOR🚀v0.1-128-ga207844torch2.3.1+cpuCPU
+
+Fusinglayers...
+ModelSummary:200layers,6219709parameters,6219709gradients,13.7GFLOPS
+
+StartingTorchScriptexportwithtorch2.3.1+cpu...
+TorchScriptexportsuccess,savedasmodel/yolov7-tiny.torchscript.pt
+CoreMLexportfailure:Nomodulenamed'coremltools'
+
+StartingTorchScript-Liteexportwithtorch2.3.1+cpu...
+TorchScript-Liteexportsuccess,savedasmodel/yolov7-tiny.torchscript.ptl
+
+StartingONNXexportwithonnx1.16.1...
+ONNXexportsuccess,savedasmodel/yolov7-tiny.onnx
+
+Exportcomplete(2.69s).Visualizewithhttps://github.com/lutzroeder/netron.
+
+
+ConvertONNXModeltoOpenVINOIntermediateRepresentation(IR)
 ---------------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__ While ONNX models are directly
-supported by OpenVINO runtime, it can be useful to convert them to IR
-format to take the advantage of OpenVINO model conversion API features.
-The ``ov.convert_model`` python function of `model conversion
-API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
-can be used for converting the model. The function returns instance of
-OpenVINO Model class, which is ready to use in Python interface.
-However, it can also be save on device in OpenVINO IR format using
-``ov.save_model`` for future execution.
+`backtotop⬆️<#table-of-contents>`__WhileONNXmodelsaredirectly
+supportedbyOpenVINOruntime,itcanbeusefultoconvertthemtoIR
+formattotaketheadvantageofOpenVINOmodelconversionAPIfeatures.
+The``ov.convert_model``pythonfunctionof`modelconversion
+API<https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
+canbeusedforconvertingthemodel.Thefunctionreturnsinstanceof
+OpenVINOModelclass,whichisreadytouseinPythoninterface.
+However,itcanalsobesaveondeviceinOpenVINOIRformatusing
+``ov.save_model``forfutureexecution.
 
-.. code:: ipython3
+..code::ipython3
 
-    import openvino as ov
-    
-    model = ov.convert_model("model/yolov7-tiny.onnx")
-    # serialize model for saving IR
-    ov.save_model(model, "model/yolov7-tiny.xml")
+importopenvinoasov
 
-Verify model inference
+model=ov.convert_model("model/yolov7-tiny.onnx")
+#serializemodelforsavingIR
+ov.save_model(model,"model/yolov7-tiny.xml")
+
+Verifymodelinference
 ----------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-To test model work, we create inference pipeline similar to
-``detect.py``. The pipeline consists of preprocessing step, inference of
-OpenVINO model, and results post-processing to get bounding boxes.
+Totestmodelwork,wecreateinferencepipelinesimilarto
+``detect.py``.Thepipelineconsistsofpreprocessingstep,inferenceof
+OpenVINOmodel,andresultspost-processingtogetboundingboxes.
 
 Preprocessing
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Model input is a tensor with the ``[1, 3, 640, 640]`` shape in
-``N, C, H, W`` format, where
+Modelinputisatensorwiththe``[1,3,640,640]``shapein
+``N,C,H,W``format,where
 
--  ``N`` - number of images in batch (batch size)
--  ``C`` - image channels
--  ``H`` - image height
--  ``W`` - image width
+-``N``-numberofimagesinbatch(batchsize)
+-``C``-imagechannels
+-``H``-imageheight
+-``W``-imagewidth
 
-Model expects images in RGB channels format and normalized in [0, 1]
-range. To resize images to fit model size ``letterbox`` resize approach
-is used where the aspect ratio of width and height is preserved. It is
-defined in yolov7 repository.
+ModelexpectsimagesinRGBchannelsformatandnormalizedin[0,1]
+range.Toresizeimagestofitmodelsize``letterbox``resizeapproach
+isusedwheretheaspectratioofwidthandheightispreserved.Itis
+definedinyolov7repository.
 
-To keep specific shape, preprocessing automatically enables padding.
+Tokeepspecificshape,preprocessingautomaticallyenablespadding.
 
-.. code:: ipython3
+..code::ipython3
 
-    import numpy as np
-    import torch
-    from PIL import Image
-    from utils.datasets import letterbox
-    from utils.plots import plot_one_box
-    
-    
-    def preprocess_image(img0: np.ndarray):
-        """
-        Preprocess image according to YOLOv7 input requirements.
-        Takes image in np.array format, resizes it to specific size using letterbox resize, converts color space from BGR (default in OpenCV) to RGB and changes data layout from HWC to CHW.
-    
-        Parameters:
-          img0 (np.ndarray): image for preprocessing
-        Returns:
-          img (np.ndarray): image after preprocessing
-          img0 (np.ndarray): original image
-        """
-        # resize
-        img = letterbox(img0, auto=False)[0]
-    
-        # Convert
-        img = img.transpose(2, 0, 1)
-        img = np.ascontiguousarray(img)
-        return img, img0
-    
-    
-    def prepare_input_tensor(image: np.ndarray):
-        """
-        Converts preprocessed image to tensor format according to YOLOv7 input requirements.
-        Takes image in np.array format with unit8 data in [0, 255] range and converts it to torch.Tensor object with float data in [0, 1] range
-    
-        Parameters:
-          image (np.ndarray): image for conversion to tensor
-        Returns:
-          input_tensor (torch.Tensor): float tensor ready to use for YOLOv7 inference
-        """
-        input_tensor = image.astype(np.float32)  # uint8 to fp16/32
-        input_tensor /= 255.0  # 0 - 255 to 0.0 - 1.0
-    
-        if input_tensor.ndim == 3:
-            input_tensor = np.expand_dims(input_tensor, 0)
-        return input_tensor
-    
-    
-    # label names for visualization
-    DEFAULT_NAMES = [
-        "person",
-        "bicycle",
-        "car",
-        "motorcycle",
-        "airplane",
-        "bus",
-        "train",
-        "truck",
-        "boat",
-        "traffic light",
-        "fire hydrant",
-        "stop sign",
-        "parking meter",
-        "bench",
-        "bird",
-        "cat",
-        "dog",
-        "horse",
-        "sheep",
-        "cow",
-        "elephant",
-        "bear",
-        "zebra",
-        "giraffe",
-        "backpack",
-        "umbrella",
-        "handbag",
-        "tie",
-        "suitcase",
-        "frisbee",
-        "skis",
-        "snowboard",
-        "sports ball",
-        "kite",
-        "baseball bat",
-        "baseball glove",
-        "skateboard",
-        "surfboard",
-        "tennis racket",
-        "bottle",
-        "wine glass",
-        "cup",
-        "fork",
-        "knife",
-        "spoon",
-        "bowl",
-        "banana",
-        "apple",
-        "sandwich",
-        "orange",
-        "broccoli",
-        "carrot",
-        "hot dog",
-        "pizza",
-        "donut",
-        "cake",
-        "chair",
-        "couch",
-        "potted plant",
-        "bed",
-        "dining table",
-        "toilet",
-        "tv",
-        "laptop",
-        "mouse",
-        "remote",
-        "keyboard",
-        "cell phone",
-        "microwave",
-        "oven",
-        "toaster",
-        "sink",
-        "refrigerator",
-        "book",
-        "clock",
-        "vase",
-        "scissors",
-        "teddy bear",
-        "hair drier",
-        "toothbrush",
-    ]
-    
-    # obtain class names from model checkpoint
-    state_dict = torch.load("model/yolov7-tiny.pt", map_location="cpu")
-    if hasattr(state_dict["model"], "module"):
-        NAMES = getattr(state_dict["model"].module, "names", DEFAULT_NAMES)
-    else:
-        NAMES = getattr(state_dict["model"], "names", DEFAULT_NAMES)
-    
-    del state_dict
-    
-    # colors for visualization
-    COLORS = {name: [np.random.randint(0, 255) for _ in range(3)] for i, name in enumerate(NAMES)}
+importnumpyasnp
+importtorch
+fromPILimportImage
+fromutils.datasetsimportletterbox
+fromutils.plotsimportplot_one_box
+
+
+defpreprocess_image(img0:np.ndarray):
+"""
+PreprocessimageaccordingtoYOLOv7inputrequirements.
+Takesimageinnp.arrayformat,resizesittospecificsizeusingletterboxresize,convertscolorspacefromBGR(defaultinOpenCV)toRGBandchangesdatalayoutfromHWCtoCHW.
+
+Parameters:
+img0(np.ndarray):imageforpreprocessing
+Returns:
+img(np.ndarray):imageafterpreprocessing
+img0(np.ndarray):originalimage
+"""
+#resize
+img=letterbox(img0,auto=False)[0]
+
+#Convert
+img=img.transpose(2,0,1)
+img=np.ascontiguousarray(img)
+returnimg,img0
+
+
+defprepare_input_tensor(image:np.ndarray):
+"""
+ConvertspreprocessedimagetotensorformataccordingtoYOLOv7inputrequirements.
+Takesimageinnp.arrayformatwithunit8datain[0,255]rangeandconvertsittotorch.Tensorobjectwithfloatdatain[0,1]range
+
+Parameters:
+image(np.ndarray):imageforconversiontotensor
+Returns:
+input_tensor(torch.Tensor):floattensorreadytouseforYOLOv7inference
+"""
+input_tensor=image.astype(np.float32)#uint8tofp16/32
+input_tensor/=255.0#0-255to0.0-1.0
+
+ifinput_tensor.ndim==3:
+input_tensor=np.expand_dims(input_tensor,0)
+returninput_tensor
+
+
+#labelnamesforvisualization
+DEFAULT_NAMES=[
+"person",
+"bicycle",
+"car",
+"motorcycle",
+"airplane",
+"bus",
+"train",
+"truck",
+"boat",
+"trafficlight",
+"firehydrant",
+"stopsign",
+"parkingmeter",
+"bench",
+"bird",
+"cat",
+"dog",
+"horse",
+"sheep",
+"cow",
+"elephant",
+"bear",
+"zebra",
+"giraffe",
+"backpack",
+"umbrella",
+"handbag",
+"tie",
+"suitcase",
+"frisbee",
+"skis",
+"snowboard",
+"sportsball",
+"kite",
+"baseballbat",
+"baseballglove",
+"skateboard",
+"surfboard",
+"tennisracket",
+"bottle",
+"wineglass",
+"cup",
+"fork",
+"knife",
+"spoon",
+"bowl",
+"banana",
+"apple",
+"sandwich",
+"orange",
+"broccoli",
+"carrot",
+"hotdog",
+"pizza",
+"donut",
+"cake",
+"chair",
+"couch",
+"pottedplant",
+"bed",
+"diningtable",
+"toilet",
+"tv",
+"laptop",
+"mouse",
+"remote",
+"keyboard",
+"cellphone",
+"microwave",
+"oven",
+"toaster",
+"sink",
+"refrigerator",
+"book",
+"clock",
+"vase",
+"scissors",
+"teddybear",
+"hairdrier",
+"toothbrush",
+]
+
+#obtainclassnamesfrommodelcheckpoint
+state_dict=torch.load("model/yolov7-tiny.pt",map_location="cpu")
+ifhasattr(state_dict["model"],"module"):
+NAMES=getattr(state_dict["model"].module,"names",DEFAULT_NAMES)
+else:
+NAMES=getattr(state_dict["model"],"names",DEFAULT_NAMES)
+
+delstate_dict
+
+#colorsforvisualization
+COLORS={name:[np.random.randint(0,255)for_inrange(3)]fori,nameinenumerate(NAMES)}
 
 Postprocessing
 ~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Model output contains detection boxes candidates. It is a tensor with
-the ``[1,25200,85]`` shape in the ``B, N, 85`` format, where:
+Modeloutputcontainsdetectionboxescandidates.Itisatensorwith
+the``[1,25200,85]``shapeinthe``B,N,85``format,where:
 
--  ``B`` - batch size
--  ``N`` - number of detection boxes
+-``B``-batchsize
+-``N``-numberofdetectionboxes
 
-Detection box has the [``x``, ``y``, ``h``, ``w``, ``box_score``,
-``class_no_1``, …, ``class_no_80``] format, where:
+Detectionboxhasthe[``x``,``y``,``h``,``w``,``box_score``,
+``class_no_1``,…,``class_no_80``]format,where:
 
--  (``x``, ``y``) - raw coordinates of box center
--  ``h``, ``w`` - raw height and width of box
--  ``box_score`` - confidence of detection box
--  ``class_no_1``, …, ``class_no_80`` - probability distribution over
-   the classes.
+-(``x``,``y``)-rawcoordinatesofboxcenter
+-``h``,``w``-rawheightandwidthofbox
+-``box_score``-confidenceofdetectionbox
+-``class_no_1``,…,``class_no_80``-probabilitydistributionover
+theclasses.
 
-For getting final prediction, we need to apply non maximum suppression
-algorithm and rescale boxes coordinates to original image size.
+Forgettingfinalprediction,weneedtoapplynonmaximumsuppression
+algorithmandrescaleboxescoordinatestooriginalimagesize.
 
-.. code:: ipython3
+..code::ipython3
 
-    from typing import List, Tuple, Dict
-    from utils.general import scale_coords, non_max_suppression
-    
-    
-    def detect(
-        model: ov.Model,
-        image_path: Path,
-        conf_thres: float = 0.25,
-        iou_thres: float = 0.45,
-        classes: List[int] = None,
-        agnostic_nms: bool = False,
-    ):
-        """
-        OpenVINO YOLOv7 model inference function. Reads image, preprocess it, runs model inference and postprocess results using NMS.
-        Parameters:
-            model (Model): OpenVINO compiled model.
-            image_path (Path): input image path.
-            conf_thres (float, *optional*, 0.25): minimal accpeted confidence for object filtering
-            iou_thres (float, *optional*, 0.45): minimal overlap score for remloving objects duplicates in NMS
-            classes (List[int], *optional*, None): labels for prediction filtering, if not provided all predicted labels will be used
-            agnostic_nms (bool, *optiona*, False): apply class agnostinc NMS approach or not
-        Returns:
-           pred (List): list of detections with (n,6) shape, where n - number of detected boxes in format [x1, y1, x2, y2, score, label]
-           orig_img (np.ndarray): image before preprocessing, can be used for results visualization
-           inpjut_shape (Tuple[int]): shape of model input tensor, can be used for output rescaling
-        """
-        output_blob = model.output(0)
-        img = np.array(Image.open(image_path))
-        preprocessed_img, orig_img = preprocess_image(img)
-        input_tensor = prepare_input_tensor(preprocessed_img)
-        predictions = torch.from_numpy(model(input_tensor)[output_blob])
-        pred = non_max_suppression(predictions, conf_thres, iou_thres, classes=classes, agnostic=agnostic_nms)
-        return pred, orig_img, input_tensor.shape
-    
-    
-    def draw_boxes(
-        predictions: np.ndarray,
-        input_shape: Tuple[int],
-        image: np.ndarray,
-        names: List[str],
-        colors: Dict[str, int],
-    ):
-        """
-        Utility function for drawing predicted bounding boxes on image
-        Parameters:
-            predictions (np.ndarray): list of detections with (n,6) shape, where n - number of detected boxes in format [x1, y1, x2, y2, score, label]
-            image (np.ndarray): image for boxes visualization
-            names (List[str]): list of names for each class in dataset
-            colors (Dict[str, int]): mapping between class name and drawing color
-        Returns:
-            image (np.ndarray): box visualization result
-        """
-        if not len(predictions):
-            return image
-        # Rescale boxes from input size to original image size
-        predictions[:, :4] = scale_coords(input_shape[2:], predictions[:, :4], image.shape).round()
-    
-        # Write results
-        for *xyxy, conf, cls in reversed(predictions):
-            label = f"{names[int(cls)]} {conf:.2f}"
-            plot_one_box(xyxy, image, label=label, color=colors[names[int(cls)]], line_thickness=1)
-        return image
+fromtypingimportList,Tuple,Dict
+fromutils.generalimportscale_coords,non_max_suppression
 
-.. code:: ipython3
 
-    core = ov.Core()
-    # read converted model
-    model = core.read_model("model/yolov7-tiny.xml")
+defdetect(
+model:ov.Model,
+image_path:Path,
+conf_thres:float=0.25,
+iou_thres:float=0.45,
+classes:List[int]=None,
+agnostic_nms:bool=False,
+):
+"""
+OpenVINOYOLOv7modelinferencefunction.Readsimage,preprocessit,runsmodelinferenceandpostprocessresultsusingNMS.
+Parameters:
+model(Model):OpenVINOcompiledmodel.
+image_path(Path):inputimagepath.
+conf_thres(float,*optional*,0.25):minimalaccpetedconfidenceforobjectfiltering
+iou_thres(float,*optional*,0.45):minimaloverlapscoreforremlovingobjectsduplicatesinNMS
+classes(List[int],*optional*,None):labelsforpredictionfiltering,ifnotprovidedallpredictedlabelswillbeused
+agnostic_nms(bool,*optiona*,False):applyclassagnostincNMSapproachornot
+Returns:
+pred(List):listofdetectionswith(n,6)shape,wheren-numberofdetectedboxesinformat[x1,y1,x2,y2,score,label]
+orig_img(np.ndarray):imagebeforepreprocessing,canbeusedforresultsvisualization
+inpjut_shape(Tuple[int]):shapeofmodelinputtensor,canbeusedforoutputrescaling
+"""
+output_blob=model.output(0)
+img=np.array(Image.open(image_path))
+preprocessed_img,orig_img=preprocess_image(img)
+input_tensor=prepare_input_tensor(preprocessed_img)
+predictions=torch.from_numpy(model(input_tensor)[output_blob])
+pred=non_max_suppression(predictions,conf_thres,iou_thres,classes=classes,agnostic=agnostic_nms)
+returnpred,orig_img,input_tensor.shape
 
-Select inference device
+
+defdraw_boxes(
+predictions:np.ndarray,
+input_shape:Tuple[int],
+image:np.ndarray,
+names:List[str],
+colors:Dict[str,int],
+):
+"""
+Utilityfunctionfordrawingpredictedboundingboxesonimage
+Parameters:
+predictions(np.ndarray):listofdetectionswith(n,6)shape,wheren-numberofdetectedboxesinformat[x1,y1,x2,y2,score,label]
+image(np.ndarray):imageforboxesvisualization
+names(List[str]):listofnamesforeachclassindataset
+colors(Dict[str,int]):mappingbetweenclassnameanddrawingcolor
+Returns:
+image(np.ndarray):boxvisualizationresult
+"""
+ifnotlen(predictions):
+returnimage
+#Rescaleboxesfrominputsizetooriginalimagesize
+predictions[:,:4]=scale_coords(input_shape[2:],predictions[:,:4],image.shape).round()
+
+#Writeresults
+for*xyxy,conf,clsinreversed(predictions):
+label=f"{names[int(cls)]}{conf:.2f}"
+plot_one_box(xyxy,image,label=label,color=colors[names[int(cls)]],line_thickness=1)
+returnimage
+
+..code::ipython3
+
+core=ov.Core()
+#readconvertedmodel
+model=core.read_model("model/yolov7-tiny.xml")
+
+Selectinferencedevice
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-select device from dropdown list for running inference using OpenVINO
+selectdevicefromdropdownlistforrunninginferenceusingOpenVINO
 
-.. code:: ipython3
+..code::ipython3
 
-    import ipywidgets as widgets
-    
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="AUTO",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+importipywidgetsaswidgets
 
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="AUTO",
+description="Device:",
+disabled=False,
+)
 
-
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', index=1, options=('CPU', 'AUTO'), value='AUTO')
-
-
-
-.. code:: ipython3
-
-    # load model on CPU device
-    compiled_model = core.compile_model(model, device.value)
-
-.. code:: ipython3
-
-    boxes, image, input_shape = detect(compiled_model, "inference/images/horses.jpg")
-    image_with_boxes = draw_boxes(boxes[0], input_shape, image, NAMES, COLORS)
-    # visualize results
-    Image.fromarray(image_with_boxes)
+device
 
 
 
 
-.. image:: yolov7-optimization-with-output_files/yolov7-optimization-with-output_27_0.png
+..parsed-literal::
+
+Dropdown(description='Device:',index=1,options=('CPU','AUTO'),value='AUTO')
 
 
 
-Verify model accuracy
+..code::ipython3
+
+#loadmodelonCPUdevice
+compiled_model=core.compile_model(model,device.value)
+
+..code::ipython3
+
+boxes,image,input_shape=detect(compiled_model,"inference/images/horses.jpg")
+image_with_boxes=draw_boxes(boxes[0],input_shape,image,NAMES,COLORS)
+#visualizeresults
+Image.fromarray(image_with_boxes)
+
+
+
+
+..image::yolov7-optimization-with-output_files/yolov7-optimization-with-output_27_0.png
+
+
+
+Verifymodelaccuracy
 ---------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Download dataset
+Downloaddataset
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-YOLOv7 tiny is pre-trained on the COCO dataset, so in order to evaluate
-the model accuracy, we need to download it. According to the
-instructions provided in the YOLOv7 repo, we also need to download
-annotations in the format used by the author of the model, for use with
-the original model evaluation scripts.
+YOLOv7tinyispre-trainedontheCOCOdataset,soinordertoevaluate
+themodelaccuracy,weneedtodownloadit.Accordingtothe
+instructionsprovidedintheYOLOv7repo,wealsoneedtodownload
+annotationsintheformatusedbytheauthorofthemodel,forusewith
+theoriginalmodelevaluationscripts.
 
-.. code:: ipython3
+..code::ipython3
 
-    from zipfile import ZipFile
-    
-    DATA_URL = "http://images.cocodataset.org/zips/val2017.zip"
-    LABELS_URL = "https://github.com/ultralytics/yolov5/releases/download/v1.0/coco2017labels-segments.zip"
-    
-    OUT_DIR = Path(".")
-    
-    download_file(DATA_URL, directory=OUT_DIR, show_progress=True)
-    download_file(LABELS_URL, directory=OUT_DIR, show_progress=True)
-    
-    if not (OUT_DIR / "coco/labels").exists():
-        with ZipFile("coco2017labels-segments.zip", "r") as zip_ref:
-            zip_ref.extractall(OUT_DIR)
-        with ZipFile("val2017.zip", "r") as zip_ref:
-            zip_ref.extractall(OUT_DIR / "coco/images")
+fromzipfileimportZipFile
 
+DATA_URL="http://images.cocodataset.org/zips/val2017.zip"
+LABELS_URL="https://github.com/ultralytics/yolov5/releases/download/v1.0/coco2017labels-segments.zip"
 
+OUT_DIR=Path(".")
 
-.. parsed-literal::
+download_file(DATA_URL,directory=OUT_DIR,show_progress=True)
+download_file(LABELS_URL,directory=OUT_DIR,show_progress=True)
 
-    val2017.zip:   0%|          | 0.00/778M [00:00<?, ?B/s]
+ifnot(OUT_DIR/"coco/labels").exists():
+withZipFile("coco2017labels-segments.zip","r")aszip_ref:
+zip_ref.extractall(OUT_DIR)
+withZipFile("val2017.zip","r")aszip_ref:
+zip_ref.extractall(OUT_DIR/"coco/images")
 
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    coco2017labels-segments.zip:   0%|          | 0.00/169M [00:00<?, ?B/s]
+val2017.zip:0%||0.00/778M[00:00<?,?B/s]
 
 
-Create dataloader
+
+..parsed-literal::
+
+coco2017labels-segments.zip:0%||0.00/169M[00:00<?,?B/s]
+
+
+Createdataloader
 ~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    from collections import namedtuple
-    import yaml
-    from utils.datasets import create_dataloader
-    from utils.general import check_dataset, box_iou, xywh2xyxy, colorstr
-    
-    # read dataset config
-    DATA_CONFIG = "data/coco.yaml"
-    with open(DATA_CONFIG) as f:
-        data = yaml.load(f, Loader=yaml.SafeLoader)
-    
-    # Dataloader
-    TASK = "val"  # path to train/val/test images
-    Option = namedtuple("Options", ["single_cls"])  # imitation of commandline provided options for single class evaluation
-    opt = Option(False)
-    dataloader = create_dataloader(data[TASK], 640, 1, 32, opt, pad=0.5, prefix=colorstr(f"{TASK}: "))[0]
+fromcollectionsimportnamedtuple
+importyaml
+fromutils.datasetsimportcreate_dataloader
+fromutils.generalimportcheck_dataset,box_iou,xywh2xyxy,colorstr
 
+#readdatasetconfig
+DATA_CONFIG="data/coco.yaml"
+withopen(DATA_CONFIG)asf:
+data=yaml.load(f,Loader=yaml.SafeLoader)
 
-.. parsed-literal::
-
-    val: Scanning 'coco/val2017' images and labels... 4952 found, 48 missing, 0 empty, 0 corrupted: 100%|██████████| 5000/5000 [00:02<00:00, 2410.16it/s]
+#Dataloader
+TASK="val"#pathtotrain/val/testimages
+Option=namedtuple("Options",["single_cls"])#imitationofcommandlineprovidedoptionsforsingleclassevaluation
+opt=Option(False)
+dataloader=create_dataloader(data[TASK],640,1,32,opt,pad=0.5,prefix=colorstr(f"{TASK}:"))[0]
 
 
-Define validation function
+..parsed-literal::
+
+val:Scanning'coco/val2017'imagesandlabels...4952found,48missing,0empty,0corrupted:100%|██████████|5000/5000[00:02<00:00,2410.16it/s]
+
+
+Definevalidationfunction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-We will reuse validation metrics provided in the YOLOv7 repo with a
-modification for this case (removing extra steps). The original model
-evaluation procedure can be found in this
-`file <https://github.com/WongKinYiu/yolov7/blob/main/test.py>`__
+WewillreusevalidationmetricsprovidedintheYOLOv7repowitha
+modificationforthiscase(removingextrasteps).Theoriginalmodel
+evaluationprocedurecanbefoundinthis
+`file<https://github.com/WongKinYiu/yolov7/blob/main/test.py>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    import numpy as np
-    from tqdm.notebook import tqdm
-    from utils.metrics import ap_per_class
-    
-    
-    def test(
-        data,
-        model: ov.Model,
-        dataloader: torch.utils.data.DataLoader,
-        conf_thres: float = 0.001,
-        iou_thres: float = 0.65,  # for NMS
-        single_cls: bool = False,
-        v5_metric: bool = False,
-        names: List[str] = None,
-        num_samples: int = None,
-    ):
-        """
-        YOLOv7 accuracy evaluation. Processes validation dataset and compites metrics.
-    
-        Parameters:
-            model (ov.Model): OpenVINO compiled model.
-            dataloader (torch.utils.DataLoader): validation dataset.
-            conf_thres (float, *optional*, 0.001): minimal confidence threshold for keeping detections
-            iou_thres (float, *optional*, 0.65): IOU threshold for NMS
-            single_cls (bool, *optional*, False): class agnostic evaluation
-            v5_metric (bool, *optional*, False): use YOLOv5 evaluation approach for metrics calculation
-            names (List[str], *optional*, None): names for each class in dataset
-            num_samples (int, *optional*, None): number samples for testing
-        Returns:
-            mp (float): mean precision
-            mr (float): mean recall
-            map50 (float): mean average precision at 0.5 IOU threshold
-            map (float): mean average precision at 0.5:0.95 IOU thresholds
-            maps (Dict(int, float): average precision per class
-            seen (int): number of evaluated images
-            labels (int): number of labels
-        """
-    
-        model_output = model.output(0)
-        check_dataset(data)  # check
-        nc = 1 if single_cls else int(data["nc"])  # number of classes
-        iouv = torch.linspace(0.5, 0.95, 10)  # iou vector for mAP@0.5:0.95
-        niou = iouv.numel()
-    
-        if v5_metric:
-            print("Testing with YOLOv5 AP metric...")
-    
-        seen = 0
-        p, r, mp, mr, map50, map = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-        stats, ap, ap_class = [], [], []
-        for sample_id, (img, targets, _, shapes) in enumerate(tqdm(dataloader)):
-            if num_samples is not None and sample_id == num_samples:
-                break
-            img = prepare_input_tensor(img.numpy())
-            targets = targets
-            height, width = img.shape[2:]
-    
-            with torch.no_grad():
-                # Run model
-                out = torch.from_numpy(model(ov.Tensor(img))[model_output])  # inference output
-                # Run NMS
-                targets[:, 2:] *= torch.Tensor([width, height, width, height])  # to pixels
-    
-                out = non_max_suppression(
-                    out,
-                    conf_thres=conf_thres,
-                    iou_thres=iou_thres,
-                    labels=None,
-                    multi_label=True,
-                )
-            # Statistics per image
-            for si, pred in enumerate(out):
-                labels = targets[targets[:, 0] == si, 1:]
-                nl = len(labels)
-                tcls = labels[:, 0].tolist() if nl else []  # target class
-                seen += 1
-    
-                if len(pred) == 0:
-                    if nl:
-                        stats.append(
-                            (
-                                torch.zeros(0, niou, dtype=torch.bool),
-                                torch.Tensor(),
-                                torch.Tensor(),
-                                tcls,
-                            )
-                        )
-                    continue
-                # Predictions
-                predn = pred.clone()
-                scale_coords(img[si].shape[1:], predn[:, :4], shapes[si][0], shapes[si][1])  # native-space pred
-                # Assign all predictions as incorrect
-                correct = torch.zeros(pred.shape[0], niou, dtype=torch.bool, device="cpu")
-                if nl:
-                    detected = []  # target indices
-                    tcls_tensor = labels[:, 0]
-                    # target boxes
-                    tbox = xywh2xyxy(labels[:, 1:5])
-                    scale_coords(img[si].shape[1:], tbox, shapes[si][0], shapes[si][1])  # native-space labels
-                    # Per target class
-                    for cls in torch.unique(tcls_tensor):
-                        ti = (cls == tcls_tensor).nonzero(as_tuple=False).view(-1)  # prediction indices
-                        pi = (cls == pred[:, 5]).nonzero(as_tuple=False).view(-1)  # target indices
-                        # Search for detections
-                        if pi.shape[0]:
-                            # Prediction to target ious
-                            ious, i = box_iou(predn[pi, :4], tbox[ti]).max(1)  # best ious, indices
-                            # Append detections
-                            detected_set = set()
-                            for j in (ious > iouv[0]).nonzero(as_tuple=False):
-                                d = ti[i[j]]  # detected target
-                                if d.item() not in detected_set:
-                                    detected_set.add(d.item())
-                                    detected.append(d)
-                                    correct[pi[j]] = ious[j] > iouv  # iou_thres is 1xn
-                                    if len(detected) == nl:  # all targets already located in image
-                                        break
-                # Append statistics (correct, conf, pcls, tcls)
-                stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
-        # Compute statistics
-        stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
-        if len(stats) and stats[0].any():
-            p, r, ap, f1, ap_class = ap_per_class(*stats, plot=True, v5_metric=v5_metric, names=names)
-            ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
-            mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
-            nt = np.bincount(stats[3].astype(np.int64), minlength=nc)  # number of targets per class
-        else:
-            nt = torch.zeros(1)
-        maps = np.zeros(nc) + map
-        for i, c in enumerate(ap_class):
-            maps[c] = ap[i]
-        return mp, mr, map50, map, maps, seen, nt.sum()
-
-Validation function reports following list of accuracy metrics:
-
--  ``Precision`` is the degree of exactness of the model in identifying
-   only relevant objects.
--  ``Recall`` measures the ability of the model to detect all ground
-   truths objects.
--  ``mAP@t`` - mean average precision, represented as area under the
-   Precision-Recall curve aggregated over all classes in the dataset,
-   where ``t`` is Intersection Over Union (IOU) threshold, degree of
-   overlapping between ground truth and predicted objects. Therefore,
-   ``mAP@.5`` indicates that mean average precision calculated at 0.5
-   IOU threshold, ``mAP@.5:.95`` - calculated on range IOU thresholds
-   from 0.5 to 0.95 with step 0.05.
-
-.. code:: ipython3
-
-    mp, mr, map50, map, maps, num_images, labels = test(data=data, model=compiled_model, dataloader=dataloader, names=NAMES)
-    # Print results
-    s = ("%20s" + "%12s" * 6) % (
-        "Class",
-        "Images",
-        "Labels",
-        "Precision",
-        "Recall",
-        "mAP@.5",
-        "mAP@.5:.95",
-    )
-    print(s)
-    pf = "%20s" + "%12i" * 2 + "%12.3g" * 4  # print format
-    print(pf % ("all", num_images, labels, mp, mr, map50, map))
+importnumpyasnp
+fromtqdm.notebookimporttqdm
+fromutils.metricsimportap_per_class
 
 
+deftest(
+data,
+model:ov.Model,
+dataloader:torch.utils.data.DataLoader,
+conf_thres:float=0.001,
+iou_thres:float=0.65,#forNMS
+single_cls:bool=False,
+v5_metric:bool=False,
+names:List[str]=None,
+num_samples:int=None,
+):
+"""
+YOLOv7accuracyevaluation.Processesvalidationdatasetandcompitesmetrics.
 
-.. parsed-literal::
+Parameters:
+model(ov.Model):OpenVINOcompiledmodel.
+dataloader(torch.utils.DataLoader):validationdataset.
+conf_thres(float,*optional*,0.001):minimalconfidencethresholdforkeepingdetections
+iou_thres(float,*optional*,0.65):IOUthresholdforNMS
+single_cls(bool,*optional*,False):classagnosticevaluation
+v5_metric(bool,*optional*,False):useYOLOv5evaluationapproachformetricscalculation
+names(List[str],*optional*,None):namesforeachclassindataset
+num_samples(int,*optional*,None):numbersamplesfortesting
+Returns:
+mp(float):meanprecision
+mr(float):meanrecall
+map50(float):meanaverageprecisionat0.5IOUthreshold
+map(float):meanaverageprecisionat0.5:0.95IOUthresholds
+maps(Dict(int,float):averageprecisionperclass
+seen(int):numberofevaluatedimages
+labels(int):numberoflabels
+"""
 
-      0%|          | 0/5000 [00:00<?, ?it/s]
+model_output=model.output(0)
+check_dataset(data)#check
+nc=1ifsingle_clselseint(data["nc"])#numberofclasses
+iouv=torch.linspace(0.5,0.95,10)#iouvectorformAP@0.5:0.95
+niou=iouv.numel()
+
+ifv5_metric:
+print("TestingwithYOLOv5APmetric...")
+
+seen=0
+p,r,mp,mr,map50,map=0.0,0.0,0.0,0.0,0.0,0.0
+stats,ap,ap_class=[],[],[]
+forsample_id,(img,targets,_,shapes)inenumerate(tqdm(dataloader)):
+ifnum_samplesisnotNoneandsample_id==num_samples:
+break
+img=prepare_input_tensor(img.numpy())
+targets=targets
+height,width=img.shape[2:]
+
+withtorch.no_grad():
+#Runmodel
+out=torch.from_numpy(model(ov.Tensor(img))[model_output])#inferenceoutput
+#RunNMS
+targets[:,2:]*=torch.Tensor([width,height,width,height])#topixels
+
+out=non_max_suppression(
+out,
+conf_thres=conf_thres,
+iou_thres=iou_thres,
+labels=None,
+multi_label=True,
+)
+#Statisticsperimage
+forsi,predinenumerate(out):
+labels=targets[targets[:,0]==si,1:]
+nl=len(labels)
+tcls=labels[:,0].tolist()ifnlelse[]#targetclass
+seen+=1
+
+iflen(pred)==0:
+ifnl:
+stats.append(
+(
+torch.zeros(0,niou,dtype=torch.bool),
+torch.Tensor(),
+torch.Tensor(),
+tcls,
+)
+)
+continue
+#Predictions
+predn=pred.clone()
+scale_coords(img[si].shape[1:],predn[:,:4],shapes[si][0],shapes[si][1])#native-spacepred
+#Assignallpredictionsasincorrect
+correct=torch.zeros(pred.shape[0],niou,dtype=torch.bool,device="cpu")
+ifnl:
+detected=[]#targetindices
+tcls_tensor=labels[:,0]
+#targetboxes
+tbox=xywh2xyxy(labels[:,1:5])
+scale_coords(img[si].shape[1:],tbox,shapes[si][0],shapes[si][1])#native-spacelabels
+#Pertargetclass
+forclsintorch.unique(tcls_tensor):
+ti=(cls==tcls_tensor).nonzero(as_tuple=False).view(-1)#predictionindices
+pi=(cls==pred[:,5]).nonzero(as_tuple=False).view(-1)#targetindices
+#Searchfordetections
+ifpi.shape[0]:
+#Predictiontotargetious
+ious,i=box_iou(predn[pi,:4],tbox[ti]).max(1)#bestious,indices
+#Appenddetections
+detected_set=set()
+forjin(ious>iouv[0]).nonzero(as_tuple=False):
+d=ti[i[j]]#detectedtarget
+ifd.item()notindetected_set:
+detected_set.add(d.item())
+detected.append(d)
+correct[pi[j]]=ious[j]>iouv#iou_thresis1xn
+iflen(detected)==nl:#alltargetsalreadylocatedinimage
+break
+#Appendstatistics(correct,conf,pcls,tcls)
+stats.append((correct.cpu(),pred[:,4].cpu(),pred[:,5].cpu(),tcls))
+#Computestatistics
+stats=[np.concatenate(x,0)forxinzip(*stats)]#tonumpy
+iflen(stats)andstats[0].any():
+p,r,ap,f1,ap_class=ap_per_class(*stats,plot=True,v5_metric=v5_metric,names=names)
+ap50,ap=ap[:,0],ap.mean(1)#AP@0.5,AP@0.5:0.95
+mp,mr,map50,map=p.mean(),r.mean(),ap50.mean(),ap.mean()
+nt=np.bincount(stats[3].astype(np.int64),minlength=nc)#numberoftargetsperclass
+else:
+nt=torch.zeros(1)
+maps=np.zeros(nc)+map
+fori,cinenumerate(ap_class):
+maps[c]=ap[i]
+returnmp,mr,map50,map,maps,seen,nt.sum()
+
+Validationfunctionreportsfollowinglistofaccuracymetrics:
+
+-``Precision``isthedegreeofexactnessofthemodelinidentifying
+onlyrelevantobjects.
+-``Recall``measurestheabilityofthemodeltodetectallground
+truthsobjects.
+-``mAP@t``-meanaverageprecision,representedasareaunderthe
+Precision-Recallcurveaggregatedoverallclassesinthedataset,
+where``t``isIntersectionOverUnion(IOU)threshold,degreeof
+overlappingbetweengroundtruthandpredictedobjects.Therefore,
+``mAP@.5``indicatesthatmeanaverageprecisioncalculatedat0.5
+IOUthreshold,``mAP@.5:.95``-calculatedonrangeIOUthresholds
+from0.5to0.95withstep0.05.
+
+..code::ipython3
+
+mp,mr,map50,map,maps,num_images,labels=test(data=data,model=compiled_model,dataloader=dataloader,names=NAMES)
+#Printresults
+s=("%20s"+"%12s"*6)%(
+"Class",
+"Images",
+"Labels",
+"Precision",
+"Recall",
+"mAP@.5",
+"mAP@.5:.95",
+)
+print(s)
+pf="%20s"+"%12i"*2+"%12.3g"*4#printformat
+print(pf%("all",num_images,labels,mp,mr,map50,map))
 
 
-.. parsed-literal::
 
-                   Class      Images      Labels   Precision      Recall      mAP@.5  mAP@.5:.95
-                     all        5000       36335       0.651       0.507       0.544       0.359
+..parsed-literal::
+
+0%||0/5000[00:00<?,?it/s]
 
 
-Optimize model using NNCF Post-training Quantization API
+..parsed-literal::
+
+ClassImagesLabelsPrecisionRecallmAP@.5mAP@.5:.95
+all5000363350.6510.5070.5440.359
+
+
+OptimizemodelusingNNCFPost-trainingQuantizationAPI
 --------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-`NNCF <https://github.com/openvinotoolkit/nncf>`__ provides a suite of
-advanced algorithms for Neural Networks inference optimization in
-OpenVINO with minimal accuracy drop. We will use 8-bit quantization in
-post-training mode (without the fine-tuning pipeline) to optimize
+`NNCF<https://github.com/openvinotoolkit/nncf>`__providesasuiteof
+advancedalgorithmsforNeuralNetworksinferenceoptimizationin
+OpenVINOwithminimalaccuracydrop.Wewilluse8-bitquantizationin
+post-trainingmode(withoutthefine-tuningpipeline)tooptimize
 YOLOv7.
 
-   **Note**: NNCF Post-training Quantization is available as a preview
-   feature in OpenVINO 2022.3 release. Fully functional support will be
-   provided in the next releases.
+**Note**:NNCFPost-trainingQuantizationisavailableasapreview
+featureinOpenVINO2022.3release.Fullyfunctionalsupportwillbe
+providedinthenextreleases.
 
-The optimization process contains the following steps:
+Theoptimizationprocesscontainsthefollowingsteps:
 
-1. Create a Dataset for quantization.
-2. Run ``nncf.quantize`` for getting an optimized model.
-3. Serialize an OpenVINO IR model, using the
-   ``openvino.runtime.serialize`` function.
+1.CreateaDatasetforquantization.
+2.Run``nncf.quantize``forgettinganoptimizedmodel.
+3.SerializeanOpenVINOIRmodel,usingthe
+``openvino.runtime.serialize``function.
 
-Reuse validation dataloader in accuracy testing for quantization. For
-that, it should be wrapped into the ``nncf.Dataset`` object and define
-transformation function for getting only input tensors.
+Reusevalidationdataloaderinaccuracytestingforquantization.For
+that,itshouldbewrappedintothe``nncf.Dataset``objectanddefine
+transformationfunctionforgettingonlyinputtensors.
 
-.. code:: ipython3
+..code::ipython3
 
-    import nncf  # noqa: F811
-    
-    
-    def transform_fn(data_item):
-        """
-        Quantization transform function. Extracts and preprocess input data from dataloader item for quantization.
-        Parameters:
-           data_item: Tuple with data item produced by DataLoader during iteration
-        Returns:
-            input_tensor: Input data for quantization
-        """
-        img = data_item[0].numpy()
-        input_tensor = prepare_input_tensor(img)
-        return input_tensor
-    
-    
-    quantization_dataset = nncf.Dataset(dataloader, transform_fn)
+importnncf#noqa:F811
 
 
-.. parsed-literal::
-
-    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, tensorflow, onnx, openvino
-
-
-The ``nncf.quantize`` function provides interface for model
-quantization. It requires instance of OpenVINO Model and quantization
-dataset. Optionally, some additional parameters for configuration
-quantization process (number of samples for quantization, preset,
-ignored scope etc.) can be provided. YOLOv7 model contains non-ReLU
-activation functions, which require asymmetric quantization of
-activations. To achieve better result, we will use ``mixed``
-quantization preset. It provides symmetric quantization of weights and
-asymmetric quantization of activations.
-
-.. code:: ipython3
-
-    quantized_model = nncf.quantize(model, quantization_dataset, preset=nncf.QuantizationPreset.MIXED)
-    
-    ov.save_model(quantized_model, "model/yolov7-tiny_int8.xml")
+deftransform_fn(data_item):
+"""
+Quantizationtransformfunction.Extractsandpreprocessinputdatafromdataloaderitemforquantization.
+Parameters:
+data_item:TuplewithdataitemproducedbyDataLoaderduringiteration
+Returns:
+input_tensor:Inputdataforquantization
+"""
+img=data_item[0].numpy()
+input_tensor=prepare_input_tensor(img)
+returninput_tensor
 
 
-.. parsed-literal::
-
-    2024-07-13 04:17:49.896323: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-07-13 04:17:49.928585: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-07-13 04:17:50.540879: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+quantization_dataset=nncf.Dataset(dataloader,transform_fn)
 
 
+..parsed-literal::
 
-.. parsed-literal::
+INFO:nncf:NNCFinitializedsuccessfully.Supportedframeworksdetected:torch,tensorflow,onnx,openvino
 
-    Output()
+
+The``nncf.quantize``functionprovidesinterfaceformodel
+quantization.ItrequiresinstanceofOpenVINOModelandquantization
+dataset.Optionally,someadditionalparametersforconfiguration
+quantizationprocess(numberofsamplesforquantization,preset,
+ignoredscopeetc.)canbeprovided.YOLOv7modelcontainsnon-ReLU
+activationfunctions,whichrequireasymmetricquantizationof
+activations.Toachievebetterresult,wewilluse``mixed``
+quantizationpreset.Itprovidessymmetricquantizationofweightsand
+asymmetricquantizationofactivations.
+
+..code::ipython3
+
+quantized_model=nncf.quantize(model,quantization_dataset,preset=nncf.QuantizationPreset.MIXED)
+
+ov.save_model(quantized_model,"model/yolov7-tiny_int8.xml")
+
+
+..parsed-literal::
+
+2024-07-1304:17:49.896323:Itensorflow/core/util/port.cc:110]oneDNNcustomoperationsareon.Youmayseeslightlydifferentnumericalresultsduetofloating-pointround-offerrorsfromdifferentcomputationorders.Toturnthemoff,settheenvironmentvariable`TF_ENABLE_ONEDNN_OPTS=0`.
+2024-07-1304:17:49.928585:Itensorflow/core/platform/cpu_feature_guard.cc:182]ThisTensorFlowbinaryisoptimizedtouseavailableCPUinstructionsinperformance-criticaloperations.
+Toenablethefollowinginstructions:AVX2AVX512FAVX512_VNNIFMA,inotheroperations,rebuildTensorFlowwiththeappropriatecompilerflags.
+2024-07-1304:17:50.540879:Wtensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38]TF-TRTWarning:CouldnotfindTensorRT
 
 
 
-.. raw:: html
+..parsed-literal::
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-
-
+Output()
 
 
-.. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
 
 
 
 
-.. parsed-literal::
+..raw::html
 
-    Output()
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
 
 
 
 
-.. raw:: html
+..parsed-literal::
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
-
+Output()
 
 
-.. parsed-literal::
 
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
-    WARNING:openvino.runtime.opset13.ops:Converting value of float32 to float16. Memory sharing is disabled by default. Set shared_memory=False to hide this warning.
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
 
 
-Validate Quantized model inference
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
+
+
+
+..parsed-literal::
+
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+WARNING:openvino.runtime.opset13.ops:Convertingvalueoffloat32tofloat16.Memorysharingisdisabledbydefault.Setshared_memory=Falsetohidethiswarning.
+
+
+ValidateQuantizedmodelinference
 ----------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    device
-
-
-
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', index=1, options=('CPU', 'AUTO'), value='AUTO')
-
-
-
-.. code:: ipython3
-
-    int8_compiled_model = core.compile_model(quantized_model, device.value)
-    boxes, image, input_shape = detect(int8_compiled_model, "inference/images/horses.jpg")
-    image_with_boxes = draw_boxes(boxes[0], input_shape, image, NAMES, COLORS)
-    Image.fromarray(image_with_boxes)
+device
 
 
 
 
-.. image:: yolov7-optimization-with-output_files/yolov7-optimization-with-output_44_0.png
+..parsed-literal::
+
+Dropdown(description='Device:',index=1,options=('CPU','AUTO'),value='AUTO')
 
 
 
-Validate quantized model accuracy
+..code::ipython3
+
+int8_compiled_model=core.compile_model(quantized_model,device.value)
+boxes,image,input_shape=detect(int8_compiled_model,"inference/images/horses.jpg")
+image_with_boxes=draw_boxes(boxes[0],input_shape,image,NAMES,COLORS)
+Image.fromarray(image_with_boxes)
+
+
+
+
+..image::yolov7-optimization-with-output_files/yolov7-optimization-with-output_44_0.png
+
+
+
+Validatequantizedmodelaccuracy
 ---------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    int8_result = test(data=data, model=int8_compiled_model, dataloader=dataloader, names=NAMES)
-
-
-
-.. parsed-literal::
-
-      0%|          | 0/5000 [00:00<?, ?it/s]
+int8_result=test(data=data,model=int8_compiled_model,dataloader=dataloader,names=NAMES)
 
 
-.. code:: ipython3
 
-    mp, mr, map50, map, maps, num_images, labels = int8_result
-    # Print results
-    s = ("%20s" + "%12s" * 6) % (
-        "Class",
-        "Images",
-        "Labels",
-        "Precision",
-        "Recall",
-        "mAP@.5",
-        "mAP@.5:.95",
-    )
-    print(s)
-    pf = "%20s" + "%12i" * 2 + "%12.3g" * 4  # print format
-    print(pf % ("all", num_images, labels, mp, mr, map50, map))
+..parsed-literal::
+
+0%||0/5000[00:00<?,?it/s]
 
 
-.. parsed-literal::
+..code::ipython3
 
-                   Class      Images      Labels   Precision      Recall      mAP@.5  mAP@.5:.95
-                     all        5000       36335       0.643       0.506        0.54       0.353
+mp,mr,map50,map,maps,num_images,labels=int8_result
+#Printresults
+s=("%20s"+"%12s"*6)%(
+"Class",
+"Images",
+"Labels",
+"Precision",
+"Recall",
+"mAP@.5",
+"mAP@.5:.95",
+)
+print(s)
+pf="%20s"+"%12i"*2+"%12.3g"*4#printformat
+print(pf%("all",num_images,labels,mp,mr,map50,map))
 
 
-As we can see, model accuracy slightly changed after quantization.
-However, if we look at the output image, these changes are not
+..parsed-literal::
+
+ClassImagesLabelsPrecisionRecallmAP@.5mAP@.5:.95
+all5000363350.6430.5060.540.353
+
+
+Aswecansee,modelaccuracyslightlychangedafterquantization.
+However,ifwelookattheoutputimage,thesechangesarenot
 significant.
 
-Compare Performance of the Original and Quantized Models
+ComparePerformanceoftheOriginalandQuantizedModels
 --------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Finally, use the OpenVINO `Benchmark
-Tool <https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
-to measure the inference performance of the ``FP32`` and ``INT8``
+Finally,usetheOpenVINO`Benchmark
+Tool<https://docs.openvino.ai/2024/learn-openvino/openvino-samples/benchmark-tool.html>`__
+tomeasuretheinferenceperformanceofthe``FP32``and``INT8``
 models.
 
-   **NOTE**: For more accurate performance, it is recommended to run
-   ``benchmark_app`` in a terminal/command prompt after closing other
-   applications. Run ``benchmark_app -m model.xml -d CPU`` to benchmark
-   async inference on CPU for one minute. Change ``CPU`` to ``GPU`` to
-   benchmark on GPU. Run ``benchmark_app --help`` to see an overview of
-   all command-line options.
+**NOTE**:Formoreaccurateperformance,itisrecommendedtorun
+``benchmark_app``inaterminal/commandpromptafterclosingother
+applications.Run``benchmark_app-mmodel.xml-dCPU``tobenchmark
+asyncinferenceonCPUforoneminute.Change``CPU``to``GPU``to
+benchmarkonGPU.Run``benchmark_app--help``toseeanoverviewof
+allcommand-lineoptions.
 
-.. code:: ipython3
+..code::ipython3
 
-    device
-
-
-
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', index=1, options=('CPU', 'AUTO'), value='AUTO')
+device
 
 
 
-.. code:: ipython3
 
-    # Inference FP32 model (OpenVINO IR)
-    !benchmark_app -m model/yolov7-tiny.xml -d $device.value -api async
+..parsed-literal::
 
-
-.. parsed-literal::
-
-    [Step 1/11] Parsing and validating input arguments
-    [ INFO ] Parsing input parameters
-    [Step 2/11] Loading OpenVINO Runtime
-    [ WARNING ] Default duration 120 seconds is used for unknown device AUTO
-    [ INFO ] OpenVINO:
-    [ INFO ] Build ................................. 2024.4.0-16028-fe423b97163
-    [ INFO ] 
-    [ INFO ] Device info:
-    [ INFO ] AUTO
-    [ INFO ] Build ................................. 2024.4.0-16028-fe423b97163
-    [ INFO ] 
-    [ INFO ] 
-    [Step 3/11] Setting device configuration
-    [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
-    [Step 4/11] Reading model files
-    [ INFO ] Loading model files
-    [ INFO ] Read model took 13.26 ms
-    [ INFO ] Original model I/O parameters:
-    [ INFO ] Model inputs:
-    [ INFO ]     images (node: images) : f32 / [...] / [1,3,640,640]
-    [ INFO ] Model outputs:
-    [ INFO ]     output (node: output) : f32 / [...] / [1,25200,85]
-    [Step 5/11] Resizing model to match image sizes and given batch
-    [ INFO ] Model batch size: 1
-    [Step 6/11] Configuring input of the model
-    [ INFO ] Model inputs:
-    [ INFO ]     images (node: images) : u8 / [N,C,H,W] / [1,3,640,640]
-    [ INFO ] Model outputs:
-    [ INFO ]     output (node: output) : f32 / [...] / [1,25200,85]
-    [Step 7/11] Loading the model to the device
-    [ INFO ] Compile model took 254.06 ms
-    [Step 8/11] Querying optimal runtime parameters
-    [ INFO ] Model:
-    [ INFO ]   NETWORK_NAME: main_graph
-    [ INFO ]   EXECUTION_DEVICES: ['CPU']
-    [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
-    [ INFO ]   OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
-    [ INFO ]   MULTI_DEVICE_PRIORITIES: CPU
-    [ INFO ]   CPU:
-    [ INFO ]     AFFINITY: Affinity.CORE
-    [ INFO ]     CPU_DENORMALS_OPTIMIZATION: False
-    [ INFO ]     CPU_SPARSE_WEIGHTS_DECOMPRESSION_RATE: 1.0
-    [ INFO ]     DYNAMIC_QUANTIZATION_GROUP_SIZE: 32
-    [ INFO ]     ENABLE_CPU_PINNING: True
-    [ INFO ]     ENABLE_HYPER_THREADING: True
-    [ INFO ]     EXECUTION_DEVICES: ['CPU']
-    [ INFO ]     EXECUTION_MODE_HINT: ExecutionMode.PERFORMANCE
-    [ INFO ]     INFERENCE_NUM_THREADS: 24
-    [ INFO ]     INFERENCE_PRECISION_HINT: <Type: 'float32'>
-    [ INFO ]     KV_CACHE_PRECISION: <Type: 'float16'>
-    [ INFO ]     LOG_LEVEL: Level.NO
-    [ INFO ]     MODEL_DISTRIBUTION_POLICY: set()
-    [ INFO ]     NETWORK_NAME: main_graph
-    [ INFO ]     NUM_STREAMS: 6
-    [ INFO ]     OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
-    [ INFO ]     PERFORMANCE_HINT: THROUGHPUT
-    [ INFO ]     PERFORMANCE_HINT_NUM_REQUESTS: 0
-    [ INFO ]     PERF_COUNT: NO
-    [ INFO ]     SCHEDULING_CORE_TYPE: SchedulingCoreType.ANY_CORE
-    [ INFO ]   MODEL_PRIORITY: Priority.MEDIUM
-    [ INFO ]   LOADED_FROM_CACHE: False
-    [ INFO ]   PERF_COUNT: False
-    [Step 9/11] Creating infer requests and preparing input tensors
-    [ WARNING ] No input files were given for input 'images'!. This input will be filled with random values!
-    [ INFO ] Fill input 'images' with random values 
-    [Step 10/11] Measuring performance (Start inference asynchronously, 6 inference requests, limits: 120000 ms duration)
-    [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-    [ INFO ] First inference took 46.77 ms
-    [Step 11/11] Dumping statistics report
-    [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            11694 iterations
-    [ INFO ] Duration:         120060.72 ms
-    [ INFO ] Latency:
-    [ INFO ]    Median:        61.36 ms
-    [ INFO ]    Average:       61.45 ms
-    [ INFO ]    Min:           34.72 ms
-    [ INFO ]    Max:           81.34 ms
-    [ INFO ] Throughput:   97.40 FPS
+Dropdown(description='Device:',index=1,options=('CPU','AUTO'),value='AUTO')
 
 
-.. code:: ipython3
 
-    # Inference INT8 model (OpenVINO IR)
-    !benchmark_app -m model/yolov7-tiny_int8.xml -d $device.value -api async
+..code::ipython3
+
+#InferenceFP32model(OpenVINOIR)
+!benchmark_app-mmodel/yolov7-tiny.xml-d$device.value-apiasync
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    [Step 1/11] Parsing and validating input arguments
-    [ INFO ] Parsing input parameters
-    [Step 2/11] Loading OpenVINO Runtime
-    [ WARNING ] Default duration 120 seconds is used for unknown device AUTO
-    [ INFO ] OpenVINO:
-    [ INFO ] Build ................................. 2024.4.0-16028-fe423b97163
-    [ INFO ] 
-    [ INFO ] Device info:
-    [ INFO ] AUTO
-    [ INFO ] Build ................................. 2024.4.0-16028-fe423b97163
-    [ INFO ] 
-    [ INFO ] 
-    [Step 3/11] Setting device configuration
-    [ WARNING ] Performance hint was not explicitly specified in command line. Device(AUTO) performance hint will be set to PerformanceMode.THROUGHPUT.
-    [Step 4/11] Reading model files
-    [ INFO ] Loading model files
-    [ INFO ] Read model took 19.00 ms
-    [ INFO ] Original model I/O parameters:
-    [ INFO ] Model inputs:
-    [ INFO ]     images (node: images) : f32 / [...] / [1,3,640,640]
-    [ INFO ] Model outputs:
-    [ INFO ]     output (node: output) : f32 / [...] / [1,25200,85]
-    [Step 5/11] Resizing model to match image sizes and given batch
-    [ INFO ] Model batch size: 1
-    [Step 6/11] Configuring input of the model
-    [ INFO ] Model inputs:
-    [ INFO ]     images (node: images) : u8 / [N,C,H,W] / [1,3,640,640]
-    [ INFO ] Model outputs:
-    [ INFO ]     output (node: output) : f32 / [...] / [1,25200,85]
-    [Step 7/11] Loading the model to the device
-    [ INFO ] Compile model took 402.55 ms
-    [Step 8/11] Querying optimal runtime parameters
-    [ INFO ] Model:
-    [ INFO ]   NETWORK_NAME: main_graph
-    [ INFO ]   EXECUTION_DEVICES: ['CPU']
-    [ INFO ]   PERFORMANCE_HINT: PerformanceMode.THROUGHPUT
-    [ INFO ]   OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
-    [ INFO ]   MULTI_DEVICE_PRIORITIES: CPU
-    [ INFO ]   CPU:
-    [ INFO ]     AFFINITY: Affinity.CORE
-    [ INFO ]     CPU_DENORMALS_OPTIMIZATION: False
-    [ INFO ]     CPU_SPARSE_WEIGHTS_DECOMPRESSION_RATE: 1.0
-    [ INFO ]     DYNAMIC_QUANTIZATION_GROUP_SIZE: 32
-    [ INFO ]     ENABLE_CPU_PINNING: True
-    [ INFO ]     ENABLE_HYPER_THREADING: True
-    [ INFO ]     EXECUTION_DEVICES: ['CPU']
-    [ INFO ]     EXECUTION_MODE_HINT: ExecutionMode.PERFORMANCE
-    [ INFO ]     INFERENCE_NUM_THREADS: 24
-    [ INFO ]     INFERENCE_PRECISION_HINT: <Type: 'float32'>
-    [ INFO ]     KV_CACHE_PRECISION: <Type: 'float16'>
-    [ INFO ]     LOG_LEVEL: Level.NO
-    [ INFO ]     MODEL_DISTRIBUTION_POLICY: set()
-    [ INFO ]     NETWORK_NAME: main_graph
-    [ INFO ]     NUM_STREAMS: 6
-    [ INFO ]     OPTIMAL_NUMBER_OF_INFER_REQUESTS: 6
-    [ INFO ]     PERFORMANCE_HINT: THROUGHPUT
-    [ INFO ]     PERFORMANCE_HINT_NUM_REQUESTS: 0
-    [ INFO ]     PERF_COUNT: NO
-    [ INFO ]     SCHEDULING_CORE_TYPE: SchedulingCoreType.ANY_CORE
-    [ INFO ]   MODEL_PRIORITY: Priority.MEDIUM
-    [ INFO ]   LOADED_FROM_CACHE: False
-    [ INFO ]   PERF_COUNT: False
-    [Step 9/11] Creating infer requests and preparing input tensors
-    [ WARNING ] No input files were given for input 'images'!. This input will be filled with random values!
-    [ INFO ] Fill input 'images' with random values 
-    [Step 10/11] Measuring performance (Start inference asynchronously, 6 inference requests, limits: 120000 ms duration)
-    [ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
-    [ INFO ] First inference took 23.71 ms
-    [Step 11/11] Dumping statistics report
-    [ INFO ] Execution Devices:['CPU']
-    [ INFO ] Count:            34356 iterations
-    [ INFO ] Duration:         120021.29 ms
-    [ INFO ] Latency:
-    [ INFO ]    Median:        20.77 ms
-    [ INFO ]    Average:       20.84 ms
-    [ INFO ]    Min:           14.81 ms
-    [ INFO ]    Max:           41.35 ms
-    [ INFO ] Throughput:   286.25 FPS
+[Step1/11]Parsingandvalidatinginputarguments
+[INFO]Parsinginputparameters
+[Step2/11]LoadingOpenVINORuntime
+[WARNING]Defaultduration120secondsisusedforunknowndeviceAUTO
+[INFO]OpenVINO:
+[INFO]Build.................................2024.4.0-16028-fe423b97163
+[INFO]
+[INFO]Deviceinfo:
+[INFO]AUTO
+[INFO]Build.................................2024.4.0-16028-fe423b97163
+[INFO]
+[INFO]
+[Step3/11]Settingdeviceconfiguration
+[WARNING]Performancehintwasnotexplicitlyspecifiedincommandline.Device(AUTO)performancehintwillbesettoPerformanceMode.THROUGHPUT.
+[Step4/11]Readingmodelfiles
+[INFO]Loadingmodelfiles
+[INFO]Readmodeltook13.26ms
+[INFO]OriginalmodelI/Oparameters:
+[INFO]Modelinputs:
+[INFO]images(node:images):f32/[...]/[1,3,640,640]
+[INFO]Modeloutputs:
+[INFO]output(node:output):f32/[...]/[1,25200,85]
+[Step5/11]Resizingmodeltomatchimagesizesandgivenbatch
+[INFO]Modelbatchsize:1
+[Step6/11]Configuringinputofthemodel
+[INFO]Modelinputs:
+[INFO]images(node:images):u8/[N,C,H,W]/[1,3,640,640]
+[INFO]Modeloutputs:
+[INFO]output(node:output):f32/[...]/[1,25200,85]
+[Step7/11]Loadingthemodeltothedevice
+[INFO]Compilemodeltook254.06ms
+[Step8/11]Queryingoptimalruntimeparameters
+[INFO]Model:
+[INFO]NETWORK_NAME:main_graph
+[INFO]EXECUTION_DEVICES:['CPU']
+[INFO]PERFORMANCE_HINT:PerformanceMode.THROUGHPUT
+[INFO]OPTIMAL_NUMBER_OF_INFER_REQUESTS:6
+[INFO]MULTI_DEVICE_PRIORITIES:CPU
+[INFO]CPU:
+[INFO]AFFINITY:Affinity.CORE
+[INFO]CPU_DENORMALS_OPTIMIZATION:False
+[INFO]CPU_SPARSE_WEIGHTS_DECOMPRESSION_RATE:1.0
+[INFO]DYNAMIC_QUANTIZATION_GROUP_SIZE:32
+[INFO]ENABLE_CPU_PINNING:True
+[INFO]ENABLE_HYPER_THREADING:True
+[INFO]EXECUTION_DEVICES:['CPU']
+[INFO]EXECUTION_MODE_HINT:ExecutionMode.PERFORMANCE
+[INFO]INFERENCE_NUM_THREADS:24
+[INFO]INFERENCE_PRECISION_HINT:<Type:'float32'>
+[INFO]KV_CACHE_PRECISION:<Type:'float16'>
+[INFO]LOG_LEVEL:Level.NO
+[INFO]MODEL_DISTRIBUTION_POLICY:set()
+[INFO]NETWORK_NAME:main_graph
+[INFO]NUM_STREAMS:6
+[INFO]OPTIMAL_NUMBER_OF_INFER_REQUESTS:6
+[INFO]PERFORMANCE_HINT:THROUGHPUT
+[INFO]PERFORMANCE_HINT_NUM_REQUESTS:0
+[INFO]PERF_COUNT:NO
+[INFO]SCHEDULING_CORE_TYPE:SchedulingCoreType.ANY_CORE
+[INFO]MODEL_PRIORITY:Priority.MEDIUM
+[INFO]LOADED_FROM_CACHE:False
+[INFO]PERF_COUNT:False
+[Step9/11]Creatinginferrequestsandpreparinginputtensors
+[WARNING]Noinputfilesweregivenforinput'images'!.Thisinputwillbefilledwithrandomvalues!
+[INFO]Fillinput'images'withrandomvalues
+[Step10/11]Measuringperformance(Startinferenceasynchronously,6inferencerequests,limits:120000msduration)
+[INFO]Benchmarkingininferenceonlymode(inputsfillingarenotincludedinmeasurementloop).
+[INFO]Firstinferencetook46.77ms
+[Step11/11]Dumpingstatisticsreport
+[INFO]ExecutionDevices:['CPU']
+[INFO]Count:11694iterations
+[INFO]Duration:120060.72ms
+[INFO]Latency:
+[INFO]Median:61.36ms
+[INFO]Average:61.45ms
+[INFO]Min:34.72ms
+[INFO]Max:81.34ms
+[INFO]Throughput:97.40FPS
+
+
+..code::ipython3
+
+#InferenceINT8model(OpenVINOIR)
+!benchmark_app-mmodel/yolov7-tiny_int8.xml-d$device.value-apiasync
+
+
+..parsed-literal::
+
+[Step1/11]Parsingandvalidatinginputarguments
+[INFO]Parsinginputparameters
+[Step2/11]LoadingOpenVINORuntime
+[WARNING]Defaultduration120secondsisusedforunknowndeviceAUTO
+[INFO]OpenVINO:
+[INFO]Build.................................2024.4.0-16028-fe423b97163
+[INFO]
+[INFO]Deviceinfo:
+[INFO]AUTO
+[INFO]Build.................................2024.4.0-16028-fe423b97163
+[INFO]
+[INFO]
+[Step3/11]Settingdeviceconfiguration
+[WARNING]Performancehintwasnotexplicitlyspecifiedincommandline.Device(AUTO)performancehintwillbesettoPerformanceMode.THROUGHPUT.
+[Step4/11]Readingmodelfiles
+[INFO]Loadingmodelfiles
+[INFO]Readmodeltook19.00ms
+[INFO]OriginalmodelI/Oparameters:
+[INFO]Modelinputs:
+[INFO]images(node:images):f32/[...]/[1,3,640,640]
+[INFO]Modeloutputs:
+[INFO]output(node:output):f32/[...]/[1,25200,85]
+[Step5/11]Resizingmodeltomatchimagesizesandgivenbatch
+[INFO]Modelbatchsize:1
+[Step6/11]Configuringinputofthemodel
+[INFO]Modelinputs:
+[INFO]images(node:images):u8/[N,C,H,W]/[1,3,640,640]
+[INFO]Modeloutputs:
+[INFO]output(node:output):f32/[...]/[1,25200,85]
+[Step7/11]Loadingthemodeltothedevice
+[INFO]Compilemodeltook402.55ms
+[Step8/11]Queryingoptimalruntimeparameters
+[INFO]Model:
+[INFO]NETWORK_NAME:main_graph
+[INFO]EXECUTION_DEVICES:['CPU']
+[INFO]PERFORMANCE_HINT:PerformanceMode.THROUGHPUT
+[INFO]OPTIMAL_NUMBER_OF_INFER_REQUESTS:6
+[INFO]MULTI_DEVICE_PRIORITIES:CPU
+[INFO]CPU:
+[INFO]AFFINITY:Affinity.CORE
+[INFO]CPU_DENORMALS_OPTIMIZATION:False
+[INFO]CPU_SPARSE_WEIGHTS_DECOMPRESSION_RATE:1.0
+[INFO]DYNAMIC_QUANTIZATION_GROUP_SIZE:32
+[INFO]ENABLE_CPU_PINNING:True
+[INFO]ENABLE_HYPER_THREADING:True
+[INFO]EXECUTION_DEVICES:['CPU']
+[INFO]EXECUTION_MODE_HINT:ExecutionMode.PERFORMANCE
+[INFO]INFERENCE_NUM_THREADS:24
+[INFO]INFERENCE_PRECISION_HINT:<Type:'float32'>
+[INFO]KV_CACHE_PRECISION:<Type:'float16'>
+[INFO]LOG_LEVEL:Level.NO
+[INFO]MODEL_DISTRIBUTION_POLICY:set()
+[INFO]NETWORK_NAME:main_graph
+[INFO]NUM_STREAMS:6
+[INFO]OPTIMAL_NUMBER_OF_INFER_REQUESTS:6
+[INFO]PERFORMANCE_HINT:THROUGHPUT
+[INFO]PERFORMANCE_HINT_NUM_REQUESTS:0
+[INFO]PERF_COUNT:NO
+[INFO]SCHEDULING_CORE_TYPE:SchedulingCoreType.ANY_CORE
+[INFO]MODEL_PRIORITY:Priority.MEDIUM
+[INFO]LOADED_FROM_CACHE:False
+[INFO]PERF_COUNT:False
+[Step9/11]Creatinginferrequestsandpreparinginputtensors
+[WARNING]Noinputfilesweregivenforinput'images'!.Thisinputwillbefilledwithrandomvalues!
+[INFO]Fillinput'images'withrandomvalues
+[Step10/11]Measuringperformance(Startinferenceasynchronously,6inferencerequests,limits:120000msduration)
+[INFO]Benchmarkingininferenceonlymode(inputsfillingarenotincludedinmeasurementloop).
+[INFO]Firstinferencetook23.71ms
+[Step11/11]Dumpingstatisticsreport
+[INFO]ExecutionDevices:['CPU']
+[INFO]Count:34356iterations
+[INFO]Duration:120021.29ms
+[INFO]Latency:
+[INFO]Median:20.77ms
+[INFO]Average:20.84ms
+[INFO]Min:14.81ms
+[INFO]Max:41.35ms
+[INFO]Throughput:286.25FPS
 

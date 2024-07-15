@@ -1,930 +1,930 @@
-Language-Visual Saliency with CLIP and OpenVINO™
+Language-VisualSaliencywithCLIPandOpenVINO™
 ================================================
 
-The notebook will cover the following topics:
+Thenotebookwillcoverthefollowingtopics:
 
--  Explanation of a *saliency map* and how it can be used.
--  Overview of the CLIP neural network and its usage in generating
-   saliency maps.
--  How to split a neural network into parts for separate inference.
--  How to speed up inference with OpenVINO™ and asynchronous execution.
+-Explanationofa*saliencymap*andhowitcanbeused.
+-OverviewoftheCLIPneuralnetworkanditsusageingenerating
+saliencymaps.
+-Howtosplitaneuralnetworkintopartsforseparateinference.
+-HowtospeedupinferencewithOpenVINO™andasynchronousexecution.
 
-Saliency Map
+SaliencyMap
 ------------
 
-A saliency map is a visualization technique that highlights regions of
-interest in an image. For example, it can be used to `explain image
+Asaliencymapisavisualizationtechniquethathighlightsregionsof
+interestinanimage.Forexample,itcanbeusedto`explainimage
 classification
-predictions <https://academic.oup.com/mnras/article/511/4/5032/6529251#389668570>`__
-for a particular label. Here is an example of a saliency map that you
-will get in this notebook:
+predictions<https://academic.oup.com/mnras/article/511/4/5032/6529251#389668570>`__
+foraparticularlabel.Hereisanexampleofasaliencymapthatyou
+willgetinthisnotebook:
 
 |image0|
 
 CLIP
 ----
 
-What Is CLIP?
+WhatIsCLIP?
 ~~~~~~~~~~~~~
 
-CLIP (Contrastive Language–Image Pre-training) is a neural network that
-can work with both images and texts. It has been trained to predict
-which randomly sampled text snippets are close to a given image, meaning
-that a text better describes the image. Here is a visualization of the
-pre-training process:
+CLIP(ContrastiveLanguage–ImagePre-training)isaneuralnetworkthat
+canworkwithbothimagesandtexts.Ithasbeentrainedtopredict
+whichrandomlysampledtextsnippetsareclosetoagivenimage,meaning
+thatatextbetterdescribestheimage.Hereisavisualizationofthe
+pre-trainingprocess:
 
-|image1| `image_source <https://openai.com/blog/clip/>`__
+|image1|`image_source<https://openai.com/blog/clip/>`__
 
-To solve the task, CLIP uses two parts: ``Image Encoder`` and
-``Text Encoder``. Both parts are used to produce embeddings, which are
-vectors of floating-point numbers, for images and texts, respectively.
-Given two vectors, one can define and measure the similarity between
-them. A popular method to do so is the ``cosine_similarity``, which is
-defined as the dot product of the two vectors divided by the product of
-their norms:
+Tosolvethetask,CLIPusestwoparts:``ImageEncoder``and
+``TextEncoder``.Bothpartsareusedtoproduceembeddings,whichare
+vectorsoffloating-pointnumbers,forimagesandtexts,respectively.
+Giventwovectors,onecandefineandmeasurethesimilaritybetween
+them.Apopularmethodtodosoisthe``cosine_similarity``,whichis
+definedasthedotproductofthetwovectorsdividedbytheproductof
+theirnorms:
 
-.. figure:: https://user-images.githubusercontent.com/29454499/218972165-f61a82f2-9711-4ce6-84b5-58fdd1d80d10.png
-   :alt: cs
+..figure::https://user-images.githubusercontent.com/29454499/218972165-f61a82f2-9711-4ce6-84b5-58fdd1d80d10.png
+:alt:cs
 
-   cs
+cs
 
-The result can range from :math:`-1` to :math:`1`. A value :math:`1`
-means that the vectors are similar, :math:`0` means that the vectors are
-not “connected” at all, and :math:`-1` is for vectors with somehow
-opposite “meaning”. To train CLIP, OpenAI uses samples of texts and
-images and organizes them so that the first text corresponds to the
-first image in the batch, the second text to the second image, and so
-on. Then, cosine similarities are measured between all texts and all
-images, and the results are put in a matrix. If the matrix has numbers
-close to :math:`1` on a diagonal and close to :math:`0` elsewhere, it
-indicates that the network is appropriately trained.
+Theresultcanrangefrom:math:`-1`to:math:`1`.Avalue:math:`1`
+meansthatthevectorsaresimilar,:math:`0`meansthatthevectorsare
+not“connected”atall,and:math:`-1`isforvectorswithsomehow
+opposite“meaning”.TotrainCLIP,OpenAIusessamplesoftextsand
+imagesandorganizesthemsothatthefirsttextcorrespondstothe
+firstimageinthebatch,thesecondtexttothesecondimage,andso
+on.Then,cosinesimilaritiesaremeasuredbetweenalltextsandall
+images,andtheresultsareputinamatrix.Ifthematrixhasnumbers
+closeto:math:`1`onadiagonalandcloseto:math:`0`elsewhere,it
+indicatesthatthenetworkisappropriatelytrained.
 
-How to Build a Saliency Map with CLIP?
+HowtoBuildaSaliencyMapwithCLIP?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Providing an image and a text to CLIP returns two vectors. The cosine
-similarity between these vectors is calculated, resulting in a number
-between :math:`-1` and :math:`1` that indicates whether the text
-describes the image or not. The idea is that *some regions of the image
-are closer to the text query* than others, and this difference can be
-used to build the saliency map. Here is how it can be done:
+ProvidinganimageandatexttoCLIPreturnstwovectors.Thecosine
+similaritybetweenthesevectorsiscalculated,resultinginanumber
+between:math:`-1`and:math:`1`thatindicateswhetherthetext
+describestheimageornot.Theideaisthat*someregionsoftheimage
+areclosertothetextquery*thanothers,andthisdifferencecanbe
+usedtobuildthesaliencymap.Hereishowitcanbedone:
 
-1. Compute ``query`` and ``image`` similarity. This will represent the
-   *neutral value* :math:`s_0` on the ``saliency map``.
-2. Get a random ``crop`` of the image.
-3. Compute ``crop`` and ``query`` similarity.
-4. Subtract the :math:`s_0` from it. If the value is positive, the
-   ``crop`` is closer to the ``query``, and it should be a red region on
-   the saliency map. If negative, it should be blue.
-5. Update the corresponding region on the ``saliency map``.
-6. Repeat steps 2-5 multiple times (``n_iters``).
+1.Compute``query``and``image``similarity.Thiswillrepresentthe
+*neutralvalue*:math:`s_0`onthe``saliencymap``.
+2.Getarandom``crop``oftheimage.
+3.Compute``crop``and``query``similarity.
+4.Subtractthe:math:`s_0`fromit.Ifthevalueispositive,the
+``crop``isclosertothe``query``,anditshouldbearedregionon
+thesaliencymap.Ifnegative,itshouldbeblue.
+5.Updatethecorrespondingregiononthe``saliencymap``.
+6.Repeatsteps2-5multipletimes(``n_iters``).
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Initial Implementation with Transformers and
-   Pytorch <#Initial-Implementation-with-Transformers-and-Pytorch>`__
--  `Separate Text and Visual
-   Processing <#Separate-Text-and-Visual-Processing>`__
--  `Convert to OpenVINO™ Intermediate Representation (IR)
-   Format <#Convert-to-OpenVINO™-Intermediate-Representation-(IR)-Format>`__
--  `Inference with OpenVINO™ <#Inference-with-OpenVINO™>`__
+-`InitialImplementationwithTransformersand
+Pytorch<#initial-implementation-with-transformers-and-pytorch>`__
+-`SeparateTextandVisual
+Processing<#separate-text-and-visual-processing>`__
+-`ConverttoOpenVINO™IntermediateRepresentation(IR)
+Format<#convert-to-openvino-intermediate-representation-ir-format>`__
+-`InferencewithOpenVINO™<#inference-with-openvino>`__
 
-   -  `Select inference device <#Select-inference-device>`__
+-`Selectinferencedevice<#select-inference-device>`__
 
--  `Accelerate Inference with
-   ``AsyncInferQueue`` <#Accelerate-Inference-with-AsyncInferQueue>`__
--  `Pack the Pipeline into a
-   Function <#Pack-the-Pipeline-into-a-Function>`__
--  `Interactive demo with Gradio <#Interactive-demo-with-Gradio>`__
--  `What To Do Next <#What-To-Do-Next>`__
+-`AccelerateInferencewith
+AsyncInferQueue<#accelerate-inference-with-asyncinferqueue>`__
+-`PackthePipelineintoa
+Function<#pack-the-pipeline-into-a-function>`__
+-`InteractivedemowithGradio<#interactive-demo-with-gradio>`__
+-`WhatToDoNext<#what-to-do-next>`__
 
-.. |image0| image:: https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG
-.. |image1| image:: https://openaiassets.blob.core.windows.net/$web/clip/draft/20210104b/overview-a.svg
+..|image0|image::https://user-images.githubusercontent.com/29454499/218967961-9858efd5-fff2-4eb0-bde9-60852f4b31cb.JPG
+..|image1|image::https://openaiassets.blob.core.windows.net/$web/clip/draft/20210104b/overview-a.svg
 
-Initial Implementation with Transformers and Pytorch
+InitialImplementationwithTransformersandPytorch
 ----------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    # Install requirements
-    %pip install -q "openvino>=2023.1.0"
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu transformers "torch>=2.1" "gradio>=4.19"
+#Installrequirements
+%pipinstall-q"openvino>=2023.1.0"
+%pipinstall-q--extra-index-urlhttps://download.pytorch.org/whl/cputransformers"torch>=2.1""gradio>=4.19"
 
-.. code:: ipython3
+..code::ipython3
 
-    from pathlib import Path
-    from typing import Tuple, Union, Optional
-    import requests
-    
-    from matplotlib import colors
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import torch
-    import tqdm
-    from PIL import Image
-    from transformers import CLIPModel, CLIPProcessor
+frompathlibimportPath
+fromtypingimportTuple,Union,Optional
+importrequests
 
-
-.. parsed-literal::
-
-    2023-09-12 14:10:49.435909: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2023-09-12 14:10:49.470573: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2023-09-12 14:10:50.130215: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+frommatplotlibimportcolors
+importmatplotlib.pyplotasplt
+importnumpyasnp
+importtorch
+importtqdm
+fromPILimportImage
+fromtransformersimportCLIPModel,CLIPProcessor
 
 
-To get the CLIP model, you will use the ``transformers`` library and the
-official ``openai/clip-vit-base-patch16`` from OpenAI. You can use any
-CLIP model from the HuggingFace Hub by simply replacing a model
-checkpoint in the cell below.
+..parsed-literal::
 
-There are several preprocessing steps required to get text and image
-data to the model. Images have to be resized, cropped, and normalized,
-and text must be split into tokens and swapped by token IDs. To do that,
-you will use ``CLIPProcessor``, which encapsulates all the preprocessing
+2023-09-1214:10:49.435909:Itensorflow/core/util/port.cc:110]oneDNNcustomoperationsareon.Youmayseeslightlydifferentnumericalresultsduetofloating-pointround-offerrorsfromdifferentcomputationorders.Toturnthemoff,settheenvironmentvariable`TF_ENABLE_ONEDNN_OPTS=0`.
+2023-09-1214:10:49.470573:Itensorflow/core/platform/cpu_feature_guard.cc:182]ThisTensorFlowbinaryisoptimizedtouseavailableCPUinstructionsinperformance-criticaloperations.
+Toenablethefollowinginstructions:AVX2AVX512FAVX512_VNNIFMA,inotheroperations,rebuildTensorFlowwiththeappropriatecompilerflags.
+2023-09-1214:10:50.130215:Wtensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38]TF-TRTWarning:CouldnotfindTensorRT
+
+
+TogettheCLIPmodel,youwillusethe``transformers``libraryandthe
+official``openai/clip-vit-base-patch16``fromOpenAI.Youcanuseany
+CLIPmodelfromtheHuggingFaceHubbysimplyreplacingamodel
+checkpointinthecellbelow.
+
+Thereareseveralpreprocessingstepsrequiredtogettextandimage
+datatothemodel.Imageshavetoberesized,cropped,andnormalized,
+andtextmustbesplitintotokensandswappedbytokenIDs.Todothat,
+youwilluse``CLIPProcessor``,whichencapsulatesallthepreprocessing
 steps.
 
-.. code:: ipython3
+..code::ipython3
 
-    model_checkpoint = "openai/clip-vit-base-patch16"
-    
-    model = CLIPModel.from_pretrained(model_checkpoint).eval()
-    processor = CLIPProcessor.from_pretrained(model_checkpoint)
+model_checkpoint="openai/clip-vit-base-patch16"
 
-Let us write helper functions first. You will generate crop coordinates
-and size with ``get_random_crop_params``, and get the actual crop with
-``get_crop_image``. To update the saliency map with the calculated
-similarity, you will use ``update_saliency_map``. A
-``cosine_similarity`` function is just a code representation of the
-formula above.
+model=CLIPModel.from_pretrained(model_checkpoint).eval()
+processor=CLIPProcessor.from_pretrained(model_checkpoint)
 
-.. code:: ipython3
+Letuswritehelperfunctionsfirst.Youwillgeneratecropcoordinates
+andsizewith``get_random_crop_params``,andgettheactualcropwith
+``get_crop_image``.Toupdatethesaliencymapwiththecalculated
+similarity,youwilluse``update_saliency_map``.A
+``cosine_similarity``functionisjustacoderepresentationofthe
+formulaabove.
 
-    def get_random_crop_params(image_height: int, image_width: int, min_crop_size: int) -> Tuple[int, int, int, int]:
-        crop_size = np.random.randint(min_crop_size, min(image_height, image_width))
-        x = np.random.randint(image_width - crop_size + 1)
-        y = np.random.randint(image_height - crop_size + 1)
-        return x, y, crop_size
-    
-    
-    def get_cropped_image(im_tensor: np.array, x: int, y: int, crop_size: int) -> np.array:
-        return im_tensor[y : y + crop_size, x : x + crop_size, ...]
-    
-    
-    def update_saliency_map(saliency_map: np.array, similarity: float, x: int, y: int, crop_size: int) -> None:
-        saliency_map[
-            y : y + crop_size,
-            x : x + crop_size,
-        ] += similarity
-    
-    
-    def cosine_similarity(one: Union[np.ndarray, torch.Tensor], other: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
-        return one @ other.T / (np.linalg.norm(one) * np.linalg.norm(other))
+..code::ipython3
 
-Parameters to be defined:
+defget_random_crop_params(image_height:int,image_width:int,min_crop_size:int)->Tuple[int,int,int,int]:
+crop_size=np.random.randint(min_crop_size,min(image_height,image_width))
+x=np.random.randint(image_width-crop_size+1)
+y=np.random.randint(image_height-crop_size+1)
+returnx,y,crop_size
 
--  ``n_iters`` - number of times the procedure will be repeated. Larger
-   is better, but will require more time to inference
--  ``min_crop_size`` - minimum size of the crop window. A smaller size
-   will increase the resolution of the saliency map but may require more
-   iterations
--  ``query`` - text that will be used to query the image
--  ``image`` - the actual image that will be queried. You will download
-   the image from a link
 
-The image at the beginning was acquired with ``n_iters=2000`` and
-``min_crop_size=50``. You will start with the lower number of inferences
-to get the result faster. It is recommended to experiment with the
-parameters at the end, when you get an optimized model.
+defget_cropped_image(im_tensor:np.array,x:int,y:int,crop_size:int)->np.array:
+returnim_tensor[y:y+crop_size,x:x+crop_size,...]
 
-.. code:: ipython3
 
-    n_iters = 300
-    min_crop_size = 50
-    
-    query = "Who developed the Theory of General Relativity?"
-    image_path = Path("example.jpg")
-    
-    r = requests.get("https://www.storypick.com/wp-content/uploads/2016/01/AE-2.jpg")
-    
-    with image_path.open("wb") as f:
-        f.write(r.content)
-    image = Image.open(image_path)
-    im_tensor = np.array(image)
-    
-    x_dim, y_dim = image.size
+defupdate_saliency_map(saliency_map:np.array,similarity:float,x:int,y:int,crop_size:int)->None:
+saliency_map[
+y:y+crop_size,
+x:x+crop_size,
+]+=similarity
 
-Given the ``model`` and ``processor``, the actual inference is simple:
-transform the text and image into combined ``inputs`` and pass it to the
+
+defcosine_similarity(one:Union[np.ndarray,torch.Tensor],other:Union[np.ndarray,torch.Tensor])->Union[np.ndarray,torch.Tensor]:
+returnone@other.T/(np.linalg.norm(one)*np.linalg.norm(other))
+
+Parameterstobedefined:
+
+-``n_iters``-numberoftimestheprocedurewillberepeated.Larger
+isbetter,butwillrequiremoretimetoinference
+-``min_crop_size``-minimumsizeofthecropwindow.Asmallersize
+willincreasetheresolutionofthesaliencymapbutmayrequiremore
+iterations
+-``query``-textthatwillbeusedtoquerytheimage
+-``image``-theactualimagethatwillbequeried.Youwilldownload
+theimagefromalink
+
+Theimageatthebeginningwasacquiredwith``n_iters=2000``and
+``min_crop_size=50``.Youwillstartwiththelowernumberofinferences
+togettheresultfaster.Itisrecommendedtoexperimentwiththe
+parametersattheend,whenyougetanoptimizedmodel.
+
+..code::ipython3
+
+n_iters=300
+min_crop_size=50
+
+query="WhodevelopedtheTheoryofGeneralRelativity?"
+image_path=Path("example.jpg")
+
+r=requests.get("https://www.storypick.com/wp-content/uploads/2016/01/AE-2.jpg")
+
+withimage_path.open("wb")asf:
+f.write(r.content)
+image=Image.open(image_path)
+im_tensor=np.array(image)
+
+x_dim,y_dim=image.size
+
+Giventhe``model``and``processor``,theactualinferenceissimple:
+transformthetextandimageintocombined``inputs``andpassittothe
 model:
 
-.. code:: ipython3
+..code::ipython3
 
-    inputs = processor(text=[query], images=[im_tensor], return_tensors="pt")
-    with torch.no_grad():
-        results = model(**inputs)
-    results.keys()
-
-
-
-
-.. parsed-literal::
-
-    odict_keys(['logits_per_image', 'logits_per_text', 'text_embeds', 'image_embeds', 'text_model_output', 'vision_model_output'])
+inputs=processor(text=[query],images=[im_tensor],return_tensors="pt")
+withtorch.no_grad():
+results=model(**inputs)
+results.keys()
 
 
 
-The model produces several outputs, but for your application, you are
-interested in ``text_embeds`` and ``image_embeds``, which are the
-vectors for text and image, respectively. Now, you can calculate
-``initial_similarity`` between the ``query`` and the ``image``. You also
-initialize a saliency map. Numbers in the comments correspond to the
-items in the “How To Build a Saliency Map With CLIP?” list above.
 
-.. code:: ipython3
+..parsed-literal::
 
-    initial_similarity = cosine_similarity(results.text_embeds, results.image_embeds).item()  # 1. Computing query and image similarity
-    saliency_map = np.zeros((y_dim, x_dim))
-    
-    for _ in tqdm.notebook.tqdm(range(n_iters)):  # 6. Setting number of the procedure iterations
-        x, y, crop_size = get_random_crop_params(y_dim, x_dim, min_crop_size)
-        im_crop = get_cropped_image(im_tensor, x, y, crop_size)  # 2. Getting a random crop of the image
-    
-        inputs = processor(text=[query], images=[im_crop], return_tensors="pt")
-        with torch.no_grad():
-            results = model(**inputs)  # 3. Computing crop and query similarity
-    
-        similarity = (
-            cosine_similarity(results.text_embeds, results.image_embeds).item() - initial_similarity
-        )  # 4. Subtracting query and image similarity from crop and query similarity
-        update_saliency_map(saliency_map, similarity, x, y, crop_size)  # 5. Updating the region on the saliency map
+odict_keys(['logits_per_image','logits_per_text','text_embeds','image_embeds','text_model_output','vision_model_output'])
 
 
 
-.. parsed-literal::
+Themodelproducesseveraloutputs,butforyourapplication,youare
+interestedin``text_embeds``and``image_embeds``,whicharethe
+vectorsfortextandimage,respectively.Now,youcancalculate
+``initial_similarity``betweenthe``query``andthe``image``.Youalso
+initializeasaliencymap.Numbersinthecommentscorrespondtothe
+itemsinthe“HowToBuildaSaliencyMapWithCLIP?”listabove.
 
-      0%|          | 0/300 [00:00<?, ?it/s]
+..code::ipython3
 
+initial_similarity=cosine_similarity(results.text_embeds,results.image_embeds).item()#1.Computingqueryandimagesimilarity
+saliency_map=np.zeros((y_dim,x_dim))
 
-To visualize the resulting saliency map, you can use ``matplotlib``:
+for_intqdm.notebook.tqdm(range(n_iters)):#6.Settingnumberoftheprocedureiterations
+x,y,crop_size=get_random_crop_params(y_dim,x_dim,min_crop_size)
+im_crop=get_cropped_image(im_tensor,x,y,crop_size)#2.Gettingarandomcropoftheimage
 
-.. code:: ipython3
+inputs=processor(text=[query],images=[im_crop],return_tensors="pt")
+withtorch.no_grad():
+results=model(**inputs)#3.Computingcropandquerysimilarity
 
-    plt.figure(dpi=150)
-    plt.imshow(saliency_map, norm=colors.TwoSlopeNorm(vcenter=0), cmap="jet")
-    plt.colorbar(location="bottom")
-    plt.title(f'Query: "{query}"')
-    plt.axis("off")
-    plt.show()
-
-
-
-.. image:: clip-language-saliency-map-with-output_files/clip-language-saliency-map-with-output_15_0.png
-
-
-The result map is not as smooth as in the example picture because of the
-lower number of iterations. However, the same red and blue areas are
-clearly visible.
-
-Let us overlay the saliency map on the image:
-
-.. code:: ipython3
-
-    def plot_saliency_map(image_tensor: np.ndarray, saliency_map: np.ndarray, query: Optional[str]) -> None:
-        fig = plt.figure(dpi=150)
-        plt.imshow(image_tensor)
-        plt.imshow(
-            saliency_map,
-            norm=colors.TwoSlopeNorm(vcenter=0),
-            cmap="jet",
-            alpha=0.5,  # make saliency map trasparent to see original picture
-        )
-        if query:
-            plt.title(f'Query: "{query}"')
-        plt.axis("off")
-        return fig
-    
-    
-    plot_saliency_map(im_tensor, saliency_map, query);
+similarity=(
+cosine_similarity(results.text_embeds,results.image_embeds).item()-initial_similarity
+)#4.Subtractingqueryandimagesimilarityfromcropandquerysimilarity
+update_saliency_map(saliency_map,similarity,x,y,crop_size)#5.Updatingtheregiononthesaliencymap
 
 
 
-.. image:: clip-language-saliency-map-with-output_files/clip-language-saliency-map-with-output_17_0.png
+..parsed-literal::
+
+0%||0/300[00:00<?,?it/s]
 
 
-Separate Text and Visual Processing
+Tovisualizetheresultingsaliencymap,youcanuse``matplotlib``:
+
+..code::ipython3
+
+plt.figure(dpi=150)
+plt.imshow(saliency_map,norm=colors.TwoSlopeNorm(vcenter=0),cmap="jet")
+plt.colorbar(location="bottom")
+plt.title(f'Query:"{query}"')
+plt.axis("off")
+plt.show()
+
+
+
+..image::clip-language-saliency-map-with-output_files/clip-language-saliency-map-with-output_15_0.png
+
+
+Theresultmapisnotassmoothasintheexamplepicturebecauseofthe
+lowernumberofiterations.However,thesameredandblueareasare
+clearlyvisible.
+
+Letusoverlaythesaliencymapontheimage:
+
+..code::ipython3
+
+defplot_saliency_map(image_tensor:np.ndarray,saliency_map:np.ndarray,query:Optional[str])->None:
+fig=plt.figure(dpi=150)
+plt.imshow(image_tensor)
+plt.imshow(
+saliency_map,
+norm=colors.TwoSlopeNorm(vcenter=0),
+cmap="jet",
+alpha=0.5,#makesaliencymaptrasparenttoseeoriginalpicture
+)
+ifquery:
+plt.title(f'Query:"{query}"')
+plt.axis("off")
+returnfig
+
+
+plot_saliency_map(im_tensor,saliency_map,query);
+
+
+
+..image::clip-language-saliency-map-with-output_files/clip-language-saliency-map-with-output_17_0.png
+
+
+SeparateTextandVisualProcessing
 -----------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The code above is functional, but there are some repeated computations
-that can be avoided. The text embedding can be computed once because it
-does not depend on the input image. This separation will also be useful
-in the future. The initial preparation will remain the same since you
-still need to compute the similarity between the text and the full
-image. After that, the ``get_image_features`` method could be used to
-obtain embeddings for the cropped images.
+Thecodeaboveisfunctional,buttherearesomerepeatedcomputations
+thatcanbeavoided.Thetextembeddingcanbecomputedoncebecauseit
+doesnotdependontheinputimage.Thisseparationwillalsobeuseful
+inthefuture.Theinitialpreparationwillremainthesamesinceyou
+stillneedtocomputethesimilaritybetweenthetextandthefull
+image.Afterthat,the``get_image_features``methodcouldbeusedto
+obtainembeddingsforthecroppedimages.
 
-.. code:: ipython3
+..code::ipython3
 
-    inputs = processor(text=[query], images=[im_tensor], return_tensors="pt")
-    with torch.no_grad():
-        results = model(**inputs)
-    text_embeds = results.text_embeds  # save text embeddings to use them later
-    
-    initial_similarity = cosine_similarity(text_embeds, results.image_embeds).item()
-    saliency_map = np.zeros((y_dim, x_dim))
-    
-    for _ in tqdm.notebook.tqdm(range(n_iters)):
-        x, y, crop_size = get_random_crop_params(y_dim, x_dim, min_crop_size)
-        im_crop = get_cropped_image(im_tensor, x, y, crop_size)
-    
-        image_inputs = processor(images=[im_crop], return_tensors="pt")  # crop preprocessing
-        with torch.no_grad():
-            image_embeds = model.get_image_features(**image_inputs)  # calculate image embeddings only
-    
-        similarity = cosine_similarity(text_embeds, image_embeds).item() - initial_similarity
-        update_saliency_map(saliency_map, similarity, x, y, crop_size)
-    
-    plot_saliency_map(im_tensor, saliency_map, query);
+inputs=processor(text=[query],images=[im_tensor],return_tensors="pt")
+withtorch.no_grad():
+results=model(**inputs)
+text_embeds=results.text_embeds#savetextembeddingstousethemlater
 
+initial_similarity=cosine_similarity(text_embeds,results.image_embeds).item()
+saliency_map=np.zeros((y_dim,x_dim))
 
+for_intqdm.notebook.tqdm(range(n_iters)):
+x,y,crop_size=get_random_crop_params(y_dim,x_dim,min_crop_size)
+im_crop=get_cropped_image(im_tensor,x,y,crop_size)
 
-.. parsed-literal::
+image_inputs=processor(images=[im_crop],return_tensors="pt")#croppreprocessing
+withtorch.no_grad():
+image_embeds=model.get_image_features(**image_inputs)#calculateimageembeddingsonly
 
-      0%|          | 0/300 [00:00<?, ?it/s]
+similarity=cosine_similarity(text_embeds,image_embeds).item()-initial_similarity
+update_saliency_map(saliency_map,similarity,x,y,crop_size)
+
+plot_saliency_map(im_tensor,saliency_map,query);
 
 
 
-.. image:: clip-language-saliency-map-with-output_files/clip-language-saliency-map-with-output_19_1.png
+..parsed-literal::
+
+0%||0/300[00:00<?,?it/s]
 
 
-The result might be slightly different because you use random crops to
-build a saliency map.
 
-Convert to OpenVINO™ Intermediate Representation (IR) Format
+..image::clip-language-saliency-map-with-output_files/clip-language-saliency-map-with-output_19_1.png
+
+
+Theresultmightbeslightlydifferentbecauseyouuserandomcropsto
+buildasaliencymap.
+
+ConverttoOpenVINO™IntermediateRepresentation(IR)Format
 ------------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The process of building a saliency map can be quite time-consuming. To
-speed it up, you will use OpenVINO. OpenVINO is an inference framework
-designed to run pre-trained neural networks efficiently. One way to use
-it is to convert a model from its original framework representation to
-an OpenVINO Intermediate Representation (IR) format and then load it for
-inference. The model currently uses PyTorch. To get an IR, you need to
-use Model Conversion API. ``ov.convert_model`` function accepts PyTorch
-model object and example input and converts it to OpenVINO Model
-instance, that ready to load on device using ``ov.compile_model`` or can
-be saved on disk using ``ov.save_model``. To separate model on text and
-image parts, we overload forward method with ``get_text_features`` and
-``get_image_features`` methods respectively. Internally, PyTorch
-conversion to OpenVINO involves TorchScript tracing. For achieving
-better conversion results, we need to guarantee that model can be
-successfully traced. ``model.config.torchscript = True`` parameters
-allows to prepare HuggingFace models for TorchScript tracing. More
-details about that can be found in HuggingFace Transformers
-`documentation <https://huggingface.co/docs/transformers/torchscript>`__
+Theprocessofbuildingasaliencymapcanbequitetime-consuming.To
+speeditup,youwilluseOpenVINO.OpenVINOisaninferenceframework
+designedtorunpre-trainedneuralnetworksefficiently.Onewaytouse
+itistoconvertamodelfromitsoriginalframeworkrepresentationto
+anOpenVINOIntermediateRepresentation(IR)formatandthenloaditfor
+inference.ThemodelcurrentlyusesPyTorch.TogetanIR,youneedto
+useModelConversionAPI.``ov.convert_model``functionacceptsPyTorch
+modelobjectandexampleinputandconvertsittoOpenVINOModel
+instance,thatreadytoloadondeviceusing``ov.compile_model``orcan
+besavedondiskusing``ov.save_model``.Toseparatemodelontextand
+imageparts,weoverloadforwardmethodwith``get_text_features``and
+``get_image_features``methodsrespectively.Internally,PyTorch
+conversiontoOpenVINOinvolvesTorchScripttracing.Forachieving
+betterconversionresults,weneedtoguaranteethatmodelcanbe
+successfullytraced.``model.config.torchscript=True``parameters
+allowstoprepareHuggingFacemodelsforTorchScripttracing.More
+detailsaboutthatcanbefoundinHuggingFaceTransformers
+`documentation<https://huggingface.co/docs/transformers/torchscript>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    import openvino as ov
-    
-    model_name = model_checkpoint.split("/")[-1]
-    
-    model.config.torchscript = True
-    model.forward = model.get_text_features
-    text_ov_model = ov.convert_model(
-        model,
-        example_input={
-            "input_ids": inputs.input_ids,
-            "attention_mask": inputs.attention_mask,
-        },
-    )
-    
-    # get image size after preprocessing from the processor
-    crops_info = processor.image_processor.crop_size.values() if hasattr(processor, "image_processor") else processor.feature_extractor.crop_size.values()
-    model.forward = model.get_image_features
-    image_ov_model = ov.convert_model(
-        model,
-        example_input={"pixel_values": inputs.pixel_values},
-        input=[1, 3, *crops_info],
-    )
-    
-    ov_dir = Path("ir")
-    ov_dir.mkdir(exist_ok=True)
-    text_model_path = ov_dir / f"{model_name}_text.xml"
-    image_model_path = ov_dir / f"{model_name}_image.xml"
-    
-    # write resulting models on disk
-    ov.save_model(text_ov_model, text_model_path)
-    ov.save_model(image_ov_model, image_model_path)
+importopenvinoasov
 
+model_name=model_checkpoint.split("/")[-1]
 
-.. parsed-literal::
+model.config.torchscript=True
+model.forward=model.get_text_features
+text_ov_model=ov.convert_model(
+model,
+example_input={
+"input_ids":inputs.input_ids,
+"attention_mask":inputs.attention_mask,
+},
+)
 
-    WARNING:tensorflow:Please fix your imports. Module tensorflow.python.training.tracking.base has been moved to tensorflow.python.trackable.base. The old module will be deleted in version 2.11.
+#getimagesizeafterpreprocessingfromtheprocessor
+crops_info=processor.image_processor.crop_size.values()ifhasattr(processor,"image_processor")elseprocessor.feature_extractor.crop_size.values()
+model.forward=model.get_image_features
+image_ov_model=ov.convert_model(
+model,
+example_input={"pixel_values":inputs.pixel_values},
+input=[1,3,*crops_info],
+)
+
+ov_dir=Path("ir")
+ov_dir.mkdir(exist_ok=True)
+text_model_path=ov_dir/f"{model_name}_text.xml"
+image_model_path=ov_dir/f"{model_name}_image.xml"
+
+#writeresultingmodelsondisk
+ov.save_model(text_ov_model,text_model_path)
+ov.save_model(image_ov_model,image_model_path)
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    [ WARNING ]  Please fix your imports. Module %s has been moved to %s. The old module will be deleted in version %s.
-
-
-.. parsed-literal::
-
-    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, tensorflow, onnx, openvino
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+WARNING:tensorflow:Pleasefixyourimports.Moduletensorflow.python.training.tracking.basehasbeenmovedtotensorflow.python.trackable.base.Theoldmodulewillbedeletedinversion2.11.
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/transformers/models/clip/modeling_clip.py:287: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if attn_weights.size() != (bsz * self.num_heads, tgt_len, src_len):
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/transformers/models/clip/modeling_clip.py:295: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if causal_attention_mask.size() != (bsz, 1, tgt_len, src_len):
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/transformers/models/clip/modeling_clip.py:304: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if attention_mask.size() != (bsz, 1, tgt_len, src_len):
-    /home/ea/work/ov_venv/lib/python3.8/site-packages/transformers/models/clip/modeling_clip.py:327: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if attn_output.size() != (bsz * self.num_heads, tgt_len, self.head_dim):
+[WARNING]Pleasefixyourimports.Module%shasbeenmovedto%s.Theoldmodulewillbedeletedinversion%s.
 
 
-Now, you have two separate models for text and images, stored on disk
-and ready to be loaded and inferred with OpenVINO™.
+..parsed-literal::
 
-Inference with OpenVINO™
+INFO:nncf:NNCFinitializedsuccessfully.Supportedframeworksdetected:torch,tensorflow,onnx,openvino
+huggingface/tokenizers:Thecurrentprocessjustgotforked,afterparallelismhasalreadybeenused.Disablingparallelismtoavoiddeadlocks...
+Todisablethiswarning,youcaneither:
+	-Avoidusing`tokenizers`beforetheforkifpossible
+	-ExplicitlysettheenvironmentvariableTOKENIZERS_PARALLELISM=(true|false)
+huggingface/tokenizers:Thecurrentprocessjustgotforked,afterparallelismhasalreadybeenused.Disablingparallelismtoavoiddeadlocks...
+Todisablethiswarning,youcaneither:
+	-Avoidusing`tokenizers`beforetheforkifpossible
+	-ExplicitlysettheenvironmentvariableTOKENIZERS_PARALLELISM=(true|false)
+huggingface/tokenizers:Thecurrentprocessjustgotforked,afterparallelismhasalreadybeenused.Disablingparallelismtoavoiddeadlocks...
+Todisablethiswarning,youcaneither:
+	-Avoidusing`tokenizers`beforetheforkifpossible
+	-ExplicitlysettheenvironmentvariableTOKENIZERS_PARALLELISM=(true|false)
+
+
+..parsed-literal::
+
+NoCUDAruntimeisfound,usingCUDA_HOME='/usr/local/cuda'
+/home/ea/work/ov_venv/lib/python3.8/site-packages/transformers/models/clip/modeling_clip.py:287:TracerWarning:ConvertingatensortoaPythonbooleanmightcausethetracetobeincorrect.Wecan'trecordthedataflowofPythonvalues,sothisvaluewillbetreatedasaconstantinthefuture.Thismeansthatthetracemightnotgeneralizetootherinputs!
+ifattn_weights.size()!=(bsz*self.num_heads,tgt_len,src_len):
+/home/ea/work/ov_venv/lib/python3.8/site-packages/transformers/models/clip/modeling_clip.py:295:TracerWarning:ConvertingatensortoaPythonbooleanmightcausethetracetobeincorrect.Wecan'trecordthedataflowofPythonvalues,sothisvaluewillbetreatedasaconstantinthefuture.Thismeansthatthetracemightnotgeneralizetootherinputs!
+ifcausal_attention_mask.size()!=(bsz,1,tgt_len,src_len):
+/home/ea/work/ov_venv/lib/python3.8/site-packages/transformers/models/clip/modeling_clip.py:304:TracerWarning:ConvertingatensortoaPythonbooleanmightcausethetracetobeincorrect.Wecan'trecordthedataflowofPythonvalues,sothisvaluewillbetreatedasaconstantinthefuture.Thismeansthatthetracemightnotgeneralizetootherinputs!
+ifattention_mask.size()!=(bsz,1,tgt_len,src_len):
+/home/ea/work/ov_venv/lib/python3.8/site-packages/transformers/models/clip/modeling_clip.py:327:TracerWarning:ConvertingatensortoaPythonbooleanmightcausethetracetobeincorrect.Wecan'trecordthedataflowofPythonvalues,sothisvaluewillbetreatedasaconstantinthefuture.Thismeansthatthetracemightnotgeneralizetootherinputs!
+ifattn_output.size()!=(bsz*self.num_heads,tgt_len,self.head_dim):
+
+
+Now,youhavetwoseparatemodelsfortextandimages,storedondisk
+andreadytobeloadedandinferredwithOpenVINO™.
+
+InferencewithOpenVINO™
 ------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-1. Create an instance of the ``Core`` object that will handle any
-   interaction with OpenVINO runtime for you.
-2. Use the ``core.read_model`` method to load the model into memory.
-3. Compile the model with the ``core.compile_model`` method for a
-   particular device to apply device-specific optimizations.
-4. Use the compiled model for inference.
+1.Createaninstanceofthe``Core``objectthatwillhandleany
+interactionwithOpenVINOruntimeforyou.
+2.Usethe``core.read_model``methodtoloadthemodelintomemory.
+3.Compilethemodelwiththe``core.compile_model``methodfora
+particulardevicetoapplydevice-specificoptimizations.
+4.Usethecompiledmodelforinference.
 
-.. code:: ipython3
+..code::ipython3
 
-    core = ov.Core()
-    
-    text_model = core.read_model(text_model_path)
-    image_model = core.read_model(image_model_path)
+core=ov.Core()
 
-Select inference device
+text_model=core.read_model(text_model_path)
+image_model=core.read_model(image_model_path)
+
+Selectinferencedevice
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-select device from dropdown list for running inference using OpenVINO
+selectdevicefromdropdownlistforrunninginferenceusingOpenVINO
 
-.. code:: ipython3
+..code::ipython3
 
-    import ipywidgets as widgets
-    
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="AUTO",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+importipywidgetsaswidgets
 
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="AUTO",
+description="Device:",
+disabled=False,
+)
 
-
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', index=2, options=('CPU', 'GPU', 'AUTO'), value='AUTO')
+device
 
 
 
-.. code:: ipython3
 
-    text_model = core.compile_model(model=text_model, device_name=device.value)
-    image_model = core.compile_model(model=image_model, device_name=device.value)
+..parsed-literal::
 
-OpenVINO supports ``numpy.ndarray`` as an input type, so you change the
-``return_tensors`` to ``np``. You also convert a transformers’
-``BatchEncoding`` object to a python dictionary with input names as keys
-and input tensors for values.
-
-Once you have a compiled model, the inference is similar to Pytorch - a
-compiled model is callable. Just pass input data to it. Inference
-results are stored in the dictionary. Once you have a compiled model,
-the inference process is mostly similar.
-
-.. code:: ipython3
-
-    text_inputs = dict(processor(text=[query], images=[im_tensor], return_tensors="np"))
-    image_inputs = text_inputs.pop("pixel_values")
-    
-    text_embeds = text_model(text_inputs)[0]
-    image_embeds = image_model(image_inputs)[0]
-    
-    initial_similarity = cosine_similarity(text_embeds, image_embeds)
-    saliency_map = np.zeros((y_dim, x_dim))
-    
-    for _ in tqdm.notebook.tqdm(range(n_iters)):
-        x, y, crop_size = get_random_crop_params(y_dim, x_dim, min_crop_size)
-        im_crop = get_cropped_image(im_tensor, x, y, crop_size)
-    
-        image_inputs = processor(images=[im_crop], return_tensors="np").pixel_values
-        image_embeds = image_model(image_inputs)[image_model.output()]
-    
-        similarity = cosine_similarity(text_embeds, image_embeds) - initial_similarity
-        update_saliency_map(saliency_map, similarity, x, y, crop_size)
-    
-    plot_saliency_map(im_tensor, saliency_map, query);
+Dropdown(description='Device:',index=2,options=('CPU','GPU','AUTO'),value='AUTO')
 
 
 
-.. parsed-literal::
+..code::ipython3
 
-      0%|          | 0/300 [00:00<?, ?it/s]
+text_model=core.compile_model(model=text_model,device_name=device.value)
+image_model=core.compile_model(model=image_model,device_name=device.value)
+
+OpenVINOsupports``numpy.ndarray``asaninputtype,soyouchangethe
+``return_tensors``to``np``.Youalsoconvertatransformers’
+``BatchEncoding``objecttoapythondictionarywithinputnamesaskeys
+andinputtensorsforvalues.
+
+Onceyouhaveacompiledmodel,theinferenceissimilartoPytorch-a
+compiledmodeliscallable.Justpassinputdatatoit.Inference
+resultsarestoredinthedictionary.Onceyouhaveacompiledmodel,
+theinferenceprocessismostlysimilar.
+
+..code::ipython3
+
+text_inputs=dict(processor(text=[query],images=[im_tensor],return_tensors="np"))
+image_inputs=text_inputs.pop("pixel_values")
+
+text_embeds=text_model(text_inputs)[0]
+image_embeds=image_model(image_inputs)[0]
+
+initial_similarity=cosine_similarity(text_embeds,image_embeds)
+saliency_map=np.zeros((y_dim,x_dim))
+
+for_intqdm.notebook.tqdm(range(n_iters)):
+x,y,crop_size=get_random_crop_params(y_dim,x_dim,min_crop_size)
+im_crop=get_cropped_image(im_tensor,x,y,crop_size)
+
+image_inputs=processor(images=[im_crop],return_tensors="np").pixel_values
+image_embeds=image_model(image_inputs)[image_model.output()]
+
+similarity=cosine_similarity(text_embeds,image_embeds)-initial_similarity
+update_saliency_map(saliency_map,similarity,x,y,crop_size)
+
+plot_saliency_map(im_tensor,saliency_map,query);
 
 
 
-.. image:: clip-language-saliency-map-with-output_files/clip-language-saliency-map-with-output_29_1.png
+..parsed-literal::
+
+0%||0/300[00:00<?,?it/s]
 
 
-Accelerate Inference with ``AsyncInferQueue``
+
+..image::clip-language-saliency-map-with-output_files/clip-language-saliency-map-with-output_29_1.png
+
+
+AccelerateInferencewith``AsyncInferQueue``
 ---------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Up until now, the pipeline was synchronous, which means that the data
-preparation, model input population, model inference, and output
-processing is sequential. That is a simple, but not the most effective
-way to organize an inference pipeline in your case. To utilize the
-available resources more efficiently, you will use ``AsyncInferQueue``.
-It can be instantiated with compiled model and a number of jobs -
-parallel execution threads. If you do not pass a number of jobs or pass
-``0``, then OpenVINO will pick the optimal number based on your device
-and heuristics. After acquiring the inference queue, you have two jobs
-to do:
+Upuntilnow,thepipelinewassynchronous,whichmeansthatthedata
+preparation,modelinputpopulation,modelinference,andoutput
+processingissequential.Thatisasimple,butnotthemosteffective
+waytoorganizeaninferencepipelineinyourcase.Toutilizethe
+availableresourcesmoreefficiently,youwilluse``AsyncInferQueue``.
+Itcanbeinstantiatedwithcompiledmodelandanumberofjobs-
+parallelexecutionthreads.Ifyoudonotpassanumberofjobsorpass
+``0``,thenOpenVINOwillpicktheoptimalnumberbasedonyourdevice
+andheuristics.Afteracquiringtheinferencequeue,youhavetwojobs
+todo:
 
--  Preprocess the data and push it to the inference queue. The
-   preprocessing steps will remain the same
--  Tell the inference queue what to do with the model output after the
-   inference is finished. It is represented by a python function called
-   ``callback`` that takes an inference result and data that you passed
-   to the inference queue along with the prepared input data
+-Preprocessthedataandpushittotheinferencequeue.The
+preprocessingstepswillremainthesame
+-Telltheinferencequeuewhattodowiththemodeloutputafterthe
+inferenceisfinished.Itisrepresentedbyapythonfunctioncalled
+``callback``thattakesaninferenceresultanddatathatyoupassed
+totheinferencequeuealongwiththepreparedinputdata
 
-Everything else will be handled by the ``AsyncInferQueue`` instance.
+Everythingelsewillbehandledbythe``AsyncInferQueue``instance.
 
-There is another low-hanging bit of optimization. You are expecting many
-inference requests for your image model at once and want the model to
-process them as fast as possible. In other words - maximize the
-**throughput**. To do that, you can recompile the model giving it the
-performance hint.
+Thereisanotherlow-hangingbitofoptimization.Youareexpectingmany
+inferencerequestsforyourimagemodelatonceandwantthemodelto
+processthemasfastaspossible.Inotherwords-maximizethe
+**throughput**.Todothat,youcanrecompilethemodelgivingitthe
+performancehint.
 
-.. code:: ipython3
+..code::ipython3
 
-    from typing import Dict, Any
-    
-    
-    image_model = core.read_model(image_model_path)
-    
-    image_model = core.compile_model(
-        model=image_model,
-        device_name=device.value,
-        config={"PERFORMANCE_HINT": "THROUGHPUT"},
-    )
-
-.. code:: ipython3
-
-    text_inputs = dict(processor(text=[query], images=[im_tensor], return_tensors="np"))
-    image_inputs = text_inputs.pop("pixel_values")
-    
-    text_embeds = text_model(text_inputs)[text_model.output()]
-    image_embeds = image_model(image_inputs)[image_model.output()]
-    
-    initial_similarity = cosine_similarity(text_embeds, image_embeds)
-    saliency_map = np.zeros((y_dim, x_dim))
-
-Your callback should do the same thing that you did after inference in
-the sync mode:
-
--  Pull the image embeddings from an inference request.
--  Compute cosine similarity between text and image embeddings.
--  Update saliency map based.
-
-If you do not change the progress bar, it will show the progress of
-pushing data to the inference queue. To track the actual progress, you
-should pass a progress bar object and call ``update`` method after
-``update_saliency_map`` call.
-
-.. code:: ipython3
-
-    def completion_callback(
-        infer_request: ov.InferRequest,  # inferente result
-        user_data: Dict[str, Any],  # data that you passed along with input pixel values
-    ) -> None:
-        pbar = user_data.pop("pbar")
-    
-        image_embeds = infer_request.get_output_tensor().data
-        similarity = cosine_similarity(user_data.pop("text_embeds"), image_embeds) - user_data.pop("initial_similarity")
-        update_saliency_map(**user_data, similarity=similarity)
-    
-        pbar.update(1)  # update the progress bar
-    
-    
-    infer_queue = ov.AsyncInferQueue(image_model)
-    infer_queue.set_callback(completion_callback)
-
-.. code:: ipython3
-
-    def infer(
-        im_tensor,
-        x_dim,
-        y_dim,
-        text_embeds,
-        image_embeds,
-        initial_similarity,
-        saliency_map,
-        query,
-        n_iters,
-        min_crop_size,
-        _tqdm=tqdm.notebook.tqdm,
-        include_query=True,
-    ):
-        with _tqdm(total=n_iters) as pbar:
-            for _ in range(n_iters):
-                x, y, crop_size = get_random_crop_params(y_dim, x_dim, min_crop_size)
-                im_crop = get_cropped_image(im_tensor, x, y, crop_size)
-    
-                image_inputs = processor(images=[im_crop], return_tensors="np")
-    
-                # push data to the queue
-                infer_queue.start_async(
-                    # pass inference data as usual
-                    image_inputs.pixel_values,
-                    # the data that will be passed to the callback after the inference complete
-                    {
-                        "text_embeds": text_embeds,
-                        "saliency_map": saliency_map,
-                        "initial_similarity": initial_similarity,
-                        "x": x,
-                        "y": y,
-                        "crop_size": crop_size,
-                        "pbar": pbar,
-                    },
-                )
-    
-            # after you pushed all data to the queue you wait until all callbacks finished
-            infer_queue.wait_all()
-    
-        return plot_saliency_map(im_tensor, saliency_map, query if include_query else None)
-    
-    
-    infer(
-        im_tensor,
-        x_dim,
-        y_dim,
-        text_embeds,
-        image_embeds,
-        initial_similarity,
-        saliency_map,
-        query,
-        n_iters,
-        min_crop_size,
-        _tqdm=tqdm.notebook.tqdm,
-        include_query=True,
-    );
+fromtypingimportDict,Any
 
 
+image_model=core.read_model(image_model_path)
 
-.. parsed-literal::
+image_model=core.compile_model(
+model=image_model,
+device_name=device.value,
+config={"PERFORMANCE_HINT":"THROUGHPUT"},
+)
 
-      0%|          | 0/300 [00:00<?, ?it/s]
+..code::ipython3
+
+text_inputs=dict(processor(text=[query],images=[im_tensor],return_tensors="np"))
+image_inputs=text_inputs.pop("pixel_values")
+
+text_embeds=text_model(text_inputs)[text_model.output()]
+image_embeds=image_model(image_inputs)[image_model.output()]
+
+initial_similarity=cosine_similarity(text_embeds,image_embeds)
+saliency_map=np.zeros((y_dim,x_dim))
+
+Yourcallbackshoulddothesamethingthatyoudidafterinferencein
+thesyncmode:
+
+-Pulltheimageembeddingsfromaninferencerequest.
+-Computecosinesimilaritybetweentextandimageembeddings.
+-Updatesaliencymapbased.
+
+Ifyoudonotchangetheprogressbar,itwillshowtheprogressof
+pushingdatatotheinferencequeue.Totracktheactualprogress,you
+shouldpassaprogressbarobjectandcall``update``methodafter
+``update_saliency_map``call.
+
+..code::ipython3
+
+defcompletion_callback(
+infer_request:ov.InferRequest,#inferenteresult
+user_data:Dict[str,Any],#datathatyoupassedalongwithinputpixelvalues
+)->None:
+pbar=user_data.pop("pbar")
+
+image_embeds=infer_request.get_output_tensor().data
+similarity=cosine_similarity(user_data.pop("text_embeds"),image_embeds)-user_data.pop("initial_similarity")
+update_saliency_map(**user_data,similarity=similarity)
+
+pbar.update(1)#updatetheprogressbar
+
+
+infer_queue=ov.AsyncInferQueue(image_model)
+infer_queue.set_callback(completion_callback)
+
+..code::ipython3
+
+definfer(
+im_tensor,
+x_dim,
+y_dim,
+text_embeds,
+image_embeds,
+initial_similarity,
+saliency_map,
+query,
+n_iters,
+min_crop_size,
+_tqdm=tqdm.notebook.tqdm,
+include_query=True,
+):
+with_tqdm(total=n_iters)aspbar:
+for_inrange(n_iters):
+x,y,crop_size=get_random_crop_params(y_dim,x_dim,min_crop_size)
+im_crop=get_cropped_image(im_tensor,x,y,crop_size)
+
+image_inputs=processor(images=[im_crop],return_tensors="np")
+
+#pushdatatothequeue
+infer_queue.start_async(
+#passinferencedataasusual
+image_inputs.pixel_values,
+#thedatathatwillbepassedtothecallbackaftertheinferencecomplete
+{
+"text_embeds":text_embeds,
+"saliency_map":saliency_map,
+"initial_similarity":initial_similarity,
+"x":x,
+"y":y,
+"crop_size":crop_size,
+"pbar":pbar,
+},
+)
+
+#afteryoupushedalldatatothequeueyouwaituntilallcallbacksfinished
+infer_queue.wait_all()
+
+returnplot_saliency_map(im_tensor,saliency_map,queryifinclude_queryelseNone)
+
+
+infer(
+im_tensor,
+x_dim,
+y_dim,
+text_embeds,
+image_embeds,
+initial_similarity,
+saliency_map,
+query,
+n_iters,
+min_crop_size,
+_tqdm=tqdm.notebook.tqdm,
+include_query=True,
+);
 
 
 
-.. image:: clip-language-saliency-map-with-output_files/clip-language-saliency-map-with-output_35_1.png
+..parsed-literal::
+
+0%||0/300[00:00<?,?it/s]
 
 
-Pack the Pipeline into a Function
+
+..image::clip-language-saliency-map-with-output_files/clip-language-saliency-map-with-output_35_1.png
+
+
+PackthePipelineintoaFunction
 ---------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Let us wrap all code in the function and add a user interface to it.
+Letuswrapallcodeinthefunctionandaddauserinterfacetoit.
 
-.. code:: ipython3
+..code::ipython3
 
-    import ipywidgets as widgets
-    
-    
-    def build_saliency_map(
-        image: Image,
-        query: str,
-        n_iters: int = n_iters,
-        min_crop_size=min_crop_size,
-        _tqdm=tqdm.notebook.tqdm,
-        include_query=True,
-    ):
-        x_dim, y_dim = image.size
-        im_tensor = np.array(image)
-    
-        text_inputs = dict(processor(text=[query], images=[im_tensor], return_tensors="np"))
-        image_inputs = text_inputs.pop("pixel_values")
-    
-        text_embeds = text_model(text_inputs)[text_model.output()]
-        image_embeds = image_model(image_inputs)[image_model.output()]
-    
-        initial_similarity = cosine_similarity(text_embeds, image_embeds)
-        saliency_map = np.zeros((y_dim, x_dim))
-    
-        return infer(
-            im_tensor,
-            x_dim,
-            y_dim,
-            text_embeds,
-            image_embeds,
-            initial_similarity,
-            saliency_map,
-            query,
-            n_iters,
-            min_crop_size,
-            _tqdm=_tqdm,
-            include_query=include_query,
-        )
-
-The first version will enable passing a link to the image, as you have
-done so far in the notebook.
-
-.. code:: ipython3
-
-    n_iters_widget = widgets.BoundedIntText(
-        value=n_iters,
-        min=1,
-        max=10000,
-        description="n_iters",
-    )
-    min_crop_size_widget = widgets.IntSlider(
-        value=min_crop_size,
-        min=1,
-        max=200,
-        description="min_crop_size",
-    )
-    
-    
-    @widgets.interact_manual(image_link="", query="", n_iters=n_iters_widget, min_crop_size=min_crop_size_widget)
-    def build_saliency_map_from_image_link(
-        image_link: str,
-        query: str,
-        n_iters: int,
-        min_crop_size: int,
-    ) -> None:
-        try:
-            image_bytes = requests.get(image_link, stream=True).raw
-        except requests.RequestException as e:
-            print(f"Cannot load image from link: {image_link}\nException: {e}")
-            return
-    
-        image = Image.open(image_bytes)
-        image = image.convert("RGB")  # remove transparency channel or convert grayscale 1 channel to 3 channels
-    
-        build_saliency_map(image, query, n_iters, min_crop_size)
+importipywidgetsaswidgets
 
 
+defbuild_saliency_map(
+image:Image,
+query:str,
+n_iters:int=n_iters,
+min_crop_size=min_crop_size,
+_tqdm=tqdm.notebook.tqdm,
+include_query=True,
+):
+x_dim,y_dim=image.size
+im_tensor=np.array(image)
 
-.. parsed-literal::
+text_inputs=dict(processor(text=[query],images=[im_tensor],return_tensors="np"))
+image_inputs=text_inputs.pop("pixel_values")
 
-    interactive(children=(Text(value='', continuous_update=False, description='image_link'), Text(value='', contin…
+text_embeds=text_model(text_inputs)[text_model.output()]
+image_embeds=image_model(image_inputs)[image_model.output()]
+
+initial_similarity=cosine_similarity(text_embeds,image_embeds)
+saliency_map=np.zeros((y_dim,x_dim))
+
+returninfer(
+im_tensor,
+x_dim,
+y_dim,
+text_embeds,
+image_embeds,
+initial_similarity,
+saliency_map,
+query,
+n_iters,
+min_crop_size,
+_tqdm=_tqdm,
+include_query=include_query,
+)
+
+Thefirstversionwillenablepassingalinktotheimage,asyouhave
+donesofarinthenotebook.
+
+..code::ipython3
+
+n_iters_widget=widgets.BoundedIntText(
+value=n_iters,
+min=1,
+max=10000,
+description="n_iters",
+)
+min_crop_size_widget=widgets.IntSlider(
+value=min_crop_size,
+min=1,
+max=200,
+description="min_crop_size",
+)
 
 
-The second version will enable loading the image from your computer.
+@widgets.interact_manual(image_link="",query="",n_iters=n_iters_widget,min_crop_size=min_crop_size_widget)
+defbuild_saliency_map_from_image_link(
+image_link:str,
+query:str,
+n_iters:int,
+min_crop_size:int,
+)->None:
+try:
+image_bytes=requests.get(image_link,stream=True).raw
+exceptrequests.RequestExceptionase:
+print(f"Cannotloadimagefromlink:{image_link}\nException:{e}")
+return
 
-.. code:: ipython3
+image=Image.open(image_bytes)
+image=image.convert("RGB")#removetransparencychannelorconvertgrayscale1channelto3channels
 
-    import io
-    
-    
-    load_file_widget = widgets.FileUpload(
-        accept="image/*",
-        multiple=False,
-        description="Image file",
-    )
-    
-    
-    @widgets.interact_manual(
-        file=load_file_widget,
-        query="",
-        n_iters=n_iters_widget,
-        min_crop_size=min_crop_size_widget,
-    )
-    def build_saliency_map_from_file(
-        file: Path,
-        query: str = "",
-        n_iters: int = 2000,
-        min_crop_size: int = 50,
-    ) -> None:
-        image_bytes = io.BytesIO(file[0]["content"])
-        try:
-            image = Image.open(image_bytes)
-        except Exception as e:
-            print(f"Cannot load the image: {e}")
-            return
-    
-        image = image.convert("RGB")
-    
-        build_saliency_map(image, query, n_iters, min_crop_size)
+build_saliency_map(image,query,n_iters,min_crop_size)
 
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    interactive(children=(FileUpload(value=(), accept='image/*', description='Image file'), Text(value='', continu…
+interactive(children=(Text(value='',continuous_update=False,description='image_link'),Text(value='',contin…
 
 
-Interactive demo with Gradio
+Thesecondversionwillenableloadingtheimagefromyourcomputer.
+
+..code::ipython3
+
+importio
+
+
+load_file_widget=widgets.FileUpload(
+accept="image/*",
+multiple=False,
+description="Imagefile",
+)
+
+
+@widgets.interact_manual(
+file=load_file_widget,
+query="",
+n_iters=n_iters_widget,
+min_crop_size=min_crop_size_widget,
+)
+defbuild_saliency_map_from_file(
+file:Path,
+query:str="",
+n_iters:int=2000,
+min_crop_size:int=50,
+)->None:
+image_bytes=io.BytesIO(file[0]["content"])
+try:
+image=Image.open(image_bytes)
+exceptExceptionase:
+print(f"Cannotloadtheimage:{e}")
+return
+
+image=image.convert("RGB")
+
+build_saliency_map(image,query,n_iters,min_crop_size)
+
+
+
+..parsed-literal::
+
+interactive(children=(FileUpload(value=(),accept='image/*',description='Imagefile'),Text(value='',continu…
+
+
+InteractivedemowithGradio
 ----------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    import gradio as gr
-    
-    
-    def _process(image, query, n_iters, min_crop_size, _=gr.Progress(track_tqdm=True)):
-        saliency_map = build_saliency_map(image, query, n_iters, min_crop_size, _tqdm=tqdm.tqdm, include_query=False)
-    
-        return saliency_map
-    
-    
-    demo = gr.Interface(
-        _process,
-        [
-            gr.Image(label="Image", type="pil"),
-            gr.Textbox(label="Query"),
-            gr.Slider(1, 10000, n_iters, label="Number of iterations"),
-            gr.Slider(1, 200, min_crop_size, label="Minimum crop size"),
-        ],
-        gr.Plot(label="Result"),
-        examples=[[image_path, query]],
-    )
-    try:
-        demo.queue().launch(debug=False)
-    except Exception:
-        demo.queue().launch(share=True, debug=False)
-    # if you are launching remotely, specify server_name and server_port
-    # demo.launch(server_name='your server name', server_port='server port in int')
-    # Read more in the docs: https://gradio.app/docs/
+importgradioasgr
 
 
-.. parsed-literal::
+def_process(image,query,n_iters,min_crop_size,_=gr.Progress(track_tqdm=True)):
+saliency_map=build_saliency_map(image,query,n_iters,min_crop_size,_tqdm=tqdm.tqdm,include_query=False)
 
-    Running on local URL:  http://127.0.0.1:7860
-    
-    To create a public link, set `share=True` in `launch()`.
-
+returnsaliency_map
 
 
-.. raw:: html
+demo=gr.Interface(
+_process,
+[
+gr.Image(label="Image",type="pil"),
+gr.Textbox(label="Query"),
+gr.Slider(1,10000,n_iters,label="Numberofiterations"),
+gr.Slider(1,200,min_crop_size,label="Minimumcropsize"),
+],
+gr.Plot(label="Result"),
+examples=[[image_path,query]],
+)
+try:
+demo.queue().launch(debug=False)
+exceptException:
+demo.queue().launch(share=True,debug=False)
+#ifyouarelaunchingremotely,specifyserver_nameandserver_port
+#demo.launch(server_name='yourservername',server_port='serverportinint')
+#Readmoreinthedocs:https://gradio.app/docs/
 
-    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
+
+..parsed-literal::
+
+RunningonlocalURL:http://127.0.0.1:7860
+
+Tocreateapubliclink,set`share=True`in`launch()`.
 
 
-What To Do Next
+
+..raw::html
+
+<div><iframesrc="http://127.0.0.1:7860/"width="100%"height="500"allow="autoplay;camera;microphone;clipboard-read;clipboard-write;"frameborder="0"allowfullscreen></iframe></div>
+
+
+WhatToDoNext
 ---------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Now that you have a convenient interface and accelerated inference, you
-can explore the CLIP capabilities further. For example:
+Nowthatyouhaveaconvenientinterfaceandacceleratedinference,you
+canexploretheCLIPcapabilitiesfurther.Forexample:
 
--  Can CLIP read? Can it detect text regions in general and specific
-   words on the image?
--  Which famous people and places does CLIP know?
--  Can CLIP identify places on a map? Or planets, stars, and
-   constellations?
--  Explore different CLIP models from HuggingFace Hub: just change the
-   ``model_checkpoint`` at the beginning of the notebook.
--  Add batch processing to the pipeline: modify
-   ``get_random_crop_params``, ``get_cropped_image`` and
-   ``update_saliency_map`` functions to process multiple crop images at
-   once and accelerate the pipeline even more.
--  Optimize models with
-   `NNCF <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training/basic-quantization-flow.html>`__
-   to get further acceleration. You can find example how to quantize
-   CLIP model in `this
-   notebook <../clip-zero-shot-image-classification>`__
+-CanCLIPread?Canitdetecttextregionsingeneralandspecific
+wordsontheimage?
+-WhichfamouspeopleandplacesdoesCLIPknow?
+-CanCLIPidentifyplacesonamap?Orplanets,stars,and
+constellations?
+-ExploredifferentCLIPmodelsfromHuggingFaceHub:justchangethe
+``model_checkpoint``atthebeginningofthenotebook.
+-Addbatchprocessingtothepipeline:modify
+``get_random_crop_params``,``get_cropped_image``and
+``update_saliency_map``functionstoprocessmultiplecropimagesat
+onceandacceleratethepipelineevenmore.
+-Optimizemodelswith
+`NNCF<https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/quantizing-models-post-training/basic-quantization-flow.html>`__
+togetfurtheracceleration.Youcanfindexamplehowtoquantize
+CLIPmodelin`this
+notebook<../clip-zero-shot-image-classification>`__

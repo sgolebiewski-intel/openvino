@@ -1,323 +1,323 @@
-Sentiment Analysis with OpenVINO™
+SentimentAnalysiswithOpenVINO™
 =================================
 
-**Sentiment analysis** is the use of natural language processing, text
-analysis, computational linguistics, and biometrics to systematically
-identify, extract, quantify, and study affective states and subjective
-information. This notebook demonstrates how to convert and run a
-sequence classification model using OpenVINO.
+**Sentimentanalysis**istheuseofnaturallanguageprocessing,text
+analysis,computationallinguistics,andbiometricstosystematically
+identify,extract,quantify,andstudyaffectivestatesandsubjective
+information.Thisnotebookdemonstrateshowtoconvertandruna
+sequenceclassificationmodelusingOpenVINO.
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#Imports>`__
--  `Initializing the Model <#Initializing-the-Model>`__
--  `Initializing the Tokenizer <#Initializing-the-Tokenizer>`__
--  `Convert Model to OpenVINO Intermediate Representation
-   format <#Convert-Model-to-OpenVINO-Intermediate-Representation-format>`__
+-`Imports<#imports>`__
+-`InitializingtheModel<#initializing-the-model>`__
+-`InitializingtheTokenizer<#initializing-the-tokenizer>`__
+-`ConvertModeltoOpenVINOIntermediateRepresentation
+format<#convert-model-to-openvino-intermediate-representation-format>`__
 
-   -  `Select inference device <#Select-inference-device>`__
+-`Selectinferencedevice<#select-inference-device>`__
 
--  `Inference <#Inference>`__
+-`Inference<#inference>`__
 
-   -  `For a single input sentence <#For-a-single-input-sentence>`__
-   -  `Read from a text file <#Read-from-a-text-file>`__
+-`Forasingleinputsentence<#for-a-single-input-sentence>`__
+-`Readfromatextfile<#read-from-a-text-file>`__
 
 Imports
 -------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    %pip install "openvino>=2023.1.0" transformers "torch>=2.1" tqdm --extra-index-url https://download.pytorch.org/whl/cpu
-
-
-.. parsed-literal::
-
-    Looking in indexes: https://pypi.org/simple, https://download.pytorch.org/whl/cpu
-    Requirement already satisfied: openvino>=2023.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (2024.4.0.dev20240712)
-    Requirement already satisfied: transformers in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (4.42.4)
-    Requirement already satisfied: torch>=2.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (2.3.1+cpu)
-    Requirement already satisfied: tqdm in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (4.66.4)
-    Requirement already satisfied: numpy<2.0.0,>=1.16.6 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino>=2023.1.0) (1.23.5)
-    Requirement already satisfied: openvino-telemetry>=2023.2.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino>=2023.1.0) (2024.1.0)
-    Requirement already satisfied: packaging in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from openvino>=2023.1.0) (24.1)
-    Requirement already satisfied: filelock in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from transformers) (3.15.4)
-    Requirement already satisfied: huggingface-hub<1.0,>=0.23.2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from transformers) (0.23.4)
-    Requirement already satisfied: pyyaml>=5.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from transformers) (6.0.1)
-    Requirement already satisfied: regex!=2019.12.17 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from transformers) (2024.5.15)
-    Requirement already satisfied: requests in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from transformers) (2.32.3)
-    Requirement already satisfied: safetensors>=0.4.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from transformers) (0.4.3)
-    Requirement already satisfied: tokenizers<0.20,>=0.19 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from transformers) (0.19.1)
-    Requirement already satisfied: typing-extensions>=4.8.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch>=2.1) (4.12.2)
-    Requirement already satisfied: sympy in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch>=2.1) (1.13.0)
-    Requirement already satisfied: networkx in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch>=2.1) (3.1)
-    Requirement already satisfied: jinja2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch>=2.1) (3.1.4)
-    Requirement already satisfied: fsspec in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from torch>=2.1) (2024.5.0)
-    Requirement already satisfied: MarkupSafe>=2.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from jinja2->torch>=2.1) (2.1.5)
-    Requirement already satisfied: charset-normalizer<4,>=2 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->transformers) (3.3.2)
-    Requirement already satisfied: idna<4,>=2.5 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->transformers) (3.7)
-    Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->transformers) (2.2.2)
-    Requirement already satisfied: certifi>=2017.4.17 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from requests->transformers) (2024.7.4)
-    Requirement already satisfied: mpmath<1.4,>=1.1.0 in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (from sympy->torch>=2.1) (1.3.0)
-    Note: you may need to restart the kernel to use updated packages.
+%pipinstall"openvino>=2023.1.0"transformers"torch>=2.1"tqdm--extra-index-urlhttps://download.pytorch.org/whl/cpu
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    import warnings
-    from pathlib import Path
-    import time
-    from transformers import AutoModelForSequenceClassification, AutoTokenizer
-    import numpy as np
-    import openvino as ov
+Lookinginindexes:https://pypi.org/simple,https://download.pytorch.org/whl/cpu
+Requirementalreadysatisfied:openvino>=2023.1.0in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(2024.4.0.dev20240712)
+Requirementalreadysatisfied:transformersin/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(4.42.4)
+Requirementalreadysatisfied:torch>=2.1in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(2.3.1+cpu)
+Requirementalreadysatisfied:tqdmin/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(4.66.4)
+Requirementalreadysatisfied:numpy<2.0.0,>=1.16.6in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromopenvino>=2023.1.0)(1.23.5)
+Requirementalreadysatisfied:openvino-telemetry>=2023.2.1in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromopenvino>=2023.1.0)(2024.1.0)
+Requirementalreadysatisfied:packagingin/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromopenvino>=2023.1.0)(24.1)
+Requirementalreadysatisfied:filelockin/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtransformers)(3.15.4)
+Requirementalreadysatisfied:huggingface-hub<1.0,>=0.23.2in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtransformers)(0.23.4)
+Requirementalreadysatisfied:pyyaml>=5.1in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtransformers)(6.0.1)
+Requirementalreadysatisfied:regex!=2019.12.17in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtransformers)(2024.5.15)
+Requirementalreadysatisfied:requestsin/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtransformers)(2.32.3)
+Requirementalreadysatisfied:safetensors>=0.4.1in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtransformers)(0.4.3)
+Requirementalreadysatisfied:tokenizers<0.20,>=0.19in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtransformers)(0.19.1)
+Requirementalreadysatisfied:typing-extensions>=4.8.0in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtorch>=2.1)(4.12.2)
+Requirementalreadysatisfied:sympyin/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtorch>=2.1)(1.13.0)
+Requirementalreadysatisfied:networkxin/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtorch>=2.1)(3.1)
+Requirementalreadysatisfied:jinja2in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtorch>=2.1)(3.1.4)
+Requirementalreadysatisfied:fsspecin/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromtorch>=2.1)(2024.5.0)
+Requirementalreadysatisfied:MarkupSafe>=2.0in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromjinja2->torch>=2.1)(2.1.5)
+Requirementalreadysatisfied:charset-normalizer<4,>=2in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromrequests->transformers)(3.3.2)
+Requirementalreadysatisfied:idna<4,>=2.5in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromrequests->transformers)(3.7)
+Requirementalreadysatisfied:urllib3<3,>=1.21.1in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromrequests->transformers)(2.2.2)
+Requirementalreadysatisfied:certifi>=2017.4.17in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromrequests->transformers)(2024.7.4)
+Requirementalreadysatisfied:mpmath<1.4,>=1.1.0in/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(fromsympy->torch>=2.1)(1.3.0)
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
 
-Initializing the Model
+
+..code::ipython3
+
+importwarnings
+frompathlibimportPath
+importtime
+fromtransformersimportAutoModelForSequenceClassification,AutoTokenizer
+importnumpyasnp
+importopenvinoasov
+
+InitializingtheModel
 ----------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-We will use the transformer-based `DistilBERT base uncased finetuned
-SST-2 <https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english>`__
-model from Hugging Face.
+Wewillusethetransformer-based`DistilBERTbaseuncasedfinetuned
+SST-2<https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english>`__
+modelfromHuggingFace.
 
-.. code:: ipython3
+..code::ipython3
 
-    checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
-    model = AutoModelForSequenceClassification.from_pretrained(pretrained_model_name_or_path=checkpoint)
+checkpoint="distilbert-base-uncased-finetuned-sst-2-english"
+model=AutoModelForSequenceClassification.from_pretrained(pretrained_model_name_or_path=checkpoint)
 
-Initializing the Tokenizer
+InitializingtheTokenizer
 --------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Text Preprocessing cleans the text-based input data so it can be fed
-into the model.
-`Tokenization <https://towardsdatascience.com/tokenization-for-natural-language-processing-a179a891bad4>`__
-splits paragraphs and sentences into smaller units that can be more
-easily assigned meaning. It involves cleaning the data and assigning
-tokens or IDs to the words, so they are represented in a vector space
-where similar words have similar vectors. This helps the model
-understand the context of a sentence. Here, we will use
-```AutoTokenizer`` <https://huggingface.co/docs/transformers/main_classes/tokenizer>`__
-- a pre-trained tokenizer from Hugging Face:
+TextPreprocessingcleansthetext-basedinputdatasoitcanbefed
+intothemodel.
+`Tokenization<https://towardsdatascience.com/tokenization-for-natural-language-processing-a179a891bad4>`__
+splitsparagraphsandsentencesintosmallerunitsthatcanbemore
+easilyassignedmeaning.Itinvolvescleaningthedataandassigning
+tokensorIDstothewords,sotheyarerepresentedinavectorspace
+wheresimilarwordshavesimilarvectors.Thishelpsthemodel
+understandthecontextofasentence.Here,wewilluse
+`AutoTokenizer<https://huggingface.co/docs/transformers/main_classes/tokenizer>`__
+-apre-trainedtokenizerfromHuggingFace:
 
-.. code:: ipython3
+..code::ipython3
 
-    tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path=checkpoint)
+tokenizer=AutoTokenizer.from_pretrained(pretrained_model_name_or_path=checkpoint)
 
-Convert Model to OpenVINO Intermediate Representation format
+ConvertModeltoOpenVINOIntermediateRepresentationformat
 ------------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-`Model conversion
-API <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
-facilitates the transition between training and deployment environments,
-performs static model analysis, and adjusts deep learning models for
-optimal execution on end-point target devices.
+`Modelconversion
+API<https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
+facilitatesthetransitionbetweentraininganddeploymentenvironments,
+performsstaticmodelanalysis,andadjustsdeeplearningmodelsfor
+optimalexecutiononend-pointtargetdevices.
 
-.. code:: ipython3
+..code::ipython3
 
-    import torch
-    
-    ir_xml_name = checkpoint + ".xml"
-    MODEL_DIR = "model/"
-    ir_xml_path = Path(MODEL_DIR) / ir_xml_name
-    
-    MAX_SEQ_LENGTH = 128
-    input_info = [
-        (ov.PartialShape([1, -1]), ov.Type.i64),
-        (ov.PartialShape([1, -1]), ov.Type.i64),
-    ]
-    default_input = torch.ones(1, MAX_SEQ_LENGTH, dtype=torch.int64)
-    inputs = {
-        "input_ids": default_input,
-        "attention_mask": default_input,
-    }
-    
-    ov_model = ov.convert_model(model, input=input_info, example_input=inputs)
-    ov.save_model(ov_model, ir_xml_path)
+importtorch
 
+ir_xml_name=checkpoint+".xml"
+MODEL_DIR="model/"
+ir_xml_path=Path(MODEL_DIR)/ir_xml_name
 
-.. parsed-literal::
+MAX_SEQ_LENGTH=128
+input_info=[
+(ov.PartialShape([1,-1]),ov.Type.i64),
+(ov.PartialShape([1,-1]),ov.Type.i64),
+]
+default_input=torch.ones(1,MAX_SEQ_LENGTH,dtype=torch.int64)
+inputs={
+"input_ids":default_input,
+"attention_mask":default_input,
+}
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4565: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
-      warnings.warn(
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/distilbert/modeling_distilbert.py:230: TracerWarning: torch.tensor results are registered as constants in the trace. You can safely ignore this warning if you use this function to create tensors out of constant variables that would be the same every time you call this function. In any other case, this might cause the trace to be incorrect.
-      mask, torch.tensor(torch.finfo(scores.dtype).min)
+ov_model=ov.convert_model(model,input=input_info,example_input=inputs)
+ov.save_model(ov_model,ir_xml_path)
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    ['input_ids', 'attention_mask']
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/modeling_utils.py:4565:FutureWarning:`_is_quantized_training_enabled`isgoingtobedeprecatedintransformers4.39.0.Pleaseuse`model.hf_quantizer.is_trainable`instead
+warnings.warn(
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/distilbert/modeling_distilbert.py:230:TracerWarning:torch.tensorresultsareregisteredasconstantsinthetrace.Youcansafelyignorethiswarningifyouusethisfunctiontocreatetensorsoutofconstantvariablesthatwouldbethesameeverytimeyoucallthisfunction.Inanyothercase,thismightcausethetracetobeincorrect.
+mask,torch.tensor(torch.finfo(scores.dtype).min)
 
 
-OpenVINO™ Runtime uses the `Infer
-Request <https://docs.openvino.ai/2024/openvino-workflow/running-inference/integrate-openvino-with-your-application/inference-request.html>`__
-mechanism which enables running models on different devices in
-asynchronous or synchronous manners. The model graph is sent as an
-argument to the OpenVINO API and an inference request is created. The
-default inference mode is AUTO but it can be changed according to
-requirements and hardware available. You can explore the different
-inference modes and their usage `in
-documentation. <https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes.html>`__
+..parsed-literal::
 
-.. code:: ipython3
+['input_ids','attention_mask']
 
-    core = ov.Core()
 
-Select inference device
+OpenVINO™Runtimeusesthe`Infer
+Request<https://docs.openvino.ai/2024/openvino-workflow/running-inference/integrate-openvino-with-your-application/inference-request.html>`__
+mechanismwhichenablesrunningmodelsondifferentdevicesin
+asynchronousorsynchronousmanners.Themodelgraphissentasan
+argumenttotheOpenVINOAPIandaninferencerequestiscreated.The
+defaultinferencemodeisAUTObutitcanbechangedaccordingto
+requirementsandhardwareavailable.Youcanexplorethedifferent
+inferencemodesandtheirusage`in
+documentation.<https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes.html>`__
+
+..code::ipython3
+
+core=ov.Core()
+
+Selectinferencedevice
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-select device from dropdown list for running inference using OpenVINO
+selectdevicefromdropdownlistforrunninginferenceusingOpenVINO
 
-.. code:: ipython3
+..code::ipython3
 
-    import ipywidgets as widgets
-    
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="AUTO",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+importipywidgetsaswidgets
 
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="AUTO",
+description="Device:",
+disabled=False,
+)
 
-
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', index=1, options=('CPU', 'AUTO'), value='AUTO')
+device
 
 
 
-.. code:: ipython3
 
-    warnings.filterwarnings("ignore")
-    compiled_model = core.compile_model(ov_model, device.value)
-    infer_request = compiled_model.create_infer_request()
+..parsed-literal::
 
-.. code:: ipython3
+Dropdown(description='Device:',index=1,options=('CPU','AUTO'),value='AUTO')
 
-    def softmax(x):
-        """
-        Defining a softmax function to extract
-        the prediction from the output of the IR format
-        Parameters: Logits array
-        Returns: Probabilities
-        """
-    
-        e_x = np.exp(x - np.max(x))
-        return e_x / e_x.sum()
+
+
+..code::ipython3
+
+warnings.filterwarnings("ignore")
+compiled_model=core.compile_model(ov_model,device.value)
+infer_request=compiled_model.create_infer_request()
+
+..code::ipython3
+
+defsoftmax(x):
+"""
+Definingasoftmaxfunctiontoextract
+thepredictionfromtheoutputoftheIRformat
+Parameters:Logitsarray
+Returns:Probabilities
+"""
+
+e_x=np.exp(x-np.max(x))
+returne_x/e_x.sum()
 
 Inference
 ---------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    def infer(input_text):
-        """
-        Creating a generic inference function
-        to read the input and infer the result
-        into 2 classes: Positive or Negative.
-        Parameters: Text to be processed
-        Returns: Label: Positive or Negative.
-        """
-    
-        input_text = tokenizer(
-            input_text,
-            truncation=True,
-            return_tensors="np",
-        )
-        inputs = dict(input_text)
-        label = {0: "NEGATIVE", 1: "POSITIVE"}
-        result = infer_request.infer(inputs=inputs)
-        for i in result.values():
-            probability = np.argmax(softmax(i))
-        return label[probability]
+definfer(input_text):
+"""
+Creatingagenericinferencefunction
+toreadtheinputandinfertheresult
+into2classes:PositiveorNegative.
+Parameters:Texttobeprocessed
+Returns:Label:PositiveorNegative.
+"""
 
-For a single input sentence
+input_text=tokenizer(
+input_text,
+truncation=True,
+return_tensors="np",
+)
+inputs=dict(input_text)
+label={0:"NEGATIVE",1:"POSITIVE"}
+result=infer_request.infer(inputs=inputs)
+foriinresult.values():
+probability=np.argmax(softmax(i))
+returnlabel[probability]
+
+Forasingleinputsentence
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    input_text = "I had a wonderful day"
-    start_time = time.perf_counter()
-    result = infer(input_text)
-    end_time = time.perf_counter()
-    total_time = end_time - start_time
-    print("Label: ", result)
-    print("Total Time: ", "%.2f" % total_time, " seconds")
-
-
-.. parsed-literal::
-
-    Label:  POSITIVE
-    Total Time:  0.03  seconds
+input_text="Ihadawonderfulday"
+start_time=time.perf_counter()
+result=infer(input_text)
+end_time=time.perf_counter()
+total_time=end_time-start_time
+print("Label:",result)
+print("TotalTime:","%.2f"%total_time,"seconds")
 
 
-Read from a text file
+..parsed-literal::
+
+Label:POSITIVE
+TotalTime:0.03seconds
+
+
+Readfromatextfile
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    # Fetch `notebook_utils` module
-    import requests
-    
-    r = requests.get(
-        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
-    )
-    
-    open("notebook_utils.py", "w").write(r.text)
-    from notebook_utils import download_file
-    
-    # Download the text from the openvino_notebooks storage
-    vocab_file_path = download_file(
-        "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/text/food_reviews.txt",
-        directory="data",
-    )
+#Fetch`notebook_utils`module
+importrequests
 
+r=requests.get(
+url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
+)
 
+open("notebook_utils.py","w").write(r.text)
+fromnotebook_utilsimportdownload_file
 
-.. parsed-literal::
-
-    data/food_reviews.txt:   0%|          | 0.00/71.0 [00:00<?, ?B/s]
+#Downloadthetextfromtheopenvino_notebooksstorage
+vocab_file_path=download_file(
+"https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/text/food_reviews.txt",
+directory="data",
+)
 
 
-.. code:: ipython3
 
-    start_time = time.perf_counter()
-    with vocab_file_path.open(mode="r") as f:
-        input_text = f.readlines()
-        for lines in input_text:
-            print("User Input: ", lines)
-            result = infer(lines)
-            print("Label: ", result, "\n")
-    end_time = time.perf_counter()
-    total_time = end_time - start_time
-    print("Total Time: ", "%.2f" % total_time, " seconds")
+..parsed-literal::
+
+data/food_reviews.txt:0%||0.00/71.0[00:00<?,?B/s]
 
 
-.. parsed-literal::
+..code::ipython3
 
-    User Input:  The food was horrible.
-    
-    Label:  NEGATIVE 
-    
-    User Input:  We went because the restaurant had good reviews.
-    Label:  POSITIVE 
-    
-    Total Time:  0.03  seconds
+start_time=time.perf_counter()
+withvocab_file_path.open(mode="r")asf:
+input_text=f.readlines()
+forlinesininput_text:
+print("UserInput:",lines)
+result=infer(lines)
+print("Label:",result,"\n")
+end_time=time.perf_counter()
+total_time=end_time-start_time
+print("TotalTime:","%.2f"%total_time,"seconds")
+
+
+..parsed-literal::
+
+UserInput:Thefoodwashorrible.
+
+Label:NEGATIVE
+
+UserInput:Wewentbecausetherestauranthadgoodreviews.
+Label:POSITIVE
+
+TotalTime:0.03seconds
 

@@ -1,227 +1,227 @@
-Hello Image Classification
+HelloImageClassification
 ==========================
 
-This basic introduction to OpenVINO™ shows how to do inference with an
-image classification model.
+ThisbasicintroductiontoOpenVINO™showshowtodoinferencewithan
+imageclassificationmodel.
 
-A pre-trained `MobileNetV3
-model <https://docs.openvino.ai/2024/omz_models_model_mobilenet_v3_small_1_0_224_tf.html>`__
-from `Open Model
-Zoo <https://github.com/openvinotoolkit/open_model_zoo/>`__ is used in
-this tutorial. For more information about how OpenVINO IR models are
-created, refer to the `TensorFlow to
-OpenVINO <tensorflow-classification-to-openvino-with-output.html>`__
+Apre-trained`MobileNetV3
+model<https://docs.openvino.ai/2024/omz_models_model_mobilenet_v3_small_1_0_224_tf.html>`__
+from`OpenModel
+Zoo<https://github.com/openvinotoolkit/open_model_zoo/>`__isusedin
+thistutorial.FormoreinformationabouthowOpenVINOIRmodelsare
+created,refertothe`TensorFlowto
+OpenVINO<tensorflow-classification-to-openvino-with-output.html>`__
 tutorial.
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#Imports>`__
--  `Download the Model and data
-   samples <#Download-the-Model-and-data-samples>`__
--  `Select inference device <#Select-inference-device>`__
--  `Load the Model <#Load-the-Model>`__
--  `Load an Image <#Load-an-Image>`__
--  `Do Inference <#Do-Inference>`__
+-`Imports<#imports>`__
+-`DownloadtheModelanddata
+samples<#download-the-model-and-data-samples>`__
+-`Selectinferencedevice<#select-inference-device>`__
+-`LoadtheModel<#load-the-model>`__
+-`LoadanImage<#load-an-image>`__
+-`DoInference<#do-inference>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    import platform
-    
-    # Install openvino package
-    %pip install -q "openvino>=2023.1.0" opencv-python tqdm
-    
-    if platform.system() != "Windows":
-        %pip install -q "matplotlib>=3.4"
-    else:
-        %pip install -q "matplotlib>=3.4,<3.7"
-    
+importplatform
 
+#Installopenvinopackage
+%pipinstall-q"openvino>=2023.1.0"opencv-pythontqdm
+
+ifplatform.system()!="Windows":
+%pipinstall-q"matplotlib>=3.4"
+else:
+%pipinstall-q"matplotlib>=3.4,<3.7"
 
 
-.. parsed-literal::
 
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
+
+..parsed-literal::
+
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
 
 
 Imports
 -------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    from pathlib import Path
-    
-    import cv2
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import openvino as ov
-    
-    # Fetch `notebook_utils` module
-    import requests
-    
-    r = requests.get(
-        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
-    )
-    
-    open("notebook_utils.py", "w").write(r.text)
-    
-    from notebook_utils import download_file
+frompathlibimportPath
 
-Download the Model and data samples
+importcv2
+importmatplotlib.pyplotasplt
+importnumpyasnp
+importopenvinoasov
+
+#Fetch`notebook_utils`module
+importrequests
+
+r=requests.get(
+url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
+)
+
+open("notebook_utils.py","w").write(r.text)
+
+fromnotebook_utilsimportdownload_file
+
+DownloadtheModelanddatasamples
 -----------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    base_artifacts_dir = Path("./artifacts").expanduser()
-    
-    model_name = "v3-small_224_1.0_float"
-    model_xml_name = f"{model_name}.xml"
-    model_bin_name = f"{model_name}.bin"
-    
-    model_xml_path = base_artifacts_dir / model_xml_name
-    
-    base_url = "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/mobelinet-v3-tf/FP32/"
-    
-    if not model_xml_path.exists():
-        download_file(base_url + model_xml_name, model_xml_name, base_artifacts_dir)
-        download_file(base_url + model_bin_name, model_bin_name, base_artifacts_dir)
-    else:
-        print(f"{model_name} already downloaded to {base_artifacts_dir}")
+base_artifacts_dir=Path("./artifacts").expanduser()
 
+model_name="v3-small_224_1.0_float"
+model_xml_name=f"{model_name}.xml"
+model_bin_name=f"{model_name}.bin"
 
+model_xml_path=base_artifacts_dir/model_xml_name
 
-.. parsed-literal::
+base_url="https://storage.openvinotoolkit.org/repositories/openvino_notebooks/models/mobelinet-v3-tf/FP32/"
 
-    artifacts/v3-small_224_1.0_float.xml:   0%|          | 0.00/294k [00:00<?, ?B/s]
+ifnotmodel_xml_path.exists():
+download_file(base_url+model_xml_name,model_xml_name,base_artifacts_dir)
+download_file(base_url+model_bin_name,model_bin_name,base_artifacts_dir)
+else:
+print(f"{model_name}alreadydownloadedto{base_artifacts_dir}")
 
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    artifacts/v3-small_224_1.0_float.bin:   0%|          | 0.00/4.84M [00:00<?, ?B/s]
+artifacts/v3-small_224_1.0_float.xml:0%||0.00/294k[00:00<?,?B/s]
 
 
-Select inference device
+
+..parsed-literal::
+
+artifacts/v3-small_224_1.0_float.bin:0%||0.00/4.84M[00:00<?,?B/s]
+
+
+Selectinferencedevice
 -----------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-select device from dropdown list for running inference using OpenVINO
+selectdevicefromdropdownlistforrunninginferenceusingOpenVINO
 
-.. code:: ipython3
+..code::ipython3
 
-    import ipywidgets as widgets
-    
-    core = ov.Core()
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="AUTO",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+importipywidgetsaswidgets
 
+core=ov.Core()
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="AUTO",
+description="Device:",
+disabled=False,
+)
 
-
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', index=1, options=('CPU', 'AUTO'), value='AUTO')
+device
 
 
 
-Load the Model
+
+..parsed-literal::
+
+Dropdown(description='Device:',index=1,options=('CPU','AUTO'),value='AUTO')
+
+
+
+LoadtheModel
 --------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    core = ov.Core()
-    model = core.read_model(model=model_xml_path)
-    compiled_model = core.compile_model(model=model, device_name=device.value)
-    
-    output_layer = compiled_model.output(0)
+core=ov.Core()
+model=core.read_model(model=model_xml_path)
+compiled_model=core.compile_model(model=model,device_name=device.value)
 
-Load an Image
+output_layer=compiled_model.output(0)
+
+LoadanImage
 -------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    # Download the image from the openvino_notebooks storage
-    image_filename = download_file(
-        "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg",
-        directory="data",
-    )
-    
-    # The MobileNet model expects images in RGB format.
-    image = cv2.cvtColor(cv2.imread(filename=str(image_filename)), code=cv2.COLOR_BGR2RGB)
-    
-    # Resize to MobileNet image shape.
-    input_image = cv2.resize(src=image, dsize=(224, 224))
-    
-    # Reshape to model input shape.
-    input_image = np.expand_dims(input_image, 0)
-    plt.imshow(image);
+#Downloadtheimagefromtheopenvino_notebooksstorage
+image_filename=download_file(
+"https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/image/coco.jpg",
+directory="data",
+)
 
+#TheMobileNetmodelexpectsimagesinRGBformat.
+image=cv2.cvtColor(cv2.imread(filename=str(image_filename)),code=cv2.COLOR_BGR2RGB)
 
+#ResizetoMobileNetimageshape.
+input_image=cv2.resize(src=image,dsize=(224,224))
 
-.. parsed-literal::
-
-    data/coco.jpg:   0%|          | 0.00/202k [00:00<?, ?B/s]
+#Reshapetomodelinputshape.
+input_image=np.expand_dims(input_image,0)
+plt.imshow(image);
 
 
 
-.. image:: hello-world-with-output_files/hello-world-with-output_11_1.png
+..parsed-literal::
+
+data/coco.jpg:0%||0.00/202k[00:00<?,?B/s]
 
 
-Do Inference
+
+..image::hello-world-with-output_files/hello-world-with-output_11_1.png
+
+
+DoInference
 ------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    result_infer = compiled_model([input_image])[output_layer]
-    result_index = np.argmax(result_infer)
+result_infer=compiled_model([input_image])[output_layer]
+result_index=np.argmax(result_infer)
 
-.. code:: ipython3
+..code::ipython3
 
-    imagenet_filename = download_file(
-        "https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/datasets/imagenet/imagenet_2012.txt",
-        directory="data",
-    )
-    
-    imagenet_classes = imagenet_filename.read_text().splitlines()
+imagenet_filename=download_file(
+"https://storage.openvinotoolkit.org/repositories/openvino_notebooks/data/data/datasets/imagenet/imagenet_2012.txt",
+directory="data",
+)
 
-
-
-.. parsed-literal::
-
-    data/imagenet_2012.txt:   0%|          | 0.00/30.9k [00:00<?, ?B/s]
-
-
-.. code:: ipython3
-
-    # The model description states that for this model, class 0 is a background.
-    # Therefore, a background must be added at the beginning of imagenet_classes.
-    imagenet_classes = ["background"] + imagenet_classes
-    
-    imagenet_classes[result_index]
+imagenet_classes=imagenet_filename.read_text().splitlines()
 
 
 
+..parsed-literal::
 
-.. parsed-literal::
+data/imagenet_2012.txt:0%||0.00/30.9k[00:00<?,?B/s]
 
-    'n02099267 flat-coated retriever'
+
+..code::ipython3
+
+#Themodeldescriptionstatesthatforthismodel,class0isabackground.
+#Therefore,abackgroundmustbeaddedatthebeginningofimagenet_classes.
+imagenet_classes=["background"]+imagenet_classes
+
+imagenet_classes[result_index]
+
+
+
+
+..parsed-literal::
+
+'n02099267flat-coatedretriever'
 
 

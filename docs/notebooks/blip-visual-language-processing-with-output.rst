@@ -1,1390 +1,1390 @@
-Visual Question Answering and Image Captioning using BLIP and OpenVINO
+VisualQuestionAnsweringandImageCaptioningusingBLIPandOpenVINO
 ======================================================================
 
-Humans perceive the world through vision and language. A longtime goal
-of AI is to build intelligent agents that can understand the world
-through vision and language inputs to communicate with humans through
-natural language. In order to achieve this goal, vision-language
-pre-training has emerged as an effective approach, where deep neural
-network models are pre-trained on large scale image-text datasets to
-improve performance on downstream vision-language tasks, such as
-image-text retrieval, image captioning, and visual question answering.
+Humansperceivetheworldthroughvisionandlanguage.Alongtimegoal
+ofAIistobuildintelligentagentsthatcanunderstandtheworld
+throughvisionandlanguageinputstocommunicatewithhumansthrough
+naturallanguage.Inordertoachievethisgoal,vision-language
+pre-traininghasemergedasaneffectiveapproach,wheredeepneural
+networkmodelsarepre-trainedonlargescaleimage-textdatasetsto
+improveperformanceondownstreamvision-languagetasks,suchas
+image-textretrieval,imagecaptioning,andvisualquestionanswering.
 
-`BLIP <https://github.com/salesforce/BLIP>`__ is a language-image
-pre-training framework for unified vision-language understanding and
-generation. BLIP achieves state-of-the-art results on a wide range of
-vision-language tasks. This tutorial demonstrates how to use BLIP for
-visual question answering and image captioning. An additional part of
-tutorial demonstrates how to speed up the model by applying 8-bit
-post-training quantization and data free int8 weight compression from
-`NNCF <https://github.com/openvinotoolkit/nncf/>`__ (Neural Network
-Compression Framework) to OpenVINO IR models and infer optimized BLIP
-model via OpenVINO™ Toolkit.
+`BLIP<https://github.com/salesforce/BLIP>`__isalanguage-image
+pre-trainingframeworkforunifiedvision-languageunderstandingand
+generation.BLIPachievesstate-of-the-artresultsonawiderangeof
+vision-languagetasks.ThistutorialdemonstrateshowtouseBLIPfor
+visualquestionansweringandimagecaptioning.Anadditionalpartof
+tutorialdemonstrateshowtospeedupthemodelbyapplying8-bit
+post-trainingquantizationanddatafreeint8weightcompressionfrom
+`NNCF<https://github.com/openvinotoolkit/nncf/>`__(NeuralNetwork
+CompressionFramework)toOpenVINOIRmodelsandinferoptimizedBLIP
+modelviaOpenVINO™Toolkit.
 
-The tutorial consists of the following parts:
+Thetutorialconsistsofthefollowingparts:
 
-1. Instantiate a BLIP model.
-2. Convert the BLIP model to OpenVINO IR.
-3. Run visual question answering and image captioning with OpenVINO.
-4. Optimize BLIP model using NNCF
-5. Compare original and optimized models
-6. Launch interactive demo
+1.InstantiateaBLIPmodel.
+2.ConverttheBLIPmodeltoOpenVINOIR.
+3.RunvisualquestionansweringandimagecaptioningwithOpenVINO.
+4.OptimizeBLIPmodelusingNNCF
+5.Compareoriginalandoptimizedmodels
+6.Launchinteractivedemo
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Background <#Background>`__
+-`Background<#background>`__
 
-   -  `Image Captioning <#Image-Captioning>`__
-   -  `Visual Question Answering <#Visual-Question-Answering>`__
+-`ImageCaptioning<#image-captioning>`__
+-`VisualQuestionAnswering<#visual-question-answering>`__
 
--  `Instantiate Model <#Instantiate-Model>`__
--  `Convert Models to OpenVINO IR <#Convert-Models-to-OpenVINO-IR>`__
+-`InstantiateModel<#instantiate-model>`__
+-`ConvertModelstoOpenVINOIR<#convert-models-to-openvino-ir>`__
 
-   -  `Vision Model <#Vision-Model>`__
-   -  `Text Encoder <#Text-Encoder>`__
-   -  `Text Decoder <#Text-Decoder>`__
+-`VisionModel<#vision-model>`__
+-`TextEncoder<#text-encoder>`__
+-`TextDecoder<#text-decoder>`__
 
--  `Run OpenVINO Model <#Run-OpenVINO-Model>`__
+-`RunOpenVINOModel<#run-openvino-model>`__
 
-   -  `Prepare Inference Pipeline <#Prepare-Inference-Pipeline>`__
-   -  `Select inference device <#Select-inference-device>`__
-   -  `Image Captioning <#Image-Captioning>`__
-   -  `Question Answering <#Question-Answering>`__
+-`PrepareInferencePipeline<#prepare-inference-pipeline>`__
+-`Selectinferencedevice<#select-inference-device>`__
+-`ImageCaptioning<#image-captioning>`__
+-`QuestionAnswering<#question-answering>`__
 
--  `Optimize model using NNCF <#Optimize-model-using-NNCF>`__
+-`OptimizemodelusingNNCF<#optimize-model-using-nncf>`__
 
-   -  `Prepare dataset <#Prepare-dataset>`__
-   -  `Quantize vision model <#Quantize-vision-model>`__
-   -  `Quantize text encoder <#Quantize-text-encoder>`__
-   -  `Compress weights of text
-      decoder <#Compress-weights-of-text-decoder>`__
-   -  `Run optimized OpenVINO model <#Run-optimized-OpenVINO-model>`__
+-`Preparedataset<#prepare-dataset>`__
+-`Quantizevisionmodel<#quantize-vision-model>`__
+-`Quantizetextencoder<#quantize-text-encoder>`__
+-`Compressweightsoftext
+decoder<#compress-weights-of-text-decoder>`__
+-`RunoptimizedOpenVINOmodel<#run-optimized-openvino-model>`__
 
-      -  `Image captioning <#Image-captioning>`__
-      -  `Question answering <#Question-answering>`__
+-`Imagecaptioning<#image-captioning>`__
+-`Questionanswering<#question-answering>`__
 
-   -  `Compare file sizes <#Compare-file-sizes>`__
-   -  `Compare inference time of the FP16 and optimized
-      models <#Compare-inference-time-of-the-FP16-and-optimized-models>`__
+-`Comparefilesizes<#compare-file-sizes>`__
+-`CompareinferencetimeoftheFP16andoptimized
+models<#compare-inference-time-of-the-fp16-and-optimized-models>`__
 
--  `Interactive demo <#Interactive-demo>`__
+-`Interactivedemo<#interactive-demo>`__
 
 Background
 ----------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Visual language processing is a branch of artificial intelligence that
-focuses on creating algorithms designed to enable computers to more
-accurately understand images and their content.
+Visuallanguageprocessingisabranchofartificialintelligencethat
+focusesoncreatingalgorithmsdesignedtoenablecomputerstomore
+accuratelyunderstandimagesandtheircontent.
 
-Popular tasks include:
+Populartasksinclude:
 
--  **Text to Image Retrieval** - a semantic task that aims to find the
-   most relevant image for a given text description.
--  **Image Captioning** - a semantic task that aims to provide a text
-   description for image content.
--  **Visual Question Answering** - a semantic task that aims to answer
-   questions based on image content.
+-**TexttoImageRetrieval**-asemantictaskthataimstofindthe
+mostrelevantimageforagiventextdescription.
+-**ImageCaptioning**-asemantictaskthataimstoprovideatext
+descriptionforimagecontent.
+-**VisualQuestionAnswering**-asemantictaskthataimstoanswer
+questionsbasedonimagecontent.
 
-As shown in the diagram below, these three tasks differ in the input
-provided to the AI system. For text-to-image retrieval, you have a
-predefined gallery of images for search and a user-requested text
-description (query). Image captioning can be represented as a particular
-case of visual question answering, where you have a predefined question
-“What is in the picture?” and various images provided by a user. For
-visual question answering, both the text-based question and image
-context are variables requested by a user.
+Asshowninthediagrambelow,thesethreetasksdifferintheinput
+providedtotheAIsystem.Fortext-to-imageretrieval,youhavea
+predefinedgalleryofimagesforsearchandauser-requestedtext
+description(query).Imagecaptioningcanberepresentedasaparticular
+caseofvisualquestionanswering,whereyouhaveapredefinedquestion
+“Whatisinthepicture?”andvariousimagesprovidedbyauser.For
+visualquestionanswering,boththetext-basedquestionandimage
+contextarevariablesrequestedbyauser.
 
 |image0|
 
-This notebook does not focus on Text to Image retrieval. Instead, it
-considers Image Captioning and Visual Question Answering.
+ThisnotebookdoesnotfocusonTexttoImageretrieval.Instead,it
+considersImageCaptioningandVisualQuestionAnswering.
 
-Image Captioning
+ImageCaptioning
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Image Captioning is the task of describing the content of an image in
-words. This task lies at the intersection of computer vision and natural
-language processing. Most image captioning systems use an
-encoder-decoder framework, where an input image is encoded into an
-intermediate representation of the information in the image, and then
-decoded into a descriptive text sequence.
+ImageCaptioningisthetaskofdescribingthecontentofanimagein
+words.Thistaskliesattheintersectionofcomputervisionandnatural
+languageprocessing.Mostimagecaptioningsystemsusean
+encoder-decoderframework,whereaninputimageisencodedintoan
+intermediaterepresentationoftheinformationintheimage,andthen
+decodedintoadescriptivetextsequence.
 
 |image1|
 
-Visual Question Answering
+VisualQuestionAnswering
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Visual Question Answering (VQA) is the task of answering text-based
-questions about image content.
+VisualQuestionAnswering(VQA)isthetaskofansweringtext-based
+questionsaboutimagecontent.
 
 |image2|
 
-For a better understanding of how VQA works, let us consider a
-traditional NLP task like Question Answering, which aims to retrieve the
-answer to a question from a given text input. Typically, a question
-answering pipeline consists of three steps:
+ForabetterunderstandingofhowVQAworks,letusconsidera
+traditionalNLPtasklikeQuestionAnswering,whichaimstoretrievethe
+answertoaquestionfromagiventextinput.Typically,aquestion
+answeringpipelineconsistsofthreesteps:
 
 |image3|
 
-1. Question analysis - analysis of provided question in natural language
-   form to understand the object in the question and additional context.
-   For example, if you have a question like “How many bridges in
-   Paris?”, question words *“how many”* gives a hint that the answer is
-   more likely to be a number, *“bridges”* is the target object of the
-   question and *" in Paris"* serves as additional context for the
-   search.
-2. Build query for search - use analyzed results to formalize query for
-   finding the most relevant information.
-3. Perform a search in the knowledge base - send the query to a
-   knowledge base, typically provided text documents or databases serve
-   as a source of knowledge.
+1.Questionanalysis-analysisofprovidedquestioninnaturallanguage
+formtounderstandtheobjectinthequestionandadditionalcontext.
+Forexample,ifyouhaveaquestionlike“Howmanybridgesin
+Paris?”,questionwords*“howmany”*givesahintthattheansweris
+morelikelytobeanumber,*“bridges”*isthetargetobjectofthe
+questionand*"inParis"*servesasadditionalcontextforthe
+search.
+2.Buildqueryforsearch-useanalyzedresultstoformalizequeryfor
+findingthemostrelevantinformation.
+3.Performasearchintheknowledgebase-sendthequerytoa
+knowledgebase,typicallyprovidedtextdocumentsordatabasesserve
+asasourceofknowledge.
 
 |image4|
 
-The difference between text-based question answering and visual question
-answering is that an image is used as context and the knowledge base.
+Thedifferencebetweentext-basedquestionansweringandvisualquestion
+answeringisthatanimageisusedascontextandtheknowledgebase.
 
 |image5|
 
-Answering arbitrary questions about images is a complex problem because
-it requires involving a lot of computer vision sub-tasks. In the table
-below, you can find an example of questions and the required computer
-vision skills to find answers.
+Answeringarbitraryquestionsaboutimagesisacomplexproblembecause
+itrequiresinvolvingalotofcomputervisionsub-tasks.Inthetable
+below,youcanfindanexampleofquestionsandtherequiredcomputer
+visionskillstofindanswers.
 
 +-----------------------------+----------------------------------------+
-| Computer vision task        | Question examples                      |
+|Computervisiontask|Questionexamples|
 +=============================+========================================+
-| Object recognition          | What is shown in the picture? What is  |
-|                             | it?                                    |
+|Objectrecognition|Whatisshowninthepicture?Whatis|
+||it?|
 +-----------------------------+----------------------------------------+
-| Object detection            | Is there any object (dog, man, book)   |
-|                             | in the image? Where is … located?      |
+|Objectdetection|Isthereanyobject(dog,man,book)|
+||intheimage?Whereis…located?|
 +-----------------------------+----------------------------------------+
-| Object and image attribute  | What color is an umbrella? Does this   |
-| recognition                 | man wear glasses? Is there color in    |
-|                             | the image?                             |
+|Objectandimageattribute|Whatcolorisanumbrella?Doesthis|
+|recognition|manwearglasses?Istherecolorin|
+||theimage?|
 +-----------------------------+----------------------------------------+
-| Scene recognition           | Is it rainy? What celebration is       |
-|                             | pictured?                              |
+|Scenerecognition|Isitrainy?Whatcelebrationis|
+||pictured?|
 +-----------------------------+----------------------------------------+
-| Object counting             | How many players are there on the      |
-|                             | football field? How many steps are     |
-|                             | there on the stairs?                   |
+|Objectcounting|Howmanyplayersarethereonthe|
+||footballfield?Howmanystepsare|
+||thereonthestairs?|
 +-----------------------------+----------------------------------------+
-| Activity recognition        | Is the baby crying? What is the woman  |
-|                             | cooking? What are they doing?          |
+|Activityrecognition|Isthebabycrying?Whatisthewoman|
+||cooking?Whataretheydoing?|
 +-----------------------------+----------------------------------------+
-| Spatial relationships among | What is located between the sofa and   |
-| objects                     | the armchair? What is in the bottom    |
-|                             | left corner?                           |
+|Spatialrelationshipsamong|Whatislocatedbetweenthesofaand|
+|objects|thearmchair?Whatisinthebottom|
+||leftcorner?|
 +-----------------------------+----------------------------------------+
-| Commonsense reasoning       | Does she have 100% vision? Does this   |
-|                             | person have children?                  |
+|Commonsensereasoning|Doesshehave100%vision?Doesthis|
+||personhavechildren?|
 +-----------------------------+----------------------------------------+
-| Knowledge-based reasoning   | Is it a vegetarian pizza?              |
+|Knowledge-basedreasoning|Isitavegetarianpizza?|
 +-----------------------------+----------------------------------------+
-| Text recognition            | What is the title of the book? What is |
-|                             | shown on the screen?                   |
+|Textrecognition|Whatisthetitleofthebook?Whatis|
+||shownonthescreen?|
 +-----------------------------+----------------------------------------+
 
-There are a lot of applications for visual question answering:
+Therearealotofapplicationsforvisualquestionanswering:
 
--  Aid Visually Impaired Persons: VQA models can be used to reduce
-   barriers for visually impaired people by helping them get information
-   about images from the web and the real world.
--  Education: VQA models can be used to improve visitor experiences at
-   museums by enabling observers to directly ask questions they are
-   interested in or to bring more interactivity to schoolbooks for
-   children interested in acquiring specific knowledge.
--  E-commerce: VQA models can retrieve information about products using
-   photos from online stores.
--  Independent expert assessment: VQA models can be provide objective
-   assessments in sports competitions, medical diagnosis, and forensic
-   examination.
+-AidVisuallyImpairedPersons:VQAmodelscanbeusedtoreduce
+barriersforvisuallyimpairedpeoplebyhelpingthemgetinformation
+aboutimagesfromthewebandtherealworld.
+-Education:VQAmodelscanbeusedtoimprovevisitorexperiencesat
+museumsbyenablingobserverstodirectlyaskquestionstheyare
+interestedinortobringmoreinteractivitytoschoolbooksfor
+childreninterestedinacquiringspecificknowledge.
+-E-commerce:VQAmodelscanretrieveinformationaboutproductsusing
+photosfromonlinestores.
+-Independentexpertassessment:VQAmodelscanbeprovideobjective
+assessmentsinsportscompetitions,medicaldiagnosis,andforensic
+examination.
 
-.. |image0| image:: https://user-images.githubusercontent.com/29454499/221755717-a5b51b7e-523c-461f-b30c-4edbfaf9a134.png
-.. |image1| image:: https://user-images.githubusercontent.com/29454499/221640847-1868117c-aac0-4806-99a4-34f218e98bb8.png
-.. |image2| image:: https://user-images.githubusercontent.com/29454499/221641984-3c6d8b2f-dd0d-4302-a4d8-0f8564fca772.png
-.. |image3| image:: https://user-images.githubusercontent.com/29454499/221760881-378f1ea8-eadc-4610-aff0-69ecabf62fff.png
-.. |image4| image:: https://user-images.githubusercontent.com/29454499/222094861-3cafdf9f-d700-4741-b6c5-fb09c1a4da9a.png
-.. |image5| image:: https://user-images.githubusercontent.com/29454499/222095118-3d5826e4-2662-4d1c-abf2-a515f23d6d6a.png
+..|image0|image::https://user-images.githubusercontent.com/29454499/221755717-a5b51b7e-523c-461f-b30c-4edbfaf9a134.png
+..|image1|image::https://user-images.githubusercontent.com/29454499/221640847-1868117c-aac0-4806-99a4-34f218e98bb8.png
+..|image2|image::https://user-images.githubusercontent.com/29454499/221641984-3c6d8b2f-dd0d-4302-a4d8-0f8564fca772.png
+..|image3|image::https://user-images.githubusercontent.com/29454499/221760881-378f1ea8-eadc-4610-aff0-69ecabf62fff.png
+..|image4|image::https://user-images.githubusercontent.com/29454499/222094861-3cafdf9f-d700-4741-b6c5-fb09c1a4da9a.png
+..|image5|image::https://user-images.githubusercontent.com/29454499/222095118-3d5826e4-2662-4d1c-abf2-a515f23d6d6a.png
 
-Instantiate Model
+InstantiateModel
 -----------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The BLIP model was proposed in the `BLIP: Bootstrapping Language-Image
-Pre-training for Unified Vision-Language Understanding and
-Generation <https://arxiv.org/abs/2201.12086>`__ paper.
+TheBLIPmodelwasproposedinthe`BLIP:BootstrappingLanguage-Image
+Pre-trainingforUnifiedVision-LanguageUnderstandingand
+Generation<https://arxiv.org/abs/2201.12086>`__paper.
 
-.. figure:: https://github.com/salesforce/BLIP/raw/main/BLIP.gif
-   :alt: blip.gif
+..figure::https://github.com/salesforce/BLIP/raw/main/BLIP.gif
+:alt:blip.gif
 
-   blip.gif
+blip.gif
 
-To pre-train a unified vision-language model with both understanding and
-generation capabilities, BLIP introduces a multimodal mixture of an
-encoder-decoder and a multi-task model which can operate in one of the
-three modes:
+Topre-trainaunifiedvision-languagemodelwithbothunderstandingand
+generationcapabilities,BLIPintroducesamultimodalmixtureofan
+encoder-decoderandamulti-taskmodelwhichcanoperateinoneofthe
+threemodes:
 
--  **Unimodal encoders**, which separately encode images and text. The
-   image encoder is a vision transformer. The text encoder is the same
-   as BERT.
--  **Image-grounded text encoder**, which injects visual information by
-   inserting a cross-attention layer between the self-attention layer
-   and the feed-forward network for each transformer block of the text
-   encoder.
--  **Image-grounded text decoder**, which replaces the bi-directional
-   self-attention layers in the text encoder with causal self-attention
-   layers.
+-**Unimodalencoders**,whichseparatelyencodeimagesandtext.The
+imageencoderisavisiontransformer.Thetextencoderisthesame
+asBERT.
+-**Image-groundedtextencoder**,whichinjectsvisualinformationby
+insertingacross-attentionlayerbetweentheself-attentionlayer
+andthefeed-forwardnetworkforeachtransformerblockofthetext
+encoder.
+-**Image-groundedtextdecoder**,whichreplacesthebi-directional
+self-attentionlayersinthetextencoderwithcausalself-attention
+layers.
 
-More details about the model can be found in the `research
-paper <https://arxiv.org/abs/2201.12086>`__, `Salesforce
-blog <https://blog.salesforceairesearch.com/blip-bootstrapping-language-image-pretraining/>`__,
-`GitHub repo <https://github.com/salesforce/BLIP>`__ and `Hugging Face
+Moredetailsaboutthemodelcanbefoundinthe`research
+paper<https://arxiv.org/abs/2201.12086>`__,`Salesforce
+blog<https://blog.salesforceairesearch.com/blip-bootstrapping-language-image-pretraining/>`__,
+`GitHubrepo<https://github.com/salesforce/BLIP>`__and`HuggingFace
 model
-documentation <https://huggingface.co/docs/transformers/model_doc/blip>`__.
+documentation<https://huggingface.co/docs/transformers/model_doc/blip>`__.
 
-In this tutorial, you will use the
-```blip-vqa-base`` <https://huggingface.co/Salesforce/blip-vqa-base>`__
-model available for download from `Hugging
-Face <https://huggingface.co/>`__. The same actions are also applicable
-to other similar models from the BLIP family. Although this model class
-is designed to perform question answering, its components can also be
-reused for image captioning.
+Inthistutorial,youwillusethe
+`blip-vqa-base<https://huggingface.co/Salesforce/blip-vqa-base>`__
+modelavailablefordownloadfrom`Hugging
+Face<https://huggingface.co/>`__.Thesameactionsarealsoapplicable
+toothersimilarmodelsfromtheBLIPfamily.Althoughthismodelclass
+isdesignedtoperformquestionanswering,itscomponentscanalsobe
+reusedforimagecaptioning.
 
-To start working with the model, you need to instantiate the
-``BlipForQuestionAnswering`` class, using ``from_pretrained`` method.
-``BlipProcessor`` is a helper class for preparing input data for both
-text and vision modalities and postprocessing of generation results.
+Tostartworkingwiththemodel,youneedtoinstantiatethe
+``BlipForQuestionAnswering``class,using``from_pretrained``method.
+``BlipProcessor``isahelperclassforpreparinginputdataforboth
+textandvisionmodalitiesandpostprocessingofgenerationresults.
 
-.. code:: ipython3
+..code::ipython3
 
-    import platform
-    
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "torch>=2.1.0" torchvision "transformers>=4.26.0" "gradio>=4.19" "openvino>=2023.3.0" "datasets>=2.14.6" "nncf>=2.8.1" "tqdm"
-    if platform.system() != "Windows":
-        %pip install -q "matplotlib>=3.4"
-    else:
-        %pip install -q "matplotlib>=3.4,<3.7"
+importplatform
 
-.. code:: ipython3
+%pipinstall-q--extra-index-urlhttps://download.pytorch.org/whl/cpu"torch>=2.1.0"torchvision"transformers>=4.26.0""gradio>=4.19""openvino>=2023.3.0""datasets>=2.14.6""nncf>=2.8.1""tqdm"
+ifplatform.system()!="Windows":
+%pipinstall-q"matplotlib>=3.4"
+else:
+%pipinstall-q"matplotlib>=3.4,<3.7"
 
-    import time
-    from PIL import Image
-    from transformers import BlipProcessor, BlipForQuestionAnswering
-    
-    # Fetch `notebook_utils` module
-    import requests
-    
-    r = requests.get(
-        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
-    )
-    open("notebook_utils.py", "w").write(r.text)
-    from notebook_utils import download_file
-    
-    # get model and processor
-    processor = BlipProcessor.from_pretrained("Salesforce/blip-vqa-base")
-    model = BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
-    
-    # setup test input: download and read image, prepare question
-    img_url = "https://storage.googleapis.com/sfr-vision-language-research/BLIP/demo.jpg"
-    download_file(img_url, "demo.jpg")
-    raw_image = Image.open("demo.jpg").convert("RGB")
-    question = "how many dogs are in the picture?"
-    # preprocess input data
-    inputs = processor(raw_image, question, return_tensors="pt")
-    
-    start = time.perf_counter()
-    # perform generation
-    out = model.generate(**inputs)
-    end = time.perf_counter() - start
-    
-    # postprocess result
-    answer = processor.decode(out[0], skip_special_tokens=True)
+..code::ipython3
 
-.. code:: ipython3
+importtime
+fromPILimportImage
+fromtransformersimportBlipProcessor,BlipForQuestionAnswering
 
-    print(f"Processing time: {end:.4f} s")
+#Fetch`notebook_utils`module
+importrequests
 
+r=requests.get(
+url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
+)
+open("notebook_utils.py","w").write(r.text)
+fromnotebook_utilsimportdownload_file
 
-.. parsed-literal::
+#getmodelandprocessor
+processor=BlipProcessor.from_pretrained("Salesforce/blip-vqa-base")
+model=BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
 
-    Processing time: 0.3707 s
+#setuptestinput:downloadandreadimage,preparequestion
+img_url="https://storage.googleapis.com/sfr-vision-language-research/BLIP/demo.jpg"
+download_file(img_url,"demo.jpg")
+raw_image=Image.open("demo.jpg").convert("RGB")
+question="howmanydogsareinthepicture?"
+#preprocessinputdata
+inputs=processor(raw_image,question,return_tensors="pt")
+
+start=time.perf_counter()
+#performgeneration
+out=model.generate(**inputs)
+end=time.perf_counter()-start
+
+#postprocessresult
+answer=processor.decode(out[0],skip_special_tokens=True)
+
+..code::ipython3
+
+print(f"Processingtime:{end:.4f}s")
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    from pathlib import Path
-    
-    if not Path("./utils.py").exists():
-        download_file(url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/blip-visual-language-processing/utils.py")
-    from utils import visualize_results
-    
-    fig = visualize_results(raw_image, answer, question)
+Processingtime:0.3707s
 
 
+..code::ipython3
 
-.. image:: blip-visual-language-processing-with-output_files/blip-visual-language-processing-with-output_7_0.png
+frompathlibimportPath
+
+ifnotPath("./utils.py").exists():
+download_file(url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/blip-visual-language-processing/utils.py")
+fromutilsimportvisualize_results
+
+fig=visualize_results(raw_image,answer,question)
 
 
-Convert Models to OpenVINO IR
+
+..image::blip-visual-language-processing-with-output_files/blip-visual-language-processing-with-output_7_0.png
+
+
+ConvertModelstoOpenVINOIR
 -----------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Starting from OpenVINO 2023.0 release, OpenVINO supports direct PyTorch
-models conversion to OpenVINO Intermediate Representation (IR) format to
-take the advantage of advanced OpenVINO optimization tools and features.
-You need to provide a model object, input data for model tracing to
-OpenVINO Model Conversion API. ``ov.convert_model`` function convert
-PyTorch model instance to ``ov.Model`` object that can be used for
-compilation on device or saved on disk using ``ov.save_model`` in
-compressed to FP16 format.
+StartingfromOpenVINO2023.0release,OpenVINOsupportsdirectPyTorch
+modelsconversiontoOpenVINOIntermediateRepresentation(IR)formatto
+taketheadvantageofadvancedOpenVINOoptimizationtoolsandfeatures.
+Youneedtoprovideamodelobject,inputdataformodeltracingto
+OpenVINOModelConversionAPI.``ov.convert_model``functionconvert
+PyTorchmodelinstanceto``ov.Model``objectthatcanbeusedfor
+compilationondeviceorsavedondiskusing``ov.save_model``in
+compressedtoFP16format.
 
-The model consists of three parts:
+Themodelconsistsofthreeparts:
 
--  vision_model - an encoder for image representation.
--  text_encoder - an encoder for input query, used for question
-   answering and text-to-image retrieval only.
--  text_decoder - a decoder for output answer.
+-vision_model-anencoderforimagerepresentation.
+-text_encoder-anencoderforinputquery,usedforquestion
+answeringandtext-to-imageretrievalonly.
+-text_decoder-adecoderforoutputanswer.
 
-To be able to perform multiple tasks, using the same model components,
-you should convert each part independently.
+Tobeabletoperformmultipletasks,usingthesamemodelcomponents,
+youshouldconverteachpartindependently.
 
-Vision Model
+VisionModel
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The vision model accepts float input tensors with the [1,3,384,384]
-shape, containing RGB image pixel values normalized in the [0,1] range.
+Thevisionmodelacceptsfloatinputtensorswiththe[1,3,384,384]
+shape,containingRGBimagepixelvaluesnormalizedinthe[0,1]range.
 
-.. code:: ipython3
+..code::ipython3
 
-    import torch
-    from pathlib import Path
-    import openvino as ov
-    
-    VISION_MODEL_OV = Path("blip_vision_model.xml")
-    vision_model = model.vision_model
-    vision_model.eval()
-    
-    # check that model works and save it outputs for reusage as text encoder input
-    with torch.no_grad():
-        vision_outputs = vision_model(inputs["pixel_values"])
-    
-    # if openvino model does not exist, convert it to IR
-    if not VISION_MODEL_OV.exists():
-        # export pytorch model to ov.Model
-        with torch.no_grad():
-            ov_vision_model = ov.convert_model(vision_model, example_input=inputs["pixel_values"])
-        # save model on disk for next usages
-        ov.save_model(ov_vision_model, VISION_MODEL_OV)
-        print(f"Vision model successfuly converted and saved to {VISION_MODEL_OV}")
-    else:
-        print(f"Vision model will be loaded from {VISION_MODEL_OV}")
+importtorch
+frompathlibimportPath
+importopenvinoasov
 
+VISION_MODEL_OV=Path("blip_vision_model.xml")
+vision_model=model.vision_model
+vision_model.eval()
 
-.. parsed-literal::
+#checkthatmodelworksandsaveitoutputsforreusageastextencoderinput
+withtorch.no_grad():
+vision_outputs=vision_model(inputs["pixel_values"])
 
-    /home/ltalamanova/tmp_venv/lib/python3.11/site-packages/transformers/modeling_utils.py:4225: FutureWarning: `_is_quantized_training_enabled` is going to be deprecated in transformers 4.39.0. Please use `model.hf_quantizer.is_trainable` instead
-      warnings.warn(
+#ifopenvinomodeldoesnotexist,convertittoIR
+ifnotVISION_MODEL_OV.exists():
+#exportpytorchmodeltoov.Model
+withtorch.no_grad():
+ov_vision_model=ov.convert_model(vision_model,example_input=inputs["pixel_values"])
+#savemodelondiskfornextusages
+ov.save_model(ov_vision_model,VISION_MODEL_OV)
+print(f"Visionmodelsuccessfulyconvertedandsavedto{VISION_MODEL_OV}")
+else:
+print(f"Visionmodelwillbeloadedfrom{VISION_MODEL_OV}")
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    Vision model successfuly converted and saved to blip_vision_model.xml
+/home/ltalamanova/tmp_venv/lib/python3.11/site-packages/transformers/modeling_utils.py:4225:FutureWarning:`_is_quantized_training_enabled`isgoingtobedeprecatedintransformers4.39.0.Pleaseuse`model.hf_quantizer.is_trainable`instead
+warnings.warn(
 
 
-Text Encoder
+..parsed-literal::
+
+Visionmodelsuccessfulyconvertedandsavedtoblip_vision_model.xml
+
+
+TextEncoder
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The text encoder is used by visual question answering tasks to build a
-question embedding representation. It takes ``input_ids`` with a
-tokenized question and output image embeddings obtained from the vision
-model and attention masks for them.
+Thetextencoderisusedbyvisualquestionansweringtaskstobuilda
+questionembeddingrepresentation.Ittakes``input_ids``witha
+tokenizedquestionandoutputimageembeddingsobtainedfromthevision
+modelandattentionmasksforthem.
 
-.. code:: ipython3
+..code::ipython3
 
-    TEXT_ENCODER_OV = Path("blip_text_encoder.xml")
-    
-    
-    text_encoder = model.text_encoder
-    text_encoder.eval()
-    
-    # if openvino model does not exist, convert it to IR
-    if not TEXT_ENCODER_OV.exists():
-        # prepare example inputs
-        image_embeds = vision_outputs[0]
-        image_attention_mask = torch.ones(image_embeds.size()[:-1], dtype=torch.long)
-        input_dict = {
-            "input_ids": inputs["input_ids"],
-            "attention_mask": inputs["attention_mask"],
-            "encoder_hidden_states": image_embeds,
-            "encoder_attention_mask": image_attention_mask,
-        }
-        # export PyTorch model
-        with torch.no_grad():
-            ov_text_encoder = ov.convert_model(text_encoder, example_input=input_dict)
-        # save model on disk for next usages
-        ov.save_model(ov_text_encoder, TEXT_ENCODER_OV)
-        print(f"Text encoder successfuly converted and saved to {TEXT_ENCODER_OV}")
-    else:
-        print(f"Text encoder will be loaded from {TEXT_ENCODER_OV}")
+TEXT_ENCODER_OV=Path("blip_text_encoder.xml")
 
 
-.. parsed-literal::
+text_encoder=model.text_encoder
+text_encoder.eval()
 
-    Text encoder successfuly converted and saved to blip_text_encoder.xml
+#ifopenvinomodeldoesnotexist,convertittoIR
+ifnotTEXT_ENCODER_OV.exists():
+#prepareexampleinputs
+image_embeds=vision_outputs[0]
+image_attention_mask=torch.ones(image_embeds.size()[:-1],dtype=torch.long)
+input_dict={
+"input_ids":inputs["input_ids"],
+"attention_mask":inputs["attention_mask"],
+"encoder_hidden_states":image_embeds,
+"encoder_attention_mask":image_attention_mask,
+}
+#exportPyTorchmodel
+withtorch.no_grad():
+ov_text_encoder=ov.convert_model(text_encoder,example_input=input_dict)
+#savemodelondiskfornextusages
+ov.save_model(ov_text_encoder,TEXT_ENCODER_OV)
+print(f"Textencodersuccessfulyconvertedandsavedto{TEXT_ENCODER_OV}")
+else:
+print(f"Textencoderwillbeloadedfrom{TEXT_ENCODER_OV}")
 
 
-Text Decoder
+..parsed-literal::
+
+Textencodersuccessfulyconvertedandsavedtoblip_text_encoder.xml
+
+
+TextDecoder
 ~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The text decoder is responsible for generating the sequence of tokens to
-represent model output (answer to question or caption), using an image
-(and question, if required) representation. The generation approach is
-based on the assumption that the probability distribution of a word
-sequence can be decomposed into the product of conditional next word
-distributions. In other words, model predicts the next token in the loop
-guided by previously generated tokens until the stop-condition will be
-not reached (generated sequence of maximum length or end of string token
-obtained). The way the next token will be selected over predicted
-probabilities is driven by the selected decoding methodology. You can
-find more information about the most popular decoding methods in this
-`blog <https://huggingface.co/blog/how-to-generate>`__. The entry point
-for the generation process for models from the Hugging Face Transformers
-library is the ``generate`` method. You can find more information about
-its parameters and configuration in the
-`documentation <https://huggingface.co/docs/transformers/v4.26.1/en/main_classes/text_generation#transformers.GenerationMixin.generate>`__.
-To preserve flexibility in the selection decoding methodology, you will
-convert only model inference for one step.
+Thetextdecoderisresponsibleforgeneratingthesequenceoftokensto
+representmodeloutput(answertoquestionorcaption),usinganimage
+(andquestion,ifrequired)representation.Thegenerationapproachis
+basedontheassumptionthattheprobabilitydistributionofaword
+sequencecanbedecomposedintotheproductofconditionalnextword
+distributions.Inotherwords,modelpredictsthenexttokenintheloop
+guidedbypreviouslygeneratedtokensuntilthestop-conditionwillbe
+notreached(generatedsequenceofmaximumlengthorendofstringtoken
+obtained).Thewaythenexttokenwillbeselectedoverpredicted
+probabilitiesisdrivenbytheselecteddecodingmethodology.Youcan
+findmoreinformationaboutthemostpopulardecodingmethodsinthis
+`blog<https://huggingface.co/blog/how-to-generate>`__.Theentrypoint
+forthegenerationprocessformodelsfromtheHuggingFaceTransformers
+libraryisthe``generate``method.Youcanfindmoreinformationabout
+itsparametersandconfigurationinthe
+`documentation<https://huggingface.co/docs/transformers/v4.26.1/en/main_classes/text_generation#transformers.GenerationMixin.generate>`__.
+Topreserveflexibilityintheselectiondecodingmethodology,youwill
+convertonlymodelinferenceforonestep.
 
-To optimize the generation process and use memory more efficiently, the
-``use_cache=True`` option is enabled. Since the output side is
-auto-regressive, an output token hidden state remains the same once
-computed for every further generation step. Therefore, recomputing it
-every time you want to generate a new token seems wasteful. With the
-cache, the model saves the hidden state once it has been computed. The
-model only computes the one for the most recently generated output token
-at each time step, re-using the saved ones for hidden tokens. This
-reduces the generation complexity from O(n^3) to O(n^2) for a
-transformer model. More details about how it works can be found in this
-`article <https://scale.com/blog/pytorch-improvements#Text%20Translation>`__.
-With this option, the model gets the previous step’s hidden states as
-input and additionally provides hidden states for the current step as
-output. Initially, you have no previous step hidden states, so the first
-step does not require you to provide them, but we should initialize them
-by default values. In PyTorch, past hidden state outputs are represented
-as a list of pairs (hidden state for key, hidden state for value] for
-each transformer layer in the model. OpenVINO model does not support
-nested outputs, they will be flattened.
+Tooptimizethegenerationprocessandusememorymoreefficiently,the
+``use_cache=True``optionisenabled.Sincetheoutputsideis
+auto-regressive,anoutputtokenhiddenstateremainsthesameonce
+computedforeveryfurthergenerationstep.Therefore,recomputingit
+everytimeyouwanttogenerateanewtokenseemswasteful.Withthe
+cache,themodelsavesthehiddenstateonceithasbeencomputed.The
+modelonlycomputestheoneforthemostrecentlygeneratedoutputtoken
+ateachtimestep,re-usingthesavedonesforhiddentokens.This
+reducesthegenerationcomplexityfromO(n^3)toO(n^2)fora
+transformermodel.Moredetailsabouthowitworkscanbefoundinthis
+`article<https://scale.com/blog/pytorch-improvements#Text%20Translation>`__.
+Withthisoption,themodelgetsthepreviousstep’shiddenstatesas
+inputandadditionallyprovideshiddenstatesforthecurrentstepas
+output.Initially,youhavenopreviousstephiddenstates,sothefirst
+stepdoesnotrequireyoutoprovidethem,butweshouldinitializethem
+bydefaultvalues.InPyTorch,pasthiddenstateoutputsarerepresented
+asalistofpairs(hiddenstateforkey,hiddenstateforvalue]for
+eachtransformerlayerinthemodel.OpenVINOmodeldoesnotsupport
+nestedoutputs,theywillbeflattened.
 
-Similar to ``text_encoder``, ``text_decoder`` can work with input
-sequences of different lengths and requires preserving dynamic input
+Similarto``text_encoder``,``text_decoder``canworkwithinput
+sequencesofdifferentlengthsandrequirespreservingdynamicinput
 shapes.
 
-.. code:: ipython3
+..code::ipython3
 
-    text_decoder = model.text_decoder
-    text_decoder.eval()
-    
-    TEXT_DECODER_OV = Path("blip_text_decoder_with_past.xml")
-    
-    # prepare example inputs
-    input_ids = torch.tensor([[30522]])  # begin of sequence token id
-    attention_mask = torch.tensor([[1]])  # attention mask for input_ids
-    encoder_hidden_states = torch.rand((1, 10, 768))  # encoder last hidden state from text_encoder
-    encoder_attention_mask = torch.ones((1, 10), dtype=torch.long)  # attention mask for encoder hidden states
-    
-    input_dict = {
-        "input_ids": input_ids,
-        "attention_mask": attention_mask,
-        "encoder_hidden_states": encoder_hidden_states,
-        "encoder_attention_mask": encoder_attention_mask,
-    }
-    text_decoder_outs = text_decoder(**input_dict)
-    # extend input dictionary with hidden states from previous step
-    input_dict["past_key_values"] = text_decoder_outs["past_key_values"]
-    
-    text_decoder.config.torchscript = True
-    if not TEXT_DECODER_OV.exists():
-        # export PyTorch model
-        with torch.no_grad():
-            ov_text_decoder = ov.convert_model(text_decoder, example_input=input_dict)
-        # save model on disk for next usages
-        ov.save_model(ov_text_decoder, TEXT_DECODER_OV)
-        print(f"Text decoder successfuly converted and saved to {TEXT_DECODER_OV}")
-    else:
-        print(f"Text decoder will be loaded from {TEXT_DECODER_OV}")
+text_decoder=model.text_decoder
+text_decoder.eval()
 
+TEXT_DECODER_OV=Path("blip_text_decoder_with_past.xml")
 
-.. parsed-literal::
+#prepareexampleinputs
+input_ids=torch.tensor([[30522]])#beginofsequencetokenid
+attention_mask=torch.tensor([[1]])#attentionmaskforinput_ids
+encoder_hidden_states=torch.rand((1,10,768))#encoderlasthiddenstatefromtext_encoder
+encoder_attention_mask=torch.ones((1,10),dtype=torch.long)#attentionmaskforencoderhiddenstates
 
-    /home/ltalamanova/tmp_venv/lib/python3.11/site-packages/transformers/models/blip/modeling_blip_text.py:635: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if causal_mask.shape[1] < attention_mask.shape[1]:
-    /home/ltalamanova/tmp_venv/lib/python3.11/site-packages/torch/jit/_trace.py:165: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at aten/src/ATen/core/TensorBody.h:489.)
-      if a.grad is not None:
+input_dict={
+"input_ids":input_ids,
+"attention_mask":attention_mask,
+"encoder_hidden_states":encoder_hidden_states,
+"encoder_attention_mask":encoder_attention_mask,
+}
+text_decoder_outs=text_decoder(**input_dict)
+#extendinputdictionarywithhiddenstatesfrompreviousstep
+input_dict["past_key_values"]=text_decoder_outs["past_key_values"]
+
+text_decoder.config.torchscript=True
+ifnotTEXT_DECODER_OV.exists():
+#exportPyTorchmodel
+withtorch.no_grad():
+ov_text_decoder=ov.convert_model(text_decoder,example_input=input_dict)
+#savemodelondiskfornextusages
+ov.save_model(ov_text_decoder,TEXT_DECODER_OV)
+print(f"Textdecodersuccessfulyconvertedandsavedto{TEXT_DECODER_OV}")
+else:
+print(f"Textdecoderwillbeloadedfrom{TEXT_DECODER_OV}")
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    Text decoder successfuly converted and saved to blip_text_decoder_with_past.xml
+/home/ltalamanova/tmp_venv/lib/python3.11/site-packages/transformers/models/blip/modeling_blip_text.py:635:TracerWarning:ConvertingatensortoaPythonbooleanmightcausethetracetobeincorrect.Wecan'trecordthedataflowofPythonvalues,sothisvaluewillbetreatedasaconstantinthefuture.Thismeansthatthetracemightnotgeneralizetootherinputs!
+ifcausal_mask.shape[1]<attention_mask.shape[1]:
+/home/ltalamanova/tmp_venv/lib/python3.11/site-packages/torch/jit/_trace.py:165:UserWarning:The.gradattributeofaTensorthatisnotaleafTensorisbeingaccessed.Its.gradattributewon'tbepopulatedduringautograd.backward().Ifyouindeedwantthe.gradfieldtobepopulatedforanon-leafTensor,use.retain_grad()onthenon-leafTensor.Ifyouaccessthenon-leafTensorbymistake,makesureyouaccesstheleafTensorinstead.Seegithub.com/pytorch/pytorch/pull/30531formoreinformations.(Triggeredinternallyataten/src/ATen/core/TensorBody.h:489.)
+ifa.gradisnotNone:
 
 
-Run OpenVINO Model
+..parsed-literal::
+
+Textdecodersuccessfulyconvertedandsavedtoblip_text_decoder_with_past.xml
+
+
+RunOpenVINOModel
 ------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Prepare Inference Pipeline
+PrepareInferencePipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-As discussed before, the model consists of several blocks which can be
-reused for building pipelines for different tasks. In the diagram below,
-you can see how image captioning works:
+Asdiscussedbefore,themodelconsistsofseveralblockswhichcanbe
+reusedforbuildingpipelinesfordifferenttasks.Inthediagrambelow,
+youcanseehowimagecaptioningworks:
 
 |image0|
 
-The visual model accepts the image preprocessed by ``BlipProcessor`` as
-input and produces image embeddings, which are directly passed to the
-text decoder for generation caption tokens. When generation is finished,
-output sequence of tokens is provided to ``BlipProcessor`` for decoding
-to text using a tokenizer.
+Thevisualmodelacceptstheimagepreprocessedby``BlipProcessor``as
+inputandproducesimageembeddings,whicharedirectlypassedtothe
+textdecoderforgenerationcaptiontokens.Whengenerationisfinished,
+outputsequenceoftokensisprovidedto``BlipProcessor``fordecoding
+totextusingatokenizer.
 
-The pipeline for question answering looks similar, but with additional
-question processing. In this case, image embeddings and question
-tokenized by ``BlipProcessor`` are provided to the text encoder and then
-multimodal question embedding is passed to the text decoder for
-performing generation of answers.
+Thepipelineforquestionansweringlookssimilar,butwithadditional
+questionprocessing.Inthiscase,imageembeddingsandquestion
+tokenizedby``BlipProcessor``areprovidedtothetextencoderandthen
+multimodalquestionembeddingispassedtothetextdecoderfor
+performinggenerationofanswers.
 
 |image1|
 
-The next step is implementing both pipelines using OpenVINO models.
+ThenextstepisimplementingbothpipelinesusingOpenVINOmodels.
 
-.. |image0| image:: https://user-images.githubusercontent.com/29454499/221865836-a56da06e-196d-449c-a5dc-4136da6ab5d5.png
-.. |image1| image:: https://user-images.githubusercontent.com/29454499/221868167-d0081add-d9f3-4591-80e7-4753c88c1d0a.png
+..|image0|image::https://user-images.githubusercontent.com/29454499/221865836-a56da06e-196d-449c-a5dc-4136da6ab5d5.png
+..|image1|image::https://user-images.githubusercontent.com/29454499/221868167-d0081add-d9f3-4591-80e7-4753c88c1d0a.png
 
-.. code:: ipython3
+..code::ipython3
 
-    # create OpenVINO Core object instance
-    core = ov.Core()
+#createOpenVINOCoreobjectinstance
+core=ov.Core()
 
-Select inference device
+Selectinferencedevice
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-select device from dropdown list for running inference using OpenVINO
+selectdevicefromdropdownlistforrunninginferenceusingOpenVINO
 
-.. code:: ipython3
+..code::ipython3
 
-    import ipywidgets as widgets
-    
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="AUTO",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+importipywidgetsaswidgets
 
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="AUTO",
+description="Device:",
+disabled=False,
+)
 
-.. parsed-literal::
-
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+device
 
 
+..parsed-literal::
 
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', index=4, options=('CPU', 'GPU.0', 'GPU.1', 'GPU.2', 'AUTO'), value='AUTO')
+huggingface/tokenizers:Thecurrentprocessjustgotforked,afterparallelismhasalreadybeenused.Disablingparallelismtoavoiddeadlocks...
+Todisablethiswarning,youcaneither:
+	-Avoidusing`tokenizers`beforetheforkifpossible
+	-ExplicitlysettheenvironmentvariableTOKENIZERS_PARALLELISM=(true|false)
 
 
 
-.. code:: ipython3
 
-    # load models on device
-    ov_vision_model = core.compile_model(VISION_MODEL_OV, device.value)
-    ov_text_encoder = core.compile_model(TEXT_ENCODER_OV, device.value)
-    ov_text_decoder_with_past = core.compile_model(TEXT_DECODER_OV, device.value)
+..parsed-literal::
 
-.. code:: ipython3
+Dropdown(description='Device:',index=4,options=('CPU','GPU.0','GPU.1','GPU.2','AUTO'),value='AUTO')
 
-    from functools import partial
-    from blip_model import text_decoder_forward
-    
-    text_decoder.forward = partial(text_decoder_forward, ov_text_decoder_with_past=ov_text_decoder_with_past)
 
-The model helper class has two methods for generation:
-**generate_answer** - used for visual question answering,
-**generate_caption** - used for caption generation. For initialization,
-model class accepts compiled OpenVINO models for the text encoder,
-vision model and text decoder, and also configuration for generation and
-initial token for decoder work.
 
-.. code:: ipython3
+..code::ipython3
 
-    if not Path("./blip_model.py").exists():
-        download_file(url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/blip-visual-language-processing/blip_model.py")
-    from blip_model import OVBlipModel
-    
-    ov_model = OVBlipModel(model.config, model.decoder_start_token_id, ov_vision_model, ov_text_encoder, text_decoder)
-    out = ov_model.generate_answer(**inputs, max_length=20)
+#loadmodelsondevice
+ov_vision_model=core.compile_model(VISION_MODEL_OV,device.value)
+ov_text_encoder=core.compile_model(TEXT_ENCODER_OV,device.value)
+ov_text_decoder_with_past=core.compile_model(TEXT_DECODER_OV,device.value)
 
-Now, the model is ready for generation.
+..code::ipython3
 
-Image Captioning
+fromfunctoolsimportpartial
+fromblip_modelimporttext_decoder_forward
+
+text_decoder.forward=partial(text_decoder_forward,ov_text_decoder_with_past=ov_text_decoder_with_past)
+
+Themodelhelperclasshastwomethodsforgeneration:
+**generate_answer**-usedforvisualquestionanswering,
+**generate_caption**-usedforcaptiongeneration.Forinitialization,
+modelclassacceptscompiledOpenVINOmodelsforthetextencoder,
+visionmodelandtextdecoder,andalsoconfigurationforgenerationand
+initialtokenfordecoderwork.
+
+..code::ipython3
+
+ifnotPath("./blip_model.py").exists():
+download_file(url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/notebooks/blip-visual-language-processing/blip_model.py")
+fromblip_modelimportOVBlipModel
+
+ov_model=OVBlipModel(model.config,model.decoder_start_token_id,ov_vision_model,ov_text_encoder,text_decoder)
+out=ov_model.generate_answer(**inputs,max_length=20)
+
+Now,themodelisreadyforgeneration.
+
+ImageCaptioning
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    out = ov_model.generate_caption(inputs["pixel_values"], max_length=20)
-    caption = processor.decode(out[0], skip_special_tokens=True)
-    fig = visualize_results(raw_image, caption)
-
-
-
-.. image:: blip-visual-language-processing-with-output_files/blip-visual-language-processing-with-output_25_0.png
+out=ov_model.generate_caption(inputs["pixel_values"],max_length=20)
+caption=processor.decode(out[0],skip_special_tokens=True)
+fig=visualize_results(raw_image,caption)
 
 
-Question Answering
+
+..image::blip-visual-language-processing-with-output_files/blip-visual-language-processing-with-output_25_0.png
+
+
+QuestionAnswering
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    start = time.perf_counter()
-    out = ov_model.generate_answer(**inputs, max_length=20)
-    end = time.perf_counter() - start
-    answer = processor.decode(out[0], skip_special_tokens=True)
-    fig = visualize_results(raw_image, answer, question)
-
-
-
-.. image:: blip-visual-language-processing-with-output_files/blip-visual-language-processing-with-output_27_0.png
+start=time.perf_counter()
+out=ov_model.generate_answer(**inputs,max_length=20)
+end=time.perf_counter()-start
+answer=processor.decode(out[0],skip_special_tokens=True)
+fig=visualize_results(raw_image,answer,question)
 
 
-.. code:: ipython3
 
-    print(f"Processing time: {end:.4f}")
-
-
-.. parsed-literal::
-
-    Processing time: 0.1186
+..image::blip-visual-language-processing-with-output_files/blip-visual-language-processing-with-output_27_0.png
 
 
-Optimize model using NNCF
+..code::ipython3
+
+print(f"Processingtime:{end:.4f}")
+
+
+..parsed-literal::
+
+Processingtime:0.1186
+
+
+OptimizemodelusingNNCF
 -------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-`NNCF <https://github.com/openvinotoolkit/nncf/>`__ enables
-post-training quantization by adding the quantization layers into the
-model graph and then using a subset of the training dataset to
-initialize the parameters of these additional quantization layers. The
-framework is designed so that modifications to your original training
-code are minor.
+`NNCF<https://github.com/openvinotoolkit/nncf/>`__enables
+post-trainingquantizationbyaddingthequantizationlayersintothe
+modelgraphandthenusingasubsetofthetrainingdatasetto
+initializetheparametersoftheseadditionalquantizationlayers.The
+frameworkisdesignedsothatmodificationstoyouroriginaltraining
+codeareminor.
 
-The optimization process contains the following steps:
+Theoptimizationprocesscontainsthefollowingsteps:
 
-1. Create a dataset for quantization.
-2. Run ``nncf.quantize`` to get a quantized model from the pre-trained
-   ``FP16`` model.
-3. Serialize the ``INT8`` model using ``openvino.save_model`` function.
+1.Createadatasetforquantization.
+2.Run``nncf.quantize``togetaquantizedmodelfromthepre-trained
+``FP16``model.
+3.Serializethe``INT8``modelusing``openvino.save_model``function.
 
 ..
 
-   **NOTE**: Quantization is time and memory consuming operation.
-   Running quantization code below may take some time. You can disable
-   it using widget below:
+**NOTE**:Quantizationistimeandmemoryconsumingoperation.
+Runningquantizationcodebelowmaytakesometime.Youcandisable
+itusingwidgetbelow:
 
-.. code:: ipython3
+..code::ipython3
 
-    to_quantize = widgets.Checkbox(
-        value=True,
-        description="Quantization",
-        disabled=False,
-    )
-    
-    to_quantize
+to_quantize=widgets.Checkbox(
+value=True,
+description="Quantization",
+disabled=False,
+)
 
-
-
-
-.. parsed-literal::
-
-    Checkbox(value=True, description='Quantization')
+to_quantize
 
 
 
-.. code:: ipython3
 
-    VISION_MODEL_OV_INT8 = Path(str(VISION_MODEL_OV).replace(".xml", "_int8.xml"))
-    TEXT_ENCODER_OV_INT8 = Path(str(TEXT_ENCODER_OV).replace(".xml", "_int8.xml"))
-    TEXT_DECODER_OV_INT8 = Path(str(TEXT_DECODER_OV).replace(".xml", "_int8.xml"))
-    int8_model = None
-    
-    # Fetch skip_kernel_extension module
-    r = requests.get(
-        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
-    )
-    open("skip_kernel_extension.py", "w").write(r.text)
-    
-    %load_ext skip_kernel_extension
+..parsed-literal::
 
-Prepare dataset
+Checkbox(value=True,description='Quantization')
+
+
+
+..code::ipython3
+
+VISION_MODEL_OV_INT8=Path(str(VISION_MODEL_OV).replace(".xml","_int8.xml"))
+TEXT_ENCODER_OV_INT8=Path(str(TEXT_ENCODER_OV).replace(".xml","_int8.xml"))
+TEXT_DECODER_OV_INT8=Path(str(TEXT_DECODER_OV).replace(".xml","_int8.xml"))
+int8_model=None
+
+#Fetchskip_kernel_extensionmodule
+r=requests.get(
+url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/skip_kernel_extension.py",
+)
+open("skip_kernel_extension.py","w").write(r.text)
+
+%load_extskip_kernel_extension
+
+Preparedataset
 ~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The ```VQAv2`` <https://visualqa.org/>`__ is a dataset containing
-open-ended questions about images. These questions require an
-understanding of vision, language and commonsense knowledge to answer.
+The`VQAv2<https://visualqa.org/>`__isadatasetcontaining
+open-endedquestionsaboutimages.Thesequestionsrequirean
+understandingofvision,languageandcommonsenseknowledgetoanswer.
 
-.. code:: ipython3
+..code::ipython3
 
-    %%skip not $to_quantize.value
-    
-    import numpy as np
-    from datasets import load_dataset
-    from tqdm.notebook import tqdm
-    
-    def preprocess_batch(batch, vision_model, inputs_info):
-        """
-        Preprocesses a dataset batch by loading and transforming image and text data.
-        VQAv2 dataset contains multiple questions to image.
-        To reduce dataset preparation time we will store preprocessed images in `inputs_info`.
-        """
-        image_id = batch["image_id"]
-        if image_id in inputs_info:
-            inputs = processor(text=batch['question'], return_tensors="np")
-            pixel_values = inputs_info[image_id]["pixel_values"]
-            encoder_hidden_states = inputs_info[image_id]["encoder_hidden_states"]
-        else:
-            inputs = processor(images=batch["image"], text=batch["question"], return_tensors="np")
-            pixel_values = inputs["pixel_values"]
-            encoder_hidden_states = vision_model(pixel_values)[vision_model.output(0)]
-            inputs_info[image_id] = {
-                "pixel_values": pixel_values,
-                "encoder_hidden_states": encoder_hidden_states,
-                "text_encoder_inputs": []
-            }
-    
-        text_encoder_inputs = {
-            "input_ids": inputs["input_ids"],
-            "attention_mask": inputs["attention_mask"]
-        }
-        inputs_info[image_id]["text_encoder_inputs"].append(text_encoder_inputs)
-    
-    
-    def prepare_input_data(dataloader, vision_model, opt_init_steps):
-        """
-        Store calibration subset in List to reduce quantization time.
-        """
-        inputs_info = {}
-        for idx, batch in enumerate(tqdm(dataloader, total=opt_init_steps, desc="Prepare calibration data")):
-            preprocess_batch(batch, vision_model, inputs_info)
-    
-        calibration_subset = []
-        for image_id in inputs_info:
-            pixel_values = inputs_info[image_id]["pixel_values"]
-            encoder_hidden_states = inputs_info[image_id]["encoder_hidden_states"]
-            encoder_attention_mask = np.ones(encoder_hidden_states.shape[:-1], dtype=int)
-            for text_encoder_inputs in inputs_info[image_id]["text_encoder_inputs"]:
-                text_encoder_inputs["encoder_hidden_states"] = encoder_hidden_states
-                text_encoder_inputs["encoder_attention_mask"] = encoder_attention_mask
-                blip_inputs = {
-                    "vision_model_inputs": {"pixel_values": pixel_values},
-                    "text_encoder_inputs": text_encoder_inputs,
-                }
-                calibration_subset.append(blip_inputs)
-        return calibration_subset
-    
-    
-    def prepare_dataset(vision_model, opt_init_steps=300, streaming=False):
-        """
-        Prepares a vision-text dataset for quantization.
-        """
-        split = f"train[:{opt_init_steps}]" if not streaming else "train"
-        dataset = load_dataset("HuggingFaceM4/VQAv2", split=split, streaming=streaming, trust_remote_code=True)
-        dataset = dataset.shuffle(seed=42)
-        if streaming:
-            dataset = dataset.take(opt_init_steps)
-        calibration_subset = prepare_input_data(dataset, vision_model, opt_init_steps)
-        return calibration_subset
+%%skipnot$to_quantize.value
 
-Loading and processing the dataset in streaming mode may take a long
-time and depends on your internet connection.
+importnumpyasnp
+fromdatasetsimportload_dataset
+fromtqdm.notebookimporttqdm
 
-.. code:: ipython3
+defpreprocess_batch(batch,vision_model,inputs_info):
+"""
+Preprocessesadatasetbatchbyloadingandtransformingimageandtextdata.
+VQAv2datasetcontainsmultiplequestionstoimage.
+Toreducedatasetpreparationtimewewillstorepreprocessedimagesin`inputs_info`.
+"""
+image_id=batch["image_id"]
+ifimage_idininputs_info:
+inputs=processor(text=batch['question'],return_tensors="np")
+pixel_values=inputs_info[image_id]["pixel_values"]
+encoder_hidden_states=inputs_info[image_id]["encoder_hidden_states"]
+else:
+inputs=processor(images=batch["image"],text=batch["question"],return_tensors="np")
+pixel_values=inputs["pixel_values"]
+encoder_hidden_states=vision_model(pixel_values)[vision_model.output(0)]
+inputs_info[image_id]={
+"pixel_values":pixel_values,
+"encoder_hidden_states":encoder_hidden_states,
+"text_encoder_inputs":[]
+}
 
-    %%skip not $to_quantize.value
-    
-    import nncf
-    
-    comp_vision_model = core.compile_model(VISION_MODEL_OV, device.value)
-    calibration_data = prepare_dataset(comp_vision_model)
+text_encoder_inputs={
+"input_ids":inputs["input_ids"],
+"attention_mask":inputs["attention_mask"]
+}
+inputs_info[image_id]["text_encoder_inputs"].append(text_encoder_inputs)
 
-Quantize vision model
+
+defprepare_input_data(dataloader,vision_model,opt_init_steps):
+"""
+StorecalibrationsubsetinListtoreducequantizationtime.
+"""
+inputs_info={}
+foridx,batchinenumerate(tqdm(dataloader,total=opt_init_steps,desc="Preparecalibrationdata")):
+preprocess_batch(batch,vision_model,inputs_info)
+
+calibration_subset=[]
+forimage_idininputs_info:
+pixel_values=inputs_info[image_id]["pixel_values"]
+encoder_hidden_states=inputs_info[image_id]["encoder_hidden_states"]
+encoder_attention_mask=np.ones(encoder_hidden_states.shape[:-1],dtype=int)
+fortext_encoder_inputsininputs_info[image_id]["text_encoder_inputs"]:
+text_encoder_inputs["encoder_hidden_states"]=encoder_hidden_states
+text_encoder_inputs["encoder_attention_mask"]=encoder_attention_mask
+blip_inputs={
+"vision_model_inputs":{"pixel_values":pixel_values},
+"text_encoder_inputs":text_encoder_inputs,
+}
+calibration_subset.append(blip_inputs)
+returncalibration_subset
+
+
+defprepare_dataset(vision_model,opt_init_steps=300,streaming=False):
+"""
+Preparesavision-textdatasetforquantization.
+"""
+split=f"train[:{opt_init_steps}]"ifnotstreamingelse"train"
+dataset=load_dataset("HuggingFaceM4/VQAv2",split=split,streaming=streaming,trust_remote_code=True)
+dataset=dataset.shuffle(seed=42)
+ifstreaming:
+dataset=dataset.take(opt_init_steps)
+calibration_subset=prepare_input_data(dataset,vision_model,opt_init_steps)
+returncalibration_subset
+
+Loadingandprocessingthedatasetinstreamingmodemaytakealong
+timeanddependsonyourinternetconnection.
+
+..code::ipython3
+
+%%skipnot$to_quantize.value
+
+importnncf
+
+comp_vision_model=core.compile_model(VISION_MODEL_OV,device.value)
+calibration_data=prepare_dataset(comp_vision_model)
+
+Quantizevisionmodel
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    %%skip not $to_quantize.value
-    
-    vision_dataset = nncf.Dataset(calibration_data, lambda x: x["vision_model_inputs"])
-    vision_model = core.read_model(VISION_MODEL_OV)
-    
-    quantized_model = nncf.quantize(
-        model=vision_model,
-        calibration_dataset=vision_dataset,
-        model_type=nncf.ModelType.TRANSFORMER
-    )
-    
-    ov.save_model(quantized_model, VISION_MODEL_OV_INT8)
+%%skipnot$to_quantize.value
 
+vision_dataset=nncf.Dataset(calibration_data,lambdax:x["vision_model_inputs"])
+vision_model=core.read_model(VISION_MODEL_OV)
 
+quantized_model=nncf.quantize(
+model=vision_model,
+calibration_dataset=vision_dataset,
+model_type=nncf.ModelType.TRANSFORMER
+)
 
-.. parsed-literal::
-
-    Output()
+ov.save_model(quantized_model,VISION_MODEL_OV_INT8)
 
 
 
-.. raw:: html
+..parsed-literal::
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-
-
+Output()
 
 
-.. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
 
 
 
 
-.. parsed-literal::
+..raw::html
 
-    Output()
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
 
 
 
 
-.. raw:: html
+..parsed-literal::
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
-
-
-
-.. parsed-literal::
-
-    INFO:nncf:36 ignored nodes were found by name in the NNCFGraph
-    INFO:nncf:48 ignored nodes were found by name in the NNCFGraph
+Output()
 
 
 
-.. parsed-literal::
+..raw::html
 
-    Output()
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
 
 
 
 
-.. raw:: html
+..raw::html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
-
-
-
-
-.. parsed-literal::
-
-    Output()
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
 
 
 
-.. raw:: html
+..parsed-literal::
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
+INFO:nncf:36ignorednodeswerefoundbynameintheNNCFGraph
+INFO:nncf:48ignorednodeswerefoundbynameintheNNCFGraph
 
 
 
-Quantize text encoder
+..parsed-literal::
+
+Output()
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
+
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
+
+
+
+
+..parsed-literal::
+
+Output()
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
+
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
+
+
+
+Quantizetextencoder
 ~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    %%skip not $to_quantize.value
-    
-    text_encoder_dataset = nncf.Dataset(calibration_data, lambda x: x["text_encoder_inputs"])
-    text_encoder_model = core.read_model(TEXT_ENCODER_OV)
-    
-    quantized_model = nncf.quantize(
-        model=text_encoder_model,
-        calibration_dataset=text_encoder_dataset,
-        model_type=nncf.ModelType.TRANSFORMER
-    )
-    ov.save_model(quantized_model, TEXT_ENCODER_OV_INT8)
+%%skipnot$to_quantize.value
 
+text_encoder_dataset=nncf.Dataset(calibration_data,lambdax:x["text_encoder_inputs"])
+text_encoder_model=core.read_model(TEXT_ENCODER_OV)
 
-
-.. parsed-literal::
-
-    Output()
+quantized_model=nncf.quantize(
+model=text_encoder_model,
+calibration_dataset=text_encoder_dataset,
+model_type=nncf.ModelType.TRANSFORMER
+)
+ov.save_model(quantized_model,TEXT_ENCODER_OV_INT8)
 
 
 
-.. raw:: html
+..parsed-literal::
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-
-
+Output()
 
 
-.. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
 
 
 
 
-.. parsed-literal::
+..raw::html
 
-    Output()
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
 
 
 
 
-.. raw:: html
+..parsed-literal::
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
-
-
-
-.. parsed-literal::
-
-    INFO:nncf:72 ignored nodes were found by name in the NNCFGraph
-    INFO:nncf:73 ignored nodes were found by name in the NNCFGraph
+Output()
 
 
 
-.. parsed-literal::
+..raw::html
 
-    Output()
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
 
 
 
 
-.. raw:: html
+..raw::html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
-
-
-
-
-.. parsed-literal::
-
-    Output()
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
 
 
 
-.. raw:: html
+..parsed-literal::
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
+INFO:nncf:72ignorednodeswerefoundbynameintheNNCFGraph
+INFO:nncf:73ignorednodeswerefoundbynameintheNNCFGraph
 
 
 
-Compress weights of text decoder
+..parsed-literal::
+
+Output()
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
+
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
+
+
+
+
+..parsed-literal::
+
+Output()
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
+
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
+
+
+
+Compressweightsoftextdecoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The quantization of the text decoder leads to significant accuracy loss.
-Instead of post-training quantization, we can use data free weights
-compression to reduce the model footprint.
+Thequantizationofthetextdecoderleadstosignificantaccuracyloss.
+Insteadofpost-trainingquantization,wecanusedatafreeweights
+compressiontoreducethemodelfootprint.
 
-The optimization process contains the following steps:
+Theoptimizationprocesscontainsthefollowingsteps:
 
-1. Run ``nncf.compress_weights`` to get a model with compressed weights.
-2. Serialize the ``OpenVINO`` model using ``openvino.save_model``
-   function.
+1.Run``nncf.compress_weights``togetamodelwithcompressedweights.
+2.Serializethe``OpenVINO``modelusing``openvino.save_model``
+function.
 
-.. code:: ipython3
+..code::ipython3
 
-    %%skip not $to_quantize.value
-    
-    text_decoder_model = core.read_model(TEXT_DECODER_OV)
-    compressed_text_decoder = nncf.compress_weights(text_decoder_model)
-    ov.save_model(compressed_text_decoder, str(TEXT_DECODER_OV_INT8))
+%%skipnot$to_quantize.value
 
-
-.. parsed-literal::
-
-    INFO:nncf:Statistics of the bitwidth distribution:
-    +--------------+---------------------------+-----------------------------------+
-    | Num bits (N) | % all parameters (layers) |    % ratio-defining parameters    |
-    |              |                           |             (layers)              |
-    +==============+===========================+===================================+
-    | 8            | 100% (124 / 124)          | 100% (124 / 124)                  |
-    +--------------+---------------------------+-----------------------------------+
+text_decoder_model=core.read_model(TEXT_DECODER_OV)
+compressed_text_decoder=nncf.compress_weights(text_decoder_model)
+ov.save_model(compressed_text_decoder,str(TEXT_DECODER_OV_INT8))
 
 
+..parsed-literal::
 
-.. parsed-literal::
-
-    Output()
+INFO:nncf:Statisticsofthebitwidthdistribution:
++--------------+---------------------------+-----------------------------------+
+|Numbits(N)|%allparameters(layers)|%ratio-definingparameters|
+|||(layers)|
++==============+===========================+===================================+
+|8|100%(124/124)|100%(124/124)|
++--------------+---------------------------+-----------------------------------+
 
 
 
-.. raw:: html
+..parsed-literal::
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-
-
-
-
-.. raw:: html
-
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
+Output()
 
 
 
-Run optimized OpenVINO model
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
+
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
+
+
+
+RunoptimizedOpenVINOmodel
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The steps for making predictions with the optimized OpenVINO BLIP model
-are similar to the PyTorch model. Let us check the model result using
-the same input data like for model before quantization
+ThestepsformakingpredictionswiththeoptimizedOpenVINOBLIPmodel
+aresimilartothePyTorchmodel.Letuscheckthemodelresultusing
+thesameinputdatalikeformodelbeforequantization
 
-.. code:: ipython3
+..code::ipython3
 
-    %%skip not $to_quantize.value
-    
-    q_ov_vision_model = core.compile_model(VISION_MODEL_OV_INT8, device.value)
-    q_ov_text_encoder = core.compile_model(TEXT_ENCODER_OV_INT8, device.value)
-    q_ov_text_decoder_with_past = core.compile_model(TEXT_DECODER_OV_INT8, device.value)
+%%skipnot$to_quantize.value
 
-.. code:: ipython3
+q_ov_vision_model=core.compile_model(VISION_MODEL_OV_INT8,device.value)
+q_ov_text_encoder=core.compile_model(TEXT_ENCODER_OV_INT8,device.value)
+q_ov_text_decoder_with_past=core.compile_model(TEXT_DECODER_OV_INT8,device.value)
 
-    %%skip not $to_quantize.value
-    
-    from functools import partial
-    from transformers import BlipForQuestionAnswering
-    from blip_model import OVBlipModel, text_decoder_forward
-    
-    model = BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
-    text_decoder = model.text_decoder
-    text_decoder.eval()
-    
-    text_decoder.forward = partial(text_decoder_forward, ov_text_decoder_with_past=q_ov_text_decoder_with_past)
-    int8_model = OVBlipModel(model.config, model.decoder_start_token_id, q_ov_vision_model, q_ov_text_encoder, text_decoder)
+..code::ipython3
 
-.. code:: ipython3
+%%skipnot$to_quantize.value
 
-    %%skip not $to_quantize.value
-    
-    raw_image = Image.open("demo.jpg").convert('RGB')
-    question = "how many dogs are in the picture?"
-    # preprocess input data
-    inputs = processor(raw_image, question, return_tensors="pt")
+fromfunctoolsimportpartial
+fromtransformersimportBlipForQuestionAnswering
+fromblip_modelimportOVBlipModel,text_decoder_forward
 
-Image captioning
+model=BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
+text_decoder=model.text_decoder
+text_decoder.eval()
+
+text_decoder.forward=partial(text_decoder_forward,ov_text_decoder_with_past=q_ov_text_decoder_with_past)
+int8_model=OVBlipModel(model.config,model.decoder_start_token_id,q_ov_vision_model,q_ov_text_encoder,text_decoder)
+
+..code::ipython3
+
+%%skipnot$to_quantize.value
+
+raw_image=Image.open("demo.jpg").convert('RGB')
+question="howmanydogsareinthepicture?"
+#preprocessinputdata
+inputs=processor(raw_image,question,return_tensors="pt")
+
+Imagecaptioning
 ^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+..code::ipython3
 
-    %%skip not $to_quantize.value
-    
-    out = int8_model.generate_caption(inputs["pixel_values"], max_length=20)
-    caption = processor.decode(out[0], skip_special_tokens=True)
-    fig = visualize_results(raw_image, caption)
+%%skipnot$to_quantize.value
 
-
-
-.. image:: blip-visual-language-processing-with-output_files/blip-visual-language-processing-with-output_47_0.png
+out=int8_model.generate_caption(inputs["pixel_values"],max_length=20)
+caption=processor.decode(out[0],skip_special_tokens=True)
+fig=visualize_results(raw_image,caption)
 
 
-Question answering
+
+..image::blip-visual-language-processing-with-output_files/blip-visual-language-processing-with-output_47_0.png
+
+
+Questionanswering
 ^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+..code::ipython3
 
-    %%skip not $to_quantize.value
-    
-    out = int8_model.generate_answer(**inputs, max_length=20)
-    answer = processor.decode(out[0], skip_special_tokens=True)
-    fig = visualize_results(raw_image, answer, question)
+%%skipnot$to_quantize.value
 
-
-
-.. image:: blip-visual-language-processing-with-output_files/blip-visual-language-processing-with-output_49_0.png
+out=int8_model.generate_answer(**inputs,max_length=20)
+answer=processor.decode(out[0],skip_special_tokens=True)
+fig=visualize_results(raw_image,answer,question)
 
 
-Compare file sizes
+
+..image::blip-visual-language-processing-with-output_files/blip-visual-language-processing-with-output_49_0.png
+
+
+Comparefilesizes
 ~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+..code::ipython3
 
-    %%skip not $to_quantize.value
-    
-    def calculate_compression_rate(ov_model_path):
-        fp16_ir_model_size = Path(ov_model_path).with_suffix(".bin").stat().st_size / 1024
-        int8_model_path = str(ov_model_path).replace(".xml", "_int8.xml")
-        quantized_model_size = Path(int8_model_path).with_suffix(".bin").stat().st_size / 1024
-        print(f'{ov_model_path.as_posix().split(".")[0]}')
-        print(f"    * FP16 IR model size: {fp16_ir_model_size:.2f} KB")
-        print(f"    * INT8 model size: {quantized_model_size:.2f} KB")
-        print(f"    * Model compression rate: {fp16_ir_model_size / quantized_model_size:.3f}")
+%%skipnot$to_quantize.value
 
-.. code:: ipython3
+defcalculate_compression_rate(ov_model_path):
+fp16_ir_model_size=Path(ov_model_path).with_suffix(".bin").stat().st_size/1024
+int8_model_path=str(ov_model_path).replace(".xml","_int8.xml")
+quantized_model_size=Path(int8_model_path).with_suffix(".bin").stat().st_size/1024
+print(f'{ov_model_path.as_posix().split(".")[0]}')
+print(f"*FP16IRmodelsize:{fp16_ir_model_size:.2f}KB")
+print(f"*INT8modelsize:{quantized_model_size:.2f}KB")
+print(f"*Modelcompressionrate:{fp16_ir_model_size/quantized_model_size:.3f}")
 
-    %%skip not $to_quantize.value
-    
-    for fp16_path in [VISION_MODEL_OV, TEXT_ENCODER_OV, TEXT_DECODER_OV]:
-        calculate_compression_rate(fp16_path)
+..code::ipython3
 
+%%skipnot$to_quantize.value
 
-.. parsed-literal::
-
-    blip_vision_model
-        * FP16 IR model size: 168145.70 KB
-        * INT8 model size: 84915.48 KB
-        * Model compression rate: 1.980
-    blip_text_encoder
-        * FP16 IR model size: 268087.16 KB
-        * INT8 model size: 134676.75 KB
-        * Model compression rate: 1.991
-    blip_text_decoder_with_past
-        * FP16 IR model size: 269303.35 KB
-        * INT8 model size: 135302.53 KB
-        * Model compression rate: 1.990
+forfp16_pathin[VISION_MODEL_OV,TEXT_ENCODER_OV,TEXT_DECODER_OV]:
+calculate_compression_rate(fp16_path)
 
 
-Compare inference time of the FP16 and optimized models
+..parsed-literal::
+
+blip_vision_model
+*FP16IRmodelsize:168145.70KB
+*INT8modelsize:84915.48KB
+*Modelcompressionrate:1.980
+blip_text_encoder
+*FP16IRmodelsize:268087.16KB
+*INT8modelsize:134676.75KB
+*Modelcompressionrate:1.991
+blip_text_decoder_with_past
+*FP16IRmodelsize:269303.35KB
+*INT8modelsize:135302.53KB
+*Modelcompressionrate:1.990
+
+
+CompareinferencetimeoftheFP16andoptimizedmodels
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-To measure the inference performance of the ``FP16`` and ``INT8``
-models, we use median inference time on 100 samples of the calibration
-dataset. So we can approximately estimate the speed up of the dynamic
-quantized models.
+Tomeasuretheinferenceperformanceofthe``FP16``and``INT8``
+models,weusemedianinferencetimeon100samplesofthecalibration
+dataset.Sowecanapproximatelyestimatethespeedupofthedynamic
+quantizedmodels.
 
-   **NOTE**: For the most accurate performance estimation, it is
-   recommended to run ``benchmark_app`` in a terminal/command prompt
-   after closing other applications with static shapes.
+**NOTE**:Forthemostaccurateperformanceestimation,itis
+recommendedtorun``benchmark_app``inaterminal/commandprompt
+afterclosingotherapplicationswithstaticshapes.
 
-.. code:: ipython3
+..code::ipython3
 
-    %%skip not $to_quantize.value
-    
-    import time
-    import torch
-    
-    def calculate_inference_time(blip_model, calibration_data, generate_caption):
-        inference_time = []
-        for inputs in calibration_data:
-            pixel_values = torch.from_numpy(inputs["vision_model_inputs"]["pixel_values"])
-            input_ids = torch.from_numpy(inputs["text_encoder_inputs"]["input_ids"])
-            attention_mask = torch.from_numpy(inputs["text_encoder_inputs"]["attention_mask"])
-    
-            start = time.perf_counter()
-            if generate_caption:
-                _ = blip_model.generate_caption(pixel_values, max_length=20)
-            else:
-                _ = blip_model.generate_answer(pixel_values=pixel_values, input_ids=input_ids, attention_mask=attention_mask, max_length=20)
-            end = time.perf_counter()
-            delta = end - start
-            inference_time.append(delta)
-        return np.median(inference_time)
+%%skipnot$to_quantize.value
 
-.. code:: ipython3
+importtime
+importtorch
 
-    %%skip not $to_quantize.value
-    
-    fp_original_model = BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
-    fp_text_decoder = fp_original_model.text_decoder
-    fp_text_decoder.eval()
-    
-    comp_text_encoder = core.compile_model(TEXT_ENCODER_OV, device.value)
-    comp_text_decoder_with_past = core.compile_model(TEXT_DECODER_OV, device.value)
-    fp_text_decoder.forward = partial(text_decoder_forward, ov_text_decoder_with_past=comp_text_decoder_with_past)
-    fp16_model = OVBlipModel(model.config, model.decoder_start_token_id, comp_vision_model, comp_text_encoder, fp_text_decoder)
+defcalculate_inference_time(blip_model,calibration_data,generate_caption):
+inference_time=[]
+forinputsincalibration_data:
+pixel_values=torch.from_numpy(inputs["vision_model_inputs"]["pixel_values"])
+input_ids=torch.from_numpy(inputs["text_encoder_inputs"]["input_ids"])
+attention_mask=torch.from_numpy(inputs["text_encoder_inputs"]["attention_mask"])
 
-.. code:: ipython3
+start=time.perf_counter()
+ifgenerate_caption:
+_=blip_model.generate_caption(pixel_values,max_length=20)
+else:
+_=blip_model.generate_answer(pixel_values=pixel_values,input_ids=input_ids,attention_mask=attention_mask,max_length=20)
+end=time.perf_counter()
+delta=end-start
+inference_time.append(delta)
+returnnp.median(inference_time)
 
-    %%skip not $to_quantize.value
-    
-    validation_data = calibration_data[:100]
-    
-    int8_caption_latency = calculate_inference_time(int8_model, validation_data, generate_caption=True)
-    fp16_caption_latency = calculate_inference_time(fp16_model, validation_data, generate_caption=True)
-    
-    print(f"Image Captioning speed up: {fp16_caption_latency / int8_caption_latency:.3f}")
+..code::ipython3
 
+%%skipnot$to_quantize.value
 
-.. parsed-literal::
+fp_original_model=BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
+fp_text_decoder=fp_original_model.text_decoder
+fp_text_decoder.eval()
 
-    Image Captioning speed up: 1.254
+comp_text_encoder=core.compile_model(TEXT_ENCODER_OV,device.value)
+comp_text_decoder_with_past=core.compile_model(TEXT_DECODER_OV,device.value)
+fp_text_decoder.forward=partial(text_decoder_forward,ov_text_decoder_with_past=comp_text_decoder_with_past)
+fp16_model=OVBlipModel(model.config,model.decoder_start_token_id,comp_vision_model,comp_text_encoder,fp_text_decoder)
+
+..code::ipython3
+
+%%skipnot$to_quantize.value
+
+validation_data=calibration_data[:100]
+
+int8_caption_latency=calculate_inference_time(int8_model,validation_data,generate_caption=True)
+fp16_caption_latency=calculate_inference_time(fp16_model,validation_data,generate_caption=True)
+
+print(f"ImageCaptioningspeedup:{fp16_caption_latency/int8_caption_latency:.3f}")
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    %%skip not $to_quantize.value
-    
-    int8_generate_answer_latency = calculate_inference_time(int8_model, validation_data, generate_caption=False)
-    fp16_generate_answer_latency = calculate_inference_time(fp16_model, validation_data, generate_caption=False)
-    print(f"Question Answering speed up: {fp16_generate_answer_latency / int8_generate_answer_latency:.3f}")
+ImageCaptioningspeedup:1.254
 
 
-.. parsed-literal::
+..code::ipython3
 
-    Question Answering speed up: 1.715
+%%skipnot$to_quantize.value
+
+int8_generate_answer_latency=calculate_inference_time(int8_model,validation_data,generate_caption=False)
+fp16_generate_answer_latency=calculate_inference_time(fp16_model,validation_data,generate_caption=False)
+print(f"QuestionAnsweringspeedup:{fp16_generate_answer_latency/int8_generate_answer_latency:.3f}")
 
 
-Interactive demo
+..parsed-literal::
+
+QuestionAnsweringspeedup:1.715
+
+
+Interactivedemo
 ----------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Please select below whether you would like to use the quantized model to
-launch the interactive demo.
+Pleaseselectbelowwhetheryouwouldliketousethequantizedmodelto
+launchtheinteractivedemo.
 
-.. code:: ipython3
+..code::ipython3
 
-    use_quantized_model = widgets.Checkbox(
-        description="Use quantized model",
-        value=int8_model is not None,
-        disabled=int8_model is None,
-    )
-    
-    use_quantized_model
+use_quantized_model=widgets.Checkbox(
+description="Usequantizedmodel",
+value=int8_modelisnotNone,
+disabled=int8_modelisNone,
+)
 
-
-
-
-.. parsed-literal::
-
-    Checkbox(value=True, description='Use quantized model')
+use_quantized_model
 
 
 
-.. code:: ipython3
 
-    import gradio as gr
-    
-    ov_model = int8_model if use_quantized_model.value else ov_model
-    
-    
-    def generate_answer(img, question):
-        if img is None:
-            raise gr.Error("Please upload an image or choose one from the examples list")
-        start = time.perf_counter()
-        inputs = processor(img, question, return_tensors="pt")
-        output = ov_model.generate_answer(**inputs, max_length=20) if len(question) else ov_model.generate_caption(inputs["pixel_values"], max_length=20)
-        answer = processor.decode(output[0], skip_special_tokens=True)
-        elapsed = time.perf_counter() - start
-        html = f"<p>Processing time: {elapsed:.4f}</p>"
-        return answer, html
-    
-    
-    demo = gr.Interface(
-        generate_answer,
-        [
-            gr.Image(label="Image"),
-            gr.Textbox(
-                label="Question",
-                info="If this field is empty, an image caption will be generated",
-            ),
-        ],
-        [gr.Text(label="Answer"), gr.HTML()],
-        examples=[["demo.jpg", ""], ["demo.jpg", question]],
-        allow_flagging="never",
-    )
-    try:
-        demo.launch(debug=False)
-    except Exception:
-        demo.launch(share=True, debug=False)
-    # if you are launching remotely, specify server_name and server_port
-    # demo.launch(server_name='your server name', server_port='server port in int')
-    # Read more in the docs: https://gradio.app/docs/
+..parsed-literal::
+
+Checkbox(value=True,description='Usequantizedmodel')
+
+
+
+..code::ipython3
+
+importgradioasgr
+
+ov_model=int8_modelifuse_quantized_model.valueelseov_model
+
+
+defgenerate_answer(img,question):
+ifimgisNone:
+raisegr.Error("Pleaseuploadanimageorchooseonefromtheexampleslist")
+start=time.perf_counter()
+inputs=processor(img,question,return_tensors="pt")
+output=ov_model.generate_answer(**inputs,max_length=20)iflen(question)elseov_model.generate_caption(inputs["pixel_values"],max_length=20)
+answer=processor.decode(output[0],skip_special_tokens=True)
+elapsed=time.perf_counter()-start
+html=f"<p>Processingtime:{elapsed:.4f}</p>"
+returnanswer,html
+
+
+demo=gr.Interface(
+generate_answer,
+[
+gr.Image(label="Image"),
+gr.Textbox(
+label="Question",
+info="Ifthisfieldisempty,animagecaptionwillbegenerated",
+),
+],
+[gr.Text(label="Answer"),gr.HTML()],
+examples=[["demo.jpg",""],["demo.jpg",question]],
+allow_flagging="never",
+)
+try:
+demo.launch(debug=False)
+exceptException:
+demo.launch(share=True,debug=False)
+#ifyouarelaunchingremotely,specifyserver_nameandserver_port
+#demo.launch(server_name='yourservername',server_port='serverportinint')
+#Readmoreinthedocs:https://gradio.app/docs/

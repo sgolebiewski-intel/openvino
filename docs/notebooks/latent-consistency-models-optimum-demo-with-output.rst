@@ -1,335 +1,335 @@
-Latent Consistency Model using Optimum-Intel OpenVINO
+LatentConsistencyModelusingOptimum-IntelOpenVINO
 =====================================================
 
-This notebook provides instructions how to run Latent Consistency Model
-(LCM). It allows to setup standard Hugging Face diffusers pipeline and
-Optimum Intel pipeline optimized for Intel hardware including CPU and
-GPU. Running inference on CPU and GPU it is easy to compare performance
-and time required to generate an image for provided prompt. The notebook
-can be also used on other Intel hardware with minimal or no
+ThisnotebookprovidesinstructionshowtorunLatentConsistencyModel
+(LCM).ItallowstosetupstandardHuggingFacediffuserspipelineand
+OptimumIntelpipelineoptimizedforIntelhardwareincludingCPUand
+GPU.RunninginferenceonCPUandGPUitiseasytocompareperformance
+andtimerequiredtogenerateanimageforprovidedprompt.Thenotebook
+canbealsousedonotherIntelhardwarewithminimalorno
 modifications.
 
 |image0|
 
-Optimum Intel is an interface from Hugging Face between both diffusers
-and transformers libraries and various tools provided by Intel to
-accelerate pipelines on Intel hardware. It allows to perform
-quantization of the models hosted on Hugging Face. In this notebook
-OpenVINO is used for AI-inference acceleration as a backend for Optimum
+OptimumIntelisaninterfacefromHuggingFacebetweenbothdiffusers
+andtransformerslibrariesandvarioustoolsprovidedbyIntelto
+acceleratepipelinesonIntelhardware.Itallowstoperform
+quantizationofthemodelshostedonHuggingFace.Inthisnotebook
+OpenVINOisusedforAI-inferenceaccelerationasabackendforOptimum
 Intel!
 
-For more details please refer to Optimum Intel repository
+FormoredetailspleaserefertoOptimumIntelrepository
 https://github.com/huggingface/optimum-intel
 
-LCMs are the next generation of generative models after Latent Diffusion
-Models (LDMs). They are proposed to overcome the slow iterative sampling
-process of Latent Diffusion Models (LDMs), enabling fast inference with
-minimal steps (from 2 to 4) on any pre-trained LDMs (e.g. Stable
-Diffusion). To read more about LCM please refer to
+LCMsarethenextgenerationofgenerativemodelsafterLatentDiffusion
+Models(LDMs).Theyareproposedtoovercometheslowiterativesampling
+processofLatentDiffusionModels(LDMs),enablingfastinferencewith
+minimalsteps(from2to4)onanypre-trainedLDMs(e.g. Stable
+Diffusion).ToreadmoreaboutLCMpleasereferto
 https://latent-consistency-models.github.io/
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#Prerequisites>`__
--  `Full precision model on the
-   CPU <#Using-full-precision-model-in-CPU-with-LatentConsistencyModelPipeline>`__
--  `Running inference using Optimum Intel
-   ``OVLatentConsistencyModelPipeline`` <#Running-inference-using-Optimum-Intel-OVLatentConsistencyModelPipeline>`__
+-`Prerequisites<#prerequisites>`__
+-`Fullprecisionmodelonthe
+CPU<#using-full-precision-model-in-cpu-with-latentconsistencymodelpipeline>`__
+-`RunninginferenceusingOptimumIntel
+OVLatentConsistencyModelPipeline<#running-inference-using-optimum-intel-ovlatentconsistencymodelpipeline>`__
 
-.. |image0| image:: https://github.com/openvinotoolkit/openvino_notebooks/assets/10940214/1858dae4-72fd-401e-b055-66d503d82446
+..|image0|image::https://github.com/openvinotoolkit/openvino_notebooks/assets/10940214/1858dae4-72fd-401e-b055-66d503d82446
 
 Prerequisites
 ~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Install required packages
+Installrequiredpackages
 
-.. code:: ipython3
+..code::ipython3
 
-    %pip install -q "openvino>=2023.3.0"
-    %pip install -q "onnx>=1.11.0"
-    %pip install -q "optimum-intel[diffusers]@git+https://github.com/huggingface/optimum-intel.git" "ipywidgets" "torch>=2.1" "transformers>=4.33.0" --extra-index-url https://download.pytorch.org/whl/cpu
-
-
-.. parsed-literal::
-
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
+%pipinstall-q"openvino>=2023.3.0"
+%pipinstall-q"onnx>=1.11.0"
+%pipinstall-q"optimum-intel[diffusers]@git+https://github.com/huggingface/optimum-intel.git""ipywidgets""torch>=2.1""transformers>=4.33.0"--extra-index-urlhttps://download.pytorch.org/whl/cpu
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    import warnings
-    
-    warnings.filterwarnings("ignore")
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
 
-Showing Info Available Devices
+
+..code::ipython3
+
+importwarnings
+
+warnings.filterwarnings("ignore")
+
+ShowingInfoAvailableDevices
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The ``available_devices`` property shows the available devices in your
-system. The “FULL_DEVICE_NAME” option to ``ie.get_property()`` shows the
-name of the device. Check what is the ID name for the discrete GPU, if
-you have integrated GPU (iGPU) and discrete GPU (dGPU), it will show
-``device_name="GPU.0"`` for iGPU and ``device_name="GPU.1"`` for dGPU.
-If you just have either an iGPU or dGPU that will be assigned to
+The``available_devices``propertyshowstheavailabledevicesinyour
+system.The“FULL_DEVICE_NAME”optionto``ie.get_property()``showsthe
+nameofthedevice.CheckwhatistheIDnameforthediscreteGPU,if
+youhaveintegratedGPU(iGPU)anddiscreteGPU(dGPU),itwillshow
+``device_name="GPU.0"``foriGPUand``device_name="GPU.1"``fordGPU.
+IfyoujusthaveeitheraniGPUordGPUthatwillbeassignedto
 ``"GPU"``
 
-Note: For more details about GPU with OpenVINO visit this
-`link <https://docs.openvino.ai/2024/get-started/configurations/configurations-intel-gpu.html>`__.
-If you have been facing any issue in Ubuntu 20.04 or Windows 11 read
+Note:FormoredetailsaboutGPUwithOpenVINOvisitthis
+`link<https://docs.openvino.ai/2024/get-started/configurations/configurations-intel-gpu.html>`__.
+IfyouhavebeenfacinganyissueinUbuntu20.04orWindows11read
 this
-`blog <https://blog.openvino.ai/blog-posts/install-gpu-drivers-windows-ubuntu>`__.
+`blog<https://blog.openvino.ai/blog-posts/install-gpu-drivers-windows-ubuntu>`__.
 
-.. code:: ipython3
+..code::ipython3
 
-    import openvino as ov
-    
-    core = ov.Core()
-    devices = core.available_devices
-    
-    for device in devices:
-        device_name = core.get_property(device, "FULL_DEVICE_NAME")
-        print(f"{device}: {device_name}")
+importopenvinoasov
 
+core=ov.Core()
+devices=core.available_devices
 
-.. parsed-literal::
-
-    CPU: Intel(R) Core(TM) i9-10920X CPU @ 3.50GHz
+fordeviceindevices:
+device_name=core.get_property(device,"FULL_DEVICE_NAME")
+print(f"{device}:{device_name}")
 
 
-Using full precision model in CPU with ``LatentConsistencyModelPipeline``
+..parsed-literal::
+
+CPU:Intel(R)Core(TM)i9-10920XCPU@3.50GHz
+
+
+UsingfullprecisionmodelinCPUwith``LatentConsistencyModelPipeline``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Standard pipeline for the Latent Consistency Model(LCM) from Diffusers
-library is used here. For more information please refer to
+StandardpipelinefortheLatentConsistencyModel(LCM)fromDiffusers
+libraryisusedhere.Formoreinformationpleasereferto
 https://huggingface.co/docs/diffusers/en/api/pipelines/latent_consistency_models
 
-.. code:: ipython3
+..code::ipython3
 
-    from diffusers import LatentConsistencyModelPipeline
-    import gc
-    
-    pipeline = LatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
+fromdiffusersimportLatentConsistencyModelPipeline
+importgc
 
-
-.. parsed-literal::
-
-    2024-07-13 01:00:03.964344: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-07-13 01:00:04.000289: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-07-13 01:00:04.671482: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+pipeline=LatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7")
 
 
+..parsed-literal::
 
-.. parsed-literal::
-
-    Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]
-
-
-.. code:: ipython3
-
-    prompt = "A cute squirrel in the forest, portrait, 8k"
-    
-    image = pipeline(prompt=prompt, num_inference_steps=4, guidance_scale=8.0, height=512, width=512).images[0]
-    image.save("image_standard_pipeline.png")
-    image
+2024-07-1301:00:03.964344:Itensorflow/core/util/port.cc:110]oneDNNcustomoperationsareon.Youmayseeslightlydifferentnumericalresultsduetofloating-pointround-offerrorsfromdifferentcomputationorders.Toturnthemoff,settheenvironmentvariable`TF_ENABLE_ONEDNN_OPTS=0`.
+2024-07-1301:00:04.000289:Itensorflow/core/platform/cpu_feature_guard.cc:182]ThisTensorFlowbinaryisoptimizedtouseavailableCPUinstructionsinperformance-criticaloperations.
+Toenablethefollowinginstructions:AVX2AVX512FAVX512_VNNIFMA,inotheroperations,rebuildTensorFlowwiththeappropriatecompilerflags.
+2024-07-1301:00:04.671482:Wtensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38]TF-TRTWarning:CouldnotfindTensorRT
 
 
 
-.. parsed-literal::
+..parsed-literal::
 
-      0%|          | 0/4 [00:00<?, ?it/s]
-
-
+Loadingpipelinecomponents...:0%||0/7[00:00<?,?it/s]
 
 
-.. image:: latent-consistency-models-optimum-demo-with-output_files/latent-consistency-models-optimum-demo-with-output_8_1.png
+..code::ipython3
+
+prompt="Acutesquirrelintheforest,portrait,8k"
+
+image=pipeline(prompt=prompt,num_inference_steps=4,guidance_scale=8.0,height=512,width=512).images[0]
+image.save("image_standard_pipeline.png")
+image
 
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    del pipeline
-    gc.collect();
+0%||0/4[00:00<?,?it/s]
 
-Select inference device for text-to-image generation
+
+
+
+..image::latent-consistency-models-optimum-demo-with-output_files/latent-consistency-models-optimum-demo-with-output_8_1.png
+
+
+
+..code::ipython3
+
+delpipeline
+gc.collect();
+
+Selectinferencedevicefortext-to-imagegeneration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+..code::ipython3
 
-    import ipywidgets as widgets
-    
-    core = ov.Core()
-    
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="CPU",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+importipywidgetsaswidgets
 
+core=ov.Core()
 
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="CPU",
+description="Device:",
+disabled=False,
+)
 
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', options=('CPU', 'AUTO'), value='CPU')
+device
 
 
 
-Running inference using Optimum Intel ``OVLatentConsistencyModelPipeline``
+
+..parsed-literal::
+
+Dropdown(description='Device:',options=('CPU','AUTO'),value='CPU')
+
+
+
+RunninginferenceusingOptimumIntel``OVLatentConsistencyModelPipeline``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Accelerating inference of LCM using Intel Optimum with OpenVINO backend.
-For more information please refer to
+AcceleratinginferenceofLCMusingIntelOptimumwithOpenVINObackend.
+Formoreinformationpleasereferto
 https://huggingface.co/docs/optimum/intel/inference#latent-consistency-models.
-The pretrained model in this notebook is available on Hugging Face in
-FP32 precision and in case if CPU is selected as a device, then
-inference runs with full precision. For GPU accelerated AI-inference is
-supported for FP16 data type and FP32 precision for GPU may produce high
-memory footprint and latency. Therefore, default precision for GPU in
-OpenVINO is FP16. OpenVINO GPU Plugin converts FP32 to FP16 on the fly
-and there is no need to do it manually
+ThepretrainedmodelinthisnotebookisavailableonHuggingFacein
+FP32precisionandincaseifCPUisselectedasadevice,then
+inferencerunswithfullprecision.ForGPUacceleratedAI-inferenceis
+supportedforFP16datatypeandFP32precisionforGPUmayproducehigh
+memoryfootprintandlatency.Therefore,defaultprecisionforGPUin
+OpenVINOisFP16.OpenVINOGPUPluginconvertsFP32toFP16onthefly
+andthereisnoneedtodoitmanually
 
-.. code:: ipython3
+..code::ipython3
 
-    from optimum.intel.openvino import OVLatentConsistencyModelPipeline
-    from pathlib import Path
-    
-    if not Path("./openvino_ir").exists():
-        ov_pipeline = OVLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7", height=512, width=512, export=True, compile=False)
-        ov_pipeline.save_pretrained("./openvino_ir")
-    else:
-        ov_pipeline = OVLatentConsistencyModelPipeline.from_pretrained("./openvino_ir", export=False, compile=False)
-    
-    ov_pipeline.reshape(batch_size=1, height=512, width=512, num_images_per_prompt=1)
+fromoptimum.intel.openvinoimportOVLatentConsistencyModelPipeline
+frompathlibimportPath
 
+ifnotPath("./openvino_ir").exists():
+ov_pipeline=OVLatentConsistencyModelPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7",height=512,width=512,export=True,compile=False)
+ov_pipeline.save_pretrained("./openvino_ir")
+else:
+ov_pipeline=OVLatentConsistencyModelPipeline.from_pretrained("./openvino_ir",export=False,compile=False)
 
-.. parsed-literal::
-
-    Framework not specified. Using pt to export the model.
-    Keyword arguments {'subfolder': '', 'token': None, 'trust_remote_code': False} are not expected by StableDiffusionPipeline and will be ignored.
+ov_pipeline.reshape(batch_size=1,height=512,width=512,num_images_per_prompt=1)
 
 
+..parsed-literal::
 
-.. parsed-literal::
-
-    Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]
-
-
-.. parsed-literal::
-
-    Using framework PyTorch: 2.3.1+cpu
-
-
-.. parsed-literal::
-
-    WARNING:tensorflow:Please fix your imports. Module tensorflow.python.training.tracking.base has been moved to tensorflow.python.trackable.base. The old module will be deleted in version 2.11.
-
-
-.. parsed-literal::
-
-    [ WARNING ]  Please fix your imports. Module %s has been moved to %s. The old module will be deleted in version %s.
-    Using framework PyTorch: 2.3.1+cpu
-    Using framework PyTorch: 2.3.1+cpu
-    Using framework PyTorch: 2.3.1+cpu
+Frameworknotspecified.Usingpttoexportthemodel.
+Keywordarguments{'subfolder':'','token':None,'trust_remote_code':False}arenotexpectedbyStableDiffusionPipelineandwillbeignored.
 
 
 
+..parsed-literal::
 
-.. parsed-literal::
-
-    OVLatentConsistencyModelPipeline {
-      "_class_name": "OVLatentConsistencyModelPipeline",
-      "_diffusers_version": "0.24.0",
-      "feature_extractor": [
-        "transformers",
-        "CLIPImageProcessor"
-      ],
-      "requires_safety_checker": true,
-      "safety_checker": [
-        "stable_diffusion",
-        "StableDiffusionSafetyChecker"
-      ],
-      "scheduler": [
-        "diffusers",
-        "LCMScheduler"
-      ],
-      "text_encoder": [
-        "optimum",
-        "OVModelTextEncoder"
-      ],
-      "text_encoder_2": [
-        null,
-        null
-      ],
-      "tokenizer": [
-        "transformers",
-        "CLIPTokenizer"
-      ],
-      "unet": [
-        "optimum",
-        "OVModelUnet"
-      ],
-      "vae_decoder": [
-        "optimum",
-        "OVModelVaeDecoder"
-      ],
-      "vae_encoder": [
-        "optimum",
-        "OVModelVaeEncoder"
-      ]
-    }
+Loadingpipelinecomponents...:0%||0/7[00:00<?,?it/s]
 
 
+..parsed-literal::
 
-.. code:: ipython3
-
-    ov_pipeline.to(device.value)
-    ov_pipeline.compile()
+UsingframeworkPyTorch:2.3.1+cpu
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    Compiling the vae_decoder to CPU ...
-    Compiling the unet to CPU ...
-    Compiling the text_encoder to CPU ...
-    Compiling the vae_encoder to CPU ...
+WARNING:tensorflow:Pleasefixyourimports.Moduletensorflow.python.training.tracking.basehasbeenmovedtotensorflow.python.trackable.base.Theoldmodulewillbedeletedinversion2.11.
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    prompt = "A cute squirrel in the forest, portrait, 8k"
-    
-    image_ov = ov_pipeline(prompt=prompt, num_inference_steps=4, guidance_scale=8.0, height=512, width=512).images[0]
-    image_ov.save("image_opt.png")
-    image_ov
-
-
-
-.. parsed-literal::
-
-      0%|          | 0/4 [00:00<?, ?it/s]
+[WARNING]Pleasefixyourimports.Module%shasbeenmovedto%s.Theoldmodulewillbedeletedinversion%s.
+UsingframeworkPyTorch:2.3.1+cpu
+UsingframeworkPyTorch:2.3.1+cpu
+UsingframeworkPyTorch:2.3.1+cpu
 
 
 
 
-.. image:: latent-consistency-models-optimum-demo-with-output_files/latent-consistency-models-optimum-demo-with-output_15_1.png
+..parsed-literal::
+
+OVLatentConsistencyModelPipeline{
+"_class_name":"OVLatentConsistencyModelPipeline",
+"_diffusers_version":"0.24.0",
+"feature_extractor":[
+"transformers",
+"CLIPImageProcessor"
+],
+"requires_safety_checker":true,
+"safety_checker":[
+"stable_diffusion",
+"StableDiffusionSafetyChecker"
+],
+"scheduler":[
+"diffusers",
+"LCMScheduler"
+],
+"text_encoder":[
+"optimum",
+"OVModelTextEncoder"
+],
+"text_encoder_2":[
+null,
+null
+],
+"tokenizer":[
+"transformers",
+"CLIPTokenizer"
+],
+"unet":[
+"optimum",
+"OVModelUnet"
+],
+"vae_decoder":[
+"optimum",
+"OVModelVaeDecoder"
+],
+"vae_encoder":[
+"optimum",
+"OVModelVaeEncoder"
+]
+}
 
 
 
-.. code:: ipython3
+..code::ipython3
 
-    del ov_pipeline
-    gc.collect();
+ov_pipeline.to(device.value)
+ov_pipeline.compile()
+
+
+..parsed-literal::
+
+Compilingthevae_decodertoCPU...
+CompilingtheunettoCPU...
+Compilingthetext_encodertoCPU...
+Compilingthevae_encodertoCPU...
+
+
+..code::ipython3
+
+prompt="Acutesquirrelintheforest,portrait,8k"
+
+image_ov=ov_pipeline(prompt=prompt,num_inference_steps=4,guidance_scale=8.0,height=512,width=512).images[0]
+image_ov.save("image_opt.png")
+image_ov
+
+
+
+..parsed-literal::
+
+0%||0/4[00:00<?,?it/s]
+
+
+
+
+..image::latent-consistency-models-optimum-demo-with-output_files/latent-consistency-models-optimum-demo-with-output_15_1.png
+
+
+
+..code::ipython3
+
+delov_pipeline
+gc.collect();

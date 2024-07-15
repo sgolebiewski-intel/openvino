@@ -1,885 +1,885 @@
-OpenVINO™ Model conversion
+OpenVINO™Modelconversion
 ==========================
 
-This notebook shows how to convert a model from original framework
-format to OpenVINO Intermediate Representation (IR).
+Thisnotebookshowshowtoconvertamodelfromoriginalframework
+formattoOpenVINOIntermediateRepresentation(IR).
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `OpenVINO IR format <#OpenVINO-IR-format>`__
--  `Fetching example models <#Fetching-example-models>`__
--  `Conversion <#Conversion>`__
+-`OpenVINOIRformat<#openvino-ir-format>`__
+-`Fetchingexamplemodels<#fetching-example-models>`__
+-`Conversion<#conversion>`__
 
-   -  `Setting Input Shapes <#Setting-Input-Shapes>`__
-   -  `Compressing a Model to FP16 <#Compressing-a-Model-to-FP16>`__
-   -  `Convert Models from memory <#Convert-Models-from-memory>`__
+-`SettingInputShapes<#setting-input-shapes>`__
+-`CompressingaModeltoFP16<#compressing-a-model-to-fp16>`__
+-`ConvertModelsfrommemory<#convert-models-from-memory>`__
 
--  `Migration from Legacy conversion
-   API <#Migration-from-Legacy-conversion-API>`__
+-`MigrationfromLegacyconversion
+API<#migration-from-legacy-conversion-api>`__
 
-   -  `Specifying Layout <#Specifying-Layout>`__
-   -  `Changing Model Layout <#Changing-Model-Layout>`__
-   -  `Specifying Mean and Scale
-      Values <#Specifying-Mean-and-Scale-Values>`__
-   -  `Reversing Input Channels <#Reversing-Input-Channels>`__
-   -  `Cutting Off Parts of a Model <#Cutting-Off-Parts-of-a-Model>`__
+-`SpecifyingLayout<#specifying-layout>`__
+-`ChangingModelLayout<#changing-model-layout>`__
+-`SpecifyingMeanandScale
+Values<#specifying-mean-and-scale-values>`__
+-`ReversingInputChannels<#reversing-input-channels>`__
+-`CuttingOffPartsofaModel<#cutting-off-parts-of-a-model>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    # Required imports. Please execute this cell first.
-    %pip install --upgrade pip
-    %pip install -q --extra-index-url https://download.pytorch.org/whl/cpu \
-    "openvino-dev>=2024.0.0" "requests" "tqdm" "transformers[onnx]>=4.31" "torch>=2.1" "torchvision" "tensorflow_hub" "tensorflow"
-
-
-.. parsed-literal::
-
-    Requirement already satisfied: pip in /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages (24.1.2)
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
+#Requiredimports.Pleaseexecutethiscellfirst.
+%pipinstall--upgradepip
+%pipinstall-q--extra-index-urlhttps://download.pytorch.org/whl/cpu\
+"openvino-dev>=2024.0.0""requests""tqdm""transformers[onnx]>=4.31""torch>=2.1""torchvision""tensorflow_hub""tensorflow"
 
 
-OpenVINO IR format
+..parsed-literal::
+
+Requirementalreadysatisfied:pipin/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages(24.1.2)
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+
+
+OpenVINOIRformat
 ------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-OpenVINO `Intermediate Representation
-(IR) <https://docs.openvino.ai/2024/documentation/openvino-ir-format.html>`__
-is the proprietary model format of OpenVINO. It is produced after
-converting a model with model conversion API. Model conversion API
-translates the frequently used deep learning operations to their
-respective similar representation in OpenVINO and tunes them with the
-associated weights and biases from the trained model. The resulting IR
-contains two files: an ``.xml`` file, containing information about
-network topology, and a ``.bin`` file, containing the weights and biases
-binary data.
+OpenVINO`IntermediateRepresentation
+(IR)<https://docs.openvino.ai/2024/documentation/openvino-ir-format.html>`__
+istheproprietarymodelformatofOpenVINO.Itisproducedafter
+convertingamodelwithmodelconversionAPI.ModelconversionAPI
+translatesthefrequentlyuseddeeplearningoperationstotheir
+respectivesimilarrepresentationinOpenVINOandtunesthemwiththe
+associatedweightsandbiasesfromthetrainedmodel.TheresultingIR
+containstwofiles:an``.xml``file,containinginformationabout
+networktopology,anda``.bin``file,containingtheweightsandbiases
+binarydata.
 
-There are two ways to convert a model from the original framework format
-to OpenVINO IR: Python conversion API and OVC command-line tool. You can
-choose one of them based on whichever is most convenient for you.
+Therearetwowaystoconvertamodelfromtheoriginalframeworkformat
+toOpenVINOIR:PythonconversionAPIandOVCcommand-linetool.Youcan
+chooseoneofthembasedonwhicheverismostconvenientforyou.
 
-OpenVINO conversion API supports next model formats: ``PyTorch``,
-``TensorFlow``, ``TensorFlow Lite``, ``ONNX``, and ``PaddlePaddle``.
-These model formats can be read, compiled, and converted to OpenVINO IR,
-either automatically or explicitly.
+OpenVINOconversionAPIsupportsnextmodelformats:``PyTorch``,
+``TensorFlow``,``TensorFlowLite``,``ONNX``,and``PaddlePaddle``.
+Thesemodelformatscanberead,compiled,andconvertedtoOpenVINOIR,
+eitherautomaticallyorexplicitly.
 
-For more details, refer to `Model
-Preparation <https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
+Formoredetails,referto`Model
+Preparation<https://docs.openvino.ai/2024/openvino-workflow/model-preparation.html>`__
 documentation.
 
-.. code:: ipython3
+..code::ipython3
 
-    # OVC CLI tool parameters description
-    
-    ! ovc --help
+#OVCCLItoolparametersdescription
 
-
-.. parsed-literal::
-
-    usage: ovc INPUT_MODEL... [-h] [--output_model OUTPUT_MODEL]
-               [--compress_to_fp16 [True | False]] [--version] [--input INPUT]
-               [--output OUTPUT] [--extension EXTENSION] [--verbose]
-    
-    positional arguments:
-      INPUT_MODEL           Input model file(s) from TensorFlow, ONNX,
-                            PaddlePaddle. Use openvino.convert_model in Python to
-                            convert models from PyTorch.
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      --output_model OUTPUT_MODEL
-                            This parameter is used to name output .xml/.bin files
-                            of converted model. Model name or output directory can
-                            be passed. If output directory is passed, the
-                            resulting .xml/.bin files are named by original model
-                            name.
-      --compress_to_fp16 [True | False]
-                            Compress weights in output OpenVINO model to FP16. To
-                            turn off compression use "--compress_to_fp16=False"
-                            command line parameter. Default value is True.
-      --version             Print ovc version and exit.
-      --input INPUT         Information of model input required for model
-                            conversion. This is a comma separated list with
-                            optional input names and shapes. The order of inputs
-                            in converted model will match the order of specified
-                            inputs. The shape is specified as comma-separated
-                            list. Example, to set `input_1` input with shape
-                            [1,100] and `sequence_len` input with shape [1,?]:
-                            "input_1[1,100],sequence_len[1,?]", where "?" is a
-                            dynamic dimension, which means that such a dimension
-                            can be specified later in the runtime. If the
-                            dimension is set as an integer (like 100 in [1,100]),
-                            such a dimension is not supposed to be changed later,
-                            during a model conversion it is treated as a static
-                            value. Example with unnamed inputs: "[1,100],[1,?]".
-      --output OUTPUT       One or more comma-separated model outputs to be
-                            preserved in the converted model. Other outputs are
-                            removed. If `output` parameter is not specified then
-                            all outputs from the original model are preserved. Do
-                            not add :0 to the names for TensorFlow. The order of
-                            outputs in the converted model is the same as the
-                            order of specified names. Example: ovc model.onnx
-                            output=out_1,out_2
-      --extension EXTENSION
-                            Paths or a comma-separated list of paths to libraries
-                            (.so or .dll) with extensions.
-      --verbose             Print detailed information about conversion.
+!ovc--help
 
 
-Fetching example models
+..parsed-literal::
+
+usage:ovcINPUT_MODEL...[-h][--output_modelOUTPUT_MODEL]
+[--compress_to_fp16[True|False]][--version][--inputINPUT]
+[--outputOUTPUT][--extensionEXTENSION][--verbose]
+
+positionalarguments:
+INPUT_MODELInputmodelfile(s)fromTensorFlow,ONNX,
+PaddlePaddle.Useopenvino.convert_modelinPythonto
+convertmodelsfromPyTorch.
+
+optionalarguments:
+-h,--helpshowthishelpmessageandexit
+--output_modelOUTPUT_MODEL
+Thisparameterisusedtonameoutput.xml/.binfiles
+ofconvertedmodel.Modelnameoroutputdirectorycan
+bepassed.Ifoutputdirectoryispassed,the
+resulting.xml/.binfilesarenamedbyoriginalmodel
+name.
+--compress_to_fp16[True|False]
+CompressweightsinoutputOpenVINOmodeltoFP16.To
+turnoffcompressionuse"--compress_to_fp16=False"
+commandlineparameter.DefaultvalueisTrue.
+--versionPrintovcversionandexit.
+--inputINPUTInformationofmodelinputrequiredformodel
+conversion.Thisisacommaseparatedlistwith
+optionalinputnamesandshapes.Theorderofinputs
+inconvertedmodelwillmatchtheorderofspecified
+inputs.Theshapeisspecifiedascomma-separated
+list.Example,toset`input_1`inputwithshape
+[1,100]and`sequence_len`inputwithshape[1,?]:
+"input_1[1,100],sequence_len[1,?]",where"?"isa
+dynamicdimension,whichmeansthatsuchadimension
+canbespecifiedlaterintheruntime.Ifthe
+dimensionissetasaninteger(like100in[1,100]),
+suchadimensionisnotsupposedtobechangedlater,
+duringamodelconversionitistreatedasastatic
+value.Examplewithunnamedinputs:"[1,100],[1,?]".
+--outputOUTPUTOneormorecomma-separatedmodeloutputstobe
+preservedintheconvertedmodel.Otheroutputsare
+removed.If`output`parameterisnotspecifiedthen
+alloutputsfromtheoriginalmodelarepreserved.Do
+notadd:0tothenamesforTensorFlow.Theorderof
+outputsintheconvertedmodelisthesameasthe
+orderofspecifiednames.Example:ovcmodel.onnx
+output=out_1,out_2
+--extensionEXTENSION
+Pathsoracomma-separatedlistofpathstolibraries
+(.soor.dll)withextensions.
+--verbosePrintdetailedinformationaboutconversion.
+
+
+Fetchingexamplemodels
 -----------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-This notebook uses two models for conversion examples:
+Thisnotebookusestwomodelsforconversionexamples:
 
--  `Distilbert <https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english>`__
-   NLP model from Hugging Face
--  `Resnet50 <https://pytorch.org/vision/stable/models/generated/torchvision.models.resnet50.html#torchvision.models.ResNet50_Weights>`__
-   CV classification model from torchvision
+-`Distilbert<https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english>`__
+NLPmodelfromHuggingFace
+-`Resnet50<https://pytorch.org/vision/stable/models/generated/torchvision.models.resnet50.html#torchvision.models.ResNet50_Weights>`__
+CVclassificationmodelfromtorchvision
 
-.. code:: ipython3
+..code::ipython3
 
-    from pathlib import Path
-    
-    # create a directory for models files
-    MODEL_DIRECTORY_PATH = Path("model")
-    MODEL_DIRECTORY_PATH.mkdir(exist_ok=True)
+frompathlibimportPath
 
-Fetch
-`distilbert <https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english>`__
-NLP model from Hugging Face and export it in ONNX format:
-
-.. code:: ipython3
-
-    from transformers import AutoModelForSequenceClassification, AutoTokenizer
-    from transformers.onnx import export, FeaturesManager
-    
-    ONNX_NLP_MODEL_PATH = MODEL_DIRECTORY_PATH / "distilbert.onnx"
-    
-    # download model
-    hf_model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
-    # initialize tokenizer
-    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
-    
-    # get model onnx config function for output feature format sequence-classification
-    model_kind, model_onnx_config = FeaturesManager.check_supported_model_or_raise(hf_model, feature="sequence-classification")
-    # fill onnx config based on pytorch model config
-    onnx_config = model_onnx_config(hf_model.config)
-    
-    # export to onnx format
-    export(
-        preprocessor=tokenizer,
-        model=hf_model,
-        config=onnx_config,
-        opset=onnx_config.default_onnx_opset,
-        output=ONNX_NLP_MODEL_PATH,
-    )
-
-
-.. parsed-literal::
-
-    2024-07-12 23:47:37.510126: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-07-12 23:47:37.545461: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-07-12 23:47:38.151630: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/distilbert/modeling_distilbert.py:230: TracerWarning: torch.tensor results are registered as constants in the trace. You can safely ignore this warning if you use this function to create tensors out of constant variables that would be the same every time you call this function. In any other case, this might cause the trace to be incorrect.
-      mask, torch.tensor(torch.finfo(scores.dtype).min)
-
-
-
-
-.. parsed-literal::
-
-    (['input_ids', 'attention_mask'], ['logits'])
-
-
+#createadirectoryformodelsfiles
+MODEL_DIRECTORY_PATH=Path("model")
+MODEL_DIRECTORY_PATH.mkdir(exist_ok=True)
 
 Fetch
-`Resnet50 <https://pytorch.org/vision/stable/models/generated/torchvision.models.resnet50.html#torchvision.models.ResNet50_Weights>`__
-CV classification model from torchvision:
+`distilbert<https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english>`__
+NLPmodelfromHuggingFaceandexportitinONNXformat:
 
-.. code:: ipython3
+..code::ipython3
 
-    from torchvision.models import resnet50, ResNet50_Weights
-    
-    # create model object
-    pytorch_model = resnet50(weights=ResNet50_Weights.DEFAULT)
-    # switch model from training to inference mode
-    pytorch_model.eval()
+fromtransformersimportAutoModelForSequenceClassification,AutoTokenizer
+fromtransformers.onnximportexport,FeaturesManager
+
+ONNX_NLP_MODEL_PATH=MODEL_DIRECTORY_PATH/"distilbert.onnx"
+
+#downloadmodel
+hf_model=AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
+#initializetokenizer
+tokenizer=AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
+
+#getmodelonnxconfigfunctionforoutputfeatureformatsequence-classification
+model_kind,model_onnx_config=FeaturesManager.check_supported_model_or_raise(hf_model,feature="sequence-classification")
+#fillonnxconfigbasedonpytorchmodelconfig
+onnx_config=model_onnx_config(hf_model.config)
+
+#exporttoonnxformat
+export(
+preprocessor=tokenizer,
+model=hf_model,
+config=onnx_config,
+opset=onnx_config.default_onnx_opset,
+output=ONNX_NLP_MODEL_PATH,
+)
 
 
+..parsed-literal::
 
-
-.. parsed-literal::
-
-    ResNet(
-      (conv1): Conv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
-      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-      (relu): ReLU(inplace=True)
-      (maxpool): MaxPool2d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
-      (layer1): Sequential(
-        (0): Bottleneck(
-          (conv1): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-          (downsample): Sequential(
-            (0): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
-            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          )
-        )
-        (1): Bottleneck(
-          (conv1): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-        (2): Bottleneck(
-          (conv1): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-      )
-      (layer2): Sequential(
-        (0): Bottleneck(
-          (conv1): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-          (downsample): Sequential(
-            (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
-            (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          )
-        )
-        (1): Bottleneck(
-          (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-        (2): Bottleneck(
-          (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-        (3): Bottleneck(
-          (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-      )
-      (layer3): Sequential(
-        (0): Bottleneck(
-          (conv1): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-          (downsample): Sequential(
-            (0): Conv2d(512, 1024, kernel_size=(1, 1), stride=(2, 2), bias=False)
-            (1): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          )
-        )
-        (1): Bottleneck(
-          (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-        (2): Bottleneck(
-          (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-        (3): Bottleneck(
-          (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-        (4): Bottleneck(
-          (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-        (5): Bottleneck(
-          (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-      )
-      (layer4): Sequential(
-        (0): Bottleneck(
-          (conv1): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-          (downsample): Sequential(
-            (0): Conv2d(1024, 2048, kernel_size=(1, 1), stride=(2, 2), bias=False)
-            (1): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          )
-        )
-        (1): Bottleneck(
-          (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-        (2): Bottleneck(
-          (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-          (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
-          (bn3): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-          (relu): ReLU(inplace=True)
-        )
-      )
-      (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
-      (fc): Linear(in_features=2048, out_features=1000, bias=True)
-    )
+2024-07-1223:47:37.510126:Itensorflow/core/util/port.cc:110]oneDNNcustomoperationsareon.Youmayseeslightlydifferentnumericalresultsduetofloating-pointround-offerrorsfromdifferentcomputationorders.Toturnthemoff,settheenvironmentvariable`TF_ENABLE_ONEDNN_OPTS=0`.
+2024-07-1223:47:37.545461:Itensorflow/core/platform/cpu_feature_guard.cc:182]ThisTensorFlowbinaryisoptimizedtouseavailableCPUinstructionsinperformance-criticaloperations.
+Toenablethefollowinginstructions:AVX2AVX512FAVX512_VNNIFMA,inotheroperations,rebuildTensorFlowwiththeappropriatecompilerflags.
+2024-07-1223:47:38.151630:Wtensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38]TF-TRTWarning:CouldnotfindTensorRT
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/distilbert/modeling_distilbert.py:230:TracerWarning:torch.tensorresultsareregisteredasconstantsinthetrace.Youcansafelyignorethiswarningifyouusethisfunctiontocreatetensorsoutofconstantvariablesthatwouldbethesameeverytimeyoucallthisfunction.Inanyothercase,thismightcausethetracetobeincorrect.
+mask,torch.tensor(torch.finfo(scores.dtype).min)
 
 
 
-Convert PyTorch model to ONNX format:
 
-.. code:: ipython3
+..parsed-literal::
 
-    import torch
-    import warnings
-    
-    ONNX_CV_MODEL_PATH = MODEL_DIRECTORY_PATH / "resnet.onnx"
-    
-    if ONNX_CV_MODEL_PATH.exists():
-        print(f"ONNX model {ONNX_CV_MODEL_PATH} already exists.")
-    else:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore")
-            torch.onnx.export(model=pytorch_model, args=torch.randn(1, 3, 224, 224), f=ONNX_CV_MODEL_PATH)
-        print(f"ONNX model exported to {ONNX_CV_MODEL_PATH}")
+(['input_ids','attention_mask'],['logits'])
 
 
-.. parsed-literal::
 
-    ONNX model exported to model/resnet.onnx
+Fetch
+`Resnet50<https://pytorch.org/vision/stable/models/generated/torchvision.models.resnet50.html#torchvision.models.ResNet50_Weights>`__
+CVclassificationmodelfromtorchvision:
+
+..code::ipython3
+
+fromtorchvision.modelsimportresnet50,ResNet50_Weights
+
+#createmodelobject
+pytorch_model=resnet50(weights=ResNet50_Weights.DEFAULT)
+#switchmodelfromtrainingtoinferencemode
+pytorch_model.eval()
+
+
+
+
+..parsed-literal::
+
+ResNet(
+(conv1):Conv2d(3,64,kernel_size=(7,7),stride=(2,2),padding=(3,3),bias=False)
+(bn1):BatchNorm2d(64,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+(maxpool):MaxPool2d(kernel_size=3,stride=2,padding=1,dilation=1,ceil_mode=False)
+(layer1):Sequential(
+(0):Bottleneck(
+(conv1):Conv2d(64,64,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(64,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(64,64,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(64,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(64,256,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+(downsample):Sequential(
+(0):Conv2d(64,256,kernel_size=(1,1),stride=(1,1),bias=False)
+(1):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+)
+)
+(1):Bottleneck(
+(conv1):Conv2d(256,64,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(64,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(64,64,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(64,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(64,256,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+(2):Bottleneck(
+(conv1):Conv2d(256,64,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(64,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(64,64,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(64,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(64,256,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+)
+(layer2):Sequential(
+(0):Bottleneck(
+(conv1):Conv2d(256,128,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(128,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(128,128,kernel_size=(3,3),stride=(2,2),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(128,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(128,512,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+(downsample):Sequential(
+(0):Conv2d(256,512,kernel_size=(1,1),stride=(2,2),bias=False)
+(1):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+)
+)
+(1):Bottleneck(
+(conv1):Conv2d(512,128,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(128,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(128,128,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(128,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(128,512,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+(2):Bottleneck(
+(conv1):Conv2d(512,128,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(128,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(128,128,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(128,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(128,512,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+(3):Bottleneck(
+(conv1):Conv2d(512,128,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(128,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(128,128,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(128,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(128,512,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+)
+(layer3):Sequential(
+(0):Bottleneck(
+(conv1):Conv2d(512,256,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(256,256,kernel_size=(3,3),stride=(2,2),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(256,1024,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(1024,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+(downsample):Sequential(
+(0):Conv2d(512,1024,kernel_size=(1,1),stride=(2,2),bias=False)
+(1):BatchNorm2d(1024,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+)
+)
+(1):Bottleneck(
+(conv1):Conv2d(1024,256,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(256,256,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(256,1024,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(1024,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+(2):Bottleneck(
+(conv1):Conv2d(1024,256,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(256,256,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(256,1024,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(1024,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+(3):Bottleneck(
+(conv1):Conv2d(1024,256,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(256,256,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(256,1024,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(1024,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+(4):Bottleneck(
+(conv1):Conv2d(1024,256,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(256,256,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(256,1024,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(1024,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+(5):Bottleneck(
+(conv1):Conv2d(1024,256,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(256,256,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(256,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(256,1024,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(1024,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+)
+(layer4):Sequential(
+(0):Bottleneck(
+(conv1):Conv2d(1024,512,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(512,512,kernel_size=(3,3),stride=(2,2),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(512,2048,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(2048,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+(downsample):Sequential(
+(0):Conv2d(1024,2048,kernel_size=(1,1),stride=(2,2),bias=False)
+(1):BatchNorm2d(2048,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+)
+)
+(1):Bottleneck(
+(conv1):Conv2d(2048,512,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(512,512,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(512,2048,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(2048,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+(2):Bottleneck(
+(conv1):Conv2d(2048,512,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn1):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv2):Conv2d(512,512,kernel_size=(3,3),stride=(1,1),padding=(1,1),bias=False)
+(bn2):BatchNorm2d(512,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(conv3):Conv2d(512,2048,kernel_size=(1,1),stride=(1,1),bias=False)
+(bn3):BatchNorm2d(2048,eps=1e-05,momentum=0.1,affine=True,track_running_stats=True)
+(relu):ReLU(inplace=True)
+)
+)
+(avgpool):AdaptiveAvgPool2d(output_size=(1,1))
+(fc):Linear(in_features=2048,out_features=1000,bias=True)
+)
+
+
+
+ConvertPyTorchmodeltoONNXformat:
+
+..code::ipython3
+
+importtorch
+importwarnings
+
+ONNX_CV_MODEL_PATH=MODEL_DIRECTORY_PATH/"resnet.onnx"
+
+ifONNX_CV_MODEL_PATH.exists():
+print(f"ONNXmodel{ONNX_CV_MODEL_PATH}alreadyexists.")
+else:
+withwarnings.catch_warnings():
+warnings.filterwarnings("ignore")
+torch.onnx.export(model=pytorch_model,args=torch.randn(1,3,224,224),f=ONNX_CV_MODEL_PATH)
+print(f"ONNXmodelexportedto{ONNX_CV_MODEL_PATH}")
+
+
+..parsed-literal::
+
+ONNXmodelexportedtomodel/resnet.onnx
 
 
 Conversion
 ----------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-To convert a model to OpenVINO IR, use the following API:
+ToconvertamodeltoOpenVINOIR,usethefollowingAPI:
 
-.. code:: ipython3
+..code::ipython3
 
-    import openvino as ov
-    
-    # ov.convert_model returns an openvino.runtime.Model object
-    print(ONNX_NLP_MODEL_PATH)
-    ov_model = ov.convert_model(ONNX_NLP_MODEL_PATH)
-    
-    # then model can be serialized to *.xml & *.bin files
-    ov.save_model(ov_model, MODEL_DIRECTORY_PATH / "distilbert.xml")
+importopenvinoasov
 
+#ov.convert_modelreturnsanopenvino.runtime.Modelobject
+print(ONNX_NLP_MODEL_PATH)
+ov_model=ov.convert_model(ONNX_NLP_MODEL_PATH)
 
-.. parsed-literal::
-
-    model/distilbert.onnx
+#thenmodelcanbeserializedto*.xml&*.binfiles
+ov.save_model(ov_model,MODEL_DIRECTORY_PATH/"distilbert.xml")
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    ! ovc model/distilbert.onnx --output_model model/distilbert.xml
-
-
-.. parsed-literal::
-
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+model/distilbert.onnx
 
 
-.. parsed-literal::
+..code::ipython3
 
-    [ INFO ] Generated IR will be compressed to FP16. If you get lower accuracy, please consider disabling compression by removing argument "compress_to_fp16" or set it to false "compress_to_fp16=False".
-    Find more information about compression to FP16 at https://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
-    [ SUCCESS ] XML file: model/distilbert.xml
-    [ SUCCESS ] BIN file: model/distilbert.bin
+!ovcmodel/distilbert.onnx--output_modelmodel/distilbert.xml
 
 
-Setting Input Shapes
+..parsed-literal::
+
+huggingface/tokenizers:Thecurrentprocessjustgotforked,afterparallelismhasalreadybeenused.Disablingparallelismtoavoiddeadlocks...
+Todisablethiswarning,youcaneither:
+	-Avoidusing`tokenizers`beforetheforkifpossible
+	-ExplicitlysettheenvironmentvariableTOKENIZERS_PARALLELISM=(true|false)
+
+
+..parsed-literal::
+
+[INFO]GeneratedIRwillbecompressedtoFP16.Ifyougetloweraccuracy,pleaseconsiderdisablingcompressionbyremovingargument"compress_to_fp16"orsetittofalse"compress_to_fp16=False".
+FindmoreinformationaboutcompressiontoFP16athttps://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
+[SUCCESS]XMLfile:model/distilbert.xml
+[SUCCESS]BINfile:model/distilbert.bin
+
+
+SettingInputShapes
 ^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Model conversion is supported for models with dynamic input shapes that
-contain undefined dimensions. However, if the shape of data is not going
-to change from one inference request to another, it is recommended to
-set up static shapes (when all dimensions are fully defined) for the
-inputs. Doing so at the model preparation stage, not at runtime, can be
-beneficial in terms of performance and memory consumption.
+Modelconversionissupportedformodelswithdynamicinputshapesthat
+containundefineddimensions.However,iftheshapeofdataisnotgoing
+tochangefromoneinferencerequesttoanother,itisrecommendedto
+setupstaticshapes(whenalldimensionsarefullydefined)forthe
+inputs.Doingsoatthemodelpreparationstage,notatruntime,canbe
+beneficialintermsofperformanceandmemoryconsumption.
 
-For more information refer to `Setting Input
-Shapes <https://docs.openvino.ai/2024/openvino-workflow/model-preparation/setting-input-shapes.html>`__
+Formoreinformationreferto`SettingInput
+Shapes<https://docs.openvino.ai/2024/openvino-workflow/model-preparation/setting-input-shapes.html>`__
 documentation.
 
-.. code:: ipython3
+..code::ipython3
 
-    import openvino as ov
-    
-    ov_model = ov.convert_model(ONNX_NLP_MODEL_PATH, input=[("input_ids", [1, 128]), ("attention_mask", [1, 128])])
+importopenvinoasov
 
-.. code:: ipython3
+ov_model=ov.convert_model(ONNX_NLP_MODEL_PATH,input=[("input_ids",[1,128]),("attention_mask",[1,128])])
 
-    ! ovc model/distilbert.onnx --input input_ids[1,128],attention_mask[1,128] --output_model model/distilbert.xml
+..code::ipython3
 
-
-.. parsed-literal::
-
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+!ovcmodel/distilbert.onnx--inputinput_ids[1,128],attention_mask[1,128]--output_modelmodel/distilbert.xml
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    [ INFO ] Generated IR will be compressed to FP16. If you get lower accuracy, please consider disabling compression by removing argument "compress_to_fp16" or set it to false "compress_to_fp16=False".
-    Find more information about compression to FP16 at https://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
-    [ SUCCESS ] XML file: model/distilbert.xml
-    [ SUCCESS ] BIN file: model/distilbert.bin
-
-
-The ``input`` parameter allows overriding original input shapes if it is
-supported by the model topology. Shapes with dynamic dimensions in the
-original model can be replaced with static shapes for the converted
-model, and vice versa. The dynamic dimension can be marked in model
-conversion API parameter as ``-1`` or ``?`` when using ``ovc``:
-
-.. code:: ipython3
-
-    import openvino as ov
-    
-    ov_model = ov.convert_model(ONNX_NLP_MODEL_PATH, input=[("input_ids", [1, -1]), ("attention_mask", [1, -1])])
-
-.. code:: ipython3
-
-    ! ovc model/distilbert.onnx --input "input_ids[1,?],attention_mask[1,?]" --output_model model/distilbert.xml
+huggingface/tokenizers:Thecurrentprocessjustgotforked,afterparallelismhasalreadybeenused.Disablingparallelismtoavoiddeadlocks...
+Todisablethiswarning,youcaneither:
+	-Avoidusing`tokenizers`beforetheforkifpossible
+	-ExplicitlysettheenvironmentvariableTOKENIZERS_PARALLELISM=(true|false)
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-
-
-.. parsed-literal::
-
-    [ INFO ] Generated IR will be compressed to FP16. If you get lower accuracy, please consider disabling compression by removing argument "compress_to_fp16" or set it to false "compress_to_fp16=False".
-    Find more information about compression to FP16 at https://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
-    [ SUCCESS ] XML file: model/distilbert.xml
-    [ SUCCESS ] BIN file: model/distilbert.bin
+[INFO]GeneratedIRwillbecompressedtoFP16.Ifyougetloweraccuracy,pleaseconsiderdisablingcompressionbyremovingargument"compress_to_fp16"orsetittofalse"compress_to_fp16=False".
+FindmoreinformationaboutcompressiontoFP16athttps://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
+[SUCCESS]XMLfile:model/distilbert.xml
+[SUCCESS]BINfile:model/distilbert.bin
 
 
-To optimize memory consumption for models with undefined dimensions in
-runtime, model conversion API provides the capability to define
-boundaries of dimensions. The boundaries of undefined dimension can be
-specified with ellipsis in the command line or with
-``openvino.Dimension`` class in Python. For example, launch model
-conversion for the ONNX Bert model and specify a boundary for the
-sequence length dimension:
+The``input``parameterallowsoverridingoriginalinputshapesifitis
+supportedbythemodeltopology.Shapeswithdynamicdimensionsinthe
+originalmodelcanbereplacedwithstaticshapesfortheconverted
+model,andviceversa.Thedynamicdimensioncanbemarkedinmodel
+conversionAPIparameteras``-1``or``?``whenusing``ovc``:
 
-.. code:: ipython3
+..code::ipython3
 
-    import openvino as ov
-    
-    
-    sequence_length_dim = ov.Dimension(10, 128)
-    
-    ov_model = ov.convert_model(
-        ONNX_NLP_MODEL_PATH,
-        input=[
-            ("input_ids", [1, sequence_length_dim]),
-            ("attention_mask", [1, sequence_length_dim]),
-        ],
-    )
+importopenvinoasov
 
-.. code:: ipython3
+ov_model=ov.convert_model(ONNX_NLP_MODEL_PATH,input=[("input_ids",[1,-1]),("attention_mask",[1,-1])])
 
-    ! ovc model/distilbert.onnx --input input_ids[1,10..128],attention_mask[1,10..128] --output_model model/distilbert.xml
+..code::ipython3
+
+!ovcmodel/distilbert.onnx--input"input_ids[1,?],attention_mask[1,?]"--output_modelmodel/distilbert.xml
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-
-
-.. parsed-literal::
-
-    [ INFO ] Generated IR will be compressed to FP16. If you get lower accuracy, please consider disabling compression by removing argument "compress_to_fp16" or set it to false "compress_to_fp16=False".
-    Find more information about compression to FP16 at https://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
-    [ SUCCESS ] XML file: model/distilbert.xml
-    [ SUCCESS ] BIN file: model/distilbert.bin
+huggingface/tokenizers:Thecurrentprocessjustgotforked,afterparallelismhasalreadybeenused.Disablingparallelismtoavoiddeadlocks...
+Todisablethiswarning,youcaneither:
+	-Avoidusing`tokenizers`beforetheforkifpossible
+	-ExplicitlysettheenvironmentvariableTOKENIZERS_PARALLELISM=(true|false)
 
 
-Compressing a Model to FP16
+..parsed-literal::
+
+[INFO]GeneratedIRwillbecompressedtoFP16.Ifyougetloweraccuracy,pleaseconsiderdisablingcompressionbyremovingargument"compress_to_fp16"orsetittofalse"compress_to_fp16=False".
+FindmoreinformationaboutcompressiontoFP16athttps://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
+[SUCCESS]XMLfile:model/distilbert.xml
+[SUCCESS]BINfile:model/distilbert.bin
+
+
+Tooptimizememoryconsumptionformodelswithundefineddimensionsin
+runtime,modelconversionAPIprovidesthecapabilitytodefine
+boundariesofdimensions.Theboundariesofundefineddimensioncanbe
+specifiedwithellipsisinthecommandlineorwith
+``openvino.Dimension``classinPython.Forexample,launchmodel
+conversionfortheONNXBertmodelandspecifyaboundaryforthe
+sequencelengthdimension:
+
+..code::ipython3
+
+importopenvinoasov
+
+
+sequence_length_dim=ov.Dimension(10,128)
+
+ov_model=ov.convert_model(
+ONNX_NLP_MODEL_PATH,
+input=[
+("input_ids",[1,sequence_length_dim]),
+("attention_mask",[1,sequence_length_dim]),
+],
+)
+
+..code::ipython3
+
+!ovcmodel/distilbert.onnx--inputinput_ids[1,10..128],attention_mask[1,10..128]--output_modelmodel/distilbert.xml
+
+
+..parsed-literal::
+
+huggingface/tokenizers:Thecurrentprocessjustgotforked,afterparallelismhasalreadybeenused.Disablingparallelismtoavoiddeadlocks...
+Todisablethiswarning,youcaneither:
+	-Avoidusing`tokenizers`beforetheforkifpossible
+	-ExplicitlysettheenvironmentvariableTOKENIZERS_PARALLELISM=(true|false)
+
+
+..parsed-literal::
+
+[INFO]GeneratedIRwillbecompressedtoFP16.Ifyougetloweraccuracy,pleaseconsiderdisablingcompressionbyremovingargument"compress_to_fp16"orsetittofalse"compress_to_fp16=False".
+FindmoreinformationaboutcompressiontoFP16athttps://docs.openvino.ai/2023.0/openvino_docs_MO_DG_FP16_Compression.html
+[SUCCESS]XMLfile:model/distilbert.xml
+[SUCCESS]BINfile:model/distilbert.bin
+
+
+CompressingaModeltoFP16
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-By default model weights compressed to FP16 format when saving OpenVINO
-model to IR. This saves up to 2x storage space for the model file and in
-most cases doesn’t sacrifice model accuracy. Weight compression can be
-disabled by setting ``compress_to_fp16`` flag to ``False``:
+BydefaultmodelweightscompressedtoFP16formatwhensavingOpenVINO
+modeltoIR.Thissavesupto2xstoragespaceforthemodelfileandin
+mostcasesdoesn’tsacrificemodelaccuracy.Weightcompressioncanbe
+disabledbysetting``compress_to_fp16``flagto``False``:
 
-.. code:: ipython3
+..code::ipython3
 
-    import openvino as ov
-    
-    ov_model = ov.convert_model(ONNX_NLP_MODEL_PATH)
-    ov.save_model(ov_model, MODEL_DIRECTORY_PATH / "distilbert.xml", compress_to_fp16=False)
+importopenvinoasov
 
-.. code:: ipython3
+ov_model=ov.convert_model(ONNX_NLP_MODEL_PATH)
+ov.save_model(ov_model,MODEL_DIRECTORY_PATH/"distilbert.xml",compress_to_fp16=False)
 
-    ! ovc model/distilbert.onnx --output_model model/distilbert.xml --compress_to_fp16=False
+..code::ipython3
 
-
-.. parsed-literal::
-
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+!ovcmodel/distilbert.onnx--output_modelmodel/distilbert.xml--compress_to_fp16=False
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    [ SUCCESS ] XML file: model/distilbert.xml
-    [ SUCCESS ] BIN file: model/distilbert.bin
+huggingface/tokenizers:Thecurrentprocessjustgotforked,afterparallelismhasalreadybeenused.Disablingparallelismtoavoiddeadlocks...
+Todisablethiswarning,youcaneither:
+	-Avoidusing`tokenizers`beforetheforkifpossible
+	-ExplicitlysettheenvironmentvariableTOKENIZERS_PARALLELISM=(true|false)
 
 
-Convert Models from memory
+..parsed-literal::
+
+[SUCCESS]XMLfile:model/distilbert.xml
+[SUCCESS]BINfile:model/distilbert.bin
+
+
+ConvertModelsfrommemory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Model conversion API supports passing original framework Python object
-directly. More details can be found in
-`PyTorch <https://docs.openvino.ai/2024/openvino-workflow/model-preparation/convert-model-pytorch.html>`__,
-`TensorFlow <https://docs.openvino.ai/2024/openvino-workflow/model-preparation/convert-model-tensorflow.html>`__,
-`PaddlePaddle <https://docs.openvino.ai/2024/openvino-workflow/model-preparation/convert-model-paddle.html>`__
-frameworks conversion guides.
+ModelconversionAPIsupportspassingoriginalframeworkPythonobject
+directly.Moredetailscanbefoundin
+`PyTorch<https://docs.openvino.ai/2024/openvino-workflow/model-preparation/convert-model-pytorch.html>`__,
+`TensorFlow<https://docs.openvino.ai/2024/openvino-workflow/model-preparation/convert-model-tensorflow.html>`__,
+`PaddlePaddle<https://docs.openvino.ai/2024/openvino-workflow/model-preparation/convert-model-paddle.html>`__
+frameworksconversionguides.
 
-.. code:: ipython3
+..code::ipython3
 
-    import openvino as ov
-    import torch
-    
-    example_input = torch.rand(1, 3, 224, 224)
-    
-    ov_model = ov.convert_model(pytorch_model, example_input=example_input, input=example_input.shape)
+importopenvinoasov
+importtorch
 
+example_input=torch.rand(1,3,224,224)
 
-.. parsed-literal::
-
-    WARNING:tensorflow:Please fix your imports. Module tensorflow.python.training.tracking.base has been moved to tensorflow.python.trackable.base. The old module will be deleted in version 2.11.
+ov_model=ov.convert_model(pytorch_model,example_input=example_input,input=example_input.shape)
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    import os
-    
-    import openvino as ov
-    import tensorflow_hub as hub
-    
-    os.environ["TFHUB_CACHE_DIR"] = str(Path("./tfhub_modules").resolve())
-    
-    model = hub.load("https://www.kaggle.com/models/google/movenet/frameworks/TensorFlow2/variations/singlepose-lightning/versions/4")
-    movenet = model.signatures["serving_default"]
-    
-    ov_model = ov.convert_model(movenet)
+WARNING:tensorflow:Pleasefixyourimports.Moduletensorflow.python.training.tracking.basehasbeenmovedtotensorflow.python.trackable.base.Theoldmodulewillbedeletedinversion2.11.
 
 
-.. parsed-literal::
+..code::ipython3
 
-    2024-07-12 23:47:58.665238: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266] failed call to cuInit: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE: forward compatibility was attempted on non supported HW
-    2024-07-12 23:47:58.665270: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:168] retrieving CUDA diagnostic information for host: iotg-dev-workstation-07
-    2024-07-12 23:47:58.665275: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:175] hostname: iotg-dev-workstation-07
-    2024-07-12 23:47:58.665487: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:199] libcuda reported version is: 470.223.2
-    2024-07-12 23:47:58.665503: I tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:203] kernel reported version is: 470.182.3
-    2024-07-12 23:47:58.665507: E tensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312] kernel version 470.182.3 does not match DSO version 470.223.2 -- cannot find working devices in this configuration
+importos
+
+importopenvinoasov
+importtensorflow_hubashub
+
+os.environ["TFHUB_CACHE_DIR"]=str(Path("./tfhub_modules").resolve())
+
+model=hub.load("https://www.kaggle.com/models/google/movenet/frameworks/TensorFlow2/variations/singlepose-lightning/versions/4")
+movenet=model.signatures["serving_default"]
+
+ov_model=ov.convert_model(movenet)
 
 
-Migration from Legacy conversion API
+..parsed-literal::
+
+2024-07-1223:47:58.665238:Etensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:266]failedcalltocuInit:CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE:forwardcompatibilitywasattemptedonnonsupportedHW
+2024-07-1223:47:58.665270:Itensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:168]retrievingCUDAdiagnosticinformationforhost:iotg-dev-workstation-07
+2024-07-1223:47:58.665275:Itensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:175]hostname:iotg-dev-workstation-07
+2024-07-1223:47:58.665487:Itensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:199]libcudareportedversionis:470.223.2
+2024-07-1223:47:58.665503:Itensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:203]kernelreportedversionis:470.182.3
+2024-07-1223:47:58.665507:Etensorflow/compiler/xla/stream_executor/cuda/cuda_diagnostics.cc:312]kernelversion470.182.3doesnotmatchDSOversion470.223.2--cannotfindworkingdevicesinthisconfiguration
+
+
+MigrationfromLegacyconversionAPI
 ------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-In the 2023.1 OpenVINO release OpenVINO Model Conversion API was
-introduced with the corresponding Python API: ``openvino.convert_model``
-method. ``ovc`` and ``openvino.convert_model`` represent a lightweight
-alternative of ``mo`` and ``openvino.tools.mo.convert_model`` which are
-considered legacy API now. ``mo.convert_model()`` provides a wide range
-of preprocessing parameters. Most of these parameters have analogs in
-OVC or can be replaced with functionality from ``ov.PrePostProcessor``
-class. Refer to `Optimize Preprocessing
-notebook <optimize-preprocessing-with-output.html>`__ for
-more information about `Preprocessing
-API <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/optimize-preprocessing.html>`__.
-Here is the migration guide from legacy model preprocessing to
-Preprocessing API.
+Inthe2023.1OpenVINOreleaseOpenVINOModelConversionAPIwas
+introducedwiththecorrespondingPythonAPI:``openvino.convert_model``
+method.``ovc``and``openvino.convert_model``representalightweight
+alternativeof``mo``and``openvino.tools.mo.convert_model``whichare
+consideredlegacyAPInow.``mo.convert_model()``providesawiderange
+ofpreprocessingparameters.Mostoftheseparametershaveanalogsin
+OVCorcanbereplacedwithfunctionalityfrom``ov.PrePostProcessor``
+class.Referto`OptimizePreprocessing
+notebook<optimize-preprocessing-with-output.html>`__for
+moreinformationabout`Preprocessing
+API<https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/optimize-preprocessing.html>`__.
+Hereisthemigrationguidefromlegacymodelpreprocessingto
+PreprocessingAPI.
 
-Specifying Layout
+SpecifyingLayout
 ^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Layout defines the meaning of dimensions in a shape and can be specified
-for both inputs and outputs. Some preprocessing requires to set input
-layouts, for example, setting a batch, applying mean or scales, and
-reversing input channels (BGR<->RGB). For the layout syntax, check the
-`Layout API
-overview <https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/optimize-preprocessing/layout-api-overview.html>`__.
-To specify the layout, you can use the layout option followed by the
-layout value.
+Layoutdefinesthemeaningofdimensionsinashapeandcanbespecified
+forbothinputsandoutputs.Somepreprocessingrequirestosetinput
+layouts,forexample,settingabatch,applyingmeanorscales,and
+reversinginputchannels(BGR<->RGB).Forthelayoutsyntax,checkthe
+`LayoutAPI
+overview<https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/optimize-preprocessing/layout-api-overview.html>`__.
+Tospecifythelayout,youcanusethelayoutoptionfollowedbythe
+layoutvalue.
 
-The following example specifies the ``NCHW`` layout for a Pytorch
-Resnet50 model that was exported to the ONNX format:
+Thefollowingexamplespecifiesthe``NCHW``layoutforaPytorch
+Resnet50modelthatwasexportedtotheONNXformat:
 
-.. code:: ipython3
+..code::ipython3
 
-    # Converter API
-    import openvino as ov
-    
-    ov_model = ov.convert_model(ONNX_CV_MODEL_PATH)
-    
-    prep = ov.preprocess.PrePostProcessor(ov_model)
-    prep.input("input.1").model().set_layout(ov.Layout("nchw"))
-    ov_model = prep.build()
+#ConverterAPI
+importopenvinoasov
 
-.. code:: ipython3
+ov_model=ov.convert_model(ONNX_CV_MODEL_PATH)
 
-    # Legacy Model Optimizer API
-    from openvino.tools import mo
-    
-    ov_model = mo.convert_model(ONNX_CV_MODEL_PATH, layout="nchw")
+prep=ov.preprocess.PrePostProcessor(ov_model)
+prep.input("input.1").model().set_layout(ov.Layout("nchw"))
+ov_model=prep.build()
 
+..code::ipython3
 
-.. parsed-literal::
+#LegacyModelOptimizerAPI
+fromopenvino.toolsimportmo
 
-    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release.
-    In 2025.0 MO command line tool and openvino.tools.mo.convert_model() will be removed. Please use OpenVINO Model Converter (OVC) or openvino.convert_model(). OVC represents a lightweight alternative of MO and provides simplified model conversion API. 
-    Find more information about transition from MO to OVC at https://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
+ov_model=mo.convert_model(ONNX_CV_MODEL_PATH,layout="nchw")
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-    	- Avoid using `tokenizers` before the fork if possible
-    	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+[INFO]MOcommandlinetoolisconsideredasthelegacyconversionAPIasofOpenVINO2023.2release.
+In2025.0MOcommandlinetoolandopenvino.tools.mo.convert_model()willberemoved.PleaseuseOpenVINOModelConverter(OVC)oropenvino.convert_model().OVCrepresentsalightweightalternativeofMOandprovidessimplifiedmodelconversionAPI.
+FindmoreinformationabouttransitionfromMOtoOVCathttps://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
 
 
-Changing Model Layout
+..parsed-literal::
+
+huggingface/tokenizers:Thecurrentprocessjustgotforked,afterparallelismhasalreadybeenused.Disablingparallelismtoavoiddeadlocks...
+Todisablethiswarning,youcaneither:
+	-Avoidusing`tokenizers`beforetheforkifpossible
+	-ExplicitlysettheenvironmentvariableTOKENIZERS_PARALLELISM=(true|false)
+
+
+ChangingModelLayout
 ^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Transposing of matrices/tensors is a typical operation in Deep Learning
-- you may have a BMP image ``640x480``, which is an array of
-``{480, 640, 3}`` elements, but Deep Learning model can require input
-with shape ``{1, 3, 480, 640}``.
+Transposingofmatrices/tensorsisatypicaloperationinDeepLearning
+-youmayhaveaBMPimage``640x480``,whichisanarrayof
+``{480,640,3}``elements,butDeepLearningmodelcanrequireinput
+withshape``{1,3,480,640}``.
 
-Conversion can be done implicitly, using the layout of a user’s tensor
-and the layout of an original model:
+Conversioncanbedoneimplicitly,usingthelayoutofauser’stensor
+andthelayoutofanoriginalmodel:
 
-.. code:: ipython3
+..code::ipython3
 
-    # Converter API
-    import openvino as ov
-    
-    ov_model = ov.convert_model(ONNX_CV_MODEL_PATH)
-    
-    prep = ov.preprocess.PrePostProcessor(ov_model)
-    prep.input("input.1").tensor().set_layout(ov.Layout("nhwc"))
-    prep.input("input.1").model().set_layout(ov.Layout("nchw"))
-    ov_model = prep.build()
+#ConverterAPI
+importopenvinoasov
 
-.. code:: ipython3
+ov_model=ov.convert_model(ONNX_CV_MODEL_PATH)
 
-    # Legacy Model Optimizer API
-    from openvino.tools import mo
-    
-    ov_model = mo.convert_model(ONNX_CV_MODEL_PATH, layout="nchw->nhwc")
-    
-    # alternatively use source_layout and target_layout parameters
-    ov_model = mo.convert_model(ONNX_CV_MODEL_PATH, source_layout="nchw", target_layout="nhwc")
+prep=ov.preprocess.PrePostProcessor(ov_model)
+prep.input("input.1").tensor().set_layout(ov.Layout("nhwc"))
+prep.input("input.1").model().set_layout(ov.Layout("nchw"))
+ov_model=prep.build()
 
+..code::ipython3
 
-.. parsed-literal::
+#LegacyModelOptimizerAPI
+fromopenvino.toolsimportmo
 
-    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release.
-    In 2025.0 MO command line tool and openvino.tools.mo.convert_model() will be removed. Please use OpenVINO Model Converter (OVC) or openvino.convert_model(). OVC represents a lightweight alternative of MO and provides simplified model conversion API. 
-    Find more information about transition from MO to OVC at https://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
-    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release.
-    In 2025.0 MO command line tool and openvino.tools.mo.convert_model() will be removed. Please use OpenVINO Model Converter (OVC) or openvino.convert_model(). OVC represents a lightweight alternative of MO and provides simplified model conversion API. 
-    Find more information about transition from MO to OVC at https://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
+ov_model=mo.convert_model(ONNX_CV_MODEL_PATH,layout="nchw->nhwc")
+
+#alternativelyusesource_layoutandtarget_layoutparameters
+ov_model=mo.convert_model(ONNX_CV_MODEL_PATH,source_layout="nchw",target_layout="nhwc")
 
 
-Specifying Mean and Scale Values
+..parsed-literal::
+
+[INFO]MOcommandlinetoolisconsideredasthelegacyconversionAPIasofOpenVINO2023.2release.
+In2025.0MOcommandlinetoolandopenvino.tools.mo.convert_model()willberemoved.PleaseuseOpenVINOModelConverter(OVC)oropenvino.convert_model().OVCrepresentsalightweightalternativeofMOandprovidessimplifiedmodelconversionAPI.
+FindmoreinformationabouttransitionfromMOtoOVCathttps://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
+[INFO]MOcommandlinetoolisconsideredasthelegacyconversionAPIasofOpenVINO2023.2release.
+In2025.0MOcommandlinetoolandopenvino.tools.mo.convert_model()willberemoved.PleaseuseOpenVINOModelConverter(OVC)oropenvino.convert_model().OVCrepresentsalightweightalternativeofMOandprovidessimplifiedmodelconversionAPI.
+FindmoreinformationabouttransitionfromMOtoOVCathttps://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
+
+
+SpecifyingMeanandScaleValues
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Using Preprocessing API ``mean`` and ``scale`` values can be set. Using
-these API, model embeds the corresponding preprocessing block for
-mean-value normalization of the input data and optimizes this block.
-Refer to `Optimize Preprocessing
-notebook <optimize-preprocessing-with-output.html>`__ for
-more examples.
+UsingPreprocessingAPI``mean``and``scale``valuescanbeset.Using
+theseAPI,modelembedsthecorrespondingpreprocessingblockfor
+mean-valuenormalizationoftheinputdataandoptimizesthisblock.
+Referto`OptimizePreprocessing
+notebook<optimize-preprocessing-with-output.html>`__for
+moreexamples.
 
-.. code:: ipython3
+..code::ipython3
 
-    # Converter API
-    import openvino as ov
-    
-    ov_model = ov.convert_model(ONNX_CV_MODEL_PATH)
-    
-    prep = ov.preprocess.PrePostProcessor(ov_model)
-    prep.input("input.1").tensor().set_layout(ov.Layout("nchw"))
-    prep.input("input.1").preprocess().mean([255 * x for x in [0.485, 0.456, 0.406]])
-    prep.input("input.1").preprocess().scale([255 * x for x in [0.229, 0.224, 0.225]])
-    
-    ov_model = prep.build()
+#ConverterAPI
+importopenvinoasov
 
-.. code:: ipython3
+ov_model=ov.convert_model(ONNX_CV_MODEL_PATH)
 
-    # Legacy Model Optimizer API
-    from openvino.tools import mo
-    
-    
-    ov_model = mo.convert_model(
-        ONNX_CV_MODEL_PATH,
-        mean_values=[255 * x for x in [0.485, 0.456, 0.406]],
-        scale_values=[255 * x for x in [0.229, 0.224, 0.225]],
-    )
+prep=ov.preprocess.PrePostProcessor(ov_model)
+prep.input("input.1").tensor().set_layout(ov.Layout("nchw"))
+prep.input("input.1").preprocess().mean([255*xforxin[0.485,0.456,0.406]])
+prep.input("input.1").preprocess().scale([255*xforxin[0.229,0.224,0.225]])
+
+ov_model=prep.build()
+
+..code::ipython3
+
+#LegacyModelOptimizerAPI
+fromopenvino.toolsimportmo
 
 
-.. parsed-literal::
+ov_model=mo.convert_model(
+ONNX_CV_MODEL_PATH,
+mean_values=[255*xforxin[0.485,0.456,0.406]],
+scale_values=[255*xforxin[0.229,0.224,0.225]],
+)
 
-    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release.
-    In 2025.0 MO command line tool and openvino.tools.mo.convert_model() will be removed. Please use OpenVINO Model Converter (OVC) or openvino.convert_model(). OVC represents a lightweight alternative of MO and provides simplified model conversion API. 
-    Find more information about transition from MO to OVC at https://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
+
+..parsed-literal::
+
+[INFO]MOcommandlinetoolisconsideredasthelegacyconversionAPIasofOpenVINO2023.2release.
+In2025.0MOcommandlinetoolandopenvino.tools.mo.convert_model()willberemoved.PleaseuseOpenVINOModelConverter(OVC)oropenvino.convert_model().OVCrepresentsalightweightalternativeofMOandprovidessimplifiedmodelconversionAPI.
+FindmoreinformationabouttransitionfromMOtoOVCathttps://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
 
 
-Reversing Input Channels
+ReversingInputChannels
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Sometimes, input images for your application can be of the ``RGB`` (or
-``BGR``) format, and the model is trained on images of the ``BGR`` (or
-``RGB``) format, which is in the opposite order of color channels. In
-this case, it is important to preprocess the input images by reverting
-the color channels before inference.
+Sometimes,inputimagesforyourapplicationcanbeofthe``RGB``(or
+``BGR``)format,andthemodelistrainedonimagesofthe``BGR``(or
+``RGB``)format,whichisintheoppositeorderofcolorchannels.In
+thiscase,itisimportanttopreprocesstheinputimagesbyreverting
+thecolorchannelsbeforeinference.
 
-.. code:: ipython3
+..code::ipython3
 
-    # Converter API
-    import openvino as ov
-    
-    ov_model = ov.convert_model(ONNX_CV_MODEL_PATH)
-    
-    prep = ov.preprocess.PrePostProcessor(ov_model)
-    prep.input("input.1").tensor().set_layout(ov.Layout("nchw"))
-    prep.input("input.1").preprocess().reverse_channels()
-    ov_model = prep.build()
+#ConverterAPI
+importopenvinoasov
 
-.. code:: ipython3
+ov_model=ov.convert_model(ONNX_CV_MODEL_PATH)
 
-    # Legacy Model Optimizer API
-    from openvino.tools import mo
-    
-    ov_model = mo.convert_model(ONNX_CV_MODEL_PATH, reverse_input_channels=True)
+prep=ov.preprocess.PrePostProcessor(ov_model)
+prep.input("input.1").tensor().set_layout(ov.Layout("nchw"))
+prep.input("input.1").preprocess().reverse_channels()
+ov_model=prep.build()
 
+..code::ipython3
 
-.. parsed-literal::
+#LegacyModelOptimizerAPI
+fromopenvino.toolsimportmo
 
-    [ INFO ] MO command line tool is considered as the legacy conversion API as of OpenVINO 2023.2 release.
-    In 2025.0 MO command line tool and openvino.tools.mo.convert_model() will be removed. Please use OpenVINO Model Converter (OVC) or openvino.convert_model(). OVC represents a lightweight alternative of MO and provides simplified model conversion API. 
-    Find more information about transition from MO to OVC at https://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
+ov_model=mo.convert_model(ONNX_CV_MODEL_PATH,reverse_input_channels=True)
 
 
-Cutting Off Parts of a Model
+..parsed-literal::
+
+[INFO]MOcommandlinetoolisconsideredasthelegacyconversionAPIasofOpenVINO2023.2release.
+In2025.0MOcommandlinetoolandopenvino.tools.mo.convert_model()willberemoved.PleaseuseOpenVINOModelConverter(OVC)oropenvino.convert_model().OVCrepresentsalightweightalternativeofMOandprovidessimplifiedmodelconversionAPI.
+FindmoreinformationabouttransitionfromMOtoOVCathttps://docs.openvino.ai/2023.2/openvino_docs_OV_Converter_UG_prepare_model_convert_model_MO_OVC_transition.html
+
+
+CuttingOffPartsofaModel
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Cutting model inputs and outputs from a model is no longer available in
-the new conversion API. Instead, we recommend performing the cut in the
-original framework. Examples of model cutting of TensorFlow protobuf,
-TensorFlow SavedModel, and ONNX formats with tools provided by the
-Tensorflow and ONNX frameworks can be found in `documentation
-guide <https://docs.openvino.ai/2024/documentation/legacy-features/transition-legacy-conversion-api.html#cutting-off-parts-of-a-model>`__.
-For PyTorch, TensorFlow 2 Keras, and PaddlePaddle, we recommend changing
-the original model code to perform the model cut.
+Cuttingmodelinputsandoutputsfromamodelisnolongeravailablein
+thenewconversionAPI.Instead,werecommendperformingthecutinthe
+originalframework.ExamplesofmodelcuttingofTensorFlowprotobuf,
+TensorFlowSavedModel,andONNXformatswithtoolsprovidedbythe
+TensorflowandONNXframeworkscanbefoundin`documentation
+guide<https://docs.openvino.ai/2024/documentation/legacy-features/transition-legacy-conversion-api.html#cutting-off-parts-of-a-model>`__.
+ForPyTorch,TensorFlow2Keras,andPaddlePaddle,werecommendchanging
+theoriginalmodelcodetoperformthemodelcut.

@@ -1,778 +1,778 @@
-Mobile language assistant with MobileVLM and OpenVINO
+MobilelanguageassistantwithMobileVLMandOpenVINO
 =====================================================
 
-`MobileVLM <https://arxiv.org/abs/2312.16886>`__ is a competent
-multimodal vision language model (MMVLM) targeted to run on mobile
-devices. It is an amalgamation of a myriad of architectural designs and
-techniques that are mobile-oriented, which comprises a set of language
-models at the scale of 1.4B and 2.7B parameters, trained from scratch, a
-multimodal vision model that is pre-trained in the CLIP fashion,
-cross-modality interaction via an efficient projector.
+`MobileVLM<https://arxiv.org/abs/2312.16886>`__isacompetent
+multimodalvisionlanguagemodel(MMVLM)targetedtorunonmobile
+devices.Itisanamalgamationofamyriadofarchitecturaldesignsand
+techniquesthataremobile-oriented,whichcomprisesasetoflanguage
+modelsatthescaleof1.4Band2.7Bparameters,trainedfromscratch,a
+multimodalvisionmodelthatispre-trainedintheCLIPfashion,
+cross-modalityinteractionviaanefficientprojector.
 
 |image0|
 
-The MobileVLM architecture (right) utilizes
-`MobileLLaMA <https://huggingface.co/mtgv/MobileLLaMA-1.4B-Base>`__ as
-its language model, intakes :math:`\mathbf{X}_v` and
-:math:`\mathbf{X}_q` which are image and language instructions as
-respective inputs and gives :math:`\mathbf{Y}_a` as the output language
-response. LDP refers to a lightweight downsample projector (left).
+TheMobileVLMarchitecture(right)utilizes
+`MobileLLaMA<https://huggingface.co/mtgv/MobileLLaMA-1.4B-Base>`__as
+itslanguagemodel,intakes:math:`\mathbf{X}_v`and
+:math:`\mathbf{X}_q`whichareimageandlanguageinstructionsas
+respectiveinputsandgives:math:`\mathbf{Y}_a`astheoutputlanguage
+response.LDPreferstoalightweightdownsampleprojector(left).
 
-See more information on official
-`GitHub <https://github.com/Meituan-AutoML/MobileVLM>`__ project page
-and `paper <https://arxiv.org/abs/2312.16886>`__.
+Seemoreinformationonofficial
+`GitHub<https://github.com/Meituan-AutoML/MobileVLM>`__projectpage
+and`paper<https://arxiv.org/abs/2312.16886>`__.
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Install requirements <#Install-requirements>`__
--  `Clone MobileVLM repository <#Clone-MobileVLM-repository>`__
--  `Import required packages <#Import-required-packages>`__
--  `Load the model <#Load-the-model>`__
--  `Convert model to OpenVINO Intermediate Representation
-   (IR) <#Convert-model-to-OpenVINO-Intermediate-Representation-(IR)>`__
--  `Inference <#Inference>`__
+-`Installrequirements<#install-requirements>`__
+-`CloneMobileVLMrepository<#clone-mobilevlm-repository>`__
+-`Importrequiredpackages<#import-required-packages>`__
+-`Loadthemodel<#load-the-model>`__
+-`ConvertmodeltoOpenVINOIntermediateRepresentation
+(IR)<#convert-model-to-openvino-intermediate-representation-ir>`__
+-`Inference<#inference>`__
 
-   -  `Load OpenVINO model <#Load-OpenVINO-model>`__
-   -  `Prepare input data <#Prepare-input-data>`__
-   -  `Run generation process <#Run-generation-process>`__
+-`LoadOpenVINOmodel<#load-openvino-model>`__
+-`Prepareinputdata<#prepare-input-data>`__
+-`Rungenerationprocess<#run-generation-process>`__
 
--  `Interactive inference <#Interactive-inference>`__
+-`Interactiveinference<#interactive-inference>`__
 
-.. |image0| image:: https://github.com/Meituan-AutoML/MobileVLM/raw/main/assets/mobilevlm_arch.png
+..|image0|image::https://github.com/Meituan-AutoML/MobileVLM/raw/main/assets/mobilevlm_arch.png
 
-Install requirements
+Installrequirements
 --------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    %pip install -q "torch>=2.1.0" "timm>=0.9.12" --extra-index-url "https://download.pytorch.org/whl/cpu"
-    %pip install -q "transformers>=4.33.1,<4.35.0" accelerate "sentencepiece>=0.1.99" "openvino>=2023.2.0" "nncf>=2.7.0" ipywidgets numpy "gradio>=4.19"
-
-
-.. parsed-literal::
-
-    Note: you may need to restart the kernel to use updated packages.
-    ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-    mobileclip 0.1.0 requires torch==1.13.1, but you have torch 2.3.1+cpu which is incompatible.
-    mobileclip 0.1.0 requires torchvision==0.14.1, but you have torchvision 0.18.1+cpu which is incompatible.
-    optimum-intel 1.19.0.dev0+9ef6766 requires transformers<4.43.0,>=4.36.0, but you have transformers 4.33.3 which is incompatible.
-    Note: you may need to restart the kernel to use updated packages.
+%pipinstall-q"torch>=2.1.0""timm>=0.9.12"--extra-index-url"https://download.pytorch.org/whl/cpu"
+%pipinstall-q"transformers>=4.33.1,<4.35.0"accelerate"sentencepiece>=0.1.99""openvino>=2023.2.0""nncf>=2.7.0"ipywidgetsnumpy"gradio>=4.19"
 
 
-Clone MobileVLM repository
+..parsed-literal::
+
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+ERROR:pip'sdependencyresolverdoesnotcurrentlytakeintoaccountallthepackagesthatareinstalled.Thisbehaviouristhesourceofthefollowingdependencyconflicts.
+mobileclip0.1.0requirestorch==1.13.1,butyouhavetorch2.3.1+cpuwhichisincompatible.
+mobileclip0.1.0requirestorchvision==0.14.1,butyouhavetorchvision0.18.1+cpuwhichisincompatible.
+optimum-intel1.19.0.dev0+9ef6766requirestransformers<4.43.0,>=4.36.0,butyouhavetransformers4.33.3whichisincompatible.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+
+
+CloneMobileVLMrepository
 --------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    from pathlib import Path
-    import sys
-    
-    MOBILEVLM_REPO_DIR = Path("./MobileVLM")
-    if not MOBILEVLM_REPO_DIR.exists():
-        !git clone -q "https://github.com/Meituan-AutoML/MobileVLM.git"
-    sys.path.insert(0, str(MOBILEVLM_REPO_DIR))
+frompathlibimportPath
+importsys
 
-Import required packages
+MOBILEVLM_REPO_DIR=Path("./MobileVLM")
+ifnotMOBILEVLM_REPO_DIR.exists():
+!gitclone-q"https://github.com/Meituan-AutoML/MobileVLM.git"
+sys.path.insert(0,str(MOBILEVLM_REPO_DIR))
+
+Importrequiredpackages
 ------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    import warnings
-    import itertools
-    import gc
-    from typing import Optional, List, Tuple
-    
-    from mobilevlm.model.mobilevlm import load_pretrained_model
-    from mobilevlm.conversation import conv_templates, SeparatorStyle
-    from mobilevlm.utils import (
-        disable_torch_init,
-        process_images,
-        tokenizer_image_token,
-        KeywordsStoppingCriteria,
-    )
-    from mobilevlm.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN
-    import PIL
-    import torch
-    import transformers
-    import numpy as np
-    import gradio as gr
-    import openvino as ov
-    import nncf
-    import ipywidgets as widgets
+importwarnings
+importitertools
+importgc
+fromtypingimportOptional,List,Tuple
 
-
-.. parsed-literal::
-
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
-      torch.utils._pytree._register_pytree_node(
-    2024-07-13 01:08:05.768809: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-07-13 01:08:05.803780: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-07-13 01:08:06.435873: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
-      torch.utils._pytree._register_pytree_node(
+frommobilevlm.model.mobilevlmimportload_pretrained_model
+frommobilevlm.conversationimportconv_templates,SeparatorStyle
+frommobilevlm.utilsimport(
+disable_torch_init,
+process_images,
+tokenizer_image_token,
+KeywordsStoppingCriteria,
+)
+frommobilevlm.constantsimportIMAGE_TOKEN_INDEX,DEFAULT_IMAGE_TOKEN
+importPIL
+importtorch
+importtransformers
+importnumpyasnp
+importgradioasgr
+importopenvinoasov
+importnncf
+importipywidgetsaswidgets
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    INFO:nncf:NNCF initialized successfully. Supported frameworks detected: torch, tensorflow, onnx, openvino
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/generic.py:311:UserWarning:torch.utils._pytree._register_pytree_nodeisdeprecated.Pleaseusetorch.utils._pytree.register_pytree_nodeinstead.
+torch.utils._pytree._register_pytree_node(
+2024-07-1301:08:05.768809:Itensorflow/core/util/port.cc:110]oneDNNcustomoperationsareon.Youmayseeslightlydifferentnumericalresultsduetofloating-pointround-offerrorsfromdifferentcomputationorders.Toturnthemoff,settheenvironmentvariable`TF_ENABLE_ONEDNN_OPTS=0`.
+2024-07-1301:08:05.803780:Itensorflow/core/platform/cpu_feature_guard.cc:182]ThisTensorFlowbinaryisoptimizedtouseavailableCPUinstructionsinperformance-criticaloperations.
+Toenablethefollowinginstructions:AVX2AVX512FAVX512_VNNIFMA,inotheroperations,rebuildTensorFlowwiththeappropriatecompilerflags.
+2024-07-1301:08:06.435873:Wtensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38]TF-TRTWarning:CouldnotfindTensorRT
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/utils/generic.py:311:UserWarning:torch.utils._pytree._register_pytree_nodeisdeprecated.Pleaseusetorch.utils._pytree.register_pytree_nodeinstead.
+torch.utils._pytree._register_pytree_node(
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    MODELS_DIR = Path("./models")
-    MODEL_PATH = "mtgv/MobileVLM-1.7B"
-    
-    TEMPERATURE = 0.2
-    TOP_P = None
-    NUM_BEAMS = 1
-    MAX_NEW_TOKENS = 512
-    
-    IMAGE_PATH = MOBILEVLM_REPO_DIR / "assets" / "samples" / "demo.jpg"
-    PROMPT_STR = "Who is the author of this book?\nAnswer the question using a single word or phrase."
+INFO:nncf:NNCFinitializedsuccessfully.Supportedframeworksdetected:torch,tensorflow,onnx,openvino
 
-Load the model
+
+..code::ipython3
+
+MODELS_DIR=Path("./models")
+MODEL_PATH="mtgv/MobileVLM-1.7B"
+
+TEMPERATURE=0.2
+TOP_P=None
+NUM_BEAMS=1
+MAX_NEW_TOKENS=512
+
+IMAGE_PATH=MOBILEVLM_REPO_DIR/"assets"/"samples"/"demo.jpg"
+PROMPT_STR="Whoistheauthorofthisbook?\nAnswerthequestionusingasinglewordorphrase."
+
+Loadthemodel
 --------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-To load the model, we use pre-defined ``load_pretrained_model`` function
-in ``mobilevlm`` module. It returns the model itself, tokenizer, and
-image processor to convert images to appropriate tensors.
+Toloadthemodel,weusepre-defined``load_pretrained_model``function
+in``mobilevlm``module.Itreturnsthemodelitself,tokenizer,and
+imageprocessortoconvertimagestoappropriatetensors.
 
-.. code:: ipython3
+..code::ipython3
 
-    model_name = MODEL_PATH.split("/")[-1]
-    disable_torch_init()
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        tokenizer, model, image_processor, _ = load_pretrained_model(MODEL_PATH, device="cpu")
-    model = model.to(dtype=torch.float32)
-
-
-.. parsed-literal::
-
-    You are resizing the embedding layer without providing a `pad_to_multiple_of` parameter. This means that the new embedding dimension will be 32000. This might induce some performance reduction as *Tensor Cores* will not be available. For more details about this, or help on choosing the correct value for resizing, refer to this guide: https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html#requirements-tc
+model_name=MODEL_PATH.split("/")[-1]
+disable_torch_init()
+withwarnings.catch_warnings():
+warnings.simplefilter("ignore")
+tokenizer,model,image_processor,_=load_pretrained_model(MODEL_PATH,device="cpu")
+model=model.to(dtype=torch.float32)
 
 
-Convert model to OpenVINO Intermediate Representation (IR)
+..parsed-literal::
+
+Youareresizingtheembeddinglayerwithoutprovidinga`pad_to_multiple_of`parameter.Thismeansthatthenewembeddingdimensionwillbe32000.Thismightinducesomeperformancereductionas*TensorCores*willnotbeavailable.Formoredetailsaboutthis,orhelponchoosingthecorrectvalueforresizing,refertothisguide:https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html#requirements-tc
+
+
+ConvertmodeltoOpenVINOIntermediateRepresentation(IR)
 ----------------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
-
-.. code:: ipython3
-
-    def cleanup_torchscript_cache():
-        """
-        Helper for removing cached model representation
-        """
-        torch._C._jit_clear_class_registry()
-        torch.jit._recursive.concrete_type_store = torch.jit._recursive.ConcreteTypeStore()
-        torch.jit._state._clear_class_state()
-
-For reducing memory consumption, weights compression optimization can be
-applied using `NNCF <https://github.com/openvinotoolkit/nncf>`__. Weight
-compression aims to reduce the memory footprint of a model. It can also
-lead to significant performance improvement for large memory-bound
-models, such as Large Language Models (LLMs). LLMs and other models,
-which require extensive memory to store the weights during inference,
-can benefit from weight compression in the following ways:
-
--  enabling the inference of exceptionally large models that cannot be
-   accommodated in the memory of the device;
-
--  improving the inference performance of the models by reducing the
-   latency of the memory access when computing the operations with
-   weights, for example, Linear layers.
-
-`Neural Network Compression Framework
-(NNCF) <https://github.com/openvinotoolkit/nncf>`__ provides 4-bit /
-8-bit mixed weight quantization as a compression method primarily
-designed to optimize LLMs. The main difference between weights
-compression and full model quantization (post-training quantization) is
-that activations remain floating-point in the case of weights
-compression which leads to a better accuracy. Weight compression for
-LLMs provides a solid inference performance improvement which is on par
-with the performance of the full model quantization. In addition, weight
-compression is data-free and does not require a calibration dataset,
-making it easy to use.
-
-``nncf.compress_weights`` function can be used for performing weights
-compression. The function accepts an OpenVINO model and other
-compression parameters. Compared to INT8 compression, INT4 compression
-improves performance even more, but introduces a minor drop in
-prediction quality.
-
-More details about weights compression, can be found in `OpenVINO
-documentation <https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/weight-compression.html>`__.
-
-Please select below whether you would like to run INT4 weight
-compression instead of INT8 weight compression.
-
-.. code:: ipython3
-
-    compression_mode = widgets.Dropdown(
-        options=["INT4", "INT8"],
-        value="INT4",
-        description="Compression mode:",
-        disabled=False,
-    )
-    
-    compression_mode
-
-
-
-
-.. parsed-literal::
-
-    Dropdown(description='Compression mode:', options=('INT4', 'INT8'), value='INT4')
-
-
-
-.. code:: ipython3
-
-    stage1_xml_path = MODELS_DIR / f"stage1_{compression_mode.value}.xml"
-    stage2_xml_path = MODELS_DIR / f"stage2_{compression_mode.value}.xml"
-
-.. code:: ipython3
-
-    if compression_mode.value == "INT4":
-        wc_parameters = dict(mode=nncf.CompressWeightsMode.INT4_ASYM, group_size=128, ratio=0.8)
-    else:
-        wc_parameters = dict(mode=nncf.CompressWeightsMode.INT8)
-
-.. code:: ipython3
+`backtotop⬆️<#table-of-contents>`__
 
-    class ModelWrapper(torch.nn.Module):
-        def __init__(self, model):
-            super().__init__()
-            self.model = model
-    
-        def forward(
-            self,
-            input_ids: torch.LongTensor = None,
-            attention_mask: Optional[torch.Tensor] = None,
-            past_key_values: Optional[List[torch.FloatTensor]] = None,
-            inputs_embeds: Optional[torch.FloatTensor] = None,
-        ):
-            outputs = self.model.model(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                past_key_values=past_key_values,
-                inputs_embeds=inputs_embeds,
-            )
-            hidden_states = outputs[0]
-            logits = self.model.lm_head(hidden_states)
-    
-            return (logits,) + outputs[1:]
+..code::ipython3
 
-.. code:: ipython3
+defcleanup_torchscript_cache():
+"""
+Helperforremovingcachedmodelrepresentation
+"""
+torch._C._jit_clear_class_registry()
+torch.jit._recursive.concrete_type_store=torch.jit._recursive.ConcreteTypeStore()
+torch.jit._state._clear_class_state()
 
-    def set_input_names(model, past_key_values):
-        input_names = [
-            "input_ids",
-            "attention_mask",
-            *itertools.chain.from_iterable([f"past_key_values.{idx}.key", f"past_key_values.{idx}.value"] for idx, _ in enumerate(past_key_values)),
-        ]
-        assert len(input_names) == len(model.inputs)
-        for _input, input_name in zip(model.inputs, input_names):
-            _input.get_tensor().set_names({input_name})
+Forreducingmemoryconsumption,weightscompressionoptimizationcanbe
+appliedusing`NNCF<https://github.com/openvinotoolkit/nncf>`__.Weight
+compressionaimstoreducethememoryfootprintofamodel.Itcanalso
+leadtosignificantperformanceimprovementforlargememory-bound
+models,suchasLargeLanguageModels(LLMs).LLMsandothermodels,
+whichrequireextensivememorytostoretheweightsduringinference,
+canbenefitfromweightcompressioninthefollowingways:
+
+-enablingtheinferenceofexceptionallylargemodelsthatcannotbe
+accommodatedinthememoryofthedevice;
 
-.. code:: ipython3
+-improvingtheinferenceperformanceofthemodelsbyreducingthe
+latencyofthememoryaccesswhencomputingtheoperationswith
+weights,forexample,Linearlayers.
+
+`NeuralNetworkCompressionFramework
+(NNCF)<https://github.com/openvinotoolkit/nncf>`__provides4-bit/
+8-bitmixedweightquantizationasacompressionmethodprimarily
+designedtooptimizeLLMs.Themaindifferencebetweenweights
+compressionandfullmodelquantization(post-trainingquantization)is
+thatactivationsremainfloating-pointinthecaseofweights
+compressionwhichleadstoabetteraccuracy.Weightcompressionfor
+LLMsprovidesasolidinferenceperformanceimprovementwhichisonpar
+withtheperformanceofthefullmodelquantization.Inaddition,weight
+compressionisdata-freeanddoesnotrequireacalibrationdataset,
+makingiteasytouse.
+
+``nncf.compress_weights``functioncanbeusedforperformingweights
+compression.ThefunctionacceptsanOpenVINOmodelandother
+compressionparameters.ComparedtoINT8compression,INT4compression
+improvesperformanceevenmore,butintroducesaminordropin
+predictionquality.
+
+Moredetailsaboutweightscompression,canbefoundin`OpenVINO
+documentation<https://docs.openvino.ai/2024/openvino-workflow/model-optimization-guide/weight-compression.html>`__.
+
+PleaseselectbelowwhetheryouwouldliketorunINT4weight
+compressioninsteadofINT8weightcompression.
+
+..code::ipython3
+
+compression_mode=widgets.Dropdown(
+options=["INT4","INT8"],
+value="INT4",
+description="Compressionmode:",
+disabled=False,
+)
 
-    def set_output_names(model, past_key_values):
-        output_names = [
-            "logits",
-            *itertools.chain.from_iterable([f"present.{idx}.key", f"present.{idx}.value"] for idx, _ in enumerate(past_key_values)),
-        ]
-        assert len(output_names) == len(model.outputs)
-        for out, out_name in zip(ov_model.outputs, output_names):
-            out.get_tensor().set_names({out_name})
+compression_mode
 
-.. code:: ipython3
 
-    example_input = {
-        "inputs_embeds": torch.zeros((1, 205, 2048)),
-        "attention_mask": torch.ones((1, 205), dtype=torch.long),
-    }
-    
-    wrapped = ModelWrapper(model)
-    past_key_values = wrapped(**example_input)[1]
-    
-    if not stage1_xml_path.exists():
-        ov_model = ov.convert_model(wrapped, example_input=example_input)
-        set_output_names(ov_model, past_key_values)
-        ov_model = nncf.compress_weights(ov_model, **wc_parameters)
-        ov.save_model(ov_model, stage1_xml_path)
-        cleanup_torchscript_cache()
-        del ov_model
-        gc.collect()
 
 
-.. parsed-literal::
+..parsed-literal::
+
+Dropdown(description='Compressionmode:',options=('INT4','INT8'),value='INT4')
+
+
+
+..code::ipython3
 
-    WARNING:tensorflow:Please fix your imports. Module tensorflow.python.training.tracking.base has been moved to tensorflow.python.trackable.base. The old module will be deleted in version 2.11.
+stage1_xml_path=MODELS_DIR/f"stage1_{compression_mode.value}.xml"
+stage2_xml_path=MODELS_DIR/f"stage2_{compression_mode.value}.xml"
 
+..code::ipython3
 
-.. parsed-literal::
+ifcompression_mode.value=="INT4":
+wc_parameters=dict(mode=nncf.CompressWeightsMode.INT4_ASYM,group_size=128,ratio=0.8)
+else:
+wc_parameters=dict(mode=nncf.CompressWeightsMode.INT8)
 
-    [ WARNING ]  Please fix your imports. Module %s has been moved to %s. The old module will be deleted in version %s.
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:595: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if input_shape[-1] > 1:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:119: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if seq_len > self.max_seq_len_cached:
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:348: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if attn_weights.size() != (bsz, self.num_heads, q_len, kv_seq_len):
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:355: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if attention_mask.size() != (bsz, 1, q_len, kv_seq_len):
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:365: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
-      if attn_output.size() != (bsz, self.num_heads, q_len, self.head_dim):
+..code::ipython3
 
+classModelWrapper(torch.nn.Module):
+def__init__(self,model):
+super().__init__()
+self.model=model
 
-.. parsed-literal::
+defforward(
+self,
+input_ids:torch.LongTensor=None,
+attention_mask:Optional[torch.Tensor]=None,
+past_key_values:Optional[List[torch.FloatTensor]]=None,
+inputs_embeds:Optional[torch.FloatTensor]=None,
+):
+outputs=self.model.model(
+input_ids=input_ids,
+attention_mask=attention_mask,
+past_key_values=past_key_values,
+inputs_embeds=inputs_embeds,
+)
+hidden_states=outputs[0]
+logits=self.model.lm_head(hidden_states)
 
-    ['attention_mask', 'inputs_embeds']
+return(logits,)+outputs[1:]
 
+..code::ipython3
 
+defset_input_names(model,past_key_values):
+input_names=[
+"input_ids",
+"attention_mask",
+*itertools.chain.from_iterable([f"past_key_values.{idx}.key",f"past_key_values.{idx}.value"]foridx,_inenumerate(past_key_values)),
+]
+assertlen(input_names)==len(model.inputs)
+for_input,input_nameinzip(model.inputs,input_names):
+_input.get_tensor().set_names({input_name})
 
-.. parsed-literal::
+..code::ipython3
 
-    Output()
+defset_output_names(model,past_key_values):
+output_names=[
+"logits",
+*itertools.chain.from_iterable([f"present.{idx}.key",f"present.{idx}.value"]foridx,_inenumerate(past_key_values)),
+]
+assertlen(output_names)==len(model.outputs)
+forout,out_nameinzip(ov_model.outputs,output_names):
+out.get_tensor().set_names({out_name})
 
+..code::ipython3
 
+example_input={
+"inputs_embeds":torch.zeros((1,205,2048)),
+"attention_mask":torch.ones((1,205),dtype=torch.long),
+}
 
-.. raw:: html
+wrapped=ModelWrapper(model)
+past_key_values=wrapped(**example_input)[1]
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+ifnotstage1_xml_path.exists():
+ov_model=ov.convert_model(wrapped,example_input=example_input)
+set_output_names(ov_model,past_key_values)
+ov_model=nncf.compress_weights(ov_model,**wc_parameters)
+ov.save_model(ov_model,stage1_xml_path)
+cleanup_torchscript_cache()
+delov_model
+gc.collect()
 
 
+..parsed-literal::
 
+WARNING:tensorflow:Pleasefixyourimports.Moduletensorflow.python.training.tracking.basehasbeenmovedtotensorflow.python.trackable.base.Theoldmodulewillbedeletedinversion2.11.
 
-.. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
+..parsed-literal::
 
+[WARNING]Pleasefixyourimports.Module%shasbeenmovedto%s.Theoldmodulewillbedeletedinversion%s.
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:595:TracerWarning:ConvertingatensortoaPythonbooleanmightcausethetracetobeincorrect.Wecan'trecordthedataflowofPythonvalues,sothisvaluewillbetreatedasaconstantinthefuture.Thismeansthatthetracemightnotgeneralizetootherinputs!
+ifinput_shape[-1]>1:
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:119:TracerWarning:ConvertingatensortoaPythonbooleanmightcausethetracetobeincorrect.Wecan'trecordthedataflowofPythonvalues,sothisvaluewillbetreatedasaconstantinthefuture.Thismeansthatthetracemightnotgeneralizetootherinputs!
+ifseq_len>self.max_seq_len_cached:
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:348:TracerWarning:ConvertingatensortoaPythonbooleanmightcausethetracetobeincorrect.Wecan'trecordthedataflowofPythonvalues,sothisvaluewillbetreatedasaconstantinthefuture.Thismeansthatthetracemightnotgeneralizetootherinputs!
+ifattn_weights.size()!=(bsz,self.num_heads,q_len,kv_seq_len):
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:355:TracerWarning:ConvertingatensortoaPythonbooleanmightcausethetracetobeincorrect.Wecan'trecordthedataflowofPythonvalues,sothisvaluewillbetreatedasaconstantinthefuture.Thismeansthatthetracemightnotgeneralizetootherinputs!
+ifattention_mask.size()!=(bsz,1,q_len,kv_seq_len):
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/transformers/models/llama/modeling_llama.py:365:TracerWarning:ConvertingatensortoaPythonbooleanmightcausethetracetobeincorrect.Wecan'trecordthedataflowofPythonvalues,sothisvaluewillbetreatedasaconstantinthefuture.Thismeansthatthetracemightnotgeneralizetootherinputs!
+ifattn_output.size()!=(bsz,self.num_heads,q_len,self.head_dim):
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    INFO:nncf:Statistics of the bitwidth distribution:
-    ┍━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┑
-    │   Num bits (N) │ % all parameters (layers)   │ % ratio-defining parameters (layers)   │
-    ┝━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
-    │              8 │ 24% (43 / 169)              │ 20% (42 / 168)                         │
-    ├────────────────┼─────────────────────────────┼────────────────────────────────────────┤
-    │              4 │ 76% (126 / 169)             │ 80% (126 / 168)                        │
-    ┕━━━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┙
+['attention_mask','inputs_embeds']
 
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    Output()
+Output()
 
 
 
-.. raw:: html
+..raw::html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
 
 
 
 
-.. raw:: html
+..raw::html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
 
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    example_input = {
-        "input_ids": torch.ones((1, 1), dtype=torch.long),
-        "past_key_values": past_key_values,
-        "attention_mask": torch.ones((1, past_key_values[-1][-1].shape[-2] + 1), dtype=torch.long),
-    }
-    
-    if not stage2_xml_path.exists():
-        ov_model = ov.convert_model(
-            wrapped,
-            example_input=example_input,
-        )
-        set_input_names(ov_model, past_key_values)
-        set_output_names(ov_model, past_key_values)
-        ov_model = nncf.compress_weights(ov_model, **wc_parameters)
-        ov.save_model(ov_model, stage2_xml_path)
-        cleanup_torchscript_cache()
-        del ov_model
-        gc.collect()
+INFO:nncf:Statisticsofthebitwidthdistribution:
+┍━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┑
+│Numbits(N)│%allparameters(layers)│%ratio-definingparameters(layers)│
+┝━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+│8│24%(43/169)│20%(42/168)│
+├────────────────┼─────────────────────────────┼────────────────────────────────────────┤
+│4│76%(126/169)│80%(126/168)│
+┕━━━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┙
 
 
-.. parsed-literal::
 
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:165: UserWarning: The .grad attribute of a Tensor that is not a leaf Tensor is being accessed. Its .grad attribute won't be populated during autograd.backward(). If you indeed want the .grad field to be populated for a non-leaf Tensor, use .retain_grad() on the non-leaf Tensor. If you access the non-leaf Tensor by mistake, make sure you access the leaf Tensor instead. See github.com/pytorch/pytorch/pull/30531 for more informations. (Triggered internally at aten/src/ATen/core/TensorBody.h:489.)
-      if a.grad is not None:
+..parsed-literal::
 
+Output()
 
-.. parsed-literal::
 
-    ['input_ids', 'attention_mask', 'past_key_values']
 
+..raw::html
 
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
 
-.. parsed-literal::
 
-    Output()
 
 
+..raw::html
 
-.. raw:: html
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 
 
+..code::ipython3
 
+example_input={
+"input_ids":torch.ones((1,1),dtype=torch.long),
+"past_key_values":past_key_values,
+"attention_mask":torch.ones((1,past_key_values[-1][-1].shape[-2]+1),dtype=torch.long),
+}
 
-.. raw:: html
+ifnotstage2_xml_path.exists():
+ov_model=ov.convert_model(
+wrapped,
+example_input=example_input,
+)
+set_input_names(ov_model,past_key_values)
+set_output_names(ov_model,past_key_values)
+ov_model=nncf.compress_weights(ov_model,**wc_parameters)
+ov.save_model(ov_model,stage2_xml_path)
+cleanup_torchscript_cache()
+delov_model
+gc.collect()
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
 
+..parsed-literal::
 
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/torch/jit/_trace.py:165:UserWarning:The.gradattributeofaTensorthatisnotaleafTensorisbeingaccessed.Its.gradattributewon'tbepopulatedduringautograd.backward().Ifyouindeedwantthe.gradfieldtobepopulatedforanon-leafTensor,use.retain_grad()onthenon-leafTensor.Ifyouaccessthenon-leafTensorbymistake,makesureyouaccesstheleafTensorinstead.Seegithub.com/pytorch/pytorch/pull/30531formoreinformations.(Triggeredinternallyataten/src/ATen/core/TensorBody.h:489.)
+ifa.gradisnotNone:
 
-.. parsed-literal::
 
-    INFO:nncf:Statistics of the bitwidth distribution:
-    ┍━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┑
-    │   Num bits (N) │ % all parameters (layers)   │ % ratio-defining parameters (layers)   │
-    ┝━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
-    │              8 │ 28% (44 / 170)              │ 20% (42 / 168)                         │
-    ├────────────────┼─────────────────────────────┼────────────────────────────────────────┤
-    │              4 │ 72% (126 / 170)             │ 80% (126 / 168)                        │
-    ┕━━━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┙
+..parsed-literal::
 
+['input_ids','attention_mask','past_key_values']
 
 
-.. parsed-literal::
 
-    Output()
+..parsed-literal::
 
+Output()
 
 
-.. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+..raw::html
 
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
 
 
 
-.. raw:: html
 
-    <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-    </pre>
+..raw::html
 
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
 
 
-.. code:: ipython3
 
-    prepare_inputs_labels_for_multimodal = model.prepare_inputs_labels_for_multimodal
-    prepare_inputs_for_generation = model.prepare_inputs_for_generation
-    config = model.config
-    config.save_pretrained(MODELS_DIR)
+..parsed-literal::
 
-.. code:: ipython3
+INFO:nncf:Statisticsofthebitwidthdistribution:
+┍━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┑
+│Numbits(N)│%allparameters(layers)│%ratio-definingparameters(layers)│
+┝━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┥
+│8│28%(44/170)│20%(42/168)│
+├────────────────┼─────────────────────────────┼────────────────────────────────────────┤
+│4│72%(126/170)│80%(126/168)│
+┕━━━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┙
 
-    del wrapped
-    del model
-    gc.collect();
+
+
+..parsed-literal::
+
+Output()
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace"></pre>
+
+
+
+
+..raw::html
+
+<prestyle="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVuSansMono',consolas,'CourierNew',monospace">
+</pre>
+
+
+
+..code::ipython3
+
+prepare_inputs_labels_for_multimodal=model.prepare_inputs_labels_for_multimodal
+prepare_inputs_for_generation=model.prepare_inputs_for_generation
+config=model.config
+config.save_pretrained(MODELS_DIR)
+
+..code::ipython3
+
+delwrapped
+delmodel
+gc.collect();
 
 Inference
 ---------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-``OVMobileLlamaForCausalLM`` class provides ease-to-use interface for
-using model in generation scenario. It is based on
-``transformers.generation.GenerationMixin`` that gives us opportunity to
-reuse all reach capabilities for generation implemented in HuggingFace
-Transformers library. More details about this interface can be found in
+``OVMobileLlamaForCausalLM``classprovidesease-to-useinterfacefor
+usingmodelingenerationscenario.Itisbasedon
+``transformers.generation.GenerationMixin``thatgivesusopportunityto
+reuseallreachcapabilitiesforgenerationimplementedinHuggingFace
+Transformerslibrary.Moredetailsaboutthisinterfacecanbefoundin
 `HuggingFace
-documentation <https://huggingface.co/docs/transformers/main_classes/text_generation>`__.
+documentation<https://huggingface.co/docs/transformers/main_classes/text_generation>`__.
 
-.. code:: ipython3
+..code::ipython3
 
-    class OVMobileLlamaForCausalLM(transformers.GenerationMixin):
-        def __init__(self, stage1_path, stage2_path, device):
-            self.stage1 = core.compile_model(stage1_path, device)
-            self.stage2 = core.read_model(stage2_path)
-    
-            self.generation_config = transformers.GenerationConfig.from_model_config(config)
-            self.config = transformers.AutoConfig.from_pretrained(MODELS_DIR)
-            self.main_input_name = "input_ids"
-            self.device = torch.device("cpu")
-            self.prepare_inputs_for_generation = prepare_inputs_for_generation
-            self.num_pkv = 2
-            self.input_names = {key.get_any_name(): idx for idx, key in enumerate(self.stage2.inputs)}
-            self.output_names = {key.get_any_name(): idx for idx, key in enumerate(self.stage2.outputs)}
-            self.key_value_input_names = [key for key in self.input_names if "key_values" in key]
-            self.key_value_output_names = [key for key in self.output_names if "present" in key]
-            stage2 = core.compile_model(self.stage2, device)
-            self.request = stage2.create_infer_request()
-            self._supports_cache_class = False
-    
-        def can_generate(self):
-            """Returns True to validate the check that the model using `GenerationMixin.generate()` can indeed generate."""
-            return True
-    
-        def __call__(
-            self,
-            input_ids: torch.LongTensor,
-            images: torch.Tensor,
-            attention_mask: Optional[torch.LongTensor] = None,
-            prefix_mask: Optional[torch.LongTensor] = None,
-            past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
-            **kwargs,
-        ) -> transformers.modeling_outputs.CausalLMOutputWithPast:
-            return self.forward(input_ids, images, attention_mask, prefix_mask, past_key_values)
-    
-        def forward(
-            self,
-            input_ids: torch.LongTensor,
-            images: torch.Tensor,
-            attention_mask: Optional[torch.LongTensor] = None,
-            prefix_mask: Optional[torch.LongTensor] = None,
-            past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
-            **kwargs,
-        ) -> transformers.modeling_outputs.CausalLMOutputWithPast:
-            """General inference method"""
-            inputs = {}
-            if past_key_values is not None:
-                # Flatten the past_key_values
-                attention_mask = torch.ones(
-                    (input_ids.shape[0], past_key_values[-1][-1].shape[-2] + 1),
-                    dtype=input_ids.dtype,
-                )
-                past_key_values = tuple(past_key_value for pkv_per_layer in past_key_values for past_key_value in pkv_per_layer)
-                # Add the past_key_values to the decoder inputs
-                inputs = dict(zip(self.key_value_input_names, past_key_values))
-    
-            else:
-                return self.forward_with_image(input_ids, images, attention_mask)
-            inputs["input_ids"] = np.array(input_ids)
-    
-            if "attention_mask" in self.input_names:
-                inputs["attention_mask"] = np.array(attention_mask)
-    
-            # Run inference
-            self.request.start_async(inputs, share_inputs=True)
-            self.request.wait()
-    
-            logits = torch.from_numpy(self.request.get_tensor("logits").data)
-    
-            # Tuple of length equal to : number of layer * number of past_key_value per decoder layer (2 corresponds to the self-attention layer)
-            past_key_values = tuple(self.request.get_tensor(key).data for key in self.key_value_output_names)
-            # Tuple of tuple of length `n_layers`, with each tuple of length equal to 2 (k/v of self-attention)
-    
-            past_key_values = tuple(past_key_values[i : i + self.num_pkv] for i in range(0, len(past_key_values), self.num_pkv))
-    
-            return transformers.modeling_outputs.CausalLMOutputWithPast(logits=logits, past_key_values=past_key_values)
-    
-        def forward_with_image(self, input_ids, images, attention_mask):
-            """First step inference method, that resolves multimodal data"""
-            _, attention_mask, _, input_embed, _ = prepare_inputs_labels_for_multimodal(input_ids, attention_mask, images=images, past_key_values=None, labels=None)
-            outs = self.stage1({"inputs_embeds": input_embed, "attention_mask": attention_mask})
-            logits = outs[0]
-            pkv = list(outs.values())[1:]
-            pkv = tuple(pkv[i : i + self.num_pkv] for i in range(0, len(pkv), self.num_pkv))
-            return transformers.modeling_outputs.CausalLMOutputWithPast(logits=torch.from_numpy(logits), past_key_values=pkv)
+classOVMobileLlamaForCausalLM(transformers.GenerationMixin):
+def__init__(self,stage1_path,stage2_path,device):
+self.stage1=core.compile_model(stage1_path,device)
+self.stage2=core.read_model(stage2_path)
 
-Now, when we have model and defined generation pipeline, we can run
-model inference.
+self.generation_config=transformers.GenerationConfig.from_model_config(config)
+self.config=transformers.AutoConfig.from_pretrained(MODELS_DIR)
+self.main_input_name="input_ids"
+self.device=torch.device("cpu")
+self.prepare_inputs_for_generation=prepare_inputs_for_generation
+self.num_pkv=2
+self.input_names={key.get_any_name():idxforidx,keyinenumerate(self.stage2.inputs)}
+self.output_names={key.get_any_name():idxforidx,keyinenumerate(self.stage2.outputs)}
+self.key_value_input_names=[keyforkeyinself.input_namesif"key_values"inkey]
+self.key_value_output_names=[keyforkeyinself.output_namesif"present"inkey]
+stage2=core.compile_model(self.stage2,device)
+self.request=stage2.create_infer_request()
+self._supports_cache_class=False
 
-Select device from dropdown list for running inference using OpenVINO.
+defcan_generate(self):
+"""ReturnsTruetovalidatethecheckthatthemodelusing`GenerationMixin.generate()`canindeedgenerate."""
+returnTrue
 
-.. code:: ipython3
+def__call__(
+self,
+input_ids:torch.LongTensor,
+images:torch.Tensor,
+attention_mask:Optional[torch.LongTensor]=None,
+prefix_mask:Optional[torch.LongTensor]=None,
+past_key_values:Optional[Tuple[Tuple[torch.FloatTensor]]]=None,
+**kwargs,
+)->transformers.modeling_outputs.CausalLMOutputWithPast:
+returnself.forward(input_ids,images,attention_mask,prefix_mask,past_key_values)
 
-    core = ov.Core()
-    
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="AUTO",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+defforward(
+self,
+input_ids:torch.LongTensor,
+images:torch.Tensor,
+attention_mask:Optional[torch.LongTensor]=None,
+prefix_mask:Optional[torch.LongTensor]=None,
+past_key_values:Optional[Tuple[Tuple[torch.FloatTensor]]]=None,
+**kwargs,
+)->transformers.modeling_outputs.CausalLMOutputWithPast:
+"""Generalinferencemethod"""
+inputs={}
+ifpast_key_valuesisnotNone:
+#Flattenthepast_key_values
+attention_mask=torch.ones(
+(input_ids.shape[0],past_key_values[-1][-1].shape[-2]+1),
+dtype=input_ids.dtype,
+)
+past_key_values=tuple(past_key_valueforpkv_per_layerinpast_key_valuesforpast_key_valueinpkv_per_layer)
+#Addthepast_key_valuestothedecoderinputs
+inputs=dict(zip(self.key_value_input_names,past_key_values))
 
+else:
+returnself.forward_with_image(input_ids,images,attention_mask)
+inputs["input_ids"]=np.array(input_ids)
 
+if"attention_mask"inself.input_names:
+inputs["attention_mask"]=np.array(attention_mask)
 
+#Runinference
+self.request.start_async(inputs,share_inputs=True)
+self.request.wait()
 
-.. parsed-literal::
+logits=torch.from_numpy(self.request.get_tensor("logits").data)
 
-    Dropdown(description='Device:', index=1, options=('CPU', 'AUTO'), value='AUTO')
+#Tupleoflengthequalto:numberoflayer*numberofpast_key_valueperdecoderlayer(2correspondstotheself-attentionlayer)
+past_key_values=tuple(self.request.get_tensor(key).dataforkeyinself.key_value_output_names)
+#Tupleoftupleoflength`n_layers`,witheachtupleoflengthequalto2(k/vofself-attention)
+
+past_key_values=tuple(past_key_values[i:i+self.num_pkv]foriinrange(0,len(past_key_values),self.num_pkv))
+
+returntransformers.modeling_outputs.CausalLMOutputWithPast(logits=logits,past_key_values=past_key_values)
+
+defforward_with_image(self,input_ids,images,attention_mask):
+"""Firststepinferencemethod,thatresolvesmultimodaldata"""
+_,attention_mask,_,input_embed,_=prepare_inputs_labels_for_multimodal(input_ids,attention_mask,images=images,past_key_values=None,labels=None)
+outs=self.stage1({"inputs_embeds":input_embed,"attention_mask":attention_mask})
+logits=outs[0]
+pkv=list(outs.values())[1:]
+pkv=tuple(pkv[i:i+self.num_pkv]foriinrange(0,len(pkv),self.num_pkv))
+returntransformers.modeling_outputs.CausalLMOutputWithPast(logits=torch.from_numpy(logits),past_key_values=pkv)
+
+Now,whenwehavemodelanddefinedgenerationpipeline,wecanrun
+modelinference.
+
+SelectdevicefromdropdownlistforrunninginferenceusingOpenVINO.
+
+..code::ipython3
+
+core=ov.Core()
+
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="AUTO",
+description="Device:",
+disabled=False,
+)
+
+device
 
 
 
-Load OpenVINO model
+
+..parsed-literal::
+
+Dropdown(description='Device:',index=1,options=('CPU','AUTO'),value='AUTO')
+
+
+
+LoadOpenVINOmodel
 ~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    ov_model = OVMobileLlamaForCausalLM(stage1_xml_path, stage2_xml_path, device.value)
+ov_model=OVMobileLlamaForCausalLM(stage1_xml_path,stage2_xml_path,device.value)
 
-Prepare input data
+Prepareinputdata
 ~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    images = [PIL.Image.open(IMAGE_PATH).convert("RGB")]
-    images_tensor = process_images(images, image_processor, transformers.AutoConfig.from_pretrained(MODELS_DIR))
+images=[PIL.Image.open(IMAGE_PATH).convert("RGB")]
+images_tensor=process_images(images,image_processor,transformers.AutoConfig.from_pretrained(MODELS_DIR))
 
-.. code:: ipython3
+..code::ipython3
 
-    conv = conv_templates["v1"].copy()
-    conv.append_message(conv.roles[0], DEFAULT_IMAGE_TOKEN + "\n" + PROMPT_STR)
-    conv.append_message(conv.roles[1], None)
-    prompt = conv.get_prompt()
-    stop_str = conv.sep if conv.sep_style != SeparatorStyle.TWO else conv.sep2
-    input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt").unsqueeze(0)
-    stopping_criteria = KeywordsStoppingCriteria([stop_str], tokenizer, input_ids)
+conv=conv_templates["v1"].copy()
+conv.append_message(conv.roles[0],DEFAULT_IMAGE_TOKEN+"\n"+PROMPT_STR)
+conv.append_message(conv.roles[1],None)
+prompt=conv.get_prompt()
+stop_str=conv.sepifconv.sep_style!=SeparatorStyle.TWOelseconv.sep2
+input_ids=tokenizer_image_token(prompt,tokenizer,IMAGE_TOKEN_INDEX,return_tensors="pt").unsqueeze(0)
+stopping_criteria=KeywordsStoppingCriteria([stop_str],tokenizer,input_ids)
 
-.. code:: ipython3
+..code::ipython3
 
-    print(PROMPT_STR)
-    images[0]
-
-
-.. parsed-literal::
-
-    Who is the author of this book?
-    Answer the question using a single word or phrase.
+print(PROMPT_STR)
+images[0]
 
 
+..parsed-literal::
 
-
-.. image:: mobilevlm-language-assistant-with-output_files/mobilevlm-language-assistant-with-output_32_1.png
+Whoistheauthorofthisbook?
+Answerthequestionusingasinglewordorphrase.
 
 
 
-Run generation process
+
+..image::mobilevlm-language-assistant-with-output_files/mobilevlm-language-assistant-with-output_32_1.png
+
+
+
+Rungenerationprocess
 ~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    output_ids = ov_model.generate(
-        input_ids,
-        images=images_tensor,
-        do_sample=True if TEMPERATURE > 0 else False,
-        temperature=TEMPERATURE,
-        top_p=TOP_P,
-        num_beams=NUM_BEAMS,
-        max_new_tokens=MAX_NEW_TOKENS,
-        use_cache=True,
-        stopping_criteria=[stopping_criteria],
-    )
-    input_token_len = input_ids.shape[1]
-    n_diff_input_output = (input_ids != output_ids[:, :input_token_len]).sum().item()
-    if n_diff_input_output > 0:
-        print(f"[Warning] {n_diff_input_output} output_ids are not the same as the input_ids")
-    outputs = tokenizer.batch_decode(output_ids[:, input_token_len:], skip_special_tokens=True)[0]
-    outputs = outputs.strip()
-    if outputs.endswith(stop_str):
-        outputs = outputs[: -len(stop_str)]
-    print(f"🚀 {model_name} with OpenVINO: {outputs.strip()}\n")
-
-
-.. parsed-literal::
-
-    🚀 MobileVLM-1.7B with OpenVINO: Susan Wise Bauer
-    
+output_ids=ov_model.generate(
+input_ids,
+images=images_tensor,
+do_sample=TrueifTEMPERATURE>0elseFalse,
+temperature=TEMPERATURE,
+top_p=TOP_P,
+num_beams=NUM_BEAMS,
+max_new_tokens=MAX_NEW_TOKENS,
+use_cache=True,
+stopping_criteria=[stopping_criteria],
+)
+input_token_len=input_ids.shape[1]
+n_diff_input_output=(input_ids!=output_ids[:,:input_token_len]).sum().item()
+ifn_diff_input_output>0:
+print(f"[Warning]{n_diff_input_output}output_idsarenotthesameastheinput_ids")
+outputs=tokenizer.batch_decode(output_ids[:,input_token_len:],skip_special_tokens=True)[0]
+outputs=outputs.strip()
+ifoutputs.endswith(stop_str):
+outputs=outputs[:-len(stop_str)]
+print(f"🚀{model_name}withOpenVINO:{outputs.strip()}\n")
 
 
-Interactive inference
+..parsed-literal::
+
+🚀MobileVLM-1.7BwithOpenVINO:SusanWiseBauer
+
+
+
+Interactiveinference
 ---------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    def generate(img, prompt):
-        images_tensor = process_images([img], image_processor, transformers.AutoConfig.from_pretrained(MODELS_DIR))
-        prompt = DEFAULT_IMAGE_TOKEN + "\n" + prompt
-        conv = conv_templates["v1"].copy()
-        conv.append_message(conv.roles[0], prompt)
-        conv.append_message(conv.roles[1], None)
-        prompt = conv.get_prompt()
-        stop_str = conv.sep if conv.sep_style != SeparatorStyle.TWO else conv.sep2
-        input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt").unsqueeze(0)
-        stopping_criteria = KeywordsStoppingCriteria([stop_str], tokenizer, input_ids)
-    
-        output_ids = ov_model.generate(
-            input_ids,
-            images=images_tensor,
-            do_sample=True if TEMPERATURE > 0 else False,
-            temperature=TEMPERATURE,
-            top_p=TOP_P,
-            num_beams=NUM_BEAMS,
-            max_new_tokens=MAX_NEW_TOKENS,
-            use_cache=True,
-            stopping_criteria=[stopping_criteria],
-        )
-        input_token_len = input_ids.shape[1]
-        outputs = tokenizer.batch_decode(output_ids[:, input_token_len:], skip_special_tokens=True)[0]
-        outputs = outputs.strip()
-        if outputs.endswith(stop_str):
-            outputs = outputs[: -len(stop_str)]
-    
-        return outputs.strip()
-    
-    
-    demo = gr.Interface(
-        generate,
-        [gr.Image(label="Image", type="pil"), gr.Textbox(label="Prompt")],
-        gr.Textbox(),
-        examples=[
-            [
-                str(IMAGE_PATH),
-                PROMPT_STR,
-            ]
-        ],
-        allow_flagging="never",
-    )
-    
-    try:
-        demo.launch(debug=False)
-    except Exception:
-        demo.launch(debug=False, share=True)
-    # if you are launching remotely, specify server_name and server_port
-    # demo.launch(server_name='your server name', server_port='server port in int')
-    # Read more in the docs: https://gradio.app/docs/
+defgenerate(img,prompt):
+images_tensor=process_images([img],image_processor,transformers.AutoConfig.from_pretrained(MODELS_DIR))
+prompt=DEFAULT_IMAGE_TOKEN+"\n"+prompt
+conv=conv_templates["v1"].copy()
+conv.append_message(conv.roles[0],prompt)
+conv.append_message(conv.roles[1],None)
+prompt=conv.get_prompt()
+stop_str=conv.sepifconv.sep_style!=SeparatorStyle.TWOelseconv.sep2
+input_ids=tokenizer_image_token(prompt,tokenizer,IMAGE_TOKEN_INDEX,return_tensors="pt").unsqueeze(0)
+stopping_criteria=KeywordsStoppingCriteria([stop_str],tokenizer,input_ids)
+
+output_ids=ov_model.generate(
+input_ids,
+images=images_tensor,
+do_sample=TrueifTEMPERATURE>0elseFalse,
+temperature=TEMPERATURE,
+top_p=TOP_P,
+num_beams=NUM_BEAMS,
+max_new_tokens=MAX_NEW_TOKENS,
+use_cache=True,
+stopping_criteria=[stopping_criteria],
+)
+input_token_len=input_ids.shape[1]
+outputs=tokenizer.batch_decode(output_ids[:,input_token_len:],skip_special_tokens=True)[0]
+outputs=outputs.strip()
+ifoutputs.endswith(stop_str):
+outputs=outputs[:-len(stop_str)]
+
+returnoutputs.strip()
 
 
-.. parsed-literal::
+demo=gr.Interface(
+generate,
+[gr.Image(label="Image",type="pil"),gr.Textbox(label="Prompt")],
+gr.Textbox(),
+examples=[
+[
+str(IMAGE_PATH),
+PROMPT_STR,
+]
+],
+allow_flagging="never",
+)
 
-    Running on local URL:  http://127.0.0.1:7860
-    
-    To create a public link, set `share=True` in `launch()`.
+try:
+demo.launch(debug=False)
+exceptException:
+demo.launch(debug=False,share=True)
+#ifyouarelaunchingremotely,specifyserver_nameandserver_port
+#demo.launch(server_name='yourservername',server_port='serverportinint')
+#Readmoreinthedocs:https://gradio.app/docs/
+
+
+..parsed-literal::
+
+RunningonlocalURL:http://127.0.0.1:7860
+
+Tocreateapubliclink,set`share=True`in`launch()`.
 
 
 
-.. raw:: html
+..raw::html
 
-    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
+<div><iframesrc="http://127.0.0.1:7860/"width="100%"height="500"allow="autoplay;camera;microphone;clipboard-read;clipboard-write;"frameborder="0"allowfullscreen></iframe></div>
 

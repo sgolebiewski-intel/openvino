@@ -1,449 +1,449 @@
-Stable Diffusion v2.1 using OpenVINO TorchDynamo backend
+StableDiffusionv2.1usingOpenVINOTorchDynamobackend
 ========================================================
 
-Stable Diffusion v2 is the next generation of Stable Diffusion model a
-Text-to-Image latent diffusion model created by the researchers and
-engineers from `Stability AI <https://stability.ai/>`__ and
-`LAION <https://laion.ai/>`__.
+StableDiffusionv2isthenextgenerationofStableDiffusionmodela
+Text-to-Imagelatentdiffusionmodelcreatedbytheresearchersand
+engineersfrom`StabilityAI<https://stability.ai/>`__and
+`LAION<https://laion.ai/>`__.
 
-General diffusion models are machine learning systems that are trained
-to denoise random gaussian noise step by step, to get to a sample of
-interest, such as an image. Diffusion models have shown to achieve
-state-of-the-art results for generating image data. But one downside of
-diffusion models is that the reverse denoising process is slow. In
-addition, these models consume a lot of memory because they operate in
-pixel space, which becomes unreasonably expensive when generating
-high-resolution images. Therefore, it is challenging to train these
-models and also use them for inference. OpenVINO brings capabilities to
-run model inference on Intel hardware and opens the door to the
-fantastic world of diffusion models for everyone!
+Generaldiffusionmodelsaremachinelearningsystemsthataretrained
+todenoiserandomgaussiannoisestepbystep,togettoasampleof
+interest,suchasanimage.Diffusionmodelshaveshowntoachieve
+state-of-the-artresultsforgeneratingimagedata.Butonedownsideof
+diffusionmodelsisthatthereversedenoisingprocessisslow.In
+addition,thesemodelsconsumealotofmemorybecausetheyoperatein
+pixelspace,whichbecomesunreasonablyexpensivewhengenerating
+high-resolutionimages.Therefore,itischallengingtotrainthese
+modelsandalsousethemforinference.OpenVINObringscapabilitiesto
+runmodelinferenceonIntelhardwareandopensthedoortothe
+fantasticworldofdiffusionmodelsforeveryone!
 
-This notebook demonstrates how to run stable diffusion model using
-`Diffusers <https://huggingface.co/docs/diffusers/index>`__ library and
-`OpenVINO ``TorchDynamo``
-backend <https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html>`__
-for Text-to-Image and Image-to-Image generation tasks.
+Thisnotebookdemonstrateshowtorunstablediffusionmodelusing
+`Diffusers<https://huggingface.co/docs/diffusers/index>`__libraryand
+`OpenVINOTorchDynamo
+backend<https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html>`__
+forText-to-ImageandImage-to-Imagegenerationtasks.
 
-Notebook contains the following steps:
+Notebookcontainsthefollowingsteps:
 
-1. Create pipeline with PyTorch models.
-2. Add OpenVINO optimization using OpenVINO TorchDynamo backend.
-3. Run Stable Diffusion pipeline with OpenVINO.
+1.CreatepipelinewithPyTorchmodels.
+2.AddOpenVINOoptimizationusingOpenVINOTorchDynamobackend.
+3.RunStableDiffusionpipelinewithOpenVINO.
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Prerequisites <#Prerequisites>`__
--  `Stable Diffusion with Diffusers
-   library <#Stable-Diffusion-with-Diffusers-library>`__
--  `OpenVINO TorchDynamo backend <#OpenVINO-TorchDynamo-backend>`__
+-`Prerequisites<#prerequisites>`__
+-`StableDiffusionwithDiffusers
+library<#stable-diffusion-with-diffusers-library>`__
+-`OpenVINOTorchDynamobackend<#openvino-torchdynamo-backend>`__
 
-   -  `Run Image generation <#Run-Image-generation>`__
+-`RunImagegeneration<#run-image-generation>`__
 
--  `Interactive demo <#Interactive-demo>`__
--  `Support for Automatic1111 Stable Diffusion
-   WebUI <#Support-for-Automatic1111-Stable-Diffusion-WebUI>`__
+-`Interactivedemo<#interactive-demo>`__
+-`SupportforAutomatic1111StableDiffusion
+WebUI<#support-for-automatic1111-stable-diffusion-webui>`__
 
 Prerequisites
 -------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    %pip install -q "torch>=2.2" transformers diffusers "gradio>=4.19" ipywidgets --extra-index-url https://download.pytorch.org/whl/cpu
-    %pip install -q "openvino>=2024.1.0"
-
-
-.. parsed-literal::
-
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
+%pipinstall-q"torch>=2.2"transformersdiffusers"gradio>=4.19"ipywidgets--extra-index-urlhttps://download.pytorch.org/whl/cpu
+%pipinstall-q"openvino>=2024.1.0"
 
 
-.. code:: ipython3
+..parsed-literal::
 
-    import gradio as gr
-    import random
-    import torch
-    import time
-    
-    from diffusers import StableDiffusionPipeline, StableDiffusionImg2ImgPipeline
-    import ipywidgets as widgets
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
 
 
-.. parsed-literal::
+..code::ipython3
 
-    2024-07-13 04:01:03.234781: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-07-13 04:01:03.269549: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-07-13 04:01:03.796151: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+importgradioasgr
+importrandom
+importtorch
+importtime
+
+fromdiffusersimportStableDiffusionPipeline,StableDiffusionImg2ImgPipeline
+importipywidgetsaswidgets
 
 
-Stable Diffusion with Diffusers library
+..parsed-literal::
+
+2024-07-1304:01:03.234781:Itensorflow/core/util/port.cc:110]oneDNNcustomoperationsareon.Youmayseeslightlydifferentnumericalresultsduetofloating-pointround-offerrorsfromdifferentcomputationorders.Toturnthemoff,settheenvironmentvariable`TF_ENABLE_ONEDNN_OPTS=0`.
+2024-07-1304:01:03.269549:Itensorflow/core/platform/cpu_feature_guard.cc:182]ThisTensorFlowbinaryisoptimizedtouseavailableCPUinstructionsinperformance-criticaloperations.
+Toenablethefollowinginstructions:AVX2AVX512FAVX512_VNNIFMA,inotheroperations,rebuildTensorFlowwiththeappropriatecompilerflags.
+2024-07-1304:01:03.796151:Wtensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38]TF-TRTWarning:CouldnotfindTensorRT
+
+
+StableDiffusionwithDiffuserslibrary
 ---------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-To work with Stable Diffusion v2.1, we will use Hugging Face Diffusers
-library. To experiment with Stable Diffusion models, Diffusers exposes
+ToworkwithStableDiffusionv2.1,wewilluseHuggingFaceDiffusers
+library.ToexperimentwithStableDiffusionmodels,Diffusersexposes
 the
-`StableDiffusionPipeline <https://huggingface.co/docs/diffusers/using-diffusers/conditional_image_generation>`__
+`StableDiffusionPipeline<https://huggingface.co/docs/diffusers/using-diffusers/conditional_image_generation>`__
 and
-`StableDiffusionImg2ImgPipeline <https://huggingface.co/docs/diffusers/using-diffusers/img2img>`__
-similar to the other `Diffusers
-pipelines <https://huggingface.co/docs/diffusers/api/pipelines/overview>`__.
-The code below demonstrates how to create the
-``StableDiffusionPipeline`` using ``stable-diffusion-2-1-base`` model:
+`StableDiffusionImg2ImgPipeline<https://huggingface.co/docs/diffusers/using-diffusers/img2img>`__
+similartotheother`Diffusers
+pipelines<https://huggingface.co/docs/diffusers/api/pipelines/overview>`__.
+Thecodebelowdemonstrateshowtocreatethe
+``StableDiffusionPipeline``using``stable-diffusion-2-1-base``model:
 
-.. code:: ipython3
+..code::ipython3
 
-    model_id = "stabilityai/stable-diffusion-2-1-base"
-    
-    # Pipeline for text-to-image generation
-    pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float32)
+model_id="stabilityai/stable-diffusion-2-1-base"
 
-
-
-.. parsed-literal::
-
-    Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]
+#Pipelinefortext-to-imagegeneration
+pipe=StableDiffusionPipeline.from_pretrained(model_id,torch_dtype=torch.float32)
 
 
-.. parsed-literal::
 
-    The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+..parsed-literal::
+
+Loadingpipelinecomponents...:0%||0/6[00:00<?,?it/s]
 
 
-OpenVINO TorchDynamo backend
+..parsed-literal::
+
+TheinstalledversionofbitsandbyteswascompiledwithoutGPUsupport.8-bitoptimizers,8-bitmultiplication,andGPUquantizationareunavailable.
+
+
+OpenVINOTorchDynamobackend
 ----------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The `OpenVINO TorchDynamo
-backend <https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html>`__
-lets you enable `OpenVINO <https://docs.openvino.ai/2024/home.html>`__
-support for PyTorch models with minimal changes to the original PyTorch
-script. It speeds up PyTorch code by JIT-compiling it into optimized
-kernels. By default, Torch code runs in eager-mode, but with the use of
-torch.compile it goes through the following steps: 1. Graph acquisition
-- the model is rewritten as blocks of subgraphs that are either: -
-compiled by TorchDynamo and “flattened”, - falling back to the
-eager-mode, due to unsupported Python constructs (like control-flow
-code). 2. Graph lowering - all PyTorch operations are decomposed into
-their constituent kernels specific to the chosen backend. 3. Graph
-compilation - the kernels call their corresponding low-level
-device-specific operations.
+The`OpenVINOTorchDynamo
+backend<https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html>`__
+letsyouenable`OpenVINO<https://docs.openvino.ai/2024/home.html>`__
+supportforPyTorchmodelswithminimalchangestotheoriginalPyTorch
+script.ItspeedsupPyTorchcodebyJIT-compilingitintooptimized
+kernels.Bydefault,Torchcoderunsineager-mode,butwiththeuseof
+torch.compileitgoesthroughthefollowingsteps:1.Graphacquisition
+-themodelisrewrittenasblocksofsubgraphsthatareeither:-
+compiledbyTorchDynamoand“flattened”,-fallingbacktothe
+eager-mode,duetounsupportedPythonconstructs(likecontrol-flow
+code).2.Graphlowering-allPyTorchoperationsaredecomposedinto
+theirconstituentkernelsspecifictothechosenbackend.3.Graph
+compilation-thekernelscalltheircorrespondinglow-level
+device-specificoperations.
 
-Select device for inference and enable or disable saving the optimized
-model files to a hard drive, after the first application run. This makes
-them available for the following application executions, reducing the
-first-inference latency. Read more about available `Environment
+Selectdeviceforinferenceandenableordisablesavingtheoptimized
+modelfilestoaharddrive,afterthefirstapplicationrun.Thismakes
+themavailableforthefollowingapplicationexecutions,reducingthe
+first-inferencelatency.Readmoreaboutavailable`Environment
 Variables
-options <https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html#options>`__
+options<https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html#options>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    import openvino as ov
-    
-    core = ov.Core()
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="CPU",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+importopenvinoasov
 
+core=ov.Core()
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="CPU",
+description="Device:",
+disabled=False,
+)
 
-
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', options=('CPU', 'AUTO'), value='CPU')
-
-
-
-.. code:: ipython3
-
-    model_caching = widgets.Dropdown(
-        options=[True, False],
-        value=True,
-        description="Model caching:",
-        disabled=False,
-    )
-    
-    model_caching
+device
 
 
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    Dropdown(description='Model caching:', options=(True, False), value=True)
+Dropdown(description='Device:',options=('CPU','AUTO'),value='CPU')
 
 
 
-To use ```torch.compile()``
-method <https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html>`__,
-you just need to add an import statement and define the OpenVINO
+..code::ipython3
+
+model_caching=widgets.Dropdown(
+options=[True,False],
+value=True,
+description="Modelcaching:",
+disabled=False,
+)
+
+model_caching
+
+
+
+
+..parsed-literal::
+
+Dropdown(description='Modelcaching:',options=(True,False),value=True)
+
+
+
+Touse`torch.compile()
+method<https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html>`__,
+youjustneedtoaddanimportstatementanddefinetheOpenVINO
 backend:
 
-.. code:: ipython3
+..code::ipython3
 
-    # this import is required to activate the openvino backend for torchdynamo
-    import openvino.torch  # noqa: F401
-    
-    pipe.unet = torch.compile(
-        pipe.unet,
-        backend="openvino",
-        options={"device": device.value, "model_caching": model_caching.value},
-    )
+#thisimportisrequiredtoactivatetheopenvinobackendfortorchdynamo
+importopenvino.torch#noqa:F401
 
-   **Note**: Read more about available `OpenVINO
-   backends <https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html#how-to-use>`__
+pipe.unet=torch.compile(
+pipe.unet,
+backend="openvino",
+options={"device":device.value,"model_caching":model_caching.value},
+)
 
-Run Image generation
+**Note**:Readmoreaboutavailable`OpenVINO
+backends<https://docs.openvino.ai/2024/openvino-workflow/torch-compile.html#how-to-use>`__
+
+RunImagegeneration
 ~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    prompt = "a photo of an astronaut riding a horse on mars"
-    image = pipe(prompt).images[0]
-    image
-
-
-
-.. parsed-literal::
-
-      0%|          | 0/50 [00:00<?, ?it/s]
+prompt="aphotoofanastronautridingahorseonmars"
+image=pipe(prompt).images[0]
+image
 
 
 
+..parsed-literal::
 
-.. image:: stable-diffusion-torchdynamo-backend-with-output_files/stable-diffusion-torchdynamo-backend-with-output_14_1.png
+0%||0/50[00:00<?,?it/s]
 
 
 
-Interactive demo
+
+..image::stable-diffusion-torchdynamo-backend-with-output_files/stable-diffusion-torchdynamo-backend-with-output_14_1.png
+
+
+
+Interactivedemo
 ================
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Now you can start the demo, choose the inference mode, define prompts
-(and input image for Image-to-Image generation) and run inference
-pipeline. Optionally, you can also change some input parameters.
+Nowyoucanstartthedemo,choosetheinferencemode,defineprompts
+(andinputimageforImage-to-Imagegeneration)andruninference
+pipeline.Optionally,youcanalsochangesomeinputparameters.
 
-.. code:: ipython3
+..code::ipython3
 
-    time_stamps = []
-    
-    
-    def callback(iter, t, latents):
-        time_stamps.append(time.time())
-    
-    
-    def error_str(error, title="Error"):
-        return (
-            f"""#### {title}
-                {error}"""
-            if error
-            else ""
-        )
-    
-    
-    def on_mode_change(mode):
-        return gr.update(visible=mode == modes["img2img"]), gr.update(visible=mode == modes["txt2img"])
-    
-    
-    def inference(
-        inf_mode,
-        prompt,
-        guidance=7.5,
-        steps=25,
-        width=768,
-        height=768,
-        seed=-1,
-        img=None,
-        strength=0.5,
-        neg_prompt="",
-    ):
-        if seed == -1:
-            seed = random.randint(0, 10000000)
-        generator = torch.Generator().manual_seed(seed)
-        res = None
-    
-        global time_stamps, pipe
-        time_stamps = []
-        try:
-            if inf_mode == modes["txt2img"]:
-                if type(pipe).__name__ != "StableDiffusionPipeline":
-                    pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float32)
-                    pipe.unet = torch.compile(pipe.unet, backend="openvino")
-                res = pipe(
-                    prompt,
-                    negative_prompt=neg_prompt,
-                    num_inference_steps=int(steps),
-                    guidance_scale=guidance,
-                    width=width,
-                    height=height,
-                    generator=generator,
-                    callback=callback,
-                    callback_steps=1,
-                ).images
-            elif inf_mode == modes["img2img"]:
-                if img is None:
-                    return (
-                        None,
-                        None,
-                        gr.update(
-                            visible=True,
-                            value=error_str("Image is required for Image to Image mode"),
-                        ),
-                    )
-                if type(pipe).__name__ != "StableDiffusionImg2ImgPipeline":
-                    pipe = StableDiffusionImg2ImgPipeline.from_pretrained(model_id, torch_dtype=torch.float32)
-                    pipe.unet = torch.compile(pipe.unet, backend="openvino")
-                res = pipe(
-                    prompt,
-                    negative_prompt=neg_prompt,
-                    image=img,
-                    num_inference_steps=int(steps),
-                    strength=strength,
-                    guidance_scale=guidance,
-                    generator=generator,
-                    callback=callback,
-                    callback_steps=1,
-                ).images
-        except Exception as e:
-            return None, None, gr.update(visible=True, value=error_str(e))
-    
-        warmup_duration = time_stamps[1] - time_stamps[0]
-        generation_rate = (steps - 1) / (time_stamps[-1] - time_stamps[1])
-        res_info = "Warm up time: " + str(round(warmup_duration, 2)) + " secs "
-        if generation_rate >= 1.0:
-            res_info = res_info + ", Performance: " + str(round(generation_rate, 2)) + " it/s "
-        else:
-            res_info = res_info + ", Performance: " + str(round(1 / generation_rate, 2)) + " s/it "
-    
-        return (
-            res,
-            gr.update(visible=True, value=res_info),
-            gr.update(visible=False, value=None),
-        )
-    
-    
-    modes = {
-        "txt2img": "Text to Image",
-        "img2img": "Image to Image",
-    }
-    
-    with gr.Blocks(css="style.css") as demo:
-        gr.HTML(
-            f"""
-                Model used: {model_id}         
-            """
-        )
-        with gr.Row():
-            with gr.Column(scale=60):
-                with gr.Group():
-                    prompt = gr.Textbox(
-                        "a photograph of an astronaut riding a horse",
-                        label="Prompt",
-                        max_lines=2,
-                    )
-                    neg_prompt = gr.Textbox(
-                        "frames, borderline, text, character, duplicate, error, out of frame, watermark, low quality, ugly, deformed, blur",
-                        label="Negative prompt",
-                    )
-                    res_img = gr.Gallery(label="Generated images", show_label=False)
-                error_output = gr.Markdown(visible=False)
-    
-            with gr.Column(scale=40):
-                generate = gr.Button(value="Generate")
-    
-                with gr.Group():
-                    inf_mode = gr.Dropdown(list(modes.values()), label="Inference Mode", value=modes["txt2img"])
-    
-                    with gr.Column(visible=False) as i2i:
-                        image = gr.Image(label="Image", height=128, type="pil")
-                        strength = gr.Slider(
-                            label="Transformation strength",
-                            minimum=0,
-                            maximum=1,
-                            step=0.01,
-                            value=0.5,
-                        )
-    
-                with gr.Group():
-                    with gr.Row() as txt2i:
-                        width = gr.Slider(label="Width", value=512, minimum=64, maximum=1024, step=8)
-                        height = gr.Slider(label="Height", value=512, minimum=64, maximum=1024, step=8)
-    
-                with gr.Group():
-                    with gr.Row():
-                        steps = gr.Slider(label="Steps", value=20, minimum=1, maximum=50, step=1)
-                        guidance = gr.Slider(label="Guidance scale", value=7.5, maximum=15)
-    
-                    seed = gr.Slider(-1, 10000000, label="Seed (-1 = random)", value=-1, step=1)
-    
-                res_info = gr.Markdown(visible=False)
-    
-        inf_mode.change(on_mode_change, inputs=[inf_mode], outputs=[i2i, txt2i], queue=False)
-    
-        inputs = [
-            inf_mode,
-            prompt,
-            guidance,
-            steps,
-            width,
-            height,
-            seed,
-            image,
-            strength,
-            neg_prompt,
-        ]
-    
-        outputs = [res_img, res_info, error_output]
-        prompt.submit(inference, inputs=inputs, outputs=outputs)
-        generate.click(inference, inputs=inputs, outputs=outputs)
-    
-    try:
-        demo.queue().launch(debug=False)
-    except Exception:
-        demo.queue().launch(share=True, debug=False)
-    
-    # if you are launching remotely, specify server_name and server_port
-    # demo.launch(server_name='your server name', server_port='server port in int')
-    # Read more in the docs: https://gradio.app/docs/
+time_stamps=[]
 
 
-.. parsed-literal::
-
-    Running on local URL:  http://127.0.0.1:7860
-    
-    To create a public link, set `share=True` in `launch()`.
+defcallback(iter,t,latents):
+time_stamps.append(time.time())
 
 
+deferror_str(error,title="Error"):
+return(
+f"""####{title}
+{error}"""
+iferror
+else""
+)
 
-.. raw:: html
 
-    <div><iframe src="http://127.0.0.1:7860/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div>
+defon_mode_change(mode):
+returngr.update(visible=mode==modes["img2img"]),gr.update(visible=mode==modes["txt2img"])
 
 
-Support for Automatic1111 Stable Diffusion WebUI
+definference(
+inf_mode,
+prompt,
+guidance=7.5,
+steps=25,
+width=768,
+height=768,
+seed=-1,
+img=None,
+strength=0.5,
+neg_prompt="",
+):
+ifseed==-1:
+seed=random.randint(0,10000000)
+generator=torch.Generator().manual_seed(seed)
+res=None
+
+globaltime_stamps,pipe
+time_stamps=[]
+try:
+ifinf_mode==modes["txt2img"]:
+iftype(pipe).__name__!="StableDiffusionPipeline":
+pipe=StableDiffusionPipeline.from_pretrained(model_id,torch_dtype=torch.float32)
+pipe.unet=torch.compile(pipe.unet,backend="openvino")
+res=pipe(
+prompt,
+negative_prompt=neg_prompt,
+num_inference_steps=int(steps),
+guidance_scale=guidance,
+width=width,
+height=height,
+generator=generator,
+callback=callback,
+callback_steps=1,
+).images
+elifinf_mode==modes["img2img"]:
+ifimgisNone:
+return(
+None,
+None,
+gr.update(
+visible=True,
+value=error_str("ImageisrequiredforImagetoImagemode"),
+),
+)
+iftype(pipe).__name__!="StableDiffusionImg2ImgPipeline":
+pipe=StableDiffusionImg2ImgPipeline.from_pretrained(model_id,torch_dtype=torch.float32)
+pipe.unet=torch.compile(pipe.unet,backend="openvino")
+res=pipe(
+prompt,
+negative_prompt=neg_prompt,
+image=img,
+num_inference_steps=int(steps),
+strength=strength,
+guidance_scale=guidance,
+generator=generator,
+callback=callback,
+callback_steps=1,
+).images
+exceptExceptionase:
+returnNone,None,gr.update(visible=True,value=error_str(e))
+
+warmup_duration=time_stamps[1]-time_stamps[0]
+generation_rate=(steps-1)/(time_stamps[-1]-time_stamps[1])
+res_info="Warmuptime:"+str(round(warmup_duration,2))+"secs"
+ifgeneration_rate>=1.0:
+res_info=res_info+",Performance:"+str(round(generation_rate,2))+"it/s"
+else:
+res_info=res_info+",Performance:"+str(round(1/generation_rate,2))+"s/it"
+
+return(
+res,
+gr.update(visible=True,value=res_info),
+gr.update(visible=False,value=None),
+)
+
+
+modes={
+"txt2img":"TexttoImage",
+"img2img":"ImagetoImage",
+}
+
+withgr.Blocks(css="style.css")asdemo:
+gr.HTML(
+f"""
+Modelused:{model_id}
+"""
+)
+withgr.Row():
+withgr.Column(scale=60):
+withgr.Group():
+prompt=gr.Textbox(
+"aphotographofanastronautridingahorse",
+label="Prompt",
+max_lines=2,
+)
+neg_prompt=gr.Textbox(
+"frames,borderline,text,character,duplicate,error,outofframe,watermark,lowquality,ugly,deformed,blur",
+label="Negativeprompt",
+)
+res_img=gr.Gallery(label="Generatedimages",show_label=False)
+error_output=gr.Markdown(visible=False)
+
+withgr.Column(scale=40):
+generate=gr.Button(value="Generate")
+
+withgr.Group():
+inf_mode=gr.Dropdown(list(modes.values()),label="InferenceMode",value=modes["txt2img"])
+
+withgr.Column(visible=False)asi2i:
+image=gr.Image(label="Image",height=128,type="pil")
+strength=gr.Slider(
+label="Transformationstrength",
+minimum=0,
+maximum=1,
+step=0.01,
+value=0.5,
+)
+
+withgr.Group():
+withgr.Row()astxt2i:
+width=gr.Slider(label="Width",value=512,minimum=64,maximum=1024,step=8)
+height=gr.Slider(label="Height",value=512,minimum=64,maximum=1024,step=8)
+
+withgr.Group():
+withgr.Row():
+steps=gr.Slider(label="Steps",value=20,minimum=1,maximum=50,step=1)
+guidance=gr.Slider(label="Guidancescale",value=7.5,maximum=15)
+
+seed=gr.Slider(-1,10000000,label="Seed(-1=random)",value=-1,step=1)
+
+res_info=gr.Markdown(visible=False)
+
+inf_mode.change(on_mode_change,inputs=[inf_mode],outputs=[i2i,txt2i],queue=False)
+
+inputs=[
+inf_mode,
+prompt,
+guidance,
+steps,
+width,
+height,
+seed,
+image,
+strength,
+neg_prompt,
+]
+
+outputs=[res_img,res_info,error_output]
+prompt.submit(inference,inputs=inputs,outputs=outputs)
+generate.click(inference,inputs=inputs,outputs=outputs)
+
+try:
+demo.queue().launch(debug=False)
+exceptException:
+demo.queue().launch(share=True,debug=False)
+
+#ifyouarelaunchingremotely,specifyserver_nameandserver_port
+#demo.launch(server_name='yourservername',server_port='serverportinint')
+#Readmoreinthedocs:https://gradio.app/docs/
+
+
+..parsed-literal::
+
+RunningonlocalURL:http://127.0.0.1:7860
+
+Tocreateapubliclink,set`share=True`in`launch()`.
+
+
+
+..raw::html
+
+<div><iframesrc="http://127.0.0.1:7860/"width="100%"height="500"allow="autoplay;camera;microphone;clipboard-read;clipboard-write;"frameborder="0"allowfullscreen></iframe></div>
+
+
+SupportforAutomatic1111StableDiffusionWebUI
 ------------------------------------------------
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Automatic1111 Stable Diffusion WebUI is an open-source repository that
-hosts a browser-based interface for the Stable Diffusion based image
-generation. It allows users to create realistic and creative images from
-text prompts. Stable Diffusion WebUI is supported on Intel CPUs, Intel
-integrated GPUs, and Intel discrete GPUs by leveraging OpenVINO
-torch.compile capability. Detailed instructions are available
-in\ `Stable Diffusion WebUI
-repository <https://github.com/openvinotoolkit/stable-diffusion-webui/wiki/Installation-on-Intel-Silicon>`__.
+Automatic1111StableDiffusionWebUIisanopen-sourcerepositorythat
+hostsabrowser-basedinterfacefortheStableDiffusionbasedimage
+generation.Itallowsuserstocreaterealisticandcreativeimagesfrom
+textprompts.StableDiffusionWebUIissupportedonIntelCPUs,Intel
+integratedGPUs,andInteldiscreteGPUsbyleveragingOpenVINO
+torch.compilecapability.Detailedinstructionsareavailable
+in\`StableDiffusionWebUI
+repository<https://github.com/openvinotoolkit/stable-diffusion-webui/wiki/Installation-on-Intel-Silicon>`__.

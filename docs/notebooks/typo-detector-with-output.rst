@@ -1,633 +1,633 @@
-Typo Detector with OpenVINO™
+TypoDetectorwithOpenVINO™
 ============================
 
-Typo detection in AI is a process of identifying and correcting
-typographical errors in text data using machine learning algorithms. The
-goal of typo detection is to improve the accuracy, readability, and
-usability of text by identifying and indicating mistakes made during the
-writing process. To detect typos, AI-based typo detectors use various
-techniques, such as natural language processing (NLP), machine learning
-(ML), and deep learning (DL).
+TypodetectioninAIisaprocessofidentifyingandcorrecting
+typographicalerrorsintextdatausingmachinelearningalgorithms.The
+goaloftypodetectionistoimprovetheaccuracy,readability,and
+usabilityoftextbyidentifyingandindicatingmistakesmadeduringthe
+writingprocess.Todetecttypos,AI-basedtypodetectorsusevarious
+techniques,suchasnaturallanguageprocessing(NLP),machinelearning
+(ML),anddeeplearning(DL).
 
-A typo detector takes a sentence as an input and identify all
-typographical errors such as misspellings and homophone errors.
+Atypodetectortakesasentenceasaninputandidentifyall
+typographicalerrorssuchasmisspellingsandhomophoneerrors.
 
-This tutorial provides how to use the `Typo
-Detector <https://huggingface.co/m3hrdadfi/typo-detector-distilbert-en>`__
-from the `Hugging Face
-Transformers <https://huggingface.co/docs/transformers/index>`__ library
-in the OpenVINO environment to perform the above task.
+Thistutorialprovideshowtousethe`Typo
+Detector<https://huggingface.co/m3hrdadfi/typo-detector-distilbert-en>`__
+fromthe`HuggingFace
+Transformers<https://huggingface.co/docs/transformers/index>`__library
+intheOpenVINOenvironmenttoperformtheabovetask.
 
-The model detects typos in a given text with a high accuracy,
-performances of which are listed below, - Precision score of 0.9923 -
-Recall score of 0.9859 - f1-score of 0.9891
+Themodeldetectstyposinagiventextwithahighaccuracy,
+performancesofwhicharelistedbelow,-Precisionscoreof0.9923-
+Recallscoreof0.9859-f1-scoreof0.9891
 
-`Source for above
-metrics <https://huggingface.co/m3hrdadfi/typo-detector-distilbert-en>`__
+`Sourceforabove
+metrics<https://huggingface.co/m3hrdadfi/typo-detector-distilbert-en>`__
 
-These metrics indicate that the model can correctly identify a high
-proportion of both correct and incorrect text, minimizing both false
-positives and false negatives.
+Thesemetricsindicatethatthemodelcancorrectlyidentifyahigh
+proportionofbothcorrectandincorrecttext,minimizingbothfalse
+positivesandfalsenegatives.
 
-The model has been pretrained on the
-`NeuSpell <https://github.com/neuspell/neuspell>`__ dataset.
+Themodelhasbeenpretrainedonthe
+`NeuSpell<https://github.com/neuspell/neuspell>`__dataset.
 
-Table of contents:
+Tableofcontents:
 ^^^^^^^^^^^^^^^^^^
 
--  `Imports <#Imports>`__
--  `Methods <#Methods>`__
+-`Imports<#imports>`__
+-`Methods<#methods>`__
 
-   -  `1. Using the Hugging Face Optimum
-      library <#1.-Using-the-Hugging-Face-Optimum-library>`__
+-`1.UsingtheHuggingFaceOptimum
+library<#1--using-the-hugging-face-optimum-library>`__
 
-      -  `2. Converting the model to OpenVINO
-         IR <#2.-Converting-the-model-to-OpenVINO-IR>`__
+-`2.ConvertingthemodeltoOpenVINO
+IR<#2--converting-the-model-to-openvino-ir>`__
 
-   -  `Select inference device <#Select-inference-device>`__
-   -  `1. Hugging Face Optimum Intel
-      library <#1.-Hugging-Face-Optimum-Intel-library>`__
+-`Selectinferencedevice<#select-inference-device>`__
+-`1.HuggingFaceOptimumIntel
+library<#1--hugging-face-optimum-intel-library>`__
 
-      -  `Load the model <#Load-the-model>`__
-      -  `Load the tokenizer <#Load-the-tokenizer>`__
+-`Loadthemodel<#load-the-model>`__
+-`Loadthetokenizer<#load-the-tokenizer>`__
 
-   -  `2. Converting the model to OpenVINO
-      IR <#2.-Converting-the-model-to-OpenVINO-IR>`__
+-`2.ConvertingthemodeltoOpenVINO
+IR<#2--converting-the-model-to-openvino-ir>`__
 
-      -  `Load the Pytorch model <#Load-the-Pytorch-model>`__
-      -  `Converting to OpenVINO IR <#Converting-to-OpenVINO-IR>`__
-      -  `Inference <#Inference>`__
+-`LoadthePytorchmodel<#load-the-pytorch-model>`__
+-`ConvertingtoOpenVINOIR<#converting-to-openvino-ir>`__
+-`Inference<#inference>`__
 
-   -  `Helper Functions <#Helper-Functions>`__
+-`HelperFunctions<#helper-functions>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    %pip install -q "diffusers>=0.17.1" "openvino>=2023.1.0" "nncf>=2.5.0" "gradio>=4.19" "onnx>=1.11.0" "transformers>=4.39.0" "torch>=2.1" --extra-index-url https://download.pytorch.org/whl/cpu
-    %pip install -q "git+https://github.com/huggingface/optimum-intel.git"
+%pipinstall-q"diffusers>=0.17.1""openvino>=2023.1.0""nncf>=2.5.0""gradio>=4.19""onnx>=1.11.0""transformers>=4.39.0""torch>=2.1"--extra-index-urlhttps://download.pytorch.org/whl/cpu
+%pipinstall-q"git+https://github.com/huggingface/optimum-intel.git"
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    Note: you may need to restart the kernel to use updated packages.
-    Note: you may need to restart the kernel to use updated packages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
+Note:youmayneedtorestartthekerneltouseupdatedpackages.
 
 
 Imports
 ~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    from transformers import (
-        AutoConfig,
-        AutoTokenizer,
-        AutoModelForTokenClassification,
-        pipeline,
-    )
-    from pathlib import Path
-    import numpy as np
-    import re
-    from typing import List, Dict
-    import time
+fromtransformersimport(
+AutoConfig,
+AutoTokenizer,
+AutoModelForTokenClassification,
+pipeline,
+)
+frompathlibimportPath
+importnumpyasnp
+importre
+fromtypingimportList,Dict
+importtime
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    2024-07-13 04:12:55.289699: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-    2024-07-13 04:12:55.325068: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-07-13 04:12:55.925329: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2024-07-1304:12:55.289699:Itensorflow/core/util/port.cc:110]oneDNNcustomoperationsareon.Youmayseeslightlydifferentnumericalresultsduetofloating-pointround-offerrorsfromdifferentcomputationorders.Toturnthemoff,settheenvironmentvariable`TF_ENABLE_ONEDNN_OPTS=0`.
+2024-07-1304:12:55.325068:Itensorflow/core/platform/cpu_feature_guard.cc:182]ThisTensorFlowbinaryisoptimizedtouseavailableCPUinstructionsinperformance-criticaloperations.
+Toenablethefollowinginstructions:AVX2AVX512FAVX512_VNNIFMA,inotheroperations,rebuildTensorFlowwiththeappropriatecompilerflags.
+2024-07-1304:12:55.925329:Wtensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38]TF-TRTWarning:CouldnotfindTensorRT
 
 
 Methods
 ~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The notebook provides two methods to run the inference of typo detector
-with OpenVINO runtime, so that you can experience both calling the API
-of Optimum with OpenVINO Runtime included, and loading models in other
-frameworks, converting them to OpenVINO IR format, and running inference
-with OpenVINO Runtime.
+Thenotebookprovidestwomethodstoruntheinferenceoftypodetector
+withOpenVINOruntime,sothatyoucanexperiencebothcallingtheAPI
+ofOptimumwithOpenVINORuntimeincluded,andloadingmodelsinother
+frameworks,convertingthemtoOpenVINOIRformat,andrunninginference
+withOpenVINORuntime.
 
-1. Using the `Hugging Face Optimum <https://huggingface.co/docs/optimum/index>`__ library
+1.Usingthe`HuggingFaceOptimum<https://huggingface.co/docs/optimum/index>`__library
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The Hugging Face Optimum API is a high-level API that allows us to
-convert models from the Hugging Face Transformers library to the
-OpenVINO™ IR format. Compiled models in OpenVINO IR format can be loaded
-using Optimum. Optimum allows the use of optimization on targeted
+TheHuggingFaceOptimumAPIisahigh-levelAPIthatallowsusto
+convertmodelsfromtheHuggingFaceTransformerslibrarytothe
+OpenVINO™IRformat.CompiledmodelsinOpenVINOIRformatcanbeloaded
+usingOptimum.Optimumallowstheuseofoptimizationontargeted
 hardware.
 
-2. Converting the model to OpenVINO IR
+2.ConvertingthemodeltoOpenVINOIR
 ''''''''''''''''''''''''''''''''''''''
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-The Pytorch model is converted to `OpenVINO IR
-format <https://docs.openvino.ai/2024/documentation/openvino-ir-format.html>`__.
-This method provides much more insight to how to set up a pipeline from
-model loading to model converting, compiling and running inference with
-OpenVINO, so that you could conveniently use OpenVINO to optimize and
-accelerate inference for other deep-learning models. The optimization of
-targeted hardware is also used here.
+ThePytorchmodelisconvertedto`OpenVINOIR
+format<https://docs.openvino.ai/2024/documentation/openvino-ir-format.html>`__.
+Thismethodprovidesmuchmoreinsighttohowtosetupapipelinefrom
+modelloadingtomodelconverting,compilingandrunninginferencewith
+OpenVINO,sothatyoucouldconvenientlyuseOpenVINOtooptimizeand
+accelerateinferenceforotherdeep-learningmodels.Theoptimizationof
+targetedhardwareisalsousedhere.
 
-The following table summarizes the major differences between the two
+Thefollowingtablesummarizesthemajordifferencesbetweenthetwo
 methods
 
 +-----------------------------------+----------------------------------+
-| Method 1                          | Method 2                         |
+|Method1|Method2|
 +===================================+==================================+
-| Load models from Optimum, an      | Load model from transformers     |
-| extension of transformers         |                                  |
+|LoadmodelsfromOptimum,an|Loadmodelfromtransformers|
+|extensionoftransformers||
 +-----------------------------------+----------------------------------+
-| Load the model in OpenVINO IR     | Convert to OpenVINO IR           |
-| format on the fly                 |                                  |
+|LoadthemodelinOpenVINOIR|ConverttoOpenVINOIR|
+|formatonthefly||
 +-----------------------------------+----------------------------------+
-| Load the compiled model by        | Compile the OpenVINO IR and run  |
-| default                           | inference with OpenVINO Runtime  |
+|Loadthecompiledmodelby|CompiletheOpenVINOIRandrun|
+|default|inferencewithOpenVINORuntime|
 +-----------------------------------+----------------------------------+
-| Pipeline is created to run        | Manually run inference.          |
-| inference with OpenVINO Runtime   |                                  |
+|Pipelineiscreatedtorun|Manuallyruninference.|
+|inferencewithOpenVINORuntime||
 +-----------------------------------+----------------------------------+
 
-Select inference device
+Selectinferencedevice
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-select device from dropdown list for running inference using OpenVINO
+selectdevicefromdropdownlistforrunninginferenceusingOpenVINO
 
-.. code:: ipython3
+..code::ipython3
 
-    import ipywidgets as widgets
-    import openvino as ov
-    
-    core = ov.Core()
-    
-    device = widgets.Dropdown(
-        options=core.available_devices + ["AUTO"],
-        value="AUTO",
-        description="Device:",
-        disabled=False,
-    )
-    
-    device
+importipywidgetsaswidgets
+importopenvinoasov
 
+core=ov.Core()
 
+device=widgets.Dropdown(
+options=core.available_devices+["AUTO"],
+value="AUTO",
+description="Device:",
+disabled=False,
+)
 
-
-.. parsed-literal::
-
-    Dropdown(description='Device:', index=1, options=('CPU', 'AUTO'), value='AUTO')
+device
 
 
 
-1. Hugging Face Optimum Intel library
+
+..parsed-literal::
+
+Dropdown(description='Device:',index=1,options=('CPU','AUTO'),value='AUTO')
+
+
+
+1.HuggingFaceOptimumIntellibrary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-For this method, we need to install the
-``Hugging Face Optimum Intel library`` accelerated by OpenVINO
+Forthismethod,weneedtoinstallthe
+``HuggingFaceOptimumIntellibrary``acceleratedbyOpenVINO
 integration.
 
-Optimum Intel can be used to load optimized models from the `Hugging
-Face Hub <https://huggingface.co/docs/optimum/intel/hf.co/models>`__ and
-create pipelines to run an inference with OpenVINO Runtime using Hugging
-Face APIs. The Optimum Inference models are API compatible with Hugging
-Face Transformers models. This means we need just replace
-``AutoModelForXxx`` class with the corresponding ``OVModelForXxx``
+OptimumIntelcanbeusedtoloadoptimizedmodelsfromthe`Hugging
+FaceHub<https://huggingface.co/docs/optimum/intel/hf.co/models>`__and
+createpipelinestorunaninferencewithOpenVINORuntimeusingHugging
+FaceAPIs.TheOptimumInferencemodelsareAPIcompatiblewithHugging
+FaceTransformersmodels.Thismeansweneedjustreplace
+``AutoModelForXxx``classwiththecorresponding``OVModelForXxx``
 class.
 
-Import required model class
+Importrequiredmodelclass
 
-.. code:: ipython3
+..code::ipython3
 
-    from optimum.intel.openvino import OVModelForTokenClassification
-
-
-.. parsed-literal::
-
-    The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+fromoptimum.intel.openvinoimportOVModelForTokenClassification
 
 
-Load the model
+..parsed-literal::
+
+TheinstalledversionofbitsandbyteswascompiledwithoutGPUsupport.8-bitoptimizers,8-bitmultiplication,andGPUquantizationareunavailable.
+
+
+Loadthemodel
 ''''''''''''''
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-From the ``OVModelForTokenCLassification`` class we will import the
-relevant pre-trained model. To load a Transformers model and convert it
-to the OpenVINO format on-the-fly, we set ``export=True`` when loading
-your model.
+Fromthe``OVModelForTokenCLassification``classwewillimportthe
+relevantpre-trainedmodel.ToloadaTransformersmodelandconvertit
+totheOpenVINOformaton-the-fly,weset``export=True``whenloading
+yourmodel.
 
-.. code:: ipython3
+..code::ipython3
 
-    # The pretrained model we are using
-    model_id = "m3hrdadfi/typo-detector-distilbert-en"
-    
-    model_dir = Path("optimum_model")
-    
-    # Save the model to the path if not existing
-    if model_dir.exists():
-        model = OVModelForTokenClassification.from_pretrained(model_dir, device=device.value)
-    else:
-        model = OVModelForTokenClassification.from_pretrained(model_id, export=True, device=device.value)
-        model.save_pretrained(model_dir)
+#Thepretrainedmodelweareusing
+model_id="m3hrdadfi/typo-detector-distilbert-en"
 
+model_dir=Path("optimum_model")
 
-.. parsed-literal::
-
-    Framework not specified. Using pt to export the model.
-    Using framework PyTorch: 2.2.2+cpu
+#Savethemodeltothepathifnotexisting
+ifmodel_dir.exists():
+model=OVModelForTokenClassification.from_pretrained(model_dir,device=device.value)
+else:
+model=OVModelForTokenClassification.from_pretrained(model_id,export=True,device=device.value)
+model.save_pretrained(model_dir)
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    WARNING:tensorflow:Please fix your imports. Module tensorflow.python.training.tracking.base has been moved to tensorflow.python.trackable.base. The old module will be deleted in version 2.11.
-
-
-.. parsed-literal::
-
-    [ WARNING ]  Please fix your imports. Module %s has been moved to %s. The old module will be deleted in version %s.
-    /opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/torch/dynamic_graph/wrappers.py:86: TracerWarning: torch.tensor results are registered as constants in the trace. You can safely ignore this warning if you use this function to create tensors out of constant variables that would be the same every time you call this function. In any other case, this might cause the trace to be incorrect.
-      op1 = operator(*args, **kwargs)
+Frameworknotspecified.Usingpttoexportthemodel.
+UsingframeworkPyTorch:2.2.2+cpu
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    ['input_ids', 'attention_mask']
-
-
-.. parsed-literal::
-
-    Compiling the model to AUTO ...
+WARNING:tensorflow:Pleasefixyourimports.Moduletensorflow.python.training.tracking.basehasbeenmovedtotensorflow.python.trackable.base.Theoldmodulewillbedeletedinversion2.11.
 
 
-Load the tokenizer
+..parsed-literal::
+
+[WARNING]Pleasefixyourimports.Module%shasbeenmovedto%s.Theoldmodulewillbedeletedinversion%s.
+/opt/home/k8sworker/ci-ai/cibuilds/ov-notebook/OVNotebookOps-727/.workspace/scm/ov-notebook/.venv/lib/python3.8/site-packages/nncf/torch/dynamic_graph/wrappers.py:86:TracerWarning:torch.tensorresultsareregisteredasconstantsinthetrace.Youcansafelyignorethiswarningifyouusethisfunctiontocreatetensorsoutofconstantvariablesthatwouldbethesameeverytimeyoucallthisfunction.Inanyothercase,thismightcausethetracetobeincorrect.
+op1=operator(*args,**kwargs)
+
+
+..parsed-literal::
+
+['input_ids','attention_mask']
+
+
+..parsed-literal::
+
+CompilingthemodeltoAUTO...
+
+
+Loadthetokenizer
 ''''''''''''''''''
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Text Preprocessing cleans the text-based input data so it can be fed
-into the model. Tokenization splits paragraphs and sentences into
-smaller units that can be more easily assigned meaning. It involves
-cleaning the data and assigning tokens or IDs to the words, so they are
-represented in a vector space where similar words have similar vectors.
-This helps the model understand the context of a sentence. We’re making
-use of an
-`AutoTokenizer <https://huggingface.co/docs/transformers/main_classes/tokenizer>`__
-from Hugging Face, which is essentially a pretrained tokenizer.
+TextPreprocessingcleansthetext-basedinputdatasoitcanbefed
+intothemodel.Tokenizationsplitsparagraphsandsentencesinto
+smallerunitsthatcanbemoreeasilyassignedmeaning.Itinvolves
+cleaningthedataandassigningtokensorIDstothewords,sotheyare
+representedinavectorspacewheresimilarwordshavesimilarvectors.
+Thishelpsthemodelunderstandthecontextofasentence.We’remaking
+useofan
+`AutoTokenizer<https://huggingface.co/docs/transformers/main_classes/tokenizer>`__
+fromHuggingFace,whichisessentiallyapretrainedtokenizer.
 
-.. code:: ipython3
+..code::ipython3
 
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
+tokenizer=AutoTokenizer.from_pretrained(model_id)
 
-Then we use the inference pipeline for ``token-classification`` task.
-You can find more information about usage Hugging Face inference
-pipelines in this
-`tutorial <https://huggingface.co/docs/transformers/pipeline_tutorial>`__
+Thenweusetheinferencepipelinefor``token-classification``task.
+YoucanfindmoreinformationaboutusageHuggingFaceinference
+pipelinesinthis
+`tutorial<https://huggingface.co/docs/transformers/pipeline_tutorial>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    nlp = pipeline(
-        "token-classification",
-        model=model,
-        tokenizer=tokenizer,
-        aggregation_strategy="average",
-    )
+nlp=pipeline(
+"token-classification",
+model=model,
+tokenizer=tokenizer,
+aggregation_strategy="average",
+)
 
-Function to find typos in a sentence and write them to the terminal
+Functiontofindtyposinasentenceandwritethemtotheterminal
 
-.. code:: ipython3
+..code::ipython3
 
-    def show_typos(sentence: str):
-        """
-        Detect typos from the given sentence.
-        Writes both the original input and typo-tagged version to the terminal.
-    
-        Arguments:
-        sentence -- Sentence to be evaluated (string)
-        """
-    
-        typos = [sentence[r["start"] : r["end"]] for r in nlp(sentence)]
-    
-        detected = sentence
-        for typo in typos:
-            detected = detected.replace(typo, f"<i>{typo}</i>")
-    
-        print("[Input]: ", sentence)
-        print("[Detected]: ", detected)
-        print("-" * 130)
+defshow_typos(sentence:str):
+"""
+Detecttyposfromthegivensentence.
+Writesboththeoriginalinputandtypo-taggedversiontotheterminal.
 
-Let’s run a demo using the Hugging Face Optimum API.
+Arguments:
+sentence--Sentencetobeevaluated(string)
+"""
 
-.. code:: ipython3
+typos=[sentence[r["start"]:r["end"]]forrinnlp(sentence)]
 
-    sentences = [
-        "He had also stgruggled with addiction during his time in Congress .",
-        "The review thoroughla assessed all aspects of JLENS SuR and CPG esign maturit and confidence .",
-        "Letterma also apologized two his staff for the satyation .",
-        "Vincent Jay had earlier won France 's first gold in gthe 10km biathlon sprint .",
-        "It is left to the directors to figure out hpw to bring the stry across to tye audience .",
-        "I wnet to the park yestreday to play foorball with my fiends, but it statred to rain very hevaily and we had to stop.",
-        "My faorite restuarant servs the best spahgetti in the town, but they are always so buzy that you have to make a resrvation in advnace.",
-        "I was goig to watch a mvoie on Netflx last night, but the straming was so slow that I decided to cancled my subscrpition.",
-        "My freind and I went campign in the forest last weekend and saw a beutiful sunst that was so amzing it took our breth away.",
-        "I  have been stuying for my math exam all week, but I'm stil not very confidet that I will pass it, because there are so many formuals to remeber.",
-    ]
-    
-    start = time.time()
-    
-    for sentence in sentences:
-        show_typos(sentence)
-    
-    print(f"Time elapsed: {time.time() - start}")
+detected=sentence
+fortypointypos:
+detected=detected.replace(typo,f"<i>{typo}</i>")
 
+print("[Input]:",sentence)
+print("[Detected]:",detected)
+print("-"*130)
 
-.. parsed-literal::
+Let’srunademousingtheHuggingFaceOptimumAPI.
 
-    [Input]:  He had also stgruggled with addiction during his time in Congress .
-    [Detected]:  He had also <i>stgruggled</i> with addiction during his time in Congress .
-    ----------------------------------------------------------------------------------------------------------------------------------
-    [Input]:  The review thoroughla assessed all aspects of JLENS SuR and CPG esign maturit and confidence .
-    [Detected]:  The review <i>thoroughla</i> assessed all aspects of JLENS SuR and CPG <i>esign maturit</i> and confidence .
-    ----------------------------------------------------------------------------------------------------------------------------------
-    [Input]:  Letterma also apologized two his staff for the satyation .
-    [Detected]:  <i>Letterma</i> also apologized <i>two</i> his staff for the <i>satyation</i> .
-    ----------------------------------------------------------------------------------------------------------------------------------
-    [Input]:  Vincent Jay had earlier won France 's first gold in gthe 10km biathlon sprint .
-    [Detected]:  Vincent Jay had earlier won France 's first gold in <i>gthe</i> 10km biathlon sprint .
-    ----------------------------------------------------------------------------------------------------------------------------------
-    [Input]:  It is left to the directors to figure out hpw to bring the stry across to tye audience .
-    [Detected]:  It is left to the directors to figure out <i>hpw</i> to bring the <i>stry</i> across to <i>tye</i> audience .
-    ----------------------------------------------------------------------------------------------------------------------------------
-    [Input]:  I wnet to the park yestreday to play foorball with my fiends, but it statred to rain very hevaily and we had to stop.
-    [Detected]:  I <i>wnet</i> to the park <i>yestreday</i> to play <i>foorball</i> with my <i>fiends</i>, but it <i>statred</i> to rain very <i>hevaily</i> and we had to stop.
-    ----------------------------------------------------------------------------------------------------------------------------------
-    [Input]:  My faorite restuarant servs the best spahgetti in the town, but they are always so buzy that you have to make a resrvation in advnace.
-    [Detected]:  My <i>faorite restuarant servs</i> the best <i>spahgetti</i> in the town, but they are always so <i>buzy</i> that you have to make a <i>resrvation</i> in <i>advnace</i>.
-    ----------------------------------------------------------------------------------------------------------------------------------
-    [Input]:  I was goig to watch a mvoie on Netflx last night, but the straming was so slow that I decided to cancled my subscrpition.
-    [Detected]:  I was <i>goig</i> to watch a <i>mvoie</i> on <i>Netflx</i> last night, but the <i>straming</i> was so slow that I decided to <i>cancled</i> my <i>subscrpition</i>.
-    ----------------------------------------------------------------------------------------------------------------------------------
-    [Input]:  My freind and I went campign in the forest last weekend and saw a beutiful sunst that was so amzing it took our breth away.
-    [Detected]:  My <i>freind</i> and I went <i>campign</i> in the forest last weekend and saw a <i>beutiful sunst</i> that was so <i>amzing</i> it took our <i>breth</i> away.
-    ----------------------------------------------------------------------------------------------------------------------------------
-    [Input]:  I  have been stuying for my math exam all week, but I'm stil not very confidet that I will pass it, because there are so many formuals to remeber.
-    [Detected]:  I  have been <i>stuying</i> for my math exam all week, but I'm <i>stil</i> not very <i>confidet</i> that I will pass it, because there are so many formuals to <i>remeber</i>.
-    ----------------------------------------------------------------------------------------------------------------------------------
-    Time elapsed: 0.15727782249450684
+..code::ipython3
+
+sentences=[
+"HehadalsostgruggledwithaddictionduringhistimeinCongress.",
+"ThereviewthoroughlaassessedallaspectsofJLENSSuRandCPGesignmaturitandconfidence.",
+"Lettermaalsoapologizedtwohisstaffforthesatyation.",
+"VincentJayhadearlierwonFrance'sfirstgoldingthe10kmbiathlonsprint.",
+"Itislefttothedirectorstofigureouthpwtobringthestryacrosstotyeaudience.",
+"Iwnettotheparkyestredaytoplayfoorballwithmyfiends,butitstatredtorainveryhevailyandwehadtostop.",
+"Myfaoriterestuarantservsthebestspahgettiinthetown,buttheyarealwayssobuzythatyouhavetomakearesrvationinadvnace.",
+"IwasgoigtowatchamvoieonNetflxlastnight,butthestramingwassoslowthatIdecidedtocancledmysubscrpition.",
+"MyfreindandIwentcampignintheforestlastweekendandsawabeutifulsunstthatwassoamzingittookourbrethaway.",
+"Ihavebeenstuyingformymathexamallweek,butI'mstilnotveryconfidetthatIwillpassit,becausetherearesomanyformualstoremeber.",
+]
+
+start=time.time()
+
+forsentenceinsentences:
+show_typos(sentence)
+
+print(f"Timeelapsed:{time.time()-start}")
 
 
-2. Converting the model to OpenVINO IR
+..parsed-literal::
+
+[Input]:HehadalsostgruggledwithaddictionduringhistimeinCongress.
+[Detected]:Hehadalso<i>stgruggled</i>withaddictionduringhistimeinCongress.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:ThereviewthoroughlaassessedallaspectsofJLENSSuRandCPGesignmaturitandconfidence.
+[Detected]:Thereview<i>thoroughla</i>assessedallaspectsofJLENSSuRandCPG<i>esignmaturit</i>andconfidence.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:Lettermaalsoapologizedtwohisstaffforthesatyation.
+[Detected]:<i>Letterma</i>alsoapologized<i>two</i>hisstaffforthe<i>satyation</i>.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:VincentJayhadearlierwonFrance'sfirstgoldingthe10kmbiathlonsprint.
+[Detected]:VincentJayhadearlierwonFrance'sfirstgoldin<i>gthe</i>10kmbiathlonsprint.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:Itislefttothedirectorstofigureouthpwtobringthestryacrosstotyeaudience.
+[Detected]:Itislefttothedirectorstofigureout<i>hpw</i>tobringthe<i>stry</i>acrossto<i>tye</i>audience.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:Iwnettotheparkyestredaytoplayfoorballwithmyfiends,butitstatredtorainveryhevailyandwehadtostop.
+[Detected]:I<i>wnet</i>tothepark<i>yestreday</i>toplay<i>foorball</i>withmy<i>fiends</i>,butit<i>statred</i>torainvery<i>hevaily</i>andwehadtostop.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:Myfaoriterestuarantservsthebestspahgettiinthetown,buttheyarealwayssobuzythatyouhavetomakearesrvationinadvnace.
+[Detected]:My<i>faoriterestuarantservs</i>thebest<i>spahgetti</i>inthetown,buttheyarealwaysso<i>buzy</i>thatyouhavetomakea<i>resrvation</i>in<i>advnace</i>.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:IwasgoigtowatchamvoieonNetflxlastnight,butthestramingwassoslowthatIdecidedtocancledmysubscrpition.
+[Detected]:Iwas<i>goig</i>towatcha<i>mvoie</i>on<i>Netflx</i>lastnight,butthe<i>straming</i>wassoslowthatIdecidedto<i>cancled</i>my<i>subscrpition</i>.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:MyfreindandIwentcampignintheforestlastweekendandsawabeutifulsunstthatwassoamzingittookourbrethaway.
+[Detected]:My<i>freind</i>andIwent<i>campign</i>intheforestlastweekendandsawa<i>beutifulsunst</i>thatwasso<i>amzing</i>ittookour<i>breth</i>away.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:Ihavebeenstuyingformymathexamallweek,butI'mstilnotveryconfidetthatIwillpassit,becausetherearesomanyformualstoremeber.
+[Detected]:Ihavebeen<i>stuying</i>formymathexamallweek,butI'm<i>stil</i>notvery<i>confidet</i>thatIwillpassit,becausetherearesomanyformualsto<i>remeber</i>.
+----------------------------------------------------------------------------------------------------------------------------------
+Timeelapsed:0.15727782249450684
+
+
+2.ConvertingthemodeltoOpenVINOIR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Load the Pytorch model
+LoadthePytorchmodel
 ''''''''''''''''''''''
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-Use the ``AutoModelForTokenClassification`` class to load the pretrained
-pytorch model.
+Usethe``AutoModelForTokenClassification``classtoloadthepretrained
+pytorchmodel.
 
-.. code:: ipython3
+..code::ipython3
 
-    model_id = "m3hrdadfi/typo-detector-distilbert-en"
-    model_dir = Path("pytorch_model")
-    
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-    config = AutoConfig.from_pretrained(model_id)
-    
-    # Save the model to the path if not existing
-    if model_dir.exists():
-        model = AutoModelForTokenClassification.from_pretrained(model_dir)
-    else:
-        model = AutoModelForTokenClassification.from_pretrained(model_id, config=config)
-        model.save_pretrained(model_dir)
+model_id="m3hrdadfi/typo-detector-distilbert-en"
+model_dir=Path("pytorch_model")
 
-Converting to OpenVINO IR
+tokenizer=AutoTokenizer.from_pretrained(model_id)
+config=AutoConfig.from_pretrained(model_id)
+
+#Savethemodeltothepathifnotexisting
+ifmodel_dir.exists():
+model=AutoModelForTokenClassification.from_pretrained(model_dir)
+else:
+model=AutoModelForTokenClassification.from_pretrained(model_id,config=config)
+model.save_pretrained(model_dir)
+
+ConvertingtoOpenVINOIR
 '''''''''''''''''''''''''
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    ov_model_path = Path(model_dir) / "typo_detect.xml"
-    
-    dummy_model_input = tokenizer("This is a sample", return_tensors="pt")
-    ov_model = ov.convert_model(model, example_input=dict(dummy_model_input))
-    ov.save_model(ov_model, ov_model_path)
+ov_model_path=Path(model_dir)/"typo_detect.xml"
+
+dummy_model_input=tokenizer("Thisisasample",return_tensors="pt")
+ov_model=ov.convert_model(model,example_input=dict(dummy_model_input))
+ov.save_model(ov_model,ov_model_path)
 
 
-.. parsed-literal::
+..parsed-literal::
 
-    ['input_ids', 'attention_mask']
+['input_ids','attention_mask']
 
 
 Inference
 '''''''''
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-OpenVINO™ Runtime Python API is used to compile the model in OpenVINO IR
-format. The Core class from the ``openvino`` module is imported first.
-This class provides access to the OpenVINO Runtime API. The ``core``
-object, which is an instance of the ``Core`` class, represents the API
-and it is used to compile the model. The output layer is extracted from
-the compiled model as it is needed for inference.
+OpenVINO™RuntimePythonAPIisusedtocompilethemodelinOpenVINOIR
+format.TheCoreclassfromthe``openvino``moduleisimportedfirst.
+ThisclassprovidesaccesstotheOpenVINORuntimeAPI.The``core``
+object,whichisaninstanceofthe``Core``class,representstheAPI
+anditisusedtocompilethemodel.Theoutputlayerisextractedfrom
+thecompiledmodelasitisneededforinference.
 
-.. code:: ipython3
+..code::ipython3
 
-    compiled_model = core.compile_model(ov_model, device.value)
-    output_layer = compiled_model.output(0)
+compiled_model=core.compile_model(ov_model,device.value)
+output_layer=compiled_model.output(0)
 
-Helper Functions
+HelperFunctions
 ~~~~~~~~~~~~~~~~
 
-`back to top ⬆️ <#Table-of-contents:>`__
+`backtotop⬆️<#table-of-contents>`__
 
-.. code:: ipython3
+..code::ipython3
 
-    def token_to_words(tokens: List[str]) -> Dict[str, int]:
-        """
-        Maps the list of tokens to words in the original text.
-        Built on the feature that tokens starting with '##' is attached to the previous token as tokens derived from the same word.
-    
-        Arguments:
-        tokens -- List of tokens
-    
-        Returns:
-        map_to_words -- Dictionary mapping tokens to words in original text
-        """
-    
-        word_count = -1
-        map_to_words = {}
-        for token in tokens:
-            if token.startswith("##"):
-                map_to_words[token] = word_count
-                continue
-            word_count += 1
-            map_to_words[token] = word_count
-        return map_to_words
+deftoken_to_words(tokens:List[str])->Dict[str,int]:
+"""
+Mapsthelistoftokenstowordsintheoriginaltext.
+Builtonthefeaturethattokensstartingwith'##'isattachedtotheprevioustokenastokensderivedfromthesameword.
 
-.. code:: ipython3
+Arguments:
+tokens--Listoftokens
 
-    def infer(input_text: str) -> Dict[np.ndarray, np.ndarray]:
-        """
-        Creating a generic inference function to read the input and infer the result
-    
-        Arguments:
-        input_text -- The text to be infered (String)
-    
-        Returns:
-        result -- Resulting list from inference
-        """
-    
-        tokens = tokenizer(
-            input_text,
-            return_tensors="np",
-        )
-        inputs = dict(tokens)
-        result = compiled_model(inputs)[output_layer]
-        return result
+Returns:
+map_to_words--Dictionarymappingtokenstowordsinoriginaltext
+"""
 
-.. code:: ipython3
+word_count=-1
+map_to_words={}
+fortokenintokens:
+iftoken.startswith("##"):
+map_to_words[token]=word_count
+continue
+word_count+=1
+map_to_words[token]=word_count
+returnmap_to_words
 
-    def get_typo_indexes(
-        result: Dict[np.ndarray, np.ndarray],
-        map_to_words: Dict[str, int],
-        tokens: List[str],
-    ) -> List[int]:
-        """
-        Given results from the inference and tokens-map-to-words, identifies the indexes of the words with typos.
-    
-        Arguments:
-        result -- Result from inference (tensor)
-        map_to_words -- Dictionary mapping tokens to words (Dictionary)
-    
-        Results:
-        wrong_words -- List of indexes of words with typos
-        """
-    
-        wrong_words = []
-        c = 0
-        result_list = result[0][1:-1]
-        for i in result_list:
-            prob = np.argmax(i)
-            if prob == 1:
-                if map_to_words[tokens[c]] not in wrong_words:
-                    wrong_words.append(map_to_words[tokens[c]])
-            c += 1
-        return wrong_words
+..code::ipython3
 
-.. code:: ipython3
+definfer(input_text:str)->Dict[np.ndarray,np.ndarray]:
+"""
+Creatingagenericinferencefunctiontoreadtheinputandinfertheresult
 
-    def sentence_split(sentence: str) -> List[str]:
-        """
-        Split the sentence into words and characters
-    
-        Arguments:
-        sentence - Sentence to be split (string)
-    
-        Returns:
-        splitted -- List of words and characters
-        """
-    
-        splitted = re.split("([',. ])", sentence)
-        splitted = [x for x in splitted if x != " " and x != ""]
-        return splitted
+Arguments:
+input_text--Thetexttobeinfered(String)
 
-.. code:: ipython3
+Returns:
+result--Resultinglistfrominference
+"""
 
-    def show_typos(sentence: str):
-        """
-        Detect typos from the given sentence.
-        Writes both the original input and typo-tagged version to the terminal.
-    
-        Arguments:
-        sentence -- Sentence to be evaluated (string)
-        """
-    
-        tokens = tokenizer.tokenize(sentence)
-        map_to_words = token_to_words(tokens)
-        result = infer(sentence)
-        typo_indexes = get_typo_indexes(result, map_to_words, tokens)
-    
-        sentence_words = sentence_split(sentence)
-    
-        typos = [sentence_words[i] for i in typo_indexes]
-    
-        detected = sentence
-        for typo in typos:
-            detected = detected.replace(typo, f"<i>{typo}</i>")
-    
-        print("   [Input]: ", sentence)
-        print("[Detected]: ", detected)
-        print("-" * 130)
+tokens=tokenizer(
+input_text,
+return_tensors="np",
+)
+inputs=dict(tokens)
+result=compiled_model(inputs)[output_layer]
+returnresult
 
-Let’s run a demo using the converted OpenVINO IR model.
+..code::ipython3
 
-.. code:: ipython3
+defget_typo_indexes(
+result:Dict[np.ndarray,np.ndarray],
+map_to_words:Dict[str,int],
+tokens:List[str],
+)->List[int]:
+"""
+Givenresultsfromtheinferenceandtokens-map-to-words,identifiestheindexesofthewordswithtypos.
 
-    sentences = [
-        "He had also stgruggled with addiction during his time in Congress .",
-        "The review thoroughla assessed all aspects of JLENS SuR and CPG esign maturit and confidence .",
-        "Letterma also apologized two his staff for the satyation .",
-        "Vincent Jay had earlier won France 's first gold in gthe 10km biathlon sprint .",
-        "It is left to the directors to figure out hpw to bring the stry across to tye audience .",
-        "I wnet to the park yestreday to play foorball with my fiends, but it statred to rain very hevaily and we had to stop.",
-        "My faorite restuarant servs the best spahgetti in the town, but they are always so buzy that you have to make a resrvation in advnace.",
-        "I was goig to watch a mvoie on Netflx last night, but the straming was so slow that I decided to cancled my subscrpition.",
-        "My freind and I went campign in the forest last weekend and saw a beutiful sunst that was so amzing it took our breth away.",
-        "I  have been stuying for my math exam all week, but I'm stil not very confidet that I will pass it, because there are so many formuals to remeber.",
-    ]
-    
-    start = time.time()
-    
-    for sentence in sentences:
-        show_typos(sentence)
-    
-    print(f"Time elapsed: {time.time() - start}")
+Arguments:
+result--Resultfrominference(tensor)
+map_to_words--Dictionarymappingtokenstowords(Dictionary)
+
+Results:
+wrong_words--Listofindexesofwordswithtypos
+"""
+
+wrong_words=[]
+c=0
+result_list=result[0][1:-1]
+foriinresult_list:
+prob=np.argmax(i)
+ifprob==1:
+ifmap_to_words[tokens[c]]notinwrong_words:
+wrong_words.append(map_to_words[tokens[c]])
+c+=1
+returnwrong_words
+
+..code::ipython3
+
+defsentence_split(sentence:str)->List[str]:
+"""
+Splitthesentenceintowordsandcharacters
+
+Arguments:
+sentence-Sentencetobesplit(string)
+
+Returns:
+splitted--Listofwordsandcharacters
+"""
+
+splitted=re.split("([',.])",sentence)
+splitted=[xforxinsplittedifx!=""andx!=""]
+returnsplitted
+
+..code::ipython3
+
+defshow_typos(sentence:str):
+"""
+Detecttyposfromthegivensentence.
+Writesboththeoriginalinputandtypo-taggedversiontotheterminal.
+
+Arguments:
+sentence--Sentencetobeevaluated(string)
+"""
+
+tokens=tokenizer.tokenize(sentence)
+map_to_words=token_to_words(tokens)
+result=infer(sentence)
+typo_indexes=get_typo_indexes(result,map_to_words,tokens)
+
+sentence_words=sentence_split(sentence)
+
+typos=[sentence_words[i]foriintypo_indexes]
+
+detected=sentence
+fortypointypos:
+detected=detected.replace(typo,f"<i>{typo}</i>")
+
+print("[Input]:",sentence)
+print("[Detected]:",detected)
+print("-"*130)
+
+Let’srunademousingtheconvertedOpenVINOIRmodel.
+
+..code::ipython3
+
+sentences=[
+"HehadalsostgruggledwithaddictionduringhistimeinCongress.",
+"ThereviewthoroughlaassessedallaspectsofJLENSSuRandCPGesignmaturitandconfidence.",
+"Lettermaalsoapologizedtwohisstaffforthesatyation.",
+"VincentJayhadearlierwonFrance'sfirstgoldingthe10kmbiathlonsprint.",
+"Itislefttothedirectorstofigureouthpwtobringthestryacrosstotyeaudience.",
+"Iwnettotheparkyestredaytoplayfoorballwithmyfiends,butitstatredtorainveryhevailyandwehadtostop.",
+"Myfaoriterestuarantservsthebestspahgettiinthetown,buttheyarealwayssobuzythatyouhavetomakearesrvationinadvnace.",
+"IwasgoigtowatchamvoieonNetflxlastnight,butthestramingwassoslowthatIdecidedtocancledmysubscrpition.",
+"MyfreindandIwentcampignintheforestlastweekendandsawabeutifulsunstthatwassoamzingittookourbrethaway.",
+"Ihavebeenstuyingformymathexamallweek,butI'mstilnotveryconfidetthatIwillpassit,becausetherearesomanyformualstoremeber.",
+]
+
+start=time.time()
+
+forsentenceinsentences:
+show_typos(sentence)
+
+print(f"Timeelapsed:{time.time()-start}")
 
 
-.. parsed-literal::
+..parsed-literal::
 
-       [Input]:  He had also stgruggled with addiction during his time in Congress .
-    [Detected]:  He had also <i>stgruggled</i> with addiction during his time in Congress .
-    ----------------------------------------------------------------------------------------------------------------------------------
-       [Input]:  The review thoroughla assessed all aspects of JLENS SuR and CPG esign maturit and confidence .
-    [Detected]:  The review <i>thoroughla</i> assessed all aspects of JLENS SuR and CPG <i>esign</i> <i>maturit</i> and confidence .
-    ----------------------------------------------------------------------------------------------------------------------------------
-       [Input]:  Letterma also apologized two his staff for the satyation .
-    [Detected]:  <i>Letterma</i> also apologized <i>two</i> his staff for the <i>satyation</i> .
-    ----------------------------------------------------------------------------------------------------------------------------------
-       [Input]:  Vincent Jay had earlier won France 's first gold in gthe 10km biathlon sprint .
-    [Detected]:  Vincent Jay had earlier won France 's first gold in <i>gthe</i> 10km biathlon sprint .
-    ----------------------------------------------------------------------------------------------------------------------------------
-       [Input]:  It is left to the directors to figure out hpw to bring the stry across to tye audience .
-    [Detected]:  It is left to the directors to figure out <i>hpw</i> to bring the <i>stry</i> across to <i>tye</i> audience .
-    ----------------------------------------------------------------------------------------------------------------------------------
-       [Input]:  I wnet to the park yestreday to play foorball with my fiends, but it statred to rain very hevaily and we had to stop.
-    [Detected]:  I <i>wnet</i> to the park <i>yestreday</i> to play <i>foorball</i> with my <i>fiends</i>, but it <i>statred</i> to rain very <i>hevaily</i> and we had to stop.
-    ----------------------------------------------------------------------------------------------------------------------------------
-       [Input]:  My faorite restuarant servs the best spahgetti in the town, but they are always so buzy that you have to make a resrvation in advnace.
-    [Detected]:  My <i>faorite</i> <i>restuarant</i> <i>servs</i> the best <i>spahgetti</i> in the town, but they are always so <i>buzy</i> that you have to make a <i>resrvation</i> in <i>advnace</i>.
-    ----------------------------------------------------------------------------------------------------------------------------------
-       [Input]:  I was goig to watch a mvoie on Netflx last night, but the straming was so slow that I decided to cancled my subscrpition.
-    [Detected]:  I was <i>goig</i> to watch a <i>mvoie</i> on <i>Netflx</i> last night, but the <i>straming</i> was so slow that I decided to <i>cancled</i> my <i>subscrpition</i>.
-    ----------------------------------------------------------------------------------------------------------------------------------
-       [Input]:  My freind and I went campign in the forest last weekend and saw a beutiful sunst that was so amzing it took our breth away.
-    [Detected]:  My <i>freind</i> and I went <i>campign</i> in the forest last weekend and saw a <i>beutiful</i> <i>sunst</i> that was so <i>amzing</i> it took our <i>breth</i> away.
-    ----------------------------------------------------------------------------------------------------------------------------------
-       [Input]:  I  have been stuying for my math exam all week, but I'm stil not very confidet that I will pass it, because there are so many formuals to remeber.
-    [Detected]:  I  have been <i>stuying</i> for my math exam all week, but I'm <i>stil</i> not very <i>confidet</i> that I will pass it, because there are so many formuals to <i>remeber</i>.
-    ----------------------------------------------------------------------------------------------------------------------------------
-    Time elapsed: 0.10021185874938965
+[Input]:HehadalsostgruggledwithaddictionduringhistimeinCongress.
+[Detected]:Hehadalso<i>stgruggled</i>withaddictionduringhistimeinCongress.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:ThereviewthoroughlaassessedallaspectsofJLENSSuRandCPGesignmaturitandconfidence.
+[Detected]:Thereview<i>thoroughla</i>assessedallaspectsofJLENSSuRandCPG<i>esign</i><i>maturit</i>andconfidence.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:Lettermaalsoapologizedtwohisstaffforthesatyation.
+[Detected]:<i>Letterma</i>alsoapologized<i>two</i>hisstaffforthe<i>satyation</i>.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:VincentJayhadearlierwonFrance'sfirstgoldingthe10kmbiathlonsprint.
+[Detected]:VincentJayhadearlierwonFrance'sfirstgoldin<i>gthe</i>10kmbiathlonsprint.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:Itislefttothedirectorstofigureouthpwtobringthestryacrosstotyeaudience.
+[Detected]:Itislefttothedirectorstofigureout<i>hpw</i>tobringthe<i>stry</i>acrossto<i>tye</i>audience.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:Iwnettotheparkyestredaytoplayfoorballwithmyfiends,butitstatredtorainveryhevailyandwehadtostop.
+[Detected]:I<i>wnet</i>tothepark<i>yestreday</i>toplay<i>foorball</i>withmy<i>fiends</i>,butit<i>statred</i>torainvery<i>hevaily</i>andwehadtostop.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:Myfaoriterestuarantservsthebestspahgettiinthetown,buttheyarealwayssobuzythatyouhavetomakearesrvationinadvnace.
+[Detected]:My<i>faorite</i><i>restuarant</i><i>servs</i>thebest<i>spahgetti</i>inthetown,buttheyarealwaysso<i>buzy</i>thatyouhavetomakea<i>resrvation</i>in<i>advnace</i>.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:IwasgoigtowatchamvoieonNetflxlastnight,butthestramingwassoslowthatIdecidedtocancledmysubscrpition.
+[Detected]:Iwas<i>goig</i>towatcha<i>mvoie</i>on<i>Netflx</i>lastnight,butthe<i>straming</i>wassoslowthatIdecidedto<i>cancled</i>my<i>subscrpition</i>.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:MyfreindandIwentcampignintheforestlastweekendandsawabeutifulsunstthatwassoamzingittookourbrethaway.
+[Detected]:My<i>freind</i>andIwent<i>campign</i>intheforestlastweekendandsawa<i>beutiful</i><i>sunst</i>thatwasso<i>amzing</i>ittookour<i>breth</i>away.
+----------------------------------------------------------------------------------------------------------------------------------
+[Input]:Ihavebeenstuyingformymathexamallweek,butI'mstilnotveryconfidetthatIwillpassit,becausetherearesomanyformualstoremeber.
+[Detected]:Ihavebeen<i>stuying</i>formymathexamallweek,butI'm<i>stil</i>notvery<i>confidet</i>thatIwillpassit,becausetherearesomanyformualsto<i>remeber</i>.
+----------------------------------------------------------------------------------------------------------------------------------
+Timeelapsed:0.10021185874938965
 
