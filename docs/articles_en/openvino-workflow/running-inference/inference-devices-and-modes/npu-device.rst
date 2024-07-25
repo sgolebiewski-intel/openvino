@@ -163,81 +163,79 @@ offer a limited set of supported OpenVINO features.
    based on the performance mode is **4 for THROUGHPUT** and **1 for LATENCY**.
    The default mode for the NPU device is LATENCY.
 
-**ov::intel_npu::compilation_mode_params**
+**Supported Features:**
 
-``ov::intel_npu::compilation_mode_params`` is an NPU-specific property that allows
-control of model compilation for NPU.
+* **ov::intel_npu::compilation_mode_params**
 
-.. note::
+  ``ov::intel_npu::compilation_mode_params`` is an NPU-specific property that allows
+  control of model compilation for NPU.
 
-   The functionality is in experimental stage currently, can be a subject for
-   deprecation and may be replaced with generic OV API in future OV releases.
+  .. note::
 
-Following configuration options are supported:
+     The functionality is in experimental stage currently, can be a subject for
+     deprecation and may be replaced with generic OV API in future OV releases.
 
-**optimization-level**
+  Following configuration options are supported:
 
-Defines an optimization effort hint to the compiler.
+* **optimization-level**
 
-.. list-table::
-   :widths: 10 200
-   :header-rows: 1
+  Defines an optimization effort hint to the compiler.
 
-   * - **Value**
-     - **Description**
-   * - 0
-     - Reduced subset of optimization passes. May result in smaller compile time.
-   * - 1
-     - **Default.** Balanced performance/compile time.
-   * - 2
-     - Prioritize performance over compile time that may be an issue.
+  .. list-table::
+     :widths: 10 200
+     :header-rows: 1
 
-**performance-hint-override**
+     * - **Value**
+       - **Description**
+     * - 0
+       - Reduced subset of optimization passes. May result in smaller compile time.
+     * - 1
+       - **Default.** Balanced performance/compile time.
+     * - 2
+       - Prioritize performance over compile time that may be an issue.
 
-The LATENCY mode can be overridden by specifying ``ov::hint::performance_mode``
-Has no effect for other ``ov::hint::PerformanceMode`` hints.
+* **performance-hint-override**
 
-.. list-table::
-   :widths: 10 200
-   :header-rows: 1
+  The LATENCY mode can be overridden by specifying ``ov::hint::performance_mode``
+  Has no effect for other ``ov::hint::PerformanceMode`` hints.
 
-   * - **Value**
-     - **Description**
-   * - efficiency
-     - **Default.** Balanced performance and power consumption.
-   * - latency
-     - Prioritize performance over power efficiency.
+  .. list-table::
+     :widths: 10 200
+     :header-rows: 1
 
-.. tab-set::
+     * - **Value**
+       - **Description**
+     * - efficiency
+       - **Default.** Balanced performance and power consumption.
+     * - latency
+       - Prioritize performance over power efficiency.
 
-   .. tab-item:: Usage example
+  * Usage example:
 
-      .. code-block::
+    .. code-block::
 
-         map<str, str> config = {ov::intel_npu::compilation_mode_params.name(), ov::Any("optimization-level=1 performance-hint-override=latency")};
+       map<str, str> config = {ov::intel_npu::compilation_mode_params.name(), ov::Any("optimization-level=1 performance-hint-override=latency")};
 
-         compile_model(model, config);
+       compile_model(model, config);
 
-**npu_turbo**
+* **npu_turbo**
 
-The turbo mode, where available, provides a hint to the system to maintain the
-maximum NPU frequency and memory throughput within the platform TDP limits.
-The turbo mode is not recommended for sustainable workloads due to higher power
-consumption and potential impact on other compute resources.
+  The turbo mode, where available, provides a hint to the system to maintain the
+  maximum NPU frequency and memory throughput within the platform TDP limits.
+  The turbo mode is not recommended for sustainable workloads due to higher power
+  consumption and potential impact on other compute resources.
 
-.. tab-set::
+  * Usage examples:
 
-   .. tab-item:: Usage example
+    .. code-block::
 
-      .. code-block::
+       core.set_property("NPU", ov::intel_npu::turbo(true));
 
-         core.set_property("NPU", ov::intel_npu::turbo(true));
+    or
 
-      or
+    .. code-block::
 
-      .. code-block::
-
-         core.compile_model(ov_model, "NPU", {ov::intel_npu::turbo(true)});
+       core.compile_model(ov_model, "NPU", {ov::intel_npu::turbo(true)});
 
 
 Limitations
@@ -245,12 +243,12 @@ Limitations
 
 * Currently, only models with static shapes are supported on NPU.
 
-**Import/Export:**
+* **Import/Export:**
 
-Offline compilation and blob import is supported only for development purposes.
-Pre-compiled models (blobs) are not recommended to be used in production.
-Blob compatibility across different OpenVINO / NPU Driver versions is not
-guaranteed.
+  Offline compilation and blob import is supported only for development purposes.
+  Pre-compiled models (blobs) are not recommended to be used in production.
+  Blob compatibility across different OpenVINO / NPU Driver versions is not
+  guaranteed.
 
 Additional Resources
 #############################
