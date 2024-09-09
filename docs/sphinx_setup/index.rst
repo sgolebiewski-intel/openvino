@@ -149,6 +149,14 @@ Key Features
 ++++++++++++++++++++++++++++
 
 
+.. button-link:: about-openvino.html
+   :color: primary
+   :outline:
+   :align: right
+   :class: key-feat-btn
+
+   See all features
+
 .. grid:: 2 2 2 2
    :class-container: homepage_begin_container
 
@@ -179,6 +187,7 @@ Key Features
       :shadow: none
 
       In applications where fast start-up is required, OpenVINO significantly reduces first-inference latency by using the CPU for initial inference and then switching to another device once the model has been compiled and loaded to memory. Compiled models are cached, improving start-up time even more.
+
 
 
 .. toctree::
