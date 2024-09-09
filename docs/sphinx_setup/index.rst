@@ -180,9 +180,11 @@ Key Features
 
       In applications where fast start-up is required, OpenVINO significantly reduces first-inference latency by using the CPU for initial inference and then switching to another device once the model has been compiled and loaded to memory. Compiled models are cached, improving start-up time even more.
 
-.. rst-class:: sd-sphinx-override sd-btn sd-text-wrap sd-btn-outline-primary reference external
+.. button-link:: about-openvino.html
+   :color: primary
+   :outline:
 
-   :doc:`See all features <about-openvino>`
+   See all features
 
 .. toctree::
    :maxdepth: 2
