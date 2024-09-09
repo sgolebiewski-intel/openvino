@@ -164,10 +164,6 @@ h1 {
 }
 
 p.sd-card-text > .sd-btn-outline-primary {
-    color: #0054AE !important;
-    text-decoration: none !important;
-    background-color: #FFF !important;
-    border-radius: 0;
     position: absolute;
     bottom: 20px;
 }
