@@ -183,7 +183,7 @@ Key Features
 .. button-link:: about-openvino.html
    :color: primary
    :outline:
-   :class: fixit
+   :align: right
 
    See all features
 
