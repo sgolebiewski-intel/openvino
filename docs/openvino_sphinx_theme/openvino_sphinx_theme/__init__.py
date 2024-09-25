@@ -92,7 +92,7 @@ def read_doxygen_configs(app, env, docnames):
             app.config.html_context['doxygen_mapping_file'] = dict()
 
 def get_branch_name():
-    branch_name = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip().decode()
+    branch_name = subprocess.check_output(['git', 'branch', '--show-current']).strip().decode()
     if not branch_name:
         raise Exception("This is neither a valid branch name nor any repository.", branch_name)
     return branch_name
