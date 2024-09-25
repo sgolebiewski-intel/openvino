@@ -438,4 +438,5 @@ Additional Resources
 * :doc:`OpenVINO™ Runtime Preprocessing <optimize-inference/optimize-preprocessing>`
 * :doc:`String Tensors <string-tensors>`
 * :ref:`Using Encrypted Models with OpenVINO <encrypted-models>`
+:ovlink:`Hello Classification Sample on Github <samples/python/hello_classification/README.md>`
 
