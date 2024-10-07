@@ -229,9 +229,22 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
 def replace_design_tabs_script(app, exception):
     shutil.copy("../../../docs/sphinx_setup/_static/design-tabs.js","../_build/_static/design-tabs.js")
 
-rst_prolog = """
-.. |prio-0.5| replace:: <!-- priority: 0.5 -->
-.. |prio-0.6| replace:: <!-- priority: 0.6 -->
+rst_epilog = """\
+.. raw:: html
+
+   <!-- Priority: 0.4 -->
+"""
+
+rst_prolog = """\
+.. |prio_05| raw:: html
+
+   <!-- Priority: 0.5 -->
+.. |prio_06| raw:: html
+
+   <!-- Priority: 0.6 -->
+.. |prio_07| raw:: html
+
+   <!-- Priority: 0.7 -->
 """
 
 def setup(app):
