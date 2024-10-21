@@ -27,6 +27,7 @@ sample shows basic usage of the ``Text2ImagePipeline`` pipeline.
             :name: maincpp
 
             .. code-block:: cpp
+               :emphasize-lines: 8-19
 
                #include "openvino/genai/text2image/pipeline.hpp"
 
@@ -55,6 +56,7 @@ sample shows basic usage of the ``Text2ImagePipeline`` pipeline.
             :name: loracpp
 
             .. code-block:: cpp
+               :emphasize-lines: 8-38
 
                #include "openvino/genai/text2image/pipeline.hpp"
 
@@ -163,6 +165,7 @@ and use audio files in WAV format at a sampling rate of 16 kHz as input.
       :sync: cpp
 
       .. code-block:: cpp
+         :emphasize-lines: 6-31
 
          int main(int argc, char* argv[]) {
              if (3 > argc) {
@@ -260,6 +263,7 @@ mark a conversation session, as shown in the samples below:
       :sync: cpp
 
       .. code-block:: cpp
+        :emphasize-lines: 10-29
 
          #include "openvino/genai/llm_pipeline.hpp"
 
