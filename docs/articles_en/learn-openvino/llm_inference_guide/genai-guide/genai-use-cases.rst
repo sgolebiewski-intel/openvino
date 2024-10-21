@@ -29,12 +29,12 @@ sample shows basic usage of the ``Text2ImagePipeline`` pipeline.
             .. code-block:: cpp
                :emphasize-lines: 8-19
 
-               #include "openvino/genai/text2image/pipeline.hpp"
+               // #include "openvino/genai/text2image/pipeline.hpp"
 
-               #include "imwrite.hpp"
+               // #include "imwrite.hpp"
 
-               int32_t main(int32_t argc, char* argv[]) {
-                   OPENVINO_ASSERT(argc == 3, "Usage: ", argv[0], " <MODEL_DIR> '<PROMPT>'");
+               // int32_t main(int32_t argc, char* argv[]) {
+               //     OPENVINO_ASSERT(argc == 3, "Usage: ", argv[0], " <MODEL_DIR> '<PROMPT>'");
 
                    const std::string models_path = argv[1], prompt = argv[2];
                    const std::string device = "CPU";  // GPU, NPU can be used as well.
@@ -49,8 +49,8 @@ sample shows basic usage of the ``Text2ImagePipeline`` pipeline.
                    // Saves images with a `num_images_per_prompt` name pattern.
                    imwrite("image_%d.bmp", image, true);
 
-                   return EXIT_SUCCESS;
-               }
+               //     return EXIT_SUCCESS;
+               // }
 
          .. tab-item:: LoRA.cpp
             :name: loracpp
@@ -167,10 +167,10 @@ and use audio files in WAV format at a sampling rate of 16 kHz as input.
       .. code-block:: cpp
          :emphasize-lines: 6-31
 
-         int main(int argc, char* argv[]) {
-             if (3 > argc) {
-                 throw std::runtime_error(std::string{"Usage: "} + argv[0] + " <MODEL_DIR> \"<WAV_FILE_PATH>\"");
-             }
+         // int main(int argc, char* argv[]) {
+         //    if (3 > argc) {
+         //        throw std::runtime_error(std::string{"Usage: "} + argv[0] + " <MODEL_DIR> \"<WAV_FILE_PATH>\"");
+         //    }
 
              std::string model_path = argv[1];
              std::string wav_file_path = argv[2];
