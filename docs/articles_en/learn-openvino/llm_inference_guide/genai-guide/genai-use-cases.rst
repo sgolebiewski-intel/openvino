@@ -55,49 +55,10 @@ sample shows basic usage of the ``Text2ImagePipeline`` pipeline.
          .. tab-item:: LoRA.cpp
             :name: loracpp
 
-            .. code-block:: cpp
+            .. literalinclude:: https://raw.githubusercontent.com/openvinotoolkit/openvino.genai/refs/heads/master/samples/cpp/text2image/lora.cpp
                :emphasize-lines: 8-38
+               :language: cpp
 
-               #include "openvino/genai/text2image/pipeline.hpp"
-
-               #include "imwrite.hpp"
-
-               int32_t main(int32_t argc, char* argv[]) {
-                   OPENVINO_ASSERT(argc >= 3 && (argc - 3) % 2 == 0, "Usage: ", argv[0], " <MODEL_DIR> '<PROMPT>' [<LORA_SAFETENSORS> <ALPHA> ...]]");
-
-                   const std::string models_path = argv[1], prompt = argv[2];
-                   const std::string device = "CPU";  // GPU, NPU can be used as well.
-
-                   ov::genai::AdapterConfig adapter_config;
-                   // Applying Multiple LoRA adapters simultaneously is supported. Parse them all and the corresponding alphas from cmd parameters:
-                   for(size_t i = 0; i < (argc - 3)/2; ++i) {
-                       ov::genai::Adapter adapter(argv[3 + 2*i]);
-                       float alpha = std::atof(argv[3 + 2*i + 1]);
-                       adapter_config.add(adapter, alpha);
-                   }
-
-                   // LoRA adapters passed to the constructor will be activated by default in the next generation.
-                   ov::genai::Text2ImagePipeline pipe(models_path, device, ov::genai::adapters(adapter_config));
-
-                   std::cout << "Generating image with LoRA adapters applied, resulting image will be in lora.bmp\n";
-                   ov::Tensor image = pipe.generate(prompt,
-                       ov::genai::random_generator(std::make_shared<ov::genai::CppStdGenerator>(42)),
-                       ov::genai::width(512),
-                       ov::genai::height(896),
-                       ov::genai::num_inference_steps(20));
-                   imwrite("lora.bmp", image, true);
-
-                   std::cout << "Generating image without LoRA adapters applied, resulting image will be in baseline.bmp\n";
-                   image = pipe.generate(prompt,
-                       ov::genai::adapters(),  // Passing adapters as generation overrides set in the constructor; adapters() means no adapters.
-                       ov::genai::random_generator(std::make_shared<ov::genai::CppStdGenerator>(42)),
-                       ov::genai::width(512),
-                       ov::genai::height(896),
-                       ov::genai::num_inference_steps(20));
-                   imwrite("baseline.bmp", image, true);
-
-                   return EXIT_SUCCESS;
-               }
 
 
       For more information, refer to the
