@@ -76,8 +76,11 @@ is installed in your environment by running the following command:
    pip install optimum[openvino]
 
 If the model comes from `Hugging Face <https://huggingface.co/models>`__ and is supported
-by Optimum, it may be easier to use the Optimum Intel API to perform weight compression
-when the model is loaded with the ``load_in_8bit=True`` parameter.
+by Optimum, it may be easier to use the **Optimum Intel API**, which employs NNCF weight
+compression capabilities to optimize various large Transformer models.
+The NNCF ``nncf.compress_weights()`` API, with most of its options, is exposed in the
+``.from_pretrained()`` method of Optimum Intel classes. Optimum also has several datasets
+for data-aware quantization available out-of-the-box.
 
 .. tab-set::
 
@@ -114,12 +117,23 @@ when the model is loaded with the ``load_in_8bit=True`` parameter.
 
       .. code-block:: python
 
-         from optimum.intel.openvino import OVModelForCausalLM
+         from optimum.intel.openvino import OVModelForCausalLM, OVWeightQuantizationConfig
          from transformers import AutoTokenizer, pipeline
 
-         # Load a model and compress it with Optimum Intel.
-         model_id = "HuggingFaceH4/zephyr-7b-beta"
-         model = OVModelForCausalLM.from_pretrained(model_id, export=True, load_in_8bit=True)
+         # Load and compress model from Hugging Face
+         model_id = "microsoft/Phi-3.5-mini-instruct"
+         model = OVModelForCausalLM.from_pretrained(
+             model_id,
+             export=True,
+             quantization_config=OVWeightQuantizationConfig(
+                 bits=8,
+                 quant_method="awq",
+                 scale_estimation=True,
+                 dataset="wikitext2",
+                 group_size=64,
+                 ratio=1.0
+             )
+         )
 
          # Inference
          tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -127,6 +141,10 @@ when the model is loaded with the ``load_in_8bit=True`` parameter.
          phrase = "The weather is"
          results = pipe(phrase)
          print(results)
+
+
+      For more details, refer to the article on how to
+      :doc:`infer LLMs using Optimum Intel <learn-openvino/llm_inference_guide/llm-inference-hf>`.
 
 The model can also be :ref:`saved into a compressed format <save_pretrained>`,
 resulting in a smaller binary file.
@@ -225,48 +243,6 @@ For data-aware weight compression refer to the following
    Some methods can be stacked on top of one another to achieve a better
    accuracy-performance trade-off after weight quantization. For example, the **Scale Estimation**
    method can be applied along with **AWQ** and mixed-precision quantization (the ``ratio`` parameter).
-
-
-**Hugging Face Optimum-Intel API**
-
-Hugging Face Optimum-Intel provides an easy way to use NNCF Weight Compression capabilities to optimize
-various large Transformer models. Most of the options of the NNCF ``nncf.compress_weights()`` API are
-exposed in the ``.from_pretrained()`` method of Optimum-Intel classes. Optimum also has several datasets
-for data-aware quantization available out-of-the-box.
-The example below shows data-free 4-bit weight quantization
-applied on top of OpenVINO IR. Before trying the example, make sure Optimum Intel
-is installed in your environment by running the following command:
-
-.. code-block:: python
-
-   pip install optimum[openvino]
-
-.. code-block:: python
-
-   from optimum.intel.openvino import OVModelForCausalLM, OVWeightQuantizationConfig
-   from transformers import AutoTokenizer, pipeline
-
-   # Load and compress model from Hugging Face
-   model_id = "microsoft/Phi-3.5-mini-instruct"
-   model = OVModelForCausalLM.from_pretrained(
-       model_id,
-       export=True,
-       quantization_config=OVWeightQuantizationConfig(
-           bits=4,
-           quant_method="awq",
-           scale_estimation=True,
-           dataset="wikitext2",
-           group_size=64,
-           ratio=1.0
-       )
-   )
-
-   # Inference
-   tokenizer = AutoTokenizer.from_pretrained(model_id)
-   pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
-   phrase = "The weather is"
-   results = pipe(phrase)
-   print(results)
 
 
 Exporting and Loading Compressed Models
