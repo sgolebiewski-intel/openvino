@@ -97,7 +97,7 @@ for data-aware quantization available out-of-the-box.
         from transformers import AutoTokenizer, pipeline
 
         # Load a model and compress it with NNCF.
-        model_id = "HuggingFaceH4/zephyr-7b-beta"
+        model_id = "microsoft/Phi-3.5-mini-instruct"
         model = OVModelForCausalLM.from_pretrained(model_id, export=True, load_in_8bit=False, compile=False)
         model.model = compress_weights(model.model, mode=CompressWeightsMode.INT8_ASYM)
 
@@ -142,6 +142,12 @@ for data-aware quantization available out-of-the-box.
          results = pipe(phrase)
          print(results)
 
+
+      You can also use the optimum-cli command line tool to the same effect:
+
+      .. code-block:: sh
+
+         optimum-cli export openvino --model microsoft/Phi-3.5-mini-instruct --weight-format int8 ov_phi-3.5-mini-instruct
 
       For more details, refer to the article on how to
       :doc:`infer LLMs using Optimum Intel <learn-openvino/llm_inference_guide/llm-inference-hf>`.
