@@ -143,8 +143,7 @@ environment by running the following command:
    pip install optimum[openvino]
 
 If the model comes from `Hugging Face <https://huggingface.co/models>`__ and is supported
-by Optimum, it may be easier to use the Optimum Intel API to perform weight compression
-when the model is loaded with the ``load_in_4bit=True`` parameter.
+by Optimum, it may be easier to use the Optimum Intel API to perform weight compression.
 
 .. tab-set::
 
@@ -184,7 +183,7 @@ when the model is loaded with the ``load_in_4bit=True`` parameter.
          from optimum.intel.openvino import OVModelForCausalLM, OVWeightQuantizationConfig
          from transformers import AutoTokenizer, pipeline
 
-         # Load and compress model from Hugging Face
+         # Load and compress a model from Hugging Face.
          model_id = "microsoft/Phi-3.5-mini-instruct"
          model = OVModelForCausalLM.from_pretrained(
              model_id,
@@ -209,9 +208,9 @@ when the model is loaded with the ``load_in_4bit=True`` parameter.
 
       You can also use the optimum-cli command line tool to the same effect:
 
-      .. code-block:: sh
+      .. code-block:: console
 
-         optimum-cli export openvino --model microsoft/Phi-3.5-mini-instruct --weight-format int4 ov_phi-3.5-mini-instruct
+         optimum-cli export openvino --model microsoft/Phi-3.5-mini-instruct --weight-format int4 --awq --scale-estimation --dataset wikitext2 --group-size 64 --ratio 1.0 ov_phi-3.5-mini-instruct
 
       For more details, refer to the article on how to
       :doc:`infer LLMs using Optimum Intel <learn-openvino/llm_inference_guide/llm-inference-hf>`.

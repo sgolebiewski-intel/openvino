@@ -120,7 +120,7 @@ for data-aware quantization available out-of-the-box.
          from optimum.intel.openvino import OVModelForCausalLM, OVWeightQuantizationConfig
          from transformers import AutoTokenizer, pipeline
 
-         # Load and compress model from Hugging Face
+         # Load and compress a model from Hugging Face.
          model_id = "microsoft/Phi-3.5-mini-instruct"
          model = OVModelForCausalLM.from_pretrained(
              model_id,
@@ -145,9 +145,9 @@ for data-aware quantization available out-of-the-box.
 
       You can also use the optimum-cli command line tool to the same effect:
 
-      .. code-block:: sh
+      .. code-block:: console
 
-         optimum-cli export openvino --model microsoft/Phi-3.5-mini-instruct --weight-format int8 ov_phi-3.5-mini-instruct
+         optimum-cli export openvino --model microsoft/Phi-3.5-mini-instruct --weight-format int4 --awq --scale-estimation --dataset wikitext2 --group-size 64 --ratio 1.0 ov_phi-3.5-mini-instruct
 
       For more details, refer to the article on how to
       :doc:`infer LLMs using Optimum Intel <learn-openvino/llm_inference_guide/llm-inference-hf>`.
@@ -228,7 +228,7 @@ for details of the usage.
    synthetic_dataset = nncf.data.generate_text_data(hf_model, tokenizer, dataset_size=100)
    quantization_dataset = nncf.Dataset(
        synthetic_dataset,
-       transform_fn # see example in NNCF repo how to make transform_fn
+       transform_fn # See the example in NNCF repo to learn how to make transform_fn.
    )
 
    model = compress_weights(
@@ -239,7 +239,7 @@ for details of the usage.
        dataset=quantization_dataset,
        awq=True,
        scale_estimation=True
-   )  # model is openvino.Model
+   )  # The model is openvino.Model.
 
 For data-aware weight compression refer to the following
 `example <https://github.com/openvinotoolkit/nncf/tree/develop/examples/llm_compression/openvino/tiny_llama>`__.
@@ -270,6 +270,11 @@ load the compressed model later for faster time to first inference.
    # Load a saved model
    model = OVModelForCausalLM.from_pretrained("Phi-3.5-mini-instruct-int4-sym-ov")
    tokenizer = AutoTokenizer.from_pretrained("Phi-3.5-mini-instruct-int4-sym-ov")
+
+.. tip::
+
+   Models optimized with with NNCF or Optimum Intel can be used with
+   :doc:`OpenVINO GenAI <../../learn-openvino/llm_inference_guide/genai-guide>`
 
 
 Auto-tuning of Weight Compression Parameters
