@@ -150,7 +150,7 @@ for data-aware quantization available out-of-the-box.
          optimum-cli export openvino --model microsoft/Phi-3.5-mini-instruct --weight-format int4 --awq --scale-estimation --dataset wikitext2 --group-size 64 --ratio 1.0 ov_phi-3.5-mini-instruct
 
       For more details, refer to the article on how to
-      :doc:`infer LLMs using Optimum Intel <learn-openvino/llm_inference_guide/llm-inference-hf>`.
+      :doc:`infer LLMs using Optimum Intel <../../learn-openvino/llm_inference_guide/llm-inference-hf>`.
 
 The model can also be :ref:`saved into a compressed format <save_pretrained>`,
 resulting in a smaller binary file.
