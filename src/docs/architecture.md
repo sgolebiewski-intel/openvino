@@ -16,11 +16,9 @@ Each OpenVINO component is projected with using DOTADIW (Do One Thing And Do It 
 ```mermaid
 flowchart TB
     subgraph tools [Tools]
-        mo{{Model Optimizer}}
-        pot{{PoT}}
-    
-        style mo fill:#6c9f7f
-        style pot fill:#6c9f7f
+        conv{{Model Conversion API}}
+
+        style conv fill:#6c9f7f
     end
     subgraph tutorials [Tutorials]
         samples[Samples]
@@ -34,7 +32,7 @@ flowchart TB
             python_api[Python]
         end
     end
-    
+
     subgraph plugins [OV Plugins]
         auto(["AUTO"])
         cpu(["Intel_CPU"])
@@ -47,7 +45,7 @@ flowchart TB
         paddle_fe["Paddle Frontend"]
     end
     openvino(openvino library)
-    
+
     frontends--Read model--->openvino
     openvino--API--->api
     openvino--infer--->plugins
@@ -80,7 +78,7 @@ flowchart TB
     end
     fw_model[(Framework model)]
     ov_model[ov::Model]
-    
+
     subgraph compiled_models [Compiled models]
         cpu_model["CPU"]
         gpu_model["GPU"]
@@ -91,23 +89,23 @@ flowchart TB
         gpu_req["GPU"]
         auto_req["AUTO"]
     end
-   
+
     result[Results]
-    
+
     fw_model--->read_model
     read_model--->ov_model
     ov_model-->compile_model
-    
+
     fw_model--->compile_model
-    
+
     compile_model--"compile_model(CPU)"--->cpu_model
     compile_model--"compile_model(GPU)"--->gpu_model
     compile_model--"compile_model(AUTO)"--->auto_model
-    
+
     cpu_model--"create_infer_request()"--->cpu_req
     gpu_model--"create_infer_request()"--->gpu_req
     auto_model--"create_infer_request()"--->auto_req
-    
+
     cpu_req--"infer()"-->result
     gpu_req--"infer()"-->result
     auto_req--"infer()"-->result

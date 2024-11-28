@@ -1,6 +1,6 @@
 # OpenVINO ONNX Frontend
 
-The main responsibility of the ONNX Frontend is to import ONNX models and convert them into the `ov::Model` representation. 
+The main responsibility of the ONNX Frontend is to import ONNX models and convert them into the `ov::Model` representation.
 Other capabilities of the ONNX Frontend:
 * modification of tensors properties (like data type and shapes)
 * changing the topology of models (like cutting subgraphs, inserting additional inputs and outputs)
@@ -19,9 +19,9 @@ In case of any questions, review and merge requests, contact the [openvino-onnx-
 ONNX Frontend implements an interface common to all frontends defined in the [Frontends API](../common/include/openvino/frontend).
 For backward compatibility reasons, the ONNX importer API (more lower-level abstraction approach) is still maintained. You can find it in the [ONNX Importer](./frontend/include/onnx_import/onnx.hpp).
 
-The API of ONNX Frontend can be called directly. It is also used internally by [Model Optimizer](../../../tools/mo) during the conversion from ONNX to Intermediate Representation (IR). The capabilities of ONNX Frontend are used by the [ONNX Runtime via OpenVINO Execution Provider](https://onnxruntime.ai/docs/build/eps.html#openvino).
+The API of ONNX Frontend can be called directly. It is also used internally by [Model Conversion API](../../../tools/ovc) during the conversion from ONNX to Intermediate Representation (IR). The capabilities of ONNX Frontend are used by the [ONNX Runtime via OpenVINO Execution Provider](https://onnxruntime.ai/docs/build/eps.html#openvino).
 
-Both `C++` and `Python` tests are implemented for the ONNX Frontend. Read the [ONNX Frontend tests](./docs/tests.md#onnx-frontend-testing-places) page for more details. 
+Both `C++` and `Python` tests are implemented for the ONNX Frontend. Read the [ONNX Frontend tests](./docs/tests.md#onnx-frontend-testing-places) page for more details.
 
 
 ## Architecture

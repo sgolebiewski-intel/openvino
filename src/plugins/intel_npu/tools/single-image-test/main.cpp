@@ -2019,7 +2019,7 @@ static int runSingleImageTest() {
             if (!FLAGS_mean_values.empty() || !FLAGS_scale_values.empty()) {
                 throw std::runtime_error("--mean_values and --scale_values aren't supported for "
                                          "compiled model.\n The values can be set via "
-                                         "model_optimizer while generating xml\n");
+                                         "model conversion API while generating xml\n");
             }
 
             std::ifstream file(FLAGS_network, std::ios_base::in | std::ios_base::binary);

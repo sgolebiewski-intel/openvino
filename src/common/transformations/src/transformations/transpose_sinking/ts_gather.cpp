@@ -69,7 +69,7 @@ TSGatherForward::TSGatherForward() {
         }
         const size_t axis = order_val[order_axis];
         /*
-            https://docs.openvino.ai/2023.0/openvino_docs_ops_movement_Gather_8.html
+            https://docs.openvino.ai/2024/documentation/openvino-ir-format/operation-sets/operation-specs/movement/gather-8.html
             The Gather output shape has the same shape as the input,
             with the indexed-axis replaced by the shape of the indices
             Gather input shape | Gather indexes shape | axis | Gather output shape

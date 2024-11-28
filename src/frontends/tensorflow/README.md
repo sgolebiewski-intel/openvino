@@ -21,9 +21,9 @@ flowchart BT
     tf_fe(TensorFlow Frontend)
     style tf_fe fill:#ee9a4d
     fem(Frontend Manager)
-    mo(Model Optimizer)
+    conv(Model Conversion API)
     ov_runtime(OpenVINO Runtime)
-    model --> mo --> fem --> tf_fe
+    model --> conv --> fem --> tf_fe
     model2 --> ov_runtime --> fem
     model3 --> ovms --> ov_runtime
     tf_fe --> ov_model

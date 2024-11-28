@@ -240,7 +240,7 @@ def read_requirements(path: str) -> List[str]:
             continue
         # get rid of newlines
         line = line.replace('\n', '')
-        # if version is specified (non-word chars present) 
+        # if version is specified (non-word chars present)
         package_constraint = constraints.get(line.split(';')[0])
         if re.search('(~|=|<|>)', line) and len(line.split(';'))>1:
             if package_constraint:  # both markers and versions specified

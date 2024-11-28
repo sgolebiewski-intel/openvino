@@ -786,7 +786,7 @@ entry_points = find_entry_points(PY_INSTALL_CFG)
 
 long_description_md = OPENVINO_SOURCE_DIR / "docs" / "dev" / "pypi_publish" / "pypi-openvino-rt.md"
 md_files = [long_description_md, OPENVINO_SOURCE_DIR / "docs" / "dev" / "pypi_publish" / "pre-release-note.md"]
-docs_url = "https://docs.openvino.ai/2023.0/index.html"
+docs_url = "https://docs.openvino.ai/2024/index.html"
 
 if os.getenv("CI_BUILD_DEV_TAG"):
     long_description_md = WORKING_DIR / "build" / "pypi-openvino-rt.md"

@@ -33,7 +33,7 @@ GPU Plugin contains the following components:
 * [Run benchmark from device_mem](./docs/use_device_mem.md)
 
 ## Documentation on dynamic-shape
-This contents explain the internal implementation of dynamic shape support in the GPU Plugin. For general usage of dynamic shape and limitations of the GPU plugin, please refer to this link: [GPU Device — OpenVINO™ documentation - Version(2023.1)](https://docs.openvino.ai/2023.1/openvino_docs_OV_UG_supported_plugins_GPU.html#dynamic-shapes).
+This contents explain the internal implementation of dynamic shape support in the GPU Plugin. For general usage of dynamic shape and limitations of the GPU plugin, please refer to this link: [GPU Device — OpenVINO™ documentation](https://docs.openvino.ai/2024/openvino-workflow/running-inference/dynamic-shapes.html).
 
 * [Overall flow for dynamic shape execution](./docs/dynamic_shape/overall_flow.md)
 * Implementation details
@@ -75,7 +75,7 @@ Community contributions to GPU plugin are highly welcome. If you have a suggesti
 - Submit a [pull request](https://github.com/openvinotoolkit/openvino/pulls)
 
 We will review your contribution and, if any additional fixes or modifications
-are necessary, we may provide feedback to guide you. Once your pull request 
+are necessary, we may provide feedback to guide you. Once your pull request
 has been approved, it will be merged into our GitHub repository.
 
 ## System Requirements

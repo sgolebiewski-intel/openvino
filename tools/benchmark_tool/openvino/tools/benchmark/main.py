@@ -339,7 +339,7 @@ def main():
         if load_from_file_enabled and not is_network_compiled:
             if args.mean_values or args.scale_values:
                 raise RuntimeError("--mean_values and --scale_values aren't supported with --load_from_file. "
-                    "The values can be set via model_optimizer while generating xml")
+                    "The values can be set via model conversion API while generating xml")
             next_step()
             print("Skipping the step for loading model from file")
             next_step()
@@ -425,7 +425,7 @@ def main():
         else:
             if args.mean_values or args.scale_values:
                 raise RuntimeError("--mean_values and --scale_values aren't supported for compiled model. "
-                    "The values can be set via model_optimizer while generating xml")
+                    "The values can be set via model conversion API while generating xml")
             next_step()
             print("Skipping the step for compiled model")
             next_step()

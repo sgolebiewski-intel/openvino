@@ -80,7 +80,7 @@ The minimum requirement to receive an approval during the code review is the imp
 
 
 ## How to register a custom operation via extensions mechanism
-The complete tutorial about custom frontends extensions can be found in [frontend extensions](../../../../docs/Extensibility_UG/frontend_extensions.md). The section below will show you the most useful ways of adding extensions for the ONNX Frontend.
+The complete tutorial about custom frontends extensions can be found in [frontend extensions](../../../../docs/articles_en/documentation/openvino-extensibility/frontend-extensions.rst). The section below will show you the most useful ways of adding extensions for the ONNX Frontend.
 ### C++ based extensions
 To register your ONNX node-OV subgraph mapping, you can use `ConversionExtension` with syntax as below:
 ```cpp
@@ -95,7 +95,7 @@ If an OpenVINO Core operation provides exactly what you need (without decomposit
 ```cpp
 core.add_extension(ov::frontend::onnx::OpExtension<ov::opset9::Add>("org.openvinotoolkit", "CustomAdd"));
 ```
-If you need to register an custom operation for a [Model Optimizer](../../../../tools/mo) scenario, you should consider `SOExtension`. More details about it can be found in [Library with Extensions](../../../../docs/Extensibility_UG/Intro.md#create-a-library-with-extensions).
+If you need to register a custom operation for a [Model Conversion API](../../../../tools/ovc) scenario, you should consider `SOExtension`. More details about it can be found in [Library with Extensions](../../../../docs/articles_en/documentation/openvino-extensibility.rst#create-a-library-with-extensions).
 ### Python-based extensions
 C++ based extensions have their equivalents in Python. For `ConversionExtension`, an example of usage can look like:
 ```python

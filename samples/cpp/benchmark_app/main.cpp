@@ -560,7 +560,7 @@ int main(int argc, char* argv[]) {
         if (FLAGS_load_from_file && !isNetworkCompiled) {
             if (!FLAGS_mean_values.empty() || !FLAGS_scale_values.empty()) {
                 throw std::runtime_error("--mean_values and --scale_values aren't supported with --load_from_file. "
-                                         "The values can be set via model_optimizer while generating xml");
+                                         "The values can be set via model conversion API while generating xml");
             }
             next_step();
             slog::info << "Skipping the step for loading model from file" << slog::endl;
@@ -758,7 +758,7 @@ int main(int argc, char* argv[]) {
         } else {
             if (!FLAGS_mean_values.empty() || !FLAGS_scale_values.empty()) {
                 throw std::runtime_error("--mean_values and --scale_values aren't supported for compiled model. "
-                                         "The values can be set via model_optimizer while generating xml");
+                                         "The values can be set via model conversion API while generating xml");
             }
             next_step();
             slog::info << "Skipping the step for compiled model" << slog::endl;
