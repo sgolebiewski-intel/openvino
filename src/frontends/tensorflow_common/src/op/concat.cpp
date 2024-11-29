@@ -63,7 +63,7 @@ OutputVector translate_concat_op(const NodeContext& node) {
     }
 
     // normalize axis to be non-negative
-    // this workaround is needed while MO IR Engine is used
+    // this workaround is needed while model conversion IR Engine is used
     if (input_rank.is_static() && axis < 0) {
         axis += input_rank.get_length();
     }

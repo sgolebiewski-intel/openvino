@@ -295,11 +295,11 @@ void serialize(const std::shared_ptr<const ov::Model>& m,
                ov::pass::Serialize::Version version = ov::pass::Serialize::Version::UNSPECIFIED);
 
 /// \brief Save given model into IR. Floating point weights are compressed to FP16 by default.
-/// This method saves a model to IR applying all necessary transformations that usually applied
-/// in model conversion flow provided by mo tool. Paricularly, floatting point weights are compressed to FP16.
+/// This method saves a model to IR, applying all necessary transformations that are usually added
+/// in model conversion flow. Particularly, floating point weights are compressed to FP16.
 /// \param model Model which will be converted to IR representation.
 /// \param output_model Path to the output model file, must have extension .xml
-/// \param compress_to_fp16 Whether to compress floatting point weights to FP16 (true by default)
+/// \param compress_to_fp16 Whether to compress floating point weights to FP16 (true by default)
 OPENVINO_API
 void save_model(const std::shared_ptr<const ov::Model>& model,
                 const std::string& output_model,

@@ -679,8 +679,8 @@ export interface NodeAddon {
   /**
    * It saves a model into IR files (xml and bin).
    * Floating point weights are compressed to FP16 by default.
-   * This method saves a model to IR applying all necessary transformations
-   * that usually applied in model conversion flow provided by mo tool.
+   * This method saves a model to IR, applying all necessary transformations
+   * that are usually added during model conversion.
    * Particularly, floating point weights are compressed to FP16,
    * debug information in model nodes are cleaned up, etc.
    * @param model The model which will be

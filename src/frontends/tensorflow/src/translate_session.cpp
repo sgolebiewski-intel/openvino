@@ -442,7 +442,7 @@ void TranslateSession::translate_graph(const ov::frontend::InputModel::Ptr& inpu
         auto input_op_name = input_tensor_place->get_operation_name();
 
         // in case of cutting graph, types of custom inputs can be dynamic,
-        // according to MO help, fp32 is used by default in such cases
+        // according to model conversion help, fp32 is used by default in such cases
         if (input_type == element::dynamic) {
             input_type = element::f32;
         }

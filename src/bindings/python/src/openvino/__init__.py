@@ -15,7 +15,6 @@ except ImportError:
 # #
 # # OpenVINO API
 # # This __init__.py forces checking of runtime modules to propagate errors.
-# # It is not compared with init files from openvino-dev package.
 # #
 # Import all public modules
 from openvino import runtime as runtime

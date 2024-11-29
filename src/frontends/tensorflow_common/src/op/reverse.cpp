@@ -112,7 +112,6 @@ OutputVector translate_reverse_v2_op(const NodeContext& node) {
     // the translator is able to convert ReverseV2 only
     // if axis is constant and has one element.
     // this limitation is due to the presence of batch_axis and seq_axis attributes.
-    // the current limitation is sufficient for parity with Legacy MO frontend.
     std::vector<int64_t> axes;
     get_const_input(node, 1, &axes);
 

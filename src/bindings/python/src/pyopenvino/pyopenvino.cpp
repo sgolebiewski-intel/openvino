@@ -188,8 +188,8 @@ PYBIND11_MODULE(_pyopenvino, m) {
         py::arg("compress_to_fp16") = true,
         R"(
             Save model into IR files (xml and bin). Floating point weights are compressed to FP16 by default.
-            This method saves a model to IR applying all necessary transformations that usually applied
-            in model conversion flow provided by mo tool. Paricularly, floatting point weights are
+            This method saves a model to IR, applying all necessary transformations that are usually added
+            in model conversion flow. Particularly, floating point weights are
             compressed to FP16, debug information in model nodes are cleaned up, etc.
 
             :param model: model which will be converted to IR representation

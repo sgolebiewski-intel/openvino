@@ -44,7 +44,7 @@ ov::OutputVector detection_output(const ov::frontend::onnx::Node& node) {
     attrs.clip_after_nms = node.get_attribute_value<int64_t>("clip_after_nms", 0);
     attrs.clip_before_nms = node.get_attribute_value<int64_t>("clip_before_nms", 0);
     attrs.decrease_label_id = node.get_attribute_value<int64_t>("decrease_label_id", 0);
-    // TODO: per spec, normalized by default should be 0, but in MO it's 1.
+    // TODO: per spec, normalized by default should be 0, but in model conversion it's 1.
     attrs.normalized = node.get_attribute_value<int64_t>("normalized", 1);
     attrs.input_width = node.get_attribute_value<int64_t>("input_width", 1);
     attrs.input_height = node.get_attribute_value<int64_t>("input_height", 1);

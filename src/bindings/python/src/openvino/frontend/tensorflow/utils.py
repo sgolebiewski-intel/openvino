@@ -31,7 +31,7 @@ def get_static_shape(shape: [PartialShape, list, tuple], dynamic_value=None):
                 continue
             shape_list.append(dim)
         elif isinstance(dim, tuple):
-            # tuple where (min_length, max_length), the format which uses MO cli parser
+            # tuple where (min_length, max_length), the format which uses model conversion cli parser
             assert len(dim) == 2, "Unknown dimension type {}".format(dim)
             if dim[0] > 0:
                 shape_list.append(dim[0])
