@@ -9,6 +9,7 @@
 import os
 import json
 import shutil
+import pathlib
 from sphinx.util import logging
 from json import JSONDecodeError
 from sphinx.ext.autodoc import ClassDocumenter
@@ -48,7 +49,7 @@ if "openvino" not in autodoc_mock_imports:
     except ImportError:
         autodoc_mock_imports.append("openvino_genai")
 
-        
+
 breathe_projects = {
     "openvino": "../xml/"
 }
@@ -108,6 +109,10 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 panels_add_bootstrap_css = False
+
+setup_dir = pathlib.Path(__file__).parent.absolute()
+spelling_word_list_filename = [os.path.join(setup_dir, "spelling_wordlist.txt")]
+spelling_exclude_patterns = ['supported_models*']
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
