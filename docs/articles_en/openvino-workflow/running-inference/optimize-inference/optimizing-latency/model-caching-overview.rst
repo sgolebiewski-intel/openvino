@@ -117,8 +117,8 @@ With model caching enabled, the total load time is even shorter, if ``read_model
 Advanced Examples
 ++++++++++++++++++++
 
-Not every device supports the network import/export capability. For those that don't, enabling caching has no effect.
-To check in advance if a particular device supports model caching, your application can use the following code:
+Enabling model caching has no effect when the specified device does not support import/export of models.
+To check in advance if a particular device supports model caching, use the following code in your application:
 
 .. tab-set::
 
@@ -136,10 +136,11 @@ To check in advance if a particular device supports model caching, your applicat
          :language: cpp
          :fragment: [ov:caching:part3]
 
-Set "cache_encryption_callbacks" config option to enable cache encryption
+Enable cache encryption
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-If model caching is enabled in the CPU Plugin, the model topology can be encrypted while it is saved to the cache and decrypted when it is loaded from the cache. Currently, this property can be set only in ``compile_model``.
+Set the ``cache_encryption_callbacks`` configuration option to encrypt the model
+while caching it and decrypt it when it is loaded from the cache. Currently, this property can be set only in ``compile_model``.
 
 .. tab-set::
 

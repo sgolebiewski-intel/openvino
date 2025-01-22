@@ -48,9 +48,9 @@ specified for the ``compile_model``.
    and future-proof.
 
 
-**When multiple models are to be used simultaneously**, consider running
-inference on separate devices for each of them. Finally, when multiple models
-are executed in parallel on a device, using additional ``ov::hint::model_priority``
+**For using multiple models simultaneously**, consider running inference on
+separate devices for each of them. When multiple models are executed in parallel
+on a device, using additional ``ov::hint::model_priority``
 may help to define relative priorities of the models. Refer to the documentation
 on the :doc:`OpenVINO feature support for devices <../../../../about-openvino/compatibility-and-support/supported-devices>`
 to check if your device supports the feature.
