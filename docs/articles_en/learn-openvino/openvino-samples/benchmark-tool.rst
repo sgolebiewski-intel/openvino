@@ -31,12 +31,12 @@ Basic Usage
       Before running ``benchmark_app``, make sure the ``openvino_env`` virtual
       environment is activated, and navigate to the directory where your model is located.
 
-      The benchmarking application works with models in the OpenVINO IR
+      The benchmark application works with models in the OpenVINO IR
       (``model.xml`` and ``model.bin``) and ONNX (``model.onnx``) formats.
       Make sure to :doc:`convert your models <../../openvino-workflow/model-preparation/convert-model-to-ir>`
       if necessary.
 
-      To run benchmarking with default options on a model, use the following command:
+      To run a benchmark with default options on a model, use the following command:
 
       .. code-block:: sh
 
@@ -57,11 +57,11 @@ Basic Usage
          :doc:`Benchmark Python Tool <benchmark-tool>` is available,
          and you should follow the usage instructions on that page instead.
 
-      The benchmarking application works with models in the OpenVINO IR, TensorFlow,
+      The benchmark application works with models in the OpenVINO IR, TensorFlow,
       TensorFlow Lite, PaddlePaddle, PyTorch and ONNX formats. If you need it,
       OpenVINO also allows you to :doc:`convert your models <../../openvino-workflow/model-preparation/convert-model-to-ir>`.
 
-      To run benchmarking with default options on a model, use the following command:
+      To run a benchmark with default options on a model, use the following command:
 
       .. code-block:: sh
 
@@ -70,7 +70,7 @@ Basic Usage
 
 By default, the application will load the specified model onto the CPU and perform
 inference on batches of randomly-generated data inputs for 60 seconds. As it loads,
-it prints information about the benchmark parameters. When benchmarking is completed,
+it prints information about the benchmark parameters. When the benchmark is completed,
 it reports the minimum, average, and maximum inference latency and the average throughput.
 
 You may be able to improve benchmark results beyond the default configuration by
@@ -79,15 +79,11 @@ use "throughput" or "latency" performance hints to optimize the runtime for high
 FPS or reduced inference time. Read on to learn more about the configuration
 options available with ``benchmark_app``.
 
-
-
-
-
 Configuration Options
 #####################
 
 The benchmark app provides various options for configuring execution parameters.
-This section covers key configuration options for easily tuning benchmarking to
+This section covers key configuration options for easily tuning benchmarks to
 achieve better performance on your device. A list of all configuration options
 is given in the :ref:`Advanced Usage <advanced-usage-benchmark>` section.
 
@@ -191,13 +187,14 @@ determined using performance hints, see
 Device
 ++++++++++++++++++++
 
-To set which device benchmarking runs on, use the ``-d <device>`` argument. This
-will tell ``benchmark_app`` to run benchmarking on that specific device. The benchmark
-app supports CPU and GPU devices. In order to use GPU, the system
-must have the appropriate drivers installed. If no device is specified, ``benchmark_app``
-will default to using ``CPU``.
+The benchmark app supports CPU and GPU devices. To run a benchmark on a chosen device,
+set the ``-d <device>`` argument. When run with default parameters, ``benchmark_app``
+creates 4 and 16 inference requests for CPU and GPU respectively.
 
-For example, to run benchmarking on GPU, use:
+In order to use GPU, the system must have the appropriate drivers installed. If no
+device is specified, ``benchmark_app`` will use ``CPU`` by default.
+
+For example, to run a benchmark on GPU, use:
 
 .. tab-set::
 
@@ -234,7 +231,7 @@ should be used purposefully. For more information, see the
 Number of iterations
 ++++++++++++++++++++
 
-By default, the benchmarking app will run for a predefined duration, repeatedly
+By default, the benchmark app will run for a predefined duration, repeatedly
 performing inference with the model and measuring the resulting inference speed.
 There are several options for setting the number of inference iterations:
 
@@ -251,16 +248,18 @@ average latency and throughput.
 Maximum inference rate
 ++++++++++++++++++++++
 
-By default, the benchmarking app will run inference at maximum rate based on device capabilities.
-The maximum inferance rate can be configured by ``-max_irate <MAXIMUM_INFERENCE_RATE>`` option.
-Tweaking this value allow better accuracy in power usage measurement by limiting the number of executions.
+By default, the benchmark app will run inference at maximum rate based on device capabilities.
+The maximum inference rate can be configured by ``-max_irate <MAXIMUM_INFERENCE_RATE>`` option.
+Modifying this parameter by limiting the number of executions, may result in
+better accuracy and reduction in power consumption.
+
 
 Inputs
 ++++++++++++++++++++
 
-The benchmark tool runs benchmarking on user-provided input images in
+The tool runs benchmarks on user-provided input images in
 ``.jpg``, ``.bmp``, or ``.png`` formats. Use ``-i <PATH_TO_INPUT>`` to specify
-the path to an image or a folder of images. For example, to run benchmarking on
+the path to an image or a folder of images. For example, to run benchmarks on
 an image named ``test1.jpg``, use:
 
 .. tab-set::
