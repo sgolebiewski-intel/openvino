@@ -20,7 +20,6 @@ the following parameters? of
 end of comment block while expecting command </u>
 argument \'.+\' from
 found paragraph command
-inline interpreted text or phrase reference start-string without end-string
 duplicate explicit target name:
 include file .+? not found
 @copybrief or @copydoc target
@@ -34,15 +33,12 @@ found unknown command '@args'
 unexpected section title
 internal inconsistency: scope for class inferenceengine
 documentation for undefined enum 'waitmode' found
-unable to resolve reference to
 duplicate id:
 invalid c\+\+ declaration
-document isn't included in any toctree
 duplicate c\+\+ declaration
 duplicate object description of
 error in declarator
 error when parsing function declaration
-could not lex literal_block as
 error in postfix expression, expected primary expression or type
 error in type declaration
 parsing of expression failed. using fallback parser
