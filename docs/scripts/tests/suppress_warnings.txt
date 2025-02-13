@@ -1,4 +1,3 @@
-undefined label: doxid-
 unexpected character '.'
 unexpected command endxmlonly
 unsupported xml/html tag
@@ -23,8 +22,6 @@ argument \'.+\' from
 found paragraph command
 inline interpreted text or phrase reference start-string without end-string
 duplicate explicit target name:
-inline literal start-string without end-string
-inline emphasis start-string without end-string
 include file .+? not found
 @copybrief or @copydoc target
 undefined substitution referenced:
@@ -33,13 +30,7 @@ autosummary: stub file not found
 failed to import object
 failed to parse name
 type object .+? has no attribute
-unknown target name
-^undefined label:
-inline substitution_reference start-string without end-string
-bullet list ends without a blank line
 found unknown command '@args'
-unexpected unindent
-unexpected indentation
 unexpected section title
 internal inconsistency: scope for class inferenceengine
 documentation for undefined enum 'waitmode' found
@@ -52,13 +43,10 @@ duplicate object description of
 error in declarator
 error when parsing function declaration
 could not lex literal_block as
-toctree contains reference to document
 error in postfix expression, expected primary expression or type
 error in type declaration
 parsing of expression failed. using fallback parser
-toctree contains reference to nonexisting document
 \'myst\' reference target not found
 pygments lexer name
 non-consecutive header level increase
 document headings start at
-inline strong start-string without end-string
