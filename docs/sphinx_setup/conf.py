@@ -25,6 +25,7 @@ version_name = 'nightly'
 
 extensions = [
     'sphinx_inline_tabs',
+    'sphinx.ext.mathjax',
     'sphinx_copybutton',
     'sphinx_design',
     'sphinx.ext.autodoc',

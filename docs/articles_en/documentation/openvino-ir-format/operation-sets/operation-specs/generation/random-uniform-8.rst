@@ -324,7 +324,6 @@ In other words:
       output = int64(x)
    else:
       output = int64(x << 32 + y) (uses 2 uint32s instead of one)
-
    output = output % (max - min) + min
 
 Example 1. RandomUniform output with initial_seed = 150, output_type = f32, alignment = PYTORCH:
