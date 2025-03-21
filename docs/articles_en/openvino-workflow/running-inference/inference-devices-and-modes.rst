@@ -55,8 +55,7 @@ The output you receive may be truncated to device names only:
 
 See the :doc:`Hello Query Device Sample <../../get-started/learn-openvino/openvino-samples/hello-query-device>`
 how to obtain this information.
-Here is an example of how to enumerate the devices and use them with the
-multi-device mode:
+Here is an example of how to enumerate the devices and use them with the multi-device mode:
 
 .. tab-set::
 
@@ -67,8 +66,9 @@ multi-device mode:
          :language: cpp
          :fragment: [part2]
 
-With two GPU devices used in one setup, the explicit configuration would be “MULTI:GPU.1,GPU.0”.
-Accordingly, the code that loops over all available devices of the “GPU” type only is as follows:
+With two GPU devices used in one setup, the explicit configuration would be
+“MULTI:GPU.1,GPU.0”. Accordingly, the code that loops over all available devices of
+the “GPU” type only is as follows:
 
 .. tab-set::
 

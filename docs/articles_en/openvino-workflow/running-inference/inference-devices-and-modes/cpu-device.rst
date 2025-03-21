@@ -1,5 +1,5 @@
 CPU Device
-==========
+===============================================================================================
 
 .. toctree::
    :maxdepth: 1
@@ -13,7 +13,9 @@ CPU Device
                  networks on Intel® x86-64 and Arm® CPUs.
 
 
-The CPU plugin is a part of the Intel® Distribution of OpenVINO™ toolkit. It is developed to achieve high performance inference of neural networks on Intel® x86-64 and Arm® CPUs. The newer 11th generation and later Intel® CPUs provide even further performance boost, especially with INT8 models.
+The CPU plugin is developed to achieve high performance inference of neural networks
+on Intel® x86-64 and Arm® CPUs. The newer 11th generation and later Intel® CPUs
+provide even further performance boost, especially with INT8 models.
 For an in-depth description of CPU plugin, see:
 
 - `CPU plugin developer documentation <https://github.com/openvinotoolkit/openvino/tree/master/src/plugins/intel_cpu/docs>`__.
@@ -21,19 +23,20 @@ For an in-depth description of CPU plugin, see:
 
 .. note::
 
-   The scope of the CPU plugin features and optimizations on Arm® may differ from
-   Intel® x86-64. If the limitation is not mentioned explicitly, the feature is supported for
-   all CPU architectures. **CPU inference on ARM64 is not supported for Windows.**
+   * Features and optimizations of the CPU plugin on Arm® may differ from those on
+     Intel® x86-64. If limitation is not mentioned explicitly, the feature is supported for
+     all CPU architectures.
+   * **CPU inference on ARM64 is not supported for Windows.**
 
 
 Device Name
-###########################################################
+###############################################################################################
 
-The ``CPU`` device name is used for the CPU plugin. Even though there can be more than one
-physical socket on a platform, only one device of this kind is listed by OpenVINO.
-On multi-socket platforms, load balancing and memory usage distribution between NUMA nodes are
-handled automatically. In order to use CPU for inference, the device name should be passed to
-the ``ov::Core::compile_model()`` method:
+The ``CPU`` device name is used for the CPU plugin. OpenVINO lists only one device of a type,
+regardless of the number of physical sockets on a platform.
+On multi-socket platforms, load and memory distribution between NUMA nodes is
+handled automatically. To use CPU for inference, pass the device name to the
+``ov::Core::compile_model()`` method:
 
 
 .. tab-set::
@@ -54,7 +57,7 @@ the ``ov::Core::compile_model()`` method:
 
 
 Supported Model Precision
-#########################
+###############################################################################################
 
 CPU plugin supports the following data types as inference precision of internal primitives:
 
@@ -79,7 +82,7 @@ CPU plugin supports the following data types as inference precision of internal 
 
 
 Quantized Data Types Specifics
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Selected precision of each primitive depends on the operation precision in IR, quantization primitives, and available hardware capabilities.
 The ``u1/u8/i8`` data types are used for quantized operations only, i.e., those are not selected automatically for non-quantized operations.
@@ -92,7 +95,7 @@ For more details on how to get a quantized model see the :doc:`low-precision opt
 
 
 Floating Point Data Types Specifics
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 CPU plugin supports the following floating-point data types as inference precision of internal primitives:
 
@@ -141,7 +144,7 @@ to query ``ov::device::capabilities`` property, which should contain ``FP16`` or
 
 
 Inference Precision Hint
------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
 
 If the model has been converted to half-precision (``bf16`` or ``f16``), the ``ov::hint::inference_precision`` is set to ``ov::element::f16`` or ``ov::element::bf16`` and can be checked via
 the ``ov::CompiledModel::get_property`` call. The code below demonstrates how to get the element type:
@@ -198,7 +201,7 @@ To enable the simulation, the ``ov::hint::inference_precision`` has to be explic
    see the `Execution Mode Hint <#execution-mode-hint>`__.
 
 Execution Mode Hint
------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
 In case ``ov::hint::inference_precision`` is not explicitly set, one can use ``ov::hint::execution_mode`` hint to direct the run-time optimizations toward either better accuracy or better performance.
 If ``ov::hint::execution_mode`` is set to ``ov::hint::ExecutionMode::PERFORMANCE`` (default behavior) and the platform natively supports half-precision
 calculations (``bfloat16`` or ``float16``) then ``bf16`` or ``f16`` type is automatically used instead of ``f32`` to achieve better performance.
@@ -208,10 +211,10 @@ use the ``f32`` precision in floating point calculations.
 For more details and code examples, see the :doc:`Precision Control <../optimize-inference/precision-control>`.
 
 Supported Features
-###########################################################
+###############################################################################################
 
 Automatic Device Selection
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 If a system includes OpenVINO-supported devices other than the CPU (e.g. an integrated GPU), then any supported model can be executed on all the devices simultaneously.
 This can be achieved by specifying ``AUTO:CPU,GPU.0`` as a target device, and adding the ``CUMULATIVE_THROUGHPUT`` parameter.
@@ -238,7 +241,7 @@ For more details, see the :doc:`Automatic Device Selection <auto-device-selectio
 .. _multi_stream_execution:
 
 Multi-stream Execution
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 If either ``ov::num_streams(n_streams)`` with ``n_streams > 1`` or ``ov::hint::performance_mode(ov::hint::PerformanceMode::THROUGHPUT)``
 property is set for CPU plugin, then multiple streams are created for the model. In case of CPU plugin, each stream has its own
@@ -254,7 +257,7 @@ For more details, see the :doc:`optimization guide <../optimize-inference>` and 
    For more details see the :doc:`performance hints <../optimize-inference/high-level-performance-hints>` overview.
 
 Dynamic Shapes
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 CPU provides full functional support for models with dynamic shapes in terms of the opset coverage.
 
@@ -287,7 +290,7 @@ with the static input shape to get the best performance.
 For more details, see the :doc:`dynamic shapes guide <../model-input-output/dynamic-shapes>`.
 
 Preprocessing Acceleration
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 CPU plugin supports a full set of the preprocessing operations, providing high performance implementations for them.
 For more details, see :doc:`preprocessing API guide <../optimize-inference/optimize-preprocessing>`.
@@ -311,7 +314,7 @@ For more details, see :doc:`preprocessing API guide <../optimize-inference/optim
 
 
 Model Caching
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 CPU supports Import/Export network capability. If model caching is enabled via the common OpenVINO™ ``ov::cache_dir`` property,
 the plugin automatically creates a cached blob inside the specified directory during model compilation. This cached blob contains
@@ -324,7 +327,7 @@ first inference latency (FIL).
 For more details, see the :doc:`model caching <../optimize-inference/optimizing-latency/model-caching-overview>` overview.
 
 Extensibility
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 CPU plugin supports fallback on ``ov::Op`` reference implementation if the plugin does not have its own implementation for such operation.
 That means that :doc:`OpenVINO™ Extensibility Mechanism <../../../documentation/openvino-extensibility>` can be used for the plugin extension as well.
@@ -332,19 +335,19 @@ Enabling fallback on a custom operation implementation is possible by overriding
 class (see :doc:`custom OpenVINO™ operations <../../../documentation/openvino-extensibility/custom-openvino-operations>` for details).
 
 Stateful Models
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 The CPU plugin supports stateful models without any limitations.
 
 For details, see :doc:`stateful models guide <../inference-request/stateful-models>`.
 
 Supported Properties
-###########################################################
+###############################################################################################
 
 The plugin supports the following properties:
 
 Read-write Properties
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 All parameters must be set before calling ``ov::Core::compile_model()`` in order to take effect or passed as additional argument to ``ov::Core::compile_model()``
 
@@ -364,7 +367,7 @@ All parameters must be set before calling ``ov::Core::compile_model()`` in order
 - ``ov::intel_cpu::sparse_weights_decompression_rate``
 
 Read-only properties
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 - ``ov::supported_properties``
 - ``ov::available_devices``
@@ -375,7 +378,7 @@ Read-only properties
 
 
 External Dependencies
-###########################################################
+###############################################################################################
 
 For some performance-critical DL operations, the CPU plugin uses third-party libraries:
 
@@ -384,10 +387,10 @@ For some performance-critical DL operations, the CPU plugin uses third-party lib
 
 
 Optimization guide
-###########################################################
+###############################################################################################
 
 Multi-Threading Optimization
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 CPU inference will infer an input or multiple inputs in parallel on multiple logical processors.
 
@@ -395,7 +398,7 @@ For more details, see the :doc:`thread scheduling introduction <cpu-device/perfo
 
 
 Denormals Optimization
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Denormal numbers (denormals) are non-zero, finite float numbers that are very close to zero, i.e. the numbers
 in (0, 1.17549e-38) and (0, -1.17549e-38). In such cases, normalized-number encoding format does not have a capability
@@ -440,7 +443,7 @@ To enable denormals optimization in the application, the ``denormals_optimizatio
 
 
 Sparse weights decompression (Intel® x86-64)
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ``Sparse weights`` are weights where most of the elements are zero. The ratio of the number of zero elements
 to the number of all elements is called ``sparse rate``. Thus, we assume that ``sparse weights`` are weights
@@ -496,7 +499,7 @@ from perf counters log. The "exec type" field will contain the implementation ty
    MatMul_1800         EXECUTED         layerType: FullyConnected         execType: brgemm_avx512_amx_sparse_I8 realTime (ms): 0.050000  cpuTime (ms): 0.050000
 
 Limitations
------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
 
 Currently, the ``sparse weights decompression feature`` is supported with the following limitations:
 
@@ -506,7 +509,7 @@ Currently, the ``sparse weights decompression feature`` is supported with the fo
 4. The number of input and output channels of the weights must be a multiple of 64.
 
 Additional Resources
-###########################################################
+###############################################################################################
 
 * :doc:`Inference Devices and Modes <../inference-devices-and-modes>`
 * :doc:`Optimization guide <../optimize-inference>`
